@@ -451,7 +451,7 @@ async function execute(message, serverQueue) {
         });
         message.channel.send({
           content: '**Added to queue**',
-          tts: true,
+          tts: false,
           embeds: [
             {
               type: 'rich',
@@ -492,7 +492,7 @@ async function execute(message, serverQueue) {
         });
         message.message.channel.send({
           content: '**Added to queue**',
-          tts: true,
+          tts: false,
           embeds: [
             {
               type: 'rich',
@@ -623,7 +623,7 @@ async function execute(message, serverQueue) {
           );
           return message.channel.send({
             content: '**Added to queue**',
-            tts: true,
+            tts: false,
             embeds: [
               {
                 type: 'rich',
@@ -737,8 +737,8 @@ async function play(guild, song) {
       //um ok
     } else {
       serverQueue.textChannel.send({
-        content: 'Now Playing',
-        tts: true,
+        content: '**Now Playing**',
+        tts: false,
         embeds: [
           {
             type: 'rich',
@@ -746,7 +746,7 @@ async function play(guild, song) {
             description: '',
             color: 0x462,
             author: {
-              name: `${song.title} ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+              name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
               icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
             },
           },
@@ -806,7 +806,7 @@ function showQueue(message, serverQueue) {
   if (!serverQueue || serverQueue.songs.length == 0) {
     return message.channel.send({
       content: 'Queue',
-      tts: true,
+      tts: false,
       embeds: [
         {
           type: 'rich',
@@ -851,8 +851,8 @@ function showQueue(message, serverQueue) {
   }
   message.channel
     .send({
-      content: Queue,
-      tts: true,
+      content: '**Queue**',
+      tts: false,
       embeds: [
         {
           type: 'rich',
@@ -950,8 +950,8 @@ function seek(message, serverQueue) {
     return message.react('<:error:1090721649621479506>');
   }
   //else if (timeToSeek == 0) {
-  //     return message.channel.send(`❌ Specify a timestamp. <0-${maxTime.minutes}:${maxTime.seconds}>`);
-  // }
+  //     return message.react('<:error:1090721649621479506>'); 
+//}
   let currentSong = serverQueue.songs[0];
   currentSong.seek = timeToSeek;
   currentSong.seekTime = seekTime;
