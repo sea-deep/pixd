@@ -1,3 +1,4 @@
+//require('dotenv').config();
 const express = require('express')
 const app = express();
 const port = 9002;
@@ -7,8 +8,6 @@ app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'))
 app.listen(port, () =>
 console.log(`Your app is listening a http://localhost/${port}`)
 );
-
-
 
 const {Client, GatewayIntentBits, Partials} = require('discord.js');
 const functions = require('./2048functions.js');
@@ -263,18 +262,13 @@ async function genetics(message) {
   // delete the message that triggered the event
 
   await message.delete();
-
   let isLink = false;
-
   let channelID = message.channelId;
-
   let referencedMessageId = null;
-
   if (message.reference) {
     referencedMessageId = message.reference.messageId;
   } else if (message.content.split(' ').length !== 1) {
     isLink = true;
-
     let msgLink = message.content.split(' ').splice(1).join(' ');
 
     const regex = /\/(\d+)\/(\d+)$/;
@@ -358,38 +352,22 @@ async function execute(message, serverQueue) {
   const args = message.content.split(' ');
   const voiceChannel = message.member.voice.channel;
   if (!voiceChannel) {
-    return Math.round(Math.random())
-      ? message.channel.send('❌ You need to be in a channel to play music.')
-      : message.channel.send('how bout u hop in a voice channel first❓');
-    //return message.channel.send("You need to be in a channel to play music.");
+    return message.react('<:error:1090721649621479506>');
   }
-  // const permissions = voiceChannel.permissionsFor(message.client.user);
-  // if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
-  //     return message.channel.send("imagine not having permissions 😭 ");
-  //     //return message.channel.send("You don't have permission to do that.")
-  // };
-
   if (args.length == 1) {
-    //someone invokes play command without any arguments
-    return message.channel.send('Specify a search or URL to play 🤓');
+    return message.react('<:error:1090721649621479506>');
   }
-
-  //check the last argument to see if it is a valid time to seek to
-  //let timeToSeek = parse(args[args.length-1]);
-
-  let song = {}; //object containing song data
+  let song = {};
   let songs = []; //array of song objects
   let check = await playDL.validate(args[1].trim());
-  //console.log(check)  //debug
   if (check === false) {
-    return message.channel.send('❌ Failed to validate URL or search.');
+    return message.react('<:error:1090721649621479506>');
   } else if (check === 'search') {
-    let searchSource = {youtube: 'video'}; //where we want to perform the search and what type of result
+    let searchSource = {youtube: 'video'};
     let query = message.content
       .substring(message.content.indexOf(' '), message.content.length)
       .trim();
     if (args[1].trim() == '-sc' || args[1].trim() == '-soundcloud') {
-      //check if the second string in the query is a specifier  (change to parse all dash prefixes as arguments)
       searchSource = {soundcloud: 'tracks'};
       query = message.content
         .substring(
@@ -405,17 +383,19 @@ async function execute(message, serverQueue) {
         `${message.author.username} searched for '${query}' on YouTube🔎`
       );
     }
-    //let query = message.content.substring(message.content.indexOf(' '),timeToSeek ? message.content.lastIndexOf(' ') : message.content.length).trim(); //if timetoseek is non-zero, go to last space (omit seek time) otherwise accept whole message
-    const searchMsg = await message.channel.send(`Searching for '${query}' 🔎`);
+
+    const searchMsg = await message.react('<:search:1090725319884951623>');
     const search = await playDL.search(query, {
       limit: 1,
       source: searchSource,
     });
-    searchMsg.delete();
-    //console.log(search)
-    //console.log(searchSource);
+    await message.reactions.cache
+      .get('1090725319884951623')
+      .remove()
+      .catch((error) => console.error('Failed to remove reactions:', error));
+
     if (search.length == 0) {
-      return message.channel.send(`No results found for  '${query}'  😢`);
+      return message.react('<:error:1090721649621479506>');
     } else {
       song = {
         title: search[0].title,
@@ -469,9 +449,22 @@ async function execute(message, serverQueue) {
           };
           songs.push(song);
         });
-        message.channel.send(
-          `Added \*\*${songs.length}\*\* songs to the queue.`
-        );
+        message.channel.send({
+          content: '**Added to queue**',
+          tts: true,
+          embeds: [
+            {
+              type: 'rich',
+              title: '',
+              description: '',
+              color: 0x462,
+              author: {
+                name: `Added ${songs.length} songs to the queue`,
+                icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+              },
+            },
+          ],
+        });
       }
     } else if (source === 'so') {
       const so = await playDL.soundcloud(args[1]);
@@ -497,32 +490,27 @@ async function execute(message, serverQueue) {
           };
           songs.push(song);
         });
-        message.channel.send(
-          `Added \*\*${songs.length}\*\* songs to the queue.`
-        );
+        message.message.channel.send({
+          content: '**Added to queue**',
+          tts: true,
+          embeds: [
+            {
+              type: 'rich',
+              title: '',
+              description: '',
+              color: 0x462,
+              author: {
+                name: `Added ${songs.length} songs to the queue`,
+                icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+              },
+            },
+          ],
+        });
       }
     } else if (source === 'sp') {
-      return message.channel.send(
-        'Spotify is currently not supported. Refer to https://play-dl.github.io/modules.html#stream for more information.'
-      );
+      return message.react('<:error:1090721649621479506>');
     }
   }
-
-  //console.log(song);
-  // if(song.source === 'yt'){
-  //     let maxDuration = song.duration;
-  //     if (timeToSeek > maxDuration){
-  //         //console.log(maxDuration)
-  //         let maxTime = parse(maxDuration);
-  //         console.log(`Seek exceeded song limits, requested ${timeToSeek}, max is ${maxDuration}`);
-  //         return message.channel.send(`❌ Seeking beyond limits. <0-${maxTime.minutes}:${maxTime.seconds}>`);
-  //     }
-  // }
-
-  /*if no server queue exists, create one with the following parameters, 
-     assign the current guild id to the serverqueue, 
-     and push the requested song onto the array.
-    */
   if (!serverQueue) {
     const queueConstructor = {
       textChannel: message.channel,
@@ -551,14 +539,6 @@ async function execute(message, serverQueue) {
       });
       queueConstructor.connection = connection;
       queueConstructor.player = createAudioPlayer();
-      /*{
-                behaviors: {
-                    noSubscriber: NoSubscriberBehavior.Stop,
-                },
-                }*/
-
-      //check if bot is moving channels or forcibly disconnected
-
       connection.on('stateChange', (oldState, newState) => {
         let oldNetworking = Reflect.get(oldState, 'networking');
 
@@ -636,16 +616,27 @@ async function execute(message, serverQueue) {
           console.log(
             `Added ${song.title} {${song.durationTime.minutes}:${song.durationTime.seconds}} to the queue starting at ${song.seekTime.minutes}:${song.seekTime.seconds}`
           );
-          return message.channel.send(
-            `\*\*${song.title}\*\* \`${song.durationTime.minutes}:${song.durationTime.seconds}\` has been added to the queue seeking to \`${song.seekTime.minutes}:${song.seekTime.seconds}\`. `
-          );
+          return message.react('<:seek:1090718780545581116>');
         } else {
           console.log(
             `Added ${song.title} to the queue. {${song.durationTime.minutes}:${song.durationTime.seconds}}`
           );
-          return message.channel.send(
-            `\*\*${song.title}\*\* \`${song.durationTime.minutes}:${song.durationTime.seconds}\` has been added to the queue. `
-          );
+          return message.channel.send({
+            content: '**Added to queue**',
+            tts: true,
+            embeds: [
+              {
+                type: 'rich',
+                title: '',
+                description: '',
+                color: 0x462,
+                author: {
+                  name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+                  icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+                },
+              },
+            ],
+          });
         }
       }
       //showQueue(serverQueue);
@@ -743,14 +734,24 @@ async function play(guild, song) {
     // don't print anything
   } else {
     if (song.seek > 0) {
-      serverQueue.textChannel.send(
-        `🎶 Now playing \*\*${song.title}\*\* \`${song.durationTime.minutes}:${song.durationTime.seconds}\` starting at \`${song.seekTime.minutes}:${song.seekTime.seconds}\` 🎵`
-      );
-      //.then(msg => setTimeout(() => msg.delete(), (song.duration-song.seek)*1000));
+      //um ok
     } else {
-      serverQueue.textChannel.send(
-        `🎶 Now playing \*\*${song.title}\*\* \`${song.durationTime.minutes}:${song.durationTime.seconds}\` 🎵`
-      );
+      serverQueue.textChannel.send({
+        content: 'Now Playing',
+        tts: true,
+        embeds: [
+          {
+            type: 'rich',
+            title: '',
+            description: '',
+            color: 0x462,
+            author: {
+              name: `${song.title} ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+              icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+            },
+          },
+        ],
+      });
       //.then(msg => setTimeout(() => msg.delete(), song.duration*1000));
     }
     //showQueue(serverQueue);
@@ -758,12 +759,10 @@ async function play(guild, song) {
 }
 function clear(message, serverQueue) {
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to clear the queue.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No queue to clear.');
+    return message.react('<:error:1090721649621479506>');
   }
 
   let currentSong = serverQueue.songs[0];
@@ -774,32 +773,26 @@ function clear(message, serverQueue) {
   //serverQueue.player.stop();  //then skip current song by invoking AudioPlayer stop method
 
   console.log(`Cleared queue.`);
-  return message.channel.send('🧹 Cleared queue. ');
+  return message.react('<:clear:1090718705060684008>');
 }
 
 function loopSong(message, serverQueue) {
   const args = message.content.split(' ');
 
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to loop the song.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No song to loop.');
+    return message.react('<:error:1090721649621479506>');
   }
-  //if only !loop is checkd with no parameter
-  //if (args.length == 1){
-  //console.log(`Loop parameter not specified. Loop not executed.`);
-  //return message.channel.send(`Specify the loop parameter. (!loop <this/all/off>`);
   serverQueue.loop = !serverQueue.loop; //loop the queue
   serverQueue.keep = !serverQueue.keep; //and keep the current song
   if (serverQueue.loop) {
     console.log(`Looping the queue.`);
-    return message.channel.send('⚡Loop **ACTIVATED**🌩️');
+    return message.react('<:loop:1090721294779162756>');
   } else {
     console.log('Disabled the loop.');
-    return message.channel.send('📴Loop **DEACTIVATED**😥');
+    return message.react('<:unloop:1090721386848333934>');
   }
 }
 
@@ -808,16 +801,24 @@ function showQueue(message, serverQueue) {
   let pos = 999;
 
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      'You have to be in a voice channel to view the queue.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send(
-      '```' +
-        `No song currently playing\n----------------------------\n` +
-        '```'
-    ); //.then(msg => setTimeout(() => msg.delete(), 15*1000));
+    return message.channel.send({
+      content: 'Queue',
+      tts: true,
+      embeds: [
+        {
+          type: 'rich',
+          title: '',
+          description:
+            '```' +
+            `No song currently playing\n----------------------------\n` +
+            '```',
+          color: 0x462,
+        },
+      ],
+    }); //.then(msg => setTimeout(() => msg.delete(), 15*1000));
   }
 
   if (args.length == 2) {
@@ -849,7 +850,18 @@ function showQueue(message, serverQueue) {
     }
   }
   message.channel
-    .send('```' + msg + '```')
+    .send({
+      content: Queue,
+      tts: true,
+      embeds: [
+        {
+          type: 'rich',
+          title: '',
+          description: `\`\`\`\n${msg}\`\`\``,
+          color: 0x462,
+        },
+      ],
+    })
     .then((msg) => setTimeout(() => msg.delete(), 60 * 1000));
   if (msg1 != ``) {
     message.channel
@@ -860,107 +872,47 @@ function showQueue(message, serverQueue) {
 
 function pause(message, serverQueue) {
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to pause the song.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No song to pause.');
+    return message.react('<:error:1090721649621479506>');
   }
   console.log(`Song paused.`);
   serverQueue.player.pause();
-  return message.channel.send('⏸️ Paused song.');
+  return message.react('<:pause:1090718191824683038>');
 }
 
 function resume(message, serverQueue) {
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to resume the song.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No song to resume.');
+    return message.react('<:error:1090721649621479506>');
   }
   console.log(`Song resumed.`);
   serverQueue.player.unpause();
-  return message.channel.send('▶️ Resumed song.');
+  return message.react('<:resume:1090718421425070090>');
 }
 
-function stop(message, serverQueue) {
-  //same thing as clear i guess
-  if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to stop the music.'
-    );
-  }
-  if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No music to stop.');
-  }
-  //console.log(`Stopped the bot.`);
-  //getVoiceConnection(message.guild.id).disconnect();
-  //getVoiceConnection(message.guild.id).destroy();
-  //queue.delete(message.guild.id);
-  clear(message, serverQueue);
-}
-
-/**
- * Removes and cleans up the bot from the provided serverQueue
- * @param {String} message
- * @param {Object} serverQueue
- */
 function kick(message, serverQueue) {
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to kick the bot'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue) {
-    return message.channel.send('❌ No bot to kick.');
+    return message.react('<:error:1090721649621479506>');
   }
   console.log(`Kicked the bot.`);
-  message.channel.send(`**🚣 Left the player and destroyed the queue :(**`);
+  message.react('<:stop:1090718630628573245>');
   serverQueue.connection.destroy();
   queue.delete(message.guild.id);
 }
 
-/**
- * Displays the list of commands
- * @param {String} message
- */
-function help(message) {
-  const commands = `
-    !play <query|url> -- search for a song or enter a YouTube or SoundCloud URL 
-    !pause -- pause the bot
-    !resume -- resume the bot
-    !stop || !kick -- bye bye bot ! 
-
-    !skip <n> -- skips the current song or remove a song from the queue
-    !skipto <n> -- skip to a desired position in the queue
-    !queue <n> -- shows songs in the queue
-    !clear -- removes all songs in the queue  
-    
-    !shuffle -- shuffles the queue
-    !loop -- repeats the queue 
-    !seek <mm:ss> -- seek to a desired time in the current playing song\n
-    To view these commands again, type !help or !commands
-    `;
-  message.channel.send('```' + commands + '```'); //.then(msg => setTimeout(() => msg.delete(), 30*1000));
-}
-
-/**
- * Shuffles the queue of songs in the provided serverQueue
- * @param {String} message
- * @param {Object} serverQueue
- * @returns
- */
 function shuffle(message, serverQueue) {
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to stop the music.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No music to stop.');
+    return message.react('<:error:1090721649621479506>');
   }
 
   for (let i = serverQueue.songs.length - 1; i > 1; --i) {
@@ -972,21 +924,19 @@ function shuffle(message, serverQueue) {
     ];
   }
   console.log('Shuffled the queue.');
-  message.channel.send('🔀 Shuffled the queue.');
+  message.react('<:shuffle:1090732407931543681>');
 }
 
 function seek(message, serverQueue) {
   const args = message.content.split(' ');
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to seek.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No song to seek.');
+    return message.react('<:error:1090721649621479506>');
   }
   if (serverQueue.songs[0].source != 'yt') {
-    return message.channel.send('❌ Song must be from YouTube to seek!');
+    return message.react('<:error:1090721649621479506>');
   }
   let timeToSeek = parse(args[1]);
   let seekTime = parse(timeToSeek);
@@ -997,9 +947,7 @@ function seek(message, serverQueue) {
   if (timeToSeek > maxDuration || timeToSeek < 0) {
     //console.log(maxDuration)
     console.log(`Seek failed, requested ${timeToSeek}, max is ${maxDuration}`);
-    return message.channel.send(
-      `❌ Invalid timestamp. <0-${maxTime.minutes}:${maxTime.seconds}>`
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   //else if (timeToSeek == 0) {
   //     return message.channel.send(`❌ Specify a timestamp. <0-${maxTime.minutes}:${maxTime.seconds}>`);
@@ -1009,6 +957,7 @@ function seek(message, serverQueue) {
   currentSong.seekTime = seekTime;
   serverQueue.songs.unshift(currentSong);
   serverQueue.player.stop();
+  return message.react('<:seek:1090718780545581116>');
 }
 
 //used to remove a song
@@ -1016,19 +965,15 @@ function skip(message, serverQueue) {
   const args = message.content.split(' ');
 
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to skip the song.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No songs to skip.');
+    return message.react('<:error:1090721649621479506>');
   }
   if (args.length == 1) {
     serverQueue.player.stop(); //AudioPlayer stop method to skip to next song
     console.log(`Skipped ${serverQueue.songs[0].title}.`);
-    return message.channel.send(
-      `⏩ Skipped \*\*${serverQueue.songs[0].title}\*\*.`
-    );
+    return message.react('<:skip:1090718541143097464>');
     //.then(msg => setTimeout(() => msg.delete(), 30 * 1000)); //delete after 30 seconds
   }
   let pos = parseInt(args[1]); //check if position is an integer
@@ -1049,29 +994,20 @@ function skip(message, serverQueue) {
       });
     }
     if (pos < 0) {
-      return message.channel.send(
-        `❌ No song in queue with keyword \`${query}\`.`
-      );
+      return message.react('<:error:1090721649621479506>');
     }
   } else if (pos > serverQueue.songs.length - 1 || pos < 0) {
-    return message.channel.send(
-      `❌ Skip position out of bounds. There are \*\*${
-        serverQueue.songs.length - 1
-      }\*\* songs in the queue.`
-    ); //return statement to avoid skipping
+    return message.react('<:error:1090721649621479506>'); //return statement to avoid skipping
   }
   if (pos == 0) {
     //removing the current playing song results in a skip
     serverQueue.player.stop();
     console.log(`Skipped ${serverQueue.songs[0].title}.`);
-    return message.channel.send(
-      `⏩ Skipped \*\*${serverQueue.songs[0].title}\*\*.`
-    );
+    return message.react('<:skip:1090718541143097464>');
   }
   console.log(`Removed ${serverQueue.songs[pos].title} from the queue.`);
-  message.channel.send(
-    `Removed \*\*${serverQueue.songs[pos].title}\*\* from the queue.`
-  ); //.then(msg => setTimeout(() => msg.delete(), 30*1000));
+  message.react('<:skip:1090718541143097464>');
+  //.then(msg => setTimeout(() => msg.delete(), 30*1000));
   serverQueue.songs.splice(pos, 1);
 
   serverQueue.keep = false; //don't keep skipped song in the queue
@@ -1083,12 +1019,10 @@ function skipto(message, serverQueue) {
   let pos = parseInt(args[1]);
   let song;
   if (!message.member.voice.channel) {
-    return message.channel.send(
-      '❌ You have to be in a voice channel to skip.'
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.channel.send('❌ No song to skip to.');
+    return message.react('<:error:1090721649621479506>');
   }
   if (isNaN(pos)) {
     //skip by keyword
@@ -1107,19 +1041,13 @@ function skipto(message, serverQueue) {
       });
     }
     if (pos < 0) {
-      return message.channel.send(
-        `❌ No song in queue with keyword \`${query}\`.`
-      );
+      return message.react('<:error:1090721649621479506>');
     }
   } else if (pos < 0 || pos > serverQueue.songs.length - 1) {
-    return message.channel.send(
-      `❌ Skip position out of bounds. There are \*\*${
-        serverQueue.songs.length - 1
-      }\*\* songs in the queue.`
-    );
+    return message.react('<:error:1090721649621479506>');
   }
   if (pos == 0) {
-    return message.channel.send(`❌ The song is already playing.`);
+    return message.react('<:error:1090721649621479506>');
   }
   song = serverQueue.songs.splice(pos, 1); //remove the song (splice returns array)
   serverQueue.songs.splice(1, 0, song[0]); //make it the next song
