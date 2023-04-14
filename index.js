@@ -1,4 +1,5 @@
-//require('dotenv').config();
+require('dotenv').config();
+/*
 const express = require('express')
 const app = express();
 const port = 9002;
@@ -8,7 +9,7 @@ app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'))
 app.listen(port, () =>
 console.log(`Your app is listening a http://localhost/${port}`)
 );
-
+*/
 const {Client, GatewayIntentBits, Partials} = require('discord.js');
 const functions = require('./2048functions.js');
 const {Configuration, OpenAIApi} = require('openai');
@@ -279,6 +280,7 @@ let messages = [].concat(
 );
 
 let response = '';
+await message.channel.sendTyping();
   let completion = await openai.createChatCompletion({
     model: `gpt-3.5-turbo`,
     messages: messages,
@@ -289,9 +291,9 @@ let response = '';
     presence_penalty: 0,
     frequency_penalty: 0
   });
-response = completion.choices[0].message.content.trim();
-responses = responses.filter(response => !!response);
-const ans = responses.shift().trim();
+  console.log(completion);
+response = completion.data.choices[0].message.content.trim();
+const ans = response.trim();
 return message.reply(ans);
 }
 async function moveDown(message) {
