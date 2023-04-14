@@ -1190,5 +1190,8 @@ function parse(input) {
     return 0;
   }
 }
-
+client.on('error', () => {
+  console.log(error);
+  client.login(process.env.BOT_TOKEN);
+});
 client.login(process.env.BOT_TOKEN);
