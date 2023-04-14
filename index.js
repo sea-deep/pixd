@@ -190,7 +190,7 @@ async function moveUp(message) {
   });
   return message.edit(msg);
 }
-async function padhaku(msssage) {
+async function padhaku(message) {
 const query = message.content.split(' ').splice(1).join(' ');
 let systemPrompt = [
   `You a super smart AI robot who can answer tough and logical questions easily.`,
