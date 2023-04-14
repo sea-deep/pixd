@@ -1,5 +1,5 @@
-require('dotenv').config();
-/*
+//require('dotenv').config();
+
 const express = require('express')
 const app = express();
 const port = 9002;
@@ -9,7 +9,7 @@ app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'))
 app.listen(port, () =>
 console.log(`Your app is listening a http://localhost/${port}`)
 );
-*/
+
 const {Client, GatewayIntentBits, Partials} = require('discord.js');
 const functions = require('./2048functions.js');
 const {Configuration, OpenAIApi} = require('openai');
