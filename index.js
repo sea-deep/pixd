@@ -15,6 +15,7 @@ const functions = require('./2048functions.js');
 const {words, ALL_WORDS} = require('./words.json'); 
  const emojis = require('./emojis.json');
 const {Configuration, OpenAIApi} = require('openai');
+const Keyv = require('keyv');
 const playDL = require('play-dl');
 const {
   VoiceConnectionStatus,
@@ -31,7 +32,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const prefix = 'p!';
-
+const keyv = new Keyv():
 //instance of the bot
 const client = new Client({
   intents: [
