@@ -1384,7 +1384,7 @@ async function sendGame(message) {
      if (!wordArr.some((element) => !element.includes('green'))) { 
        // If the player wins 
        await keyv.delete(interaction.message.id); 
-     } else if (currentChances == 1) { 
+     } else if (oldChances == 1) { 
        // Updating the msg object for when the user loses 
        msg.embeds[0].fields[0].name = '🦆 You Lost'; 
        msg.embeds[0].fields[0].value = `The word was ${answer}`; 
