@@ -1325,9 +1325,9 @@ async function sendGame(message) {
    } 
  } 
  async function executeModal(interaction) { 
-   const value = interaction.fields.getTextInputValue('answer'); 
+   const value = interaction.fields.getTextInputValue('answer').toLowerCase();
    if (ALL_WORDS.includes(value.toLowerCase())) { //if the word is valid. 
-     const answer = await keyv.get(interaction.message.id).toLowerCase();
+     const answer = await keyv.get(interaction.message.id);
      const wordArr = getColoredWord(answer, value); //Calling getColoredWord function to get the coloured alphabet emote's array 
      const colouredWord = wordArr.join(' '); //Joining it 
      const oldChances = parseInt( 
