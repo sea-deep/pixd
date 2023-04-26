@@ -32,7 +32,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const prefix = 'p!';
-const keyv = new Keyv():
+const keyv = new Keyv();
 //instance of the bot
 const client = new Client({
   intents: [
