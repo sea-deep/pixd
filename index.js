@@ -1393,7 +1393,7 @@ async function sendGame(message) {
        // If the game is not over 
        msg.components[0].components[0].disabled = false; 
        msg.embeds[0].fields[0].name = '🎚️ Chances Left :'; 
-       msg.embeds[0].fields[0].value = chances; 
+       msg.embeds[0].fields[0].value = newChances; 
      } 
      await interaction.deferUpdate();//Deferring the interaction as we are not responding to it. 
      await interaction.message.edit(msg);//Editing the game message 
