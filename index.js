@@ -195,7 +195,6 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.on('error', () => {
-  console.log(error);
   client.login(process.env.BOT_TOKEN);
 });
 
