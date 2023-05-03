@@ -13,8 +13,10 @@ console.log(`Your app is listening a http://localhost/${port}`)
 const {Client, GatewayIntentBits, Partials} = require('discord.js');
 const functions = require('./2048functions.js');
 const {words, ALL_WORDS} = require('./words.json'); 
- const emojis = require('./emojis.json');
+const emojis = require('./emojis.json');
 const {Configuration, OpenAIApi} = require('openai');
+const GIFEncoder = require('gif-encoder-2');
+const Jimp = require('jimp');
 const Keyv = require('keyv');
 const playDL = require('play-dl');
 const {
@@ -141,6 +143,16 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+client.on('guildMemberAdd', async (member) => {
+switch (member.guild.id) {
+case '804902112700923954':
+await sendokbb (member);
+break;
+default:
+break;
+}
+});
+
 client.on('interactionCreate', async (interaction) => {
 if (interaction.type !== 3 
       && interaction.type !== 5) return; 
@@ -182,6 +194,46 @@ client.on('error', () => {
 });
 
 client.login(process.env.BOT_TOKEN);
+async function sendokbb(member) {
+  let avatarURL = member.user.displayAvatarURL({extension: 'png', forceStatic: true});
+   let tag = member.user.tag;
+  let channel_id = "804902112700923957";
+  let avatar = await Jimp.read(avatarURL);
+  avatar.resize(152, 152);
+  let font = await Jimp.loadFont('fcb.fnt');
+const encoder = new GIFEncoder(945, 720);
+  encoder.setDelay(100);
+  encoder.start();
+  for (let i = 0; i < 18; i++) {
+ const frame = i < 10 ? `0${i}` : `${i}`;
+  const file = `./frames/frame_${frame}_delay-0.1s.gif`
+ 
+let banner = await Jimp.read(file);
+   banner.composite(avatar, 55, 31)
+     .print(
+      font,
+      226,
+      70,
+      {
+        text: tag,
+        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
+        alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
+      },
+      700,
+    );
+encoder.addFrame(banner.bitmap.data);
+    banner.write(`output${i}.jpg`);
+    console.log(file)
+  }
+  encoder.finish();
+  const buffer = encoder.out.getData();
+  let file = new AttachmentBuilder(buffer, {name: 'godnessgraciousness.gif'});
+  let channel = client.guild.channels.cache.get(channel_id)
+  await channel.send({
+    content: `Namaste saar <@${message.member.user.id}> cummed in sarvar`,
+    files: [file]
+  })
+}
 
 async function moveRight(message) {
   const description = message.embeds[0].description;
