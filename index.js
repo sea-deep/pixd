@@ -229,8 +229,7 @@ async function sendokbb(member) {
       700
     );
     encoder.addFrame(banner.bitmap.data);
-    banner.write(`output${i}.jpg`);
-    console.log(file);
+      console.log(file);
   }
   encoder.finish();
   const buffer = encoder.out.getData();
