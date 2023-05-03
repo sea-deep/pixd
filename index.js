@@ -1,18 +1,23 @@
 //require('dotenv').config();
 
-const express = require('express')
+const express = require('express');
 const app = express();
 const port = 9002;
 
-app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'))
+app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'));
 
 app.listen(port, () =>
-console.log(`Your app is listening a http://localhost/${port}`)
+  console.log(`Your app is listening a http://localhost/${port}`)
 );
 
-const {Client, GatewayIntentBits, Partials, AttachmentBuilder} = require('discord.js');
+const {
+  Client,
+  GatewayIntentBits,
+  Partials,
+  AttachmentBuilder,
+} = require('discord.js');
 const functions = require('./2048functions.js');
-const {words, ALL_WORDS} = require('./words.json'); 
+const {words, ALL_WORDS} = require('./words.json');
 const emojis = require('./emojis.json');
 const {Configuration, OpenAIApi} = require('openai');
 const GIFEncoder = require('gif-encoder-2');
@@ -129,14 +134,14 @@ client.on('messageCreate', async (message) => {
       case 'remove':
         await kick(message, serverQueue);
         break;
-      case 'wordle': 
-       await sendHelp(message); 
-       break; 
-     case 'playwordle': 
-       await sendGame(message); 
-       break; 
-     default: 
-       break; 
+      case 'wordle':
+        await sendHelp(message);
+        break;
+      case 'playwordle':
+        await sendGame(message);
+        break;
+      default:
+        break;
     }
   } catch (err) {
     console.error(err.message);
@@ -144,18 +149,17 @@ client.on('messageCreate', async (message) => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-switch (member.guild.id) {
-case '804902112700923954':
-await sendokbb (member);
-break;
-default:
-break;
-}
+  switch (member.guild.id) {
+    case '804902112700923954':
+      await sendokbb(member);
+      break;
+    default:
+      break;
+  }
 });
 
 client.on('interactionCreate', async (interaction) => {
-if (interaction.type !== 3 
-      && interaction.type !== 5) return; 
+  if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
     switch (interaction.customId) {
       case '2048_up':
@@ -174,14 +178,14 @@ if (interaction.type !== 3
         await interaction.deferUpdate();
         await moveRight(interaction.message);
         break;
-      case 'guess': 
-       await createModal(interaction); 
-       break; 
-     case 'guessed': 
-       await executeModal(interaction); 
-       break; 
-     default: 
-       break;
+      case 'guess':
+        await createModal(interaction);
+        break;
+      case 'guessed':
+        await executeModal(interaction);
+        break;
+      default:
+        break;
     }
   } catch (err) {
     console.log(err);
@@ -195,22 +199,24 @@ client.on('error', () => {
 
 client.login(process.env.BOT_TOKEN);
 async function sendokbb(member) {
-  let avatarURL = member.user.displayAvatarURL({extension: 'png', forceStatic: true});
-   let tag = member.user.tag;
-  let channel_id = "804902112700923957";
+  let avatarURL = member.user.displayAvatarURL({
+    extension: 'png',
+    forceStatic: true,
+  });
+  let tag = member.user.tag;
+  let channel_id = '804902112700923957';
   let avatar = await Jimp.read(avatarURL);
   avatar.resize(152, 152);
   let font = await Jimp.loadFont('fcb.fnt');
-const encoder = new GIFEncoder(945, 720);
+  const encoder = new GIFEncoder(945, 720);
   encoder.setDelay(100);
   encoder.start();
   for (let i = 0; i < 18; i++) {
- const frame = i < 10 ? `0${i}` : `${i}`;
-  const file = `./frames/frame_${frame}_delay-0.1s.gif`
- 
-let banner = await Jimp.read(file);
-   banner.composite(avatar, 55, 31)
-     .print(
+    const frame = i < 10 ? `0${i}` : `${i}`;
+    const file = `./frames/frame_${frame}_delay-0.1s.gif`;
+
+    let banner = await Jimp.read(file);
+    banner.composite(avatar, 55, 31).print(
       font,
       226,
       70,
@@ -219,20 +225,20 @@ let banner = await Jimp.read(file);
         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
       },
-      700,
+      700
     );
-encoder.addFrame(banner.bitmap.data);
+    encoder.addFrame(banner.bitmap.data);
     banner.write(`output${i}.jpg`);
-    console.log(file)
+    console.log(file);
   }
   encoder.finish();
   const buffer = encoder.out.getData();
   let file = new AttachmentBuilder(buffer, {name: 'godnessgraciousness.gif'});
-  let channel = client.guild.channels.cache.get(channel_id)
+  let channel = client.guild.channels.cache.get(channel_id);
   await channel.send({
     content: `Namaste saar <@${message.member.user.id}> cummed in sarvar`,
-    files: [file]
-  })
+    files: [file],
+  });
 }
 
 async function moveRight(message) {
@@ -266,95 +272,92 @@ async function moveUp(message) {
   return message.edit(msg);
 }
 async function padhaku(message) {
-const query = message.content.split(' ').splice(1).join(' ');
-let systemPrompt = [
-  `You a super smart AI robot who can answer tough and logical questions easily.`,
-  `Make responses by doing full research and maintaining accuracy.`
-].join(' ');
-const prompt = [
-  `Context:`,
-  `You are a super intelligent AI Robot.`,
-  `You answer to the questions asked by the user.`,
-  `You have very concise knowledge of Physics, Chemistry, Biology, and Maths`,
-  `You do critical research before sending answer to the user.`,
-  `You can perform large mathematical operations and complex physics questions.`,
-  `You are smart enough to answer all the IIT-JEE and NEET questions.`,
-  `You don't believe the user blindly if they are wrong, instead you correct them`,
-  `You can answer to any academic question accurately`,
-  `You are comprehensive and accurate.`,
-  `You have a full range of knowledge in Science and Humanities.`,
-  `You talk like a real Genius and you are smarter than a University student.`,
-  `You have a very complex undersatanding of world affairs`,
-  `You love helping others with their queries`,
-  `You are never wrong.`,
-  `You do cross check and examine in the depth of the questions before answering.`,
-  `You can understand the question of the user easily even if they give little context.`,
-  `You have an opinion about anythimg wrong in the society amd you are willing to share`,
-  `You can draw ASCII art. You put it in code blocks:`,
-  `\`\`\``,
-  `ASCII art here!`,
-  `\`\`\``,
-  `You can write code and provide examples, for example (if the language were javascript):`,
-  `\`\`\`javascript`,
-  `const add = (a, b) => a + b;`,
-  `add(1, 2); // returns 3`,
-  `\`\`\``,
-  ``,
-  `Examples:`,
-  `User: A wire of length 2 units is cut into two parts which are bent respectively to form a square of side = x units and a circle of radius = r units. If the sum of the areas of the square and the circle so formed is minimum, then?`,
-  `You: If the sum of the areas of the square and the circle so formed is minimum, then x = 2.`,
-  `User: For x∈R, f(x) = |log2 – sinx| and g(x) = f(f(x)), then?`,
-  `You: g'(0) = cos(log2)`,
-  `User: Which of the following is not a desirable feature of a cloning vector?`,
-`A) Presence of a marker gene`,
-`B) Presence of single restriction enzyme site`,
-`C) Presence of two or more recognition sites`,
-`D) Presence of origin of replication`,
-  `You: D. Presence of two or more recognition sites,`,
-  `User: When light propagates through a miaterial medium of relative permittivity and relative permeability , the velocity of light,
+  const query = message.content.split(' ').splice(1).join(' ');
+  let systemPrompt = [
+    `You a super smart AI robot who can answer tough and logical questions easily.`,
+    `Make responses by doing full research and maintaining accuracy.`,
+  ].join(' ');
+  const prompt = [
+    `Context:`,
+    `You are a super intelligent AI Robot.`,
+    `You answer to the questions asked by the user.`,
+    `You have very concise knowledge of Physics, Chemistry, Biology, and Maths`,
+    `You do critical research before sending answer to the user.`,
+    `You can perform large mathematical operations and complex physics questions.`,
+    `You are smart enough to answer all the IIT-JEE and NEET questions.`,
+    `You don't believe the user blindly if they are wrong, instead you correct them`,
+    `You can answer to any academic question accurately`,
+    `You are comprehensive and accurate.`,
+    `You have a full range of knowledge in Science and Humanities.`,
+    `You talk like a real Genius and you are smarter than a University student.`,
+    `You have a very complex undersatanding of world affairs`,
+    `You love helping others with their queries`,
+    `You are never wrong.`,
+    `You do cross check and examine in the depth of the questions before answering.`,
+    `You can understand the question of the user easily even if they give little context.`,
+    `You have an opinion about anythimg wrong in the society amd you are willing to share`,
+    `You can draw ASCII art. You put it in code blocks:`,
+    `\`\`\``,
+    `ASCII art here!`,
+    `\`\`\``,
+    `You can write code and provide examples, for example (if the language were javascript):`,
+    `\`\`\`javascript`,
+    `const add = (a, b) => a + b;`,
+    `add(1, 2); // returns 3`,
+    `\`\`\``,
+    ``,
+    `Examples:`,
+    `User: A wire of length 2 units is cut into two parts which are bent respectively to form a square of side = x units and a circle of radius = r units. If the sum of the areas of the square and the circle so formed is minimum, then?`,
+    `You: If the sum of the areas of the square and the circle so formed is minimum, then x = 2.`,
+    `User: For x∈R, f(x) = |log2 – sinx| and g(x) = f(f(x)), then?`,
+    `You: g'(0) = cos(log2)`,
+    `User: Which of the following is not a desirable feature of a cloning vector?`,
+    `A) Presence of a marker gene`,
+    `B) Presence of single restriction enzyme site`,
+    `C) Presence of two or more recognition sites`,
+    `D) Presence of origin of replication`,
+    `You: D. Presence of two or more recognition sites,`,
+    `User: When light propagates through a miaterial medium of relative permittivity and relative permeability , the velocity of light,
 is given by`,
-  `You: v = c/(√ϵrμr)`,
-  `User: The ratio of the radius of gyration of a thin uniform disc about an axis passing through its centre and normal to its plane to the
+    `You: v = c/(√ϵrμr)`,
+    `User: The ratio of the radius of gyration of a thin uniform disc about an axis passing through its centre and normal to its plane to the
 radius of gyration of the disc about its diameter is`,
-  `Assistant: The
+    `Assistant: The
 radius of gyration of the disc about its diameter is √2:1`,
-  `User: Let and be the energy of an electron in the first and second excited states of hydrogen atom, respectively. According to
+    `User: Let and be the energy of an electron in the first and second excited states of hydrogen atom, respectively. According to
 the Bohr's model of an atom, the ratio is
 `,
-  `You: The Bohr's model of an atom, the ratio is 9:4`,
-  `User: A body of mass experiences a gravitational force of , when placed at a particular point. The magnitude of the
+    `You: The Bohr's model of an atom, the ratio is 9:4`,
+    `User: A body of mass experiences a gravitational force of , when placed at a particular point. The magnitude of the
 gravitational field intensity at that point is`,
-  `You: 50 N kg−1`,
-  `User: What the capital of France`,
-  `You: The capital of France is Paris.`,
-  `User: The region between two concentric spheres of radii ‘a’ and ‘b’, respectively, has volume charge density ρ=A/r, where A is a constant and r is the distance from the centre. At the centre of the spheres is a point charge Q. The value of A such that the electric field in the region between the spheres will be constant, is:`,
-  `You: Q/2πa2`,
-  `User: If a curve y = f(x) passes through the point (1, –1) and satisfies the differential equation, y(1 + xy) dx = x dy, then f(-1/2) is equal to:`,
-  `You: f(-1/2) is equal to 4/5`,
-  `User: Why is the sky blue?`,
-  `Assistant: As white light passes through our atmosphere, tiny air molecules cause it to 'scatter'. The scattering caused by these tiny air molecules (known as Rayleigh scattering) increases as the wavelength of light decreases. Violet and blue light have the shortest wavelengths and red light has the longest.`,
-  ``,
-  `Current Chat:`,
-].join('\n');
+    `You: 50 N kg−1`,
+    `User: What the capital of France`,
+    `You: The capital of France is Paris.`,
+    `User: The region between two concentric spheres of radii ‘a’ and ‘b’, respectively, has volume charge density ρ=A/r, where A is a constant and r is the distance from the centre. At the centre of the spheres is a point charge Q. The value of A such that the electric field in the region between the spheres will be constant, is:`,
+    `You: Q/2πa2`,
+    `User: If a curve y = f(x) passes through the point (1, –1) and satisfies the differential equation, y(1 + xy) dx = x dy, then f(-1/2) is equal to:`,
+    `You: f(-1/2) is equal to 4/5`,
+    `User: Why is the sky blue?`,
+    `Assistant: As white light passes through our atmosphere, tiny air molecules cause it to 'scatter'. The scattering caused by these tiny air molecules (known as Rayleigh scattering) increases as the wavelength of light decreases. Violet and blue light have the shortest wavelengths and red light has the longest.`,
+    ``,
+    `Current Chat:`,
+  ].join('\n');
 
-let currentChat = [
-  `User: ${query}`,
-  `You:`
-].join('\n');
+  let currentChat = [`User: ${query}`, `You:`].join('\n');
 
-let messages = [].concat(
-  {
-    role: 'system',
-    content: systemPrompt
-  },
-  {
-    role: 'user',
-    content: [].concat(prompt, currentChat).join('\n')
-  }
-);
+  let messages = [].concat(
+    {
+      role: 'system',
+      content: systemPrompt,
+    },
+    {
+      role: 'user',
+      content: [].concat(prompt, currentChat).join('\n'),
+    }
+  );
 
-let response = '';
-await message.channel.sendTyping();
+  let response = '';
+  await message.channel.sendTyping();
   let completion = await openai.createChatCompletion({
     model: `gpt-3.5-turbo`,
     messages: messages,
@@ -363,12 +366,12 @@ await message.channel.sendTyping();
     top_p: 1,
     n: 1,
     presence_penalty: 0,
-    frequency_penalty: 0
+    frequency_penalty: 0,
   });
   console.log(completion);
-response = completion.data.choices[0].message.content.trim();
-const ans = response.trim();
-return message.reply(ans);
+  response = completion.data.choices[0].message.content.trim();
+  const ans = response.trim();
+  return message.reply(ans);
 }
 async function moveDown(message) {
   const description = message.embeds[0].description;
@@ -1133,8 +1136,8 @@ function seek(message, serverQueue) {
     return message.react('<:error:1090721649621479506>');
   }
   //else if (timeToSeek == 0) {
-  //     return message.react('<:error:1090721649621479506>'); 
-//}
+  //     return message.react('<:error:1090721649621479506>');
+  //}
   let currentSong = serverQueue.songs[0];
   currentSong.seek = timeToSeek;
   currentSong.seekTime = seekTime;
@@ -1266,217 +1269,218 @@ function parse(input) {
     return 0;
   }
 }
-async function sendGame(message) { 
-   let msg = await message.reply({ 
-     content: `<@${message.author.id}>'s game`, 
-     tts: false, 
-     components: [ 
-       { 
-         type: 1, 
-         components: [ 
-           { 
-             style: 1, 
-             label: `GUESS`, 
-             custom_id: `guess`, 
-             disabled: false, 
-             emoji: { 
-               id: null, 
-               name: `🧐`, 
-             }, 
-             type: 2, 
-           }, 
-         ], 
-       }, 
-     ], 
-     embeds: [ 
-       { 
-         type: 'rich', 
-         title: `WORDLE`, 
-         description: [ 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-           `◻️ ◻️ ◻️ ◻️ ◻️`, 
-         ].join('\n'), 
-         color: 0xff0000, 
-         fields: [ 
-           { 
-             name: `🎚️ Chances Left :`, 
-             value: `6`, 
-           }, 
-         ], 
-         footer: { 
-           text: `Use ${prefix}help for rules and context about the game`, 
-         }, 
-       }, 
-     ], 
-   }); 
-  
-   let key = msg.id; 
-   let val = words[Math.floor(Math.random() * words.length)]; 
-   await keyv.set(key, val, 75000000); 
- } 
- async function sendHelp(message) { 
- const desc = [ 
-   `• After each guess, the color of the tiles will change to show how close your guess was to the word.\n`, 
- `**Tile color meanings:**\n`, 
- `${emojis.green.w} ${emojis.gray.e} ${emojis.gray.a} ${emojis.gray.r} ${emojis.gray.y}`, 
- `The letter **W** is present in this word and is in the correct spot.\n`, 
- `${emojis.gray.p} ${emojis.gray.i} ${emojis.yellow.v} ${emojis.gray.o} ${emojis.gray.t}`, 
- `The letter **V** is in the word but in wrong spot.\n`, 
- `${emojis.green.v} ${emojis.green.a} ${emojis.gray.l} ${emojis.green.u} ${emojis.green.e}`, 
- `The letter **L** is not in the word in any spot` 
- ].join(`\n`); 
-   await message.channel.send({ 
-     content: `**HOW TO PLAY**`, 
-     tts: false, 
-     embeds: [ 
-       { 
-         type: 'rich', 
-         title: `Guess the WORDLE in 6 tries.`, 
-         description: desc, 
-         color: 0xa9f, 
-         footer: { 
-           text: `Play now ${prefix}playwordle`, 
-         }, 
-       }, 
-     ], 
-   }); 
- } 
-  
- async function createModal(interaction) { 
-   if (interaction.message.content.includes(interaction.user.id)) { 
-     await interaction.showModal({ 
-       custom_id: `guessed`, 
-       title: `Enter your guess`, 
-       components: [ 
-         { 
-           type: 1, // Component row 
-           components: [ 
-             { 
-               type: 4, // Text input component, only valid in modals 
-               custom_id: 'answer', 
-               label: `Enter a valid word:`, 
-               style: 1, // 1 for line, 2 for paragraph 
-               min_length: 5, 
-               max_length: 5, 
-               placeholder: 'adieu', 
-               required: true, 
-             }, 
-           ], 
-         }, 
-       ], 
-     }); 
-   } else { 
-     await interaction.reply({ 
-       content: 'This is not your game.', 
-       ephemeral: true, 
-     }); 
-   } 
- } 
- async function executeModal(interaction) { 
-   const value = interaction.fields.getTextInputValue('answer').toLowerCase();
-   if (ALL_WORDS.includes(value.toLowerCase())) { //if the word is valid. 
-     const answer = await keyv.get(interaction.message.id);
-     const wordArr = getColoredWord(answer, value); //Calling getColoredWord function to get the coloured alphabet emote's array 
-     const colouredWord = wordArr.join(' '); //Joining it 
-     const oldChances = parseInt( 
-       interaction.message.embeds[0].fields[0].value 
-     ); //Chances before the modal was submitted 
-     const newChances = oldChances - 1; //Decrementing a turn to continue game. 
-     let descArr = interaction.message.embeds[0].description.split('\n').reverse(); //Splitting the description from new lines, then reversing it. 
-     descArr[newChances] = colouredWord;//Replacing the next '◻️ ◻️ ◻️ ◻️ ◻️' with the coloured word, which was entered by the player 
-    let newDesc = descArr.reverse().join('\n'); //getting the new description up by reversing and joining with new lines. 
-  
-     const count = descArr.reduce( 
-       (count, el) => (!el.includes('◻️') ? count + 1 : count), 
-       0 
-     );//Turns taken by the player reaching the correct word. 
-     let msg = { 
-       content: `<@${interaction.user.id}>'s game`, 
-       tts: false, 
-       components: [ 
-         { 
-           type: 1, 
-           components: [ 
-             { 
-               style: 1, 
-               label: `GUESS`, 
-               custom_id: `guess`, 
-               disabled: true, 
-               emoji: { 
-                 id: null, 
-                 name: `🧐`, 
-               }, 
-               type: 2, 
-             }, 
-           ], 
-         }, 
-       ], 
-       embeds: [ 
-         { 
-           type: 'rich', 
-           title: `WORDLE`, 
-           description: `${newDesc}`, 
-           color: 0xff0000, 
-           fields: [ 
-             { 
-               name: `🏆 YOU WON`, 
-               value: `Your performance: \`${count}/6\``, 
-             }, 
-           ], 
-           footer: { 
-             text: `Use ${prefix}wordle for rules and context about the game`, 
-           }, 
-         }, 
-       ], 
-     }; // The message when the player wins, it is updated below depending on the game status  
-     if (!wordArr.some((element) => !element.includes('green'))) { 
-       // If the player wins 
-       await keyv.delete(interaction.message.id); 
-     } else if (oldChances == 1) { 
-       // Updating the msg object for when the user loses 
-       msg.embeds[0].fields[0].name = '🦆 You Lost'; 
-       msg.embeds[0].fields[0].value = `The word was ${answer}`; 
-       await keyv.delete(interaction.message.id); 
-     } else { 
-       // If the game is not over 
-       msg.components[0].components[0].disabled = false; 
-       msg.embeds[0].fields[0].name = '🎚️ Chances Left :'; 
-       msg.embeds[0].fields[0].value = newChances; 
-     } 
-     await interaction.deferUpdate();//Deferring the interaction as we are not responding to it. 
-     await interaction.message.edit(msg);//Editing the game message 
-   } else { 
-     await interaction.reply({ 
-       content: 'Please enter a valid word.', 
-       ephemeral: true, 
-     }); 
-   } 
- } 
- function getColoredWord(answer, guess) { 
-   let coloredWord = []; 
-   for (let i = 0; i < guess.length; i++) { 
-     coloredWord.push(emojis.gray[guess[i]]); 
-   } 
-   let guessLetters = guess.split(''); 
-   let answerLetters = answer.split(''); 
-  
-   for (let i = 0; i < guessLetters.length; i++) { 
-     if (guessLetters[i] === answerLetters[i]) { 
-       coloredWord[i] = emojis.green[guessLetters[i]]; 
-       answerLetters[i] = null; 
-       guessLetters[i] = null; 
-     } 
-   } 
-  
-   for (let i = 0; i < guessLetters.length; i++) { 
-     if (guessLetters[i] && answerLetters.includes(guessLetters[i])) { 
-       coloredWord[i] = emojis.yellow[guessLetters[i]]; 
-       answerLetters[answerLetters.indexOf(guessLetters[i])] = null; 
-     } 
-   } 
-   return coloredWord; 
- }
+async function sendGame(message) {
+  let msg = await message.reply({
+    content: `<@${message.author.id}>'s game`,
+    tts: false,
+    components: [
+      {
+        type: 1,
+        components: [
+          {
+            style: 1,
+            label: `GUESS`,
+            custom_id: `guess`,
+            disabled: false,
+            emoji: {
+              id: null,
+              name: `🧐`,
+            },
+            type: 2,
+          },
+        ],
+      },
+    ],
+    embeds: [
+      {
+        type: 'rich',
+        title: `WORDLE`,
+        description: [
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `◻️ ◻️ ◻️ ◻️ ◻️`,
+        ].join('\n'),
+        color: 0xff0000,
+        fields: [
+          {
+            name: `🎚️ Chances Left :`,
+            value: `6`,
+          },
+        ],
+        footer: {
+          text: `Use ${prefix}help for rules and context about the game`,
+        },
+      },
+    ],
+  });
+
+  let key = msg.id;
+  let val = words[Math.floor(Math.random() * words.length)];
+  await keyv.set(key, val, 75000000);
+}
+async function sendHelp(message) {
+  const desc = [
+    `• After each guess, the color of the tiles will change to show how close your guess was to the word.\n`,
+    `**Tile color meanings:**\n`,
+    `${emojis.green.w} ${emojis.gray.e} ${emojis.gray.a} ${emojis.gray.r} ${emojis.gray.y}`,
+    `The letter **W** is present in this word and is in the correct spot.\n`,
+    `${emojis.gray.p} ${emojis.gray.i} ${emojis.yellow.v} ${emojis.gray.o} ${emojis.gray.t}`,
+    `The letter **V** is in the word but in wrong spot.\n`,
+    `${emojis.green.v} ${emojis.green.a} ${emojis.gray.l} ${emojis.green.u} ${emojis.green.e}`,
+    `The letter **L** is not in the word in any spot`,
+  ].join(`\n`);
+  await message.channel.send({
+    content: `**HOW TO PLAY**`,
+    tts: false,
+    embeds: [
+      {
+        type: 'rich',
+        title: `Guess the WORDLE in 6 tries.`,
+        description: desc,
+        color: 0xa9f,
+        footer: {
+          text: `Play now ${prefix}playwordle`,
+        },
+      },
+    ],
+  });
+}
+
+async function createModal(interaction) {
+  if (interaction.message.content.includes(interaction.user.id)) {
+    await interaction.showModal({
+      custom_id: `guessed`,
+      title: `Enter your guess`,
+      components: [
+        {
+          type: 1, // Component row
+          components: [
+            {
+              type: 4, // Text input component, only valid in modals
+              custom_id: 'answer',
+              label: `Enter a valid word:`,
+              style: 1, // 1 for line, 2 for paragraph
+              min_length: 5,
+              max_length: 5,
+              placeholder: 'adieu',
+              required: true,
+            },
+          ],
+        },
+      ],
+    });
+  } else {
+    await interaction.reply({
+      content: 'This is not your game.',
+      ephemeral: true,
+    });
+  }
+}
+async function executeModal(interaction) {
+  const value = interaction.fields.getTextInputValue('answer').toLowerCase();
+  if (ALL_WORDS.includes(value.toLowerCase())) {
+    //if the word is valid.
+    const answer = await keyv.get(interaction.message.id);
+    const wordArr = getColoredWord(answer, value); //Calling getColoredWord function to get the coloured alphabet emote's array
+    const colouredWord = wordArr.join(' '); //Joining it
+    const oldChances = parseInt(interaction.message.embeds[0].fields[0].value); //Chances before the modal was submitted
+    const newChances = oldChances - 1; //Decrementing a turn to continue game.
+    let descArr = interaction.message.embeds[0].description
+      .split('\n')
+      .reverse(); //Splitting the description from new lines, then reversing it.
+    descArr[newChances] = colouredWord; //Replacing the next '◻️ ◻️ ◻️ ◻️ ◻️' with the coloured word, which was entered by the player
+    let newDesc = descArr.reverse().join('\n'); //getting the new description up by reversing and joining with new lines.
+
+    const count = descArr.reduce(
+      (count, el) => (!el.includes('◻️') ? count + 1 : count),
+      0
+    ); //Turns taken by the player reaching the correct word.
+    let msg = {
+      content: `<@${interaction.user.id}>'s game`,
+      tts: false,
+      components: [
+        {
+          type: 1,
+          components: [
+            {
+              style: 1,
+              label: `GUESS`,
+              custom_id: `guess`,
+              disabled: true,
+              emoji: {
+                id: null,
+                name: `🧐`,
+              },
+              type: 2,
+            },
+          ],
+        },
+      ],
+      embeds: [
+        {
+          type: 'rich',
+          title: `WORDLE`,
+          description: `${newDesc}`,
+          color: 0xff0000,
+          fields: [
+            {
+              name: `🏆 YOU WON`,
+              value: `Your performance: \`${count}/6\``,
+            },
+          ],
+          footer: {
+            text: `Use ${prefix}wordle for rules and context about the game`,
+          },
+        },
+      ],
+    }; // The message when the player wins, it is updated below depending on the game status
+    if (!wordArr.some((element) => !element.includes('green'))) {
+      // If the player wins
+      await keyv.delete(interaction.message.id);
+    } else if (oldChances == 1) {
+      // Updating the msg object for when the user loses
+      msg.embeds[0].fields[0].name = '🦆 You Lost';
+      msg.embeds[0].fields[0].value = `The word was ${answer}`;
+      await keyv.delete(interaction.message.id);
+    } else {
+      // If the game is not over
+      msg.components[0].components[0].disabled = false;
+      msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
+      msg.embeds[0].fields[0].value = newChances;
+    }
+    await interaction.deferUpdate(); //Deferring the interaction as we are not responding to it.
+    await interaction.message.edit(msg); //Editing the game message
+  } else {
+    await interaction.reply({
+      content: 'Please enter a valid word.',
+      ephemeral: true,
+    });
+  }
+}
+function getColoredWord(answer, guess) {
+  let coloredWord = [];
+  for (let i = 0; i < guess.length; i++) {
+    coloredWord.push(emojis.gray[guess[i]]);
+  }
+  let guessLetters = guess.split('');
+  let answerLetters = answer.split('');
+
+  for (let i = 0; i < guessLetters.length; i++) {
+    if (guessLetters[i] === answerLetters[i]) {
+      coloredWord[i] = emojis.green[guessLetters[i]];
+      answerLetters[i] = null;
+      guessLetters[i] = null;
+    }
+  }
+
+  for (let i = 0; i < guessLetters.length; i++) {
+    if (guessLetters[i] && answerLetters.includes(guessLetters[i])) {
+      coloredWord[i] = emojis.yellow[guessLetters[i]];
+      answerLetters[answerLetters.indexOf(guessLetters[i])] = null;
+    }
+  }
+  return coloredWord;
+}
