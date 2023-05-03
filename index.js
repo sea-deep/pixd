@@ -47,6 +47,8 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.MessageContent,
+    	
+GatewayIntentBits.GuildMembers
   ],
   ws: {properties: {browser: 'Discord iOS'}},
   partials: [Partials.Channel],
