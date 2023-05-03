@@ -14,6 +14,7 @@ const {
   Client,
   GatewayIntentBits,
   Partials,
+  Events,
   AttachmentBuilder,
 } = require('discord.js');
 const path = require('path');
@@ -70,7 +71,7 @@ playDL.getFreeClientID().then((clientID) =>
     },
   })
 );
-client.on('messageCreate', async (message) => {
+client.on(Events.MessageCreate, async (message) => {
   try {
     if (message.author.bot) {
       return; //don't respond to self-messages
@@ -151,7 +152,7 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.on('guildMemberAdd', async (member) => {
+client.on(Events.GuildMemberAdd, async (member) => {
   switch (member.guild.id) {
     case '804902112700923954':
       await sendokbb(member);
@@ -161,7 +162,7 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
-client.on('interactionCreate', async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
     switch (interaction.customId) {
@@ -195,7 +196,8 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-client.on('error', () => {
+client.on(Events.ShardError, error => {
+  console.log(error);
   client.login(process.env.BOT_TOKEN);
 });
 
