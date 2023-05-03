@@ -16,6 +16,7 @@ const {
   Partials,
   AttachmentBuilder,
 } = require('discord.js');
+const path = require('path');
 const functions = require('./2048functions.js');
 const {words, ALL_WORDS} = require('./words.json');
 const emojis = require('./emojis.json');
@@ -214,7 +215,7 @@ async function sendokbb(member) {
   encoder.start();
   for (let i = 0; i < 18; i++) {
     const frame = i < 10 ? `0${i}` : `${i}`;
-    const file = `./frames/frame_${frame}_delay-0.1s.gif`;
+    const file = path.resolve(`./frames/frame_${frame}_delay-0.1s.gif`);
 
     let banner = await Jimp.read(file);
     banner.composite(avatar, 55, 31).print(
