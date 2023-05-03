@@ -209,7 +209,7 @@ async function sendokbb(member) {
   let channel_id = '804902112700923957';
   let avatar = await Jimp.read(avatarURL);
   avatar.resize(152, 152);
-  let font = await Jimp.loadFont('fcb.fnt');
+  let font = await Jimp.loadFont(path.resolve('./fcb.fnt'));
   const encoder = new GIFEncoder(945, 720);
   encoder.setDelay(100);
   encoder.start();
