@@ -237,7 +237,7 @@ async function sendokbb(member) {
   let file = new AttachmentBuilder(buffer, {name: 'godnessgraciousness.gif'});
   let channel = client.guild.channels.cache.get(channel_id);
   await channel.send({
-    content: `Namaste saar <@${message.member.user.id}> cummed in sarvar`,
+    content: `Namaste saar <@${member.user.id}> cummed in sarvar`,
     files: [file],
   });
 }
