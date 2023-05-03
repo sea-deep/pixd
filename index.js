@@ -10,7 +10,7 @@ app.listen(port, () =>
 console.log(`Your app is listening a http://localhost/${port}`)
 );
 
-const {Client, GatewayIntentBits, Partials} = require('discord.js');
+const {Client, GatewayIntentBits, Partials, AttachmentBuilder} = require('discord.js');
 const functions = require('./2048functions.js');
 const {words, ALL_WORDS} = require('./words.json'); 
 const emojis = require('./emojis.json');
