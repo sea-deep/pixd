@@ -210,9 +210,9 @@ async function sendokbb(member) {
   let tag = member.user.tag;
   let channel_id = '804902112700923957';
   let avatar = await Jimp.read(avatarURL);
-  avatar.resize(152, 152);
+  avatar.resize(100, 100);
   let font = await Jimp.loadFont(path.resolve('./fcb.fnt'));
-  const encoder = new GIFEncoder(945, 720);
+  const encoder = new GIFEncoder(630, 430);
   encoder.setDelay(100);
   encoder.start();
   for (let i = 0; i < 18; i++) {
@@ -220,19 +220,30 @@ async function sendokbb(member) {
     const file = path.resolve(`./frames/frame_${frame}_delay-0.1s.gif`);
 
     let banner = await Jimp.read(file);
-    banner.composite(avatar, 55, 31).print(
-      font,
-      226,
-      70,
-      {
-        text: tag,
-        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
-        alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
-      },
-      700
-    );
+    banner.composite(avatar, 80, 5).print( 
+       font, 
+       190, 
+       10, 
+       { 
+         text: tag, 
+         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
+         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
+       }, 
+      300
+     )
+.print( 
+       font, 
+       190, 
+       55, 
+       { 
+         text: "Just joined the server", 
+         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
+         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
+       }, 
+      400
+     );
     encoder.addFrame(banner.bitmap.data);
-      console.log(file);
+     console.log(file);
   }
   encoder.finish();
   const buffer = encoder.out.getData();
