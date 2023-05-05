@@ -229,7 +229,7 @@ async function sendokbb(member) {
          alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
          alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
        }, 
-      300
+      430
      )
 .print( 
        font, 
@@ -240,7 +240,7 @@ async function sendokbb(member) {
          alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
          alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
        }, 
-      400
+      430
      );
     encoder.addFrame(banner.bitmap.data);
      console.log(file);
