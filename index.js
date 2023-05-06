@@ -1580,12 +1580,12 @@ function getInputImage(message) {
   }
   if (message.mentions.length > 0) {
     return message.mentions[0].displayAvatarURL({
-      extention: 'png',
+      extension: 'png',
       forceStatic: true,
     });
   }
   return message.author.displayAvatarURL({
-    extention: 'png',
+    extension: 'png',
     forceStatic: true,
   });
 }
