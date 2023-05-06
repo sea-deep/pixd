@@ -453,7 +453,7 @@ async function gpt(message) {
     presence_penalty: 0,
     frequency_penalty: 0,
   });
-  response = completion.data.choices[0].message.content.trim();
+  response = gptResponse.data.choices[0].message.content.trim();
   const ans = response.trim();
 
   return message.reply({
