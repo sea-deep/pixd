@@ -243,7 +243,6 @@ async function sendokbb(member) {
       430
      );
     encoder.addFrame(banner.bitmap.data);
-     console.log(file);
   }
   encoder.finish();
   const buffer = encoder.out.getData();
@@ -253,6 +252,7 @@ async function sendokbb(member) {
     content: `Namaste saar <@${member.user.id}> cummed in sarvar`,
     files: [file],
   });
+console.log(`${member.user.tag} just joined`);
 }
 
 async function moveRight(message) {
@@ -382,7 +382,6 @@ gravitational field intensity at that point is`,
     presence_penalty: 0,
     frequency_penalty: 0,
   });
-  console.log(completion);
   response = completion.data.choices[0].message.content.trim();
   const ans = response.trim();
   return message.reply(ans);
