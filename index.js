@@ -205,6 +205,8 @@ client.on(Events.ShardError, (error) => {
 });
 
 client.login(process.env.BOT_TOKEN);
+
+
 async function sendokbb(member) {
   let avatarURL = member.user.displayAvatarURL({
     extension: 'png',
@@ -259,6 +261,54 @@ async function sendokbb(member) {
   });
   console.log(`${member.user.tag} just joined`);
 }
+
+
+async function vosahihai(message) {
+  const bgs = [
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839306235944/frame_0_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839595630603/frame_1_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839868272700/frame_2_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840136687726/frame_3_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840463863918/frame_4_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840723890186/frame_5_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840971362334/frame_6_delay-0.1s.gif"
+];
+
+console.log(getInputImage(message));
+let avatar = await Jimp.read(getInputImage(message));
+avatar.resize(310,400);
+  const encoder = new GIFEncoder(600, 450);
+  encoder.setDelay(100);
+for (let i = 0; i < bgs.length; i++) {
+console.log(bgs[i]);
+  let bg = await Jimp.read(bgs[i]);
+  bg.composite(avatar, 287, 50);
+  encoder.addFrame(bg.bitmap.data);
+  if (i == 6) {
+  for (let i = 0; i < 20; i++) {
+    encoder.addFrame(bg.bitmap.data);
+  }
+  }
+}
+encoder.finish(); 
+  console.log("encoded");
+   const buffer = encoder.out.getData(); 
+   let file = new AttachmentBuilder(buffer, {name: 'vohsahihain.gif'});
+   let text = [
+  'vo kuch thug hai',
+  'vo to koi thug nahi hai',
+  'vo sahi hai',
+  'vo galat hai',
+  'vo real hai',
+  'vo fake hai',
+  'vo <:genesis:1013083814270074890> hai',
+];
+return message.reply({
+  comtent: text[Math.round(Math.random() * text.length)],
+  files: [file]
+})
+}
+
 
 async function moveRight(message) {
   const description = message.embeds[0].description;
@@ -1508,51 +1558,6 @@ function getColoredWord(answer, guess) {
     }
   }
   return coloredWord;
-}
-
-async function vosahihai(message) {
-  const bgs = [
-  "https://media.discordapp.net/attachments/916697198761234492/1104376839306235944/frame_0_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376839595630603/frame_1_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376839868272700/frame_2_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376840136687726/frame_3_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376840463863918/frame_4_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376840723890186/frame_5_delay-0.1s.gif",
-  "https://media.discordapp.net/attachments/916697198761234492/1104376840971362334/frame_6_delay-0.1s.gif"
-];
-
-console.log(getInputImage(message));
-let avatar = await Jimp.read(getInputImage(message));
-avatar.resize(310,400);
-  const encoder = new GIFEncoder(600, 450);
-  encoder.setDelay(100);
-for (let i = 0; i < bgs.length; i++) {
-console.log(bgs[i]);
-  let bg = await Jimp.read(bgs[i]);
-  bg.composite(avatar, 287, 50);
-  encoder.addFrame(bg.bitmap.data);
-  if (i == 6) {
-  for (let i = 0; i < 39; i++) {
-    encoder.addFrame(bg.bitmap.data);
-  }
-  }
-}
-encoder.finish(); console.log("encoded");
-   const buffer = encoder.out.getData(); 
-   let file = new AttachmentBuilder(buffer, {name: 'vohsahihain.gif'});
-   let text = [
-  'vo kuch thug hai',
-  'vo to koi thug nahi hai',
-  'vo sahi hai',
-  'vo galat hai',
-  'vo real hai',
-  'vo fake hai',
-  'vo <:genesis:1013083814270074890> hai',
-];
-return message.reply({
-  comtent: text[Math.round(Math.random() * text.length)],
-  files: [file]
-})
 }
 
 
