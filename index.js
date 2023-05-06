@@ -1523,13 +1523,13 @@ async function vosahihai(message) {
 
 console.log(getInputImage(message));
 let avatar = await Jimp.read(getInputImage(message));
-avatar.resize(283,405).rotate(11);
+avatar.resize(310,400);
   const encoder = new GIFEncoder(600, 450);
   encoder.setDelay(100);
 for (let i = 0; i < bgs.length; i++) {
 console.log(bgs[i]);
   let bg = await Jimp.read(bgs[i]);
-  bg.composite(avatar, 235, 50);
+  bg.composite(avatar, 287, 50);
   encoder.addFrame(bg.bitmap.data);
   if (i == 6) {
   for (let i = 0; i < 39; i++) {
