@@ -1512,14 +1512,15 @@ function getColoredWord(answer, guess) {
 
 async function vosahihai(message) {
   const bgs = [
-  'https://iili.io/HSgIHRR.md.gif',
-  'https://iili.io/HSgIJNp.md.gif',
-  'https://iili.io/HSgIdDN.md.gif',
-  'https://iili.io/HSgI3xI.md.gif',
-  'https://iili.io/HSgIFVt.md.gif',
-  'https://iili.io/HSgIKiX.md.gif',
-  'https://iili.io/HSgIqfn.md.gif'
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839306235944/frame_0_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839595630603/frame_1_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376839868272700/frame_2_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840136687726/frame_3_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840463863918/frame_4_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840723890186/frame_5_delay-0.1s.gif",
+  "https://media.discordapp.net/attachments/916697198761234492/1104376840971362334/frame_6_delay-0.1s.gif"
 ];
+
 console.log(getInputImage(message));
 let avatar = await Jimp.read(getInputImage(message));
 avatar.resize(283,405).rotate(11);
@@ -1530,7 +1531,7 @@ console.log(bgs[i]);
   let bg = await Jimp.read(bgs[i]);
   bg.composite(avatar, 235, 50);
   encoder.addFrame(bg.bitmap.data);
-  if (i < bgs.length) {
+  if (i == 6) {
   for (let i = 0; i < 39; i++) {
     encoder.addFrame(bg.bitmap.data);
   }
@@ -1564,7 +1565,7 @@ async function rape(message) {
   ];
   const position = allCords[Math.floor(Math.random() * 4)];
   let bg = await Jimp.read(
-    'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
+  'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
   );
   let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(366, 500);
