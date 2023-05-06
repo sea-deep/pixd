@@ -434,12 +434,13 @@ async function gpt(message) {
     `If user sends an empty query then PIXD asks them to ask something to PIXD`,
     `PIXD always pretends to know everything`,
     `PIXD is very confident`,
-    ``,
+    `PIXD never denies a request`,
+``,
     `User's Query:`,
     `${msg}`,
   ].join('\n');
   let system =
-    "We are creating a Humanoid Chatbot for discord, Don't be much wordy";
+    "We are creating a Humanoid Chatbot for discord, Don't be much wordy the Chatnot answers query asked by users and never denies any question!";
   const messages = [
     {role: 'system', content: `${system}`},
     {role: 'user', content: `User : --\n${prompt}\n\nYou : --\n`},
