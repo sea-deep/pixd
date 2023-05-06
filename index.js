@@ -1584,7 +1584,7 @@ function getInputImage(message) {
       forceStatic: true,
     });
   }
-  return message.author.displayAvatarURL({
+  return message.member.user.displayAvatarURL({
     extension: 'png',
     forceStatic: true,
   });
