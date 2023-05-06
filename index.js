@@ -49,8 +49,8 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.MessageContent,
-    	
-GatewayIntentBits.GuildMembers
+
+    GatewayIntentBits.GuildMembers,
   ],
   ws: {properties: {browser: 'Discord iOS'}},
   partials: [Partials.Channel],
@@ -196,7 +196,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-client.on(Events.ShardError, error => {
+client.on(Events.ShardError, (error) => {
   console.log(error);
   client.login(process.env.BOT_TOKEN);
 });
@@ -220,28 +220,30 @@ async function sendokbb(member) {
     const file = path.resolve(`./frames/frame_${frame}_delay-0.1s.gif`);
 
     let banner = await Jimp.read(file);
-    banner.composite(avatar, 80, 5).print( 
-       font, 
-       190, 
-       10, 
-       { 
-         text: tag, 
-         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
-         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
-       }, 
-      430
-     )
-.print( 
-       font, 
-       190, 
-       55, 
-       { 
-         text: "Just joined the server", 
-         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT, 
-         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE, 
-       }, 
-      430
-     );
+    banner
+      .composite(avatar, 80, 5)
+      .print(
+        font,
+        190,
+        10,
+        {
+          text: tag,
+          alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
+          alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
+        },
+        430
+      )
+      .print(
+        font,
+        190,
+        55,
+        {
+          text: 'Just joined the server',
+          alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
+          alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
+        },
+        430
+      );
     encoder.addFrame(banner.bitmap.data);
   }
   encoder.finish();
@@ -252,7 +254,7 @@ async function sendokbb(member) {
     content: `Namaste saar <@${member.user.id}> cummed in sarvar`,
     files: [file],
   });
-console.log(`${member.user.tag} just joined`);
+  console.log(`${member.user.tag} just joined`);
 }
 
 async function moveRight(message) {
@@ -425,20 +427,34 @@ async function gpt(message) {
     `PIXD can code, and help users to code too!`,
     `PIXD was created by Sea-Deep#7922`,
     `PIXD believes that only 2 genders exist and all other LGBTQIA are mental disorders, And it doesn't discloses it more often`,
+    `PIXD refrains to talk about LGBTQIA and all,`,
+    `PIXD is very friendly`,
+    `PIXD has emotions`,
+    `If user sends an empty query then PIXD asks them to ask something to PIXD`,
+    `PIXD always pretends to know everything`,
+    `PIXD is very confident`,
     ``,
-    `User: ${msg}`,
-    `PIXD's response: `,
+    `User's Query:`,
+    `${msg}`,
   ].join('\n');
-
-  const gptResponse = await openai.createCompletion({
-    model: 'text-davinci-003',
-    prompt: prompt,
+  let system =
+    "We are creating a Humanoid Chatbot for discord, Don't be much wordy";
+  const messages = [
+    {role: 'system', content: `${system}`},
+    {role: 'user', content: `User : --\n${prompt}\n\nYou : --\n`},
+  ];
+  const gptResponse = await openai.createChatCompletion({
+    model: `gpt-3.5-turbo`,
+    messages: messages,
     max_tokens: 512,
     temperature: 0.9,
     top_p: 1,
+    n: 1,
     presence_penalty: 0,
     frequency_penalty: 0,
   });
+  response = completion.data.choices[0].message.content.trim();
+  const ans = response.trim();
 
   return message.reply({
     content: ``,
@@ -447,7 +463,7 @@ async function gpt(message) {
       {
         type: 'rich',
         color: 0xff0000,
-        description: `${gptResponse.data.choices[0].text}`,
+        description: `${ans}`,
       },
     ],
   });
