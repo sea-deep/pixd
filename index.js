@@ -1520,11 +1520,13 @@ async function vosahihai(message) {
   'https://iili.io/HSgIKiX.md.gif',
   'https://iili.io/HSgIqfn.md.gif'
 ];
+console.log(getInputImage(message));
 let avatar = await Jimp.read(getInputImage(message));
 avatar.resize(283,405).rotate(11);
   const encoder = new GIFEncoder(600, 450);
   encoder.setDelay(100);
 for (let i = 0; i < bgs.length; i++) {
+console.log(bgs[i]);
   let bg = await Jimp.read(bgs[i]);
   bg.composite(avatar, 235, 50);
   encoder.addFrame(bg.bitmap.data);
@@ -1534,7 +1536,7 @@ for (let i = 0; i < bgs.length; i++) {
   }
   }
 }
-encoder.finish(); 
+encoder.finish(); console.log("encoded");
    const buffer = encoder.out.getData(); 
    let file = new AttachmentBuilder(buffer, {name: 'vohsahihain.gif'});
    let text = [
