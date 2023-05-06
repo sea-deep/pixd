@@ -441,8 +441,8 @@ async function gpt(message) {
   ].join('\n');
 
   const completion = await openai.createCompletion({
-    model: `text-davinci-003`,
-    messages: prompt,
+    model: 'text-davinci-003',
+    prompt: prompt,
     max_tokens: 512,
     temperature: 0.9,
     top_p: 1,
