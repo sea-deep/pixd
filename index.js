@@ -1535,11 +1535,11 @@ async function rape(message) {
 }
 
 async function vosahihai(message) {
-  const position = {x: 235, y: 50};
+  const position = {x: 257, y: 0};
   let bg = await Jimp.read("https://iili.io/HSsje1V.md.png");
   let avatar = await Jimp.read(getInputImage(message));
-  avatar.resize(283,405).rotate(11); 
-  bg.resize.composite(avatar, position.x, position.y);
+  avatar.resize(453,450);
+  bg.composite(avatar, position.x, position.y);
   let buffer = await bg.getBufferAsync(jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'maisahitha.png'});
   let text = [
