@@ -1559,10 +1559,11 @@ return message.reply({
 
 
 function getInputImage(message) {
-  if (message.attachments.length > 0) {
+console.log(message);
+  if (message.attachments.length >= 1) {
     return message.attachments[0].url;
   }
-  if (message.mentions.length > 0) {
+  if (message.mentions.length >= 1) {
     return message.mentions[0].displayAvatarURL({
       extension: 'png',
       forceStatic: true,
