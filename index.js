@@ -1535,10 +1535,10 @@ async function rape(message) {
 }
 
 async function vosahihai(message) {
-  const position = {x: 257, y: 0};
-  let bg = await Jimp.read("https://iili.io/HSsje1V.md.png");
+  const position = {x: 245, y: 0};
+  let bg = await Jimp.read("https://cdn.discordapp.com/attachments/1088008848469655562/1104863177897934908/PicsArt_05-08-01.41.32.jpg");
   let avatar = await Jimp.read(getInputImage(message));
-  avatar.resize(453,450);
+  avatar.resize(354,433);
   bg.composite(avatar, position.x, position.y);
   let buffer = await bg.getBufferAsync(Jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'maisahitha.png'});
