@@ -147,6 +147,9 @@ client.on(Events.MessageCreate, async (message) => {
       case 'vosahihai':
         await vosahihai(message);
         break;
+      case 'lapata':
+        await lapata(message);
+        break;
       default:
         break;
     }
