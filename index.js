@@ -1521,8 +1521,7 @@ async function rape(message) {
     {x: 366, y: 500},
   ];
   const position = allCords[Math.floor(Math.random() * 4)];
-  let bg = await Jimp.read(
-  'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
+  let bg = await Jimp.read( 'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
   );
   let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(366, 500);
@@ -1537,7 +1536,7 @@ async function rape(message) {
 
 async function vosahihai(message) {
   const position = {x: 235, y: 50};
-  let bg = await Jimp.read("https://iili.io/HSgIqfn.md.gif");
+  let bg = await Jimp.read("https://iili.io/HSsje1V.md.png");
   let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(283,405).rotate(11); 
   bg.resize.composite(avatar, position.x, position.y);
