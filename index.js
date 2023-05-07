@@ -1559,12 +1559,11 @@ return message.reply({
 
 
 function getInputImage(message) {
-console.log(message);
-  if (message.attachments.length >= 1) {
-    return message.attachments[0].url;
+  if (message.attachments.size >= 1) {
+    return message.attachments.first().url;
   }
-  if (message.mentions.length >= 1) {
-    return message.mentions[0].displayAvatarURL({
+  if (message.mentions.users.size >= 1) {
+    return message.mentions.users.first().displayAvatarURL({
       extension: 'png',
       forceStatic: true,
     });
@@ -1574,3 +1573,4 @@ console.log(message);
     forceStatic: true,
   });
 }
+
