@@ -1540,7 +1540,7 @@ async function vosahihai(message) {
   let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(453,450);
   bg.composite(avatar, position.x, position.y);
-  let buffer = await bg.getBufferAsync(jimp.MIME_PNG);
+  let buffer = await bg.getBufferAsync(Jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'maisahitha.png'});
   let text = [
   'vo kuch thug hai',
