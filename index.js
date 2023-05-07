@@ -1557,6 +1557,20 @@ return message.reply({
 });
 }
 
+async function lapata(message) {
+  let base = new Jimp(720, 404);
+let avatar = await Jimp.read(getInputImage(message));
+  avatar.resize(156, 182);
+let fg = await Jimp.read("https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png");
+base.composite(avatar, 32, 119).composite(fg, 0, 0);
+  let buffer = await base.getBufferAsync(Jimp.MIME_PNG);
+  let file = new AttachmentBuilder(buffer, {name: 'lapata.png'});
+return message.reply({
+  comtent: '',
+  files: [file]
+});
+}
+
 
 function getInputImage(message) {
   if (message.attachments.size >= 1) {
