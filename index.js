@@ -486,6 +486,7 @@ async function gpt(message) {
     `PIXD can write poems and stories about everything, infact he's a fiction pro!`,
     `User's Query:`,
     `${msg}`,
+    `PIXD's Response: `
   ].join('\n');
 
   const completion = await openai.createCompletion({
