@@ -1574,7 +1574,7 @@ return message.reply({
 });
 }
 
-function getInputImage(message) {
+async function getInputImage(message) {
   switch (true) {
     case message.attachments.size >= 1:
       return message.attachments.first().url;
