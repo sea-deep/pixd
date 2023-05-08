@@ -1574,7 +1574,7 @@ return message.reply({
 });
 }
 
-/*
+
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
@@ -1597,20 +1597,20 @@ async function getInputImage(message) {
     } else if (refMsg.stickers.size >= 1) {
       return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
     }
-  } else if (message.mentions.size >= 1) {
+  } else if (message.mentions.users.size >= 1) {
     return message.mentions.users.first().displayAvatarURL({
-      extention: 'png',
-      forceStatic: true
+      extension: 'png',
+      forceStatic: true,
     });
   } else {
-    return message.author.displayAvatarURL({
-      extention: 'png',
-      forceStatic: true
-    });
+    return message.member.user.displayAvatarURL({
+    extension: 'png',
+    forceStatic: true,
+  });
   }
 }
-*/
 
+/*
 function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
@@ -1625,5 +1625,5 @@ function getInputImage(message) {
     extension: 'png',
     forceStatic: true,
   });
-}
+}*/
 
