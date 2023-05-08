@@ -212,8 +212,8 @@ client.on(Events.ShardError, (error) => {
 
 client.login(process.env.BOT_TOKEN);
 
-async function sendPajeet (message) {
-console.log("sone")
+async function sendPajeet(message) {
+console.log("done")
  let avatar = Jimp.read(message.member.user.displayAvatarURL({
    extension: 'png',
    forceStatic: true
