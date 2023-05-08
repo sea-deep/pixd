@@ -1561,11 +1561,11 @@ return message.reply({
 }
 
 async function lapata(message) {
-  let base = new Jimp(720, 404);
+  let base = new Jimp(720, 404, 0x00000000);
 let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(156, 182);
 let fg = await Jimp.read("https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png");
-base.composite(avatar, 32, 119).composite(fg, 0, 0);
+base.composite(avatar, 32,119).composite(fg, 0, 0);
   let buffer = await base.getBufferAsync(Jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'lapata.png'});
 return message.reply({
@@ -1575,42 +1575,39 @@ return message.reply({
 }
 
 async function getInputImage(message) {
-  switch (true) {
-    case message.attachments.size >= 1:
-      return message.attachments.first().url;
-    case message.stickers.size >= 1:
-      return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
-    case /<:[^:]+:(\d+)>/.test(message.content):
-      let emojiId = RegExp.$1;
-      return `https://discord.com/emojis/${emojiId}.png`;
-    case /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content):
+  if (message.attachments.size >= 1) {
+    return message.attachments.first().url;
+  } else if (message.stickers.size >= 1) {
+    return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+  } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
+    let emojiId = RegExp.$1;
+    return `https://discord.com/emojis/${emojiId}.png`;
+  } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
+    return RegExp['$&'];
+  } else if (message.reference) {
+    let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+    if (refMsg.attachments.size >= 1) {
+      return refMsg.attachments.first().url;
+    } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) {
       return RegExp['$&'];
-    case message.reference:
-      let refMsg = await message.channel.messages.fetch(message.reference.messageId);
-      if (refMsg.attachments.size >= 1) {
-        return refMsg.attachments.first().url;
-      }
-      switch (true) {
-        case /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content):
-          return RegExp['$&'];
-        case /<:[^:]+:(\d+)>/.test(refMsg.content):
-          let emojiId = RegExp.$1;
-          return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-        case refMsg.stickers.size >= 1:
-          return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
-      }
-    case message.mentions.size >= 1:
-      return message.mentions.users.first().displayAvatarURL({
-        extention: 'png',
-        forceStatic: true
-      });
-    default:
-      return message.author.displayAvatarURL({
-        extention: 'png',
-        forceStatic: true
-      });
+    } else if (/<:[^:]+:(\d+)>/.test(refMsg.content)) {
+      let emojiId = RegExp.$1;
+      return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+    } else if (refMsg.stickers.size >= 1) {
+      return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+    }
+  } else if (message.mentions.size >= 1) {
+    return message.mentions.users.first().displayAvatarURL({
+      extention: 'png',
+      forceStatic: true
+    });
+  } else {
+    return message.author.displayAvatarURL({
+      extention: 'png',
+      forceStatic: true
+    });
   }
-} 
+}
 
 
 /*
