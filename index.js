@@ -1575,56 +1575,54 @@ return message.reply({
 });
 }
 
-
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
-  } else if (message.stickers.size >= 1) {
+  }
+
+  if (message.stickers.size >= 1) {
     return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
-  } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
+  }
+
+  if (/<:[^:]+:(\d+)>/.test(message.content)) {
     let emojiId = RegExp.$1;
     return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-  } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
+  }
+
+  if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
     return RegExp['$&'];
-  } else if (message.reference) {
+  }
+
+  if (message.reference) {
     let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+
     if (refMsg.attachments.size >= 1) {
       return refMsg.attachments.first().url;
-    } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) {
+    }
+
+    if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) {
       return RegExp['$&'];
-    } else if (/<:[^:]+:(\d+)>/.test(refMsg.content)) {
+    }
+
+    if (/<:[^:]+:(\d+)>/.test(refMsg.content)) {
       let emojiId = RegExp.$1;
       return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-    } else if (refMsg.stickers.size >= 1) {
+    }
+
+    if (refMsg.stickers.size >= 1) {
       return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
     }
-  } else if (message.mentions.users.size >= 1) {
-    return message.mentions.users.first().displayAvatarURL({
-      extension: 'png',
-      forceStatic: true,
-    });
-  } else {
-    return message.member.user.displayAvatarURL({
-    extension: 'png',
-    forceStatic: true,
-  });
   }
-}
 
-/*
-function getInputImage(message) {
-  if (message.attachments.size >= 1) {
-    return message.attachments.first().url;
-  }
   if (message.mentions.users.size >= 1) {
     return message.mentions.users.first().displayAvatarURL({
       extension: 'png',
       forceStatic: true,
     });
   }
+
   return message.member.user.displayAvatarURL({
     extension: 'png',
     forceStatic: true,
   });
-}*/
-
+}
