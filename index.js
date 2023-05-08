@@ -174,6 +174,19 @@ client.on(Events.GuildMemberAdd, async (member) => {
   }
 });
 
+client.on(Events.GuildMemberRemove, async (member) => {
+  switch (member.guild.id) {
+    case '804902112700923954':
+      await sendokbbl(member);
+      break;
+    case '1062998378293776384':
+      await sendPajeetl(member);
+      break;
+    default:
+      break;
+  }
+});
+
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
@@ -215,6 +228,14 @@ client.on(Events.ShardError, (error) => {
 
 client.login(process.env.BOT_TOKEN);
 
+async function sendokbbl(member) {
+let channel = client.channels.cache.get("804902112700923957");
+channel.send(`ayyo saar **${member.user.tag}** gayaa`);
+}
+async function sendPajeetl(member) {
+let channel = client.channels.cache.get("1065736446981451776");
+channel.send(`**${member.user.tag}** sirs went on a phoren trip`);
+}
 async function sendPajeet(member) {
  let avatar = await Jimp.read(member.user.displayAvatarURL({
    extension: 'png',
