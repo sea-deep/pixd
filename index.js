@@ -1526,7 +1526,7 @@ async function rape(message) {
   const position = allCords[Math.floor(Math.random() * 4)];
   let bg = await Jimp.read( 'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
   );
-  let avatar = await Jimp.read(getInputImage(message));
+  let avatar = await Jimp.read(await getInputImage(message));
   avatar.resize(366, 500);
   bg.resize(732, 1000).composite(avatar, position.x, position.y);
   let buffer = await bg.getBufferAsync(Jimp.MIME_PNG);
@@ -1540,7 +1540,7 @@ async function rape(message) {
 async function vosahihai(message) {
   const position = {x: 245, y: 0};
   let bg = await Jimp.read("https://cdn.discordapp.com/attachments/1088008848469655562/1104863177897934908/PicsArt_05-08-01.41.32.jpg");
-  let avatar = await Jimp.read(getInputImage(message));
+  let avatar = await Jimp.read(await getInputImage(message));
   avatar.resize(354,433);
   bg.composite(avatar, position.x, position.y);
   let buffer = await bg.getBufferAsync(Jimp.MIME_PNG);
@@ -1562,8 +1562,8 @@ return message.reply({
 
 async function lapata(message) {
   let base = new Jimp(720, 404, 0x00000000);
-console.log(getInputImage(message));
-let avatar = await Jimp.read(getInputImage(message));
+//console.log(getInputImage(message));
+let avatar = await Jimp.read(await getInputImage(message));
   avatar.resize(156, 182);
 let fg = await Jimp.read("https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png");
 base.composite(avatar, 32,119).composite(fg, 0, 0);
