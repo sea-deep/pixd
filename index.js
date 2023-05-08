@@ -1574,7 +1574,46 @@ return message.reply({
 });
 }
 
+function getInputImage(message) {
+  switch (true) {
+    case message.attachments.size >= 1:
+      return message.attachments.first().url;
+    case message.stickers.size >= 1:
+      return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+    case /<:[^:]+:(\d+)>/.test(message.content):
+      let emojiId = RegExp.$1;
+      return `https://discord.com/emojis/${emojiId}.png`;
+    case /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content):
+      return RegExp['$&'];
+    case message.reference:
+      let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+      if (refMsg.attachments.size >= 1) {
+        return refMsg.attachments.first().url;
+      }
+      switch (true) {
+        case /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content):
+          return RegExp['$&'];
+        case /<:[^:]+:(\d+)>/.test(refMsg.content):
+          let emojiId = RegExp.$1;
+          return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+        case refMsg.stickers.size >= 1:
+          return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+      }
+    case message.mentions.size >= 1:
+      return message.mentions.users.first().displayAvatarURL({
+        extention: 'png',
+        forceStatic: true
+      });
+    default:
+      return message.author.displayAvatarURL({
+        extention: 'png',
+        forceStatic: true
+      });
+  }
+} 
 
+
+/*
 function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
@@ -1589,5 +1628,5 @@ function getInputImage(message) {
     extension: 'png',
     forceStatic: true,
   });
-}
+}*/
 
