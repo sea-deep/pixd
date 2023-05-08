@@ -150,7 +150,7 @@ client.on(Events.MessageCreate, async (message) => {
       case 'lapata':
         await lapata(message);
         break;
-      case 'testWel'
+      case 'testWel':
         await sendPajeet(message);
         break;
       default:
