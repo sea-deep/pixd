@@ -1562,6 +1562,7 @@ return message.reply({
 
 async function lapata(message) {
   let base = new Jimp(720, 404, 0x00000000);
+console.log(getInputImage(message));
 let avatar = await Jimp.read(getInputImage(message));
   avatar.resize(156, 182);
 let fg = await Jimp.read("https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png");
