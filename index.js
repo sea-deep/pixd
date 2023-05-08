@@ -1574,6 +1574,7 @@ return message.reply({
 });
 }
 
+/*
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
@@ -1608,9 +1609,8 @@ async function getInputImage(message) {
     });
   }
 }
+*/
 
-
-/*
 function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
@@ -1625,5 +1625,5 @@ function getInputImage(message) {
     extension: 'png',
     forceStatic: true,
   });
-}*/
+}
 
