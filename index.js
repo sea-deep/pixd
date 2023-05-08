@@ -166,6 +166,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
     case '804902112700923954':
       await sendokbb(member);
       break;
+    case '1062998378293776384':
+      await sendPajeet(member);
+      break;
     default:
       break;
   }
@@ -212,9 +215,8 @@ client.on(Events.ShardError, (error) => {
 
 client.login(process.env.BOT_TOKEN);
 
-async function sendPajeet(message) {
-console.log("done")
- let avatar = await Jimp.read(message.member.user.displayAvatarURL({
+async function sendPajeet(member) {
+ let avatar = await Jimp.read(member.user.displayAvatarURL({
    extension: 'png',
    forceStatic: true
  }));
@@ -224,8 +226,9 @@ avatar.circle();
  banner.composite(avatar, 50, 80);
  let buffer = await banner.getBufferAsync(Jimp.MIME_PNG);
  let file = new AttachmentBuilder(buffer, {name: "aagaya_muh_uthake.png"});
- return message.channel.send({
-   content: `Namaste sirs <@${message.member.user.id}> did poo in the loo`,
+ let channel = client.channels.cache.get('1065736446981451776');
+ return channel.send({
+   content: `Namaste sirs <@${member.user.id}> did poo in the loo`,
    files: [ file ]
  });
 }
