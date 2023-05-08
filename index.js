@@ -1583,7 +1583,7 @@ async function getInputImage(message) {
     return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
   } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
     let emojiId = RegExp.$1;
-    return `https://discord.com/emojis/${emojiId}.png`;
+    return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
   } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
     return RegExp['$&'];
   } else if (message.reference) {
