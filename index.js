@@ -222,7 +222,7 @@ console.log("done")
 avatar.circle();
  let banner = await Jimp.read('https://media.discordapp.net/attachments/1063000940279509022/1105098775652995124/PicsArt_05-08-05.14.41.png');
  banner.composite(avatar, 50, 80);
- let buffer = banner.getBufferAsync(Jimp.MIME_PNG);
+ let buffer = await banner.getBufferAsync(Jimp.MIME_PNG);
  let file = new AttachmentBuilder(buffer, {name: "aagaya_muh_uthake.png"});
  return message.channel.send({
    content: `Namaste sirs <@${message.member.user.id}> did poo in the loo`,
