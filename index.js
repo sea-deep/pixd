@@ -213,11 +213,13 @@ client.on(Events.ShardError, (error) => {
 client.login(process.env.BOT_TOKEN);
 
 async function sendPajeet (message) {
+console.log("sone")
  let avatar = Jimp.read(message.member.user.displayAvatarURL({
    extension: 'png',
    forceStatic: true
  }));
- avatar.resize(275, 275).circle();
+ avatar.resize(275, 275);
+avatar.circle();
  let banner = Jimp.read('https://media.discordapp.net/attachments/1063000940279509022/1105098775652995124/PicsArt_05-08-05.14.41.png');
  banner.composite(avatar, 50, 80);
  let buffer = banner.getBufferAsync(Jimp.MIME_PNG);
