@@ -544,7 +544,7 @@ async function genetics(message) {
     referencedMessageId = msg.first().id;
   }
 
-  for (let i = 0; i < genesis.length; i++) {
+  for (let i = 0; i < genesis.length; i++) { try {
     if (isLink) {
       let channel = client.channels.cache.get(channelID);
 
@@ -556,6 +556,7 @@ async function genetics(message) {
         .fetch(referencedMessageId)
         .then((msg) => msg.react(genesis[i]));
     }
+   } catch (e) { console.warn(e); break; }
   }
 }
 async function actually(message) {
@@ -590,11 +591,10 @@ async function actually(message) {
     referencedMessageId = match[2];
   } else {
     let msg = await message.channel.messages.fetch({limit: 1});
-
     referencedMessageId = msg.first().id;
   }
 
-  for (let i = 0; i < genesis.length; i++) {
+  for (let i = 0; i < genesis.length; i++) { try {
     if (isLink) {
       let channel = client.channels.cache.get(channelID);
 
@@ -606,6 +606,7 @@ async function actually(message) {
         .fetch(referencedMessageId)
         .then((msg) => msg.react(genesis[i]));
     }
+   } catch (e) { console.warn(e); break; }
   }
 }
 async function execute(message, serverQueue) {
