@@ -286,7 +286,7 @@ async function sendokbb(member) {
       )
       .print(
         font,
-        190,
+        145,
         55,
         {
           text: 'Just joined the server',
