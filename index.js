@@ -272,17 +272,17 @@ async function sendokbb(member) {
 
     let banner = await Jimp.read(file);
     banner
-      .composite(avatar, 80, 5)
+      .composite(avatar, 30, 5)
       .print(
         font,
-        190,
+        140,
         10,
         {
           text: tag,
           alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
           alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
         },
-        430
+       600
       )
       .print(
         font,
