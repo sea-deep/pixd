@@ -23,6 +23,8 @@ const {words, ALL_WORDS} = require('./words.json');
 const emojis = require('./emojis.json');
 const {Configuration, OpenAIApi} = require('openai');
 const GIFEncoder = require('gif-encoder-2');
+const sharp = require('sharp');
+const translate = require('google-translate-api-x');
 const Jimp = require('jimp');
 const Keyv = require('keyv');
 const playDL = require('play-dl');
@@ -150,8 +152,8 @@ client.on(Events.MessageCreate, async (message) => {
       case 'lapata':
         await lapata(message);
         break;
-      case 'testwel':
-        await sendPajeet(message);
+      case 'allustuff':
+        await stufImg(message);
         break;
       default:
         break;
@@ -1619,6 +1621,84 @@ return message.reply({
   files: [file]
 });
 }
+
+
+async function stuffImg(message) {
+  let image;
+
+  if (message.attachments.size >= 1) {
+    image = message.attachments.first().url;
+  } else if (message.stickers.size >= 1) {
+    image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+  } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
+    let emojiId = RegExp.$1;
+    image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+  } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
+    image = RegExp['$&'];
+  }
+
+  if (message.reference) {
+    let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+
+    if (refMsg.attachments.size >= 1) {
+      image = refMsg.attachments.first().url;
+    } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) {
+      image = RegExp['$&'];
+    } else if (/<:[^:]+:(\d+)>/.test(refMsg.content)) {
+      let emojiId = RegExp.$1;
+      image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+    } else if (refMsg.stickers.size >= 1) {
+      image = `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+    }
+  }
+
+  if (!image) {
+    let messages = await message.channel.messages.fetch({ limit: 50 });
+    messages.reverse().forEach(async (msg) => {
+      if (msg.attachments.size >= 1) {
+        image = msg.attachments.first().url;
+        
+      } else if (msg.stickers.size >= 1) {
+        image = `https://cdn.discordapp.com/stickers/${msg.stickers.first().id}.png`;
+      } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(msg.content)) {
+        image = RegExp['$&'];
+      }
+    });
+  }
+
+  let reg = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
+  let text = message.content.split(' ').splice(1).join(' ').replace(reg, '').trim();
+  let output = await alluStuff(image, text);
+  let file = new AttachmentBuilder(output, { name: 'stuff.png' });
+  message.reply({
+    content: '',
+    files: [file],
+  });
+}
+
+async function alluStuff(image, inputText) {
+  const response = await fetch(image);
+  const data = await response.arrayBuffer();
+  const res = await translate(inputText, { to: 'te' });
+  let text = res.text;
+  let img = await sharp(data).resize(1080).toBuffer();
+  let md = await sharp(img).metadata();
+  let height = md.height + 408;
+
+  return sharp(img)
+    .resize(1080, height, {
+      kernel: sharp.kernel.nearest,
+      fit: 'contain',
+      position: 'top',
+    })
+    .composite([
+      { input: 'allustuff.jpg', gravity: 'south' },
+      { input: { text: { text: text, font: 'Noto Serif Telugu', fontfile: 'nst.ttf', width: 650, height: 370 } }, top: md.height + 20, left: 14, blend: 'difference' },
+    ])
+    .png()
+    .toBuffer();
+}
+
 
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
