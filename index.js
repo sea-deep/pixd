@@ -153,7 +153,7 @@ client.on(Events.MessageCreate, async (message) => {
         await lapata(message);
         break;
       case 'allustuff':
-        await stufImg(message);
+        await stuffImg(message);
         break;
       default:
         break;
