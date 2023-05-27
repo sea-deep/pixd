@@ -1520,12 +1520,13 @@ async function executeModal(interaction) {
     }; // The message when the player wins, it is updated below depending on the game status
     if (!wordArr.some((element) => !element.includes('green'))) {
       // If the player wins
-      await keyv.delete(interaction.message.id);
-    } else if (oldChances == 1) {
+ 
+     // await keyv.delete(interaction.message.id);
+   } else if (oldChances == 1) {
       // Updating the msg object for when the user loses
       msg.embeds[0].fields[0].name = '🦆 You Lost';
-      msg.embeds[0].fields[0].value = `The word was ${answer}`;
-      await keyv.delete(interaction.message.id);
+      msg.embeds[0].fields[0].value = `The word was \`${answer}\``;
+     // await keyv.delete(interaction.message.id);
     } else {
       // If the game is not over
  msg.components[0].components = [{
@@ -1766,7 +1767,7 @@ async function getInputImage(message) {
   });
 }
 async function getDef(interaction) {
-let word = await keyv.get(interaction.message.id);
+let word = keyv.get(interaction.message.id);
 let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`)
 
  let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
