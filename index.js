@@ -18,6 +18,7 @@ const {
   AttachmentBuilder,
 } = require('discord.js');
 const path = require('path');
+const axios = require('axios');
 const functions = require('./2048functions.js');
 const {words, ALL_WORDS} = require('./words.json');
 const emojis = require('./emojis.json');
@@ -214,6 +215,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         break;
       case 'guessed':
         await executeModal(interaction);
+        break;
+      case 'getDef':
+        await getDef(interaction);
         break;
       default:
         break;
@@ -1484,12 +1488,12 @@ async function executeModal(interaction) {
           components: [
             {
               style: 1,
-              label: `GUESS`,
-              custom_id: `guess`,
-              disabled: true,
+              label: `Get Definition`,
+              custom_id: `getDef`,
+              disabled: false,
               emoji: {
                 id: null,
-                name: `🧐`,
+                name: `ℹ️`,
               },
               type: 2,
             },
@@ -1751,3 +1755,10 @@ async function getInputImage(message) {
     forceStatic: true,
   });
 }
+async function getDef(interaction) {
+let word = await keyv.get(interaction.message.id);
+let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`)
+
+ let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
+ return interaction.reply(`The short definitions for \`${word}\` are: ${shortdef}`);
+ }
