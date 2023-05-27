@@ -1528,7 +1528,7 @@ async function executeModal(interaction) {
       await keyv.delete(interaction.message.id);
     } else {
       // If the game is not over
- msg.components[0].components[0] = {
+ msg.components[0].components = [{
               style: 1,
               label: `GUESS`,
               custom_id: `guess`,
@@ -1538,7 +1538,7 @@ async function executeModal(interaction) {
                 name: `🤔`,
               },
               type: 2,
-            };
+            }];
       msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
