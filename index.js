@@ -1768,7 +1768,8 @@ async function getInputImage(message) {
 }
 async function getDef(interaction) {
 let word = keyv.get(interaction.message.id);
-let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`)
+let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`);
+console.log(resp.data[0]);
 
  let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
  return interaction.reply(`The short definitions for \`${word}\` are:\n${shortdef}`);
