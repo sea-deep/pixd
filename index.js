@@ -1538,7 +1538,7 @@ async function executeModal(interaction) {
                 name: `🤔`,
               },
               type: 2,
-            },
+            };
       msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
