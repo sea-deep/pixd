@@ -1528,7 +1528,17 @@ async function executeModal(interaction) {
       await keyv.delete(interaction.message.id);
     } else {
       // If the game is not over
-      msg.components[0].components[0].disabled = false;
+ msg.components[0].components[0] = {
+              style: 1,
+              label: `GUESS`,
+              custom_id: `guess`,
+              disabled: false,
+              emoji: {
+                id: null,
+                name: `🤔`,
+              },
+              type: 2,
+            },
       msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
@@ -1760,5 +1770,5 @@ let word = await keyv.get(interaction.message.id);
 let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`)
 
  let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
- return interaction.reply(`The short definitions for \`${word}\` are: ${shortdef}`);
+ return interaction.reply(`The short definitions for \`${word}\` are:\n${shortdef}`);
  }
