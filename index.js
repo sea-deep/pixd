@@ -27,7 +27,6 @@ const GIFEncoder = require('gif-encoder-2');
 const sharp = require('sharp');
 const translate = require('google-translate-api-x');
 const Jimp = require('jimp');
-const Keyv = require('@keyv/mongo');
 const playDL = require('play-dl');
 const {
   VoiceConnectionStatus,
@@ -44,7 +43,6 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const prefix = 'p!';
-let keyv = new Keyv('mongodb://pixdy:okbhaibudbak@pixd.jpul8rs.mongodb.net/?retryWrites=true&w=majority/pixdbot');
 //instance of the bot
 const client = new Client({
   intents: [
@@ -58,6 +56,7 @@ const client = new Client({
   partials: [Partials.Channel],
 });
 
+const keyv = new Map();
 const queue = new Map(); //map of guild ID and its respective queue
 
 client.once('ready', () => {
