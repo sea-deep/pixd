@@ -1767,7 +1767,10 @@ async function sendAniman(message) {
   let avatars = [];
   for (let i = 0; i < idArray.length; i++) {
     let user = await client.users.fetch(idArray[i]);
-   avatars.push(user.displayAvatarURL());
+   avatars.push(user.displayAvatarURL({
+   extension: 'png',
+   forceStatic: true
+}));
   }
 
   let avatar1 = Jimp.read(avatars[0]);
