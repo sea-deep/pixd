@@ -27,7 +27,7 @@ const GIFEncoder = require('gif-encoder-2');
 const sharp = require('sharp');
 const translate = require('google-translate-api-x');
 const Jimp = require('jimp');
-const Keyv = require('keyv');
+const Keyv = require('@keyv/mongo');
 const playDL = require('play-dl');
 const {
   VoiceConnectionStatus,
@@ -1759,18 +1759,18 @@ async function alluStuff(image, inputText) {
 }
 async function sendAniman(message) {
   await message.channel.sendTyping();
-  const idArray = message.content
-    .match(/<@(\d+)>/g)
-    .map((id) => id.slice(2, -1));
-  if (idArray.length < 4) {
+  const ids = message.content
+    .match(/<@(\d+)>/g);
+  if (!ids || ids.length < 4) {
     return message.reply('Please mention 4 peoples 🤓');
-    I;
   }
+  let idArray = ids.map((id) => id.slice(2, -1));
   let avatars = [];
   for (let i = 0; i < idArray.length; i++) {
     let user = await client.users.fetch(idArray[i]);
-    avatars.push(avatars.displayAvatarURL());
+   avatars.push(user.displayAvatarURL());
   }
+
   let avatar1 = Jimp.read(avatars[0]);
   let avatar2 = Jimp.read(avatars[1]);
   let avatar3 = Jimp.read(avatars[2]);
