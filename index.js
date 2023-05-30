@@ -237,97 +237,34 @@ client.on(Events.ShardError, (error) => {
 
 client.login(process.env.BOT_TOKEN);
 
-
-async function sendAniman(message) {
-  await message.channel.sendTyping();
-  const idArray = message.content.match(/<@(\d+)>/g);
-  let mentions = Array.from(message.mentions.users);
-
-  let sortedMentions = [];
-  for (let i = 0; i < idArray.length; i++) {
-    for (let j = 0; j < mentions.length; j++) {
-      if (idArray[i].includes(mentions[j].id)) {
-        sortedMentions.push(mentions[j]);
-        break;
-      }
-    }
-  }
-
-  mentions = sortedMentions;
-  mentions.sort((a, b) => idArray.indexOf(a.id) - idArray.indexOf(b.id));
-  if (mentions.length !== 4) {
-    return message.reply(`Mention 4 peoples 🤓`);
-  }
-  let bg = await Jimp.read(
-    'https://cdn.discordapp.com/attachments/916697198761234492/1098731085187252344/PicsArt_04-21-03.34.30.png'
-  );
-  bg.resize(720, 762);
-  let avatar1 = await Jimp.read(mentions[0].displayAvatarURL());
-  let avatar2 = await Jimp.read(mentions[1].displayAvatarURL());
-  let avatar3 = await Jimp.read(mentions[2].displayAvatarURL());
-  let avatar4 = await Jimp.read(mentions[3].displayAvatarURL());
-  avatar1.resize(80, 80);
-  avatar2.resize(148, 144);
-  avatar3.resize(123, 112);
-  avatar4.resize(100, 110);
-  const animan = new jimp(720, 762, 00000000)
-    .composite(avatar2, 156, 527)
-    .composite(avatar3, 363, 581)
-    .composite(avatar4, 555, 527)
-    .composite(anim, 0, 0)
-    .composite(avatar1, 291, 38);
-  let buffer = await animan.getBufferAsync(jimp.MIME_PNG);
-
-  const b = [
-    'I put the new Forgis on the Jeep',
-    'I trap until the bloody bottoms is underneath',
-    "'Cause all my niggas got it out the streets",
-    'I keep a hundred racks, inside my jeans',
-    "I remember hittin' the mall with the whole team",
-    "Now a nigga can't answer calls 'cause I'm ballin'",
-    "I was wakin' up gettin' racks in the morning",
-    "I was broke, now I'm rich, these niggs salty",
-    'All this designer on my body got me drip, drip, ayy',
-    "Straight up out the Yaadas, I'm a big Crip",
-    "If I got a pint of lean, I'ma sip, sip",
-    'I run the racks up with my queen like London and Nip',
-    "But I got rich on all these niggas I didn't forget back",
-    "I had to go through the struggle, I didn't forget that",
-    'I hopped inside of the Maybach and now I can sit back',
-    'These Chanel bags is a bad habit, I-I do not know how to act',
-  ];
-
-  const line = b[Math.floor(Math.random() * b.length)];
-  let file = new AttachmentBuilder(buffer, {name: 'animanu'});
-  return message.reply({
-    content: line,
-    files: [file],
-  });
-}
 async function sendokbbl(member) {
-let channel = client.channels.cache.get("804902112700923957");
-channel.send(`ayyo saar **${member.user.tag}** gayaa`);
+  let channel = client.channels.cache.get('804902112700923957');
+  channel.send(`ayyo saar **${member.user.tag}** gayaa`);
 }
 async function sendPajeetl(member) {
-let channel = client.channels.cache.get("1065736446981451776");
-channel.send(`**${member.user.tag}** sirs went on a phoren trip`);
+  let channel = client.channels.cache.get('1065736446981451776');
+  channel.send(`**${member.user.tag}** sirs went on a phoren trip`);
 }
 async function sendPajeet(member) {
- let avatar = await Jimp.read(member.user.displayAvatarURL({
-   extension: 'png',
-   forceStatic: true
- }));
- avatar.resize(275, 275);
-avatar.circle();
- let banner = await Jimp.read('https://media.discordapp.net/attachments/1063000940279509022/1105098775652995124/PicsArt_05-08-05.14.41.png');
- banner.composite(avatar, 50, 78);
- let buffer = await banner.getBufferAsync(Jimp.MIME_PNG);
- let file = new AttachmentBuilder(buffer, {name: "aagaya_muh_uthake.png"});
- let channel = client.channels.cache.get('1065736446981451776');
- return channel.send({
-   content: `Namaste sirs <@${member.user.id}> did poo in the loo`,
-   files: [ file ]
- });
+  let avatar = await Jimp.read(
+    member.user.displayAvatarURL({
+      extension: 'png',
+      forceStatic: true,
+    })
+  );
+  avatar.resize(275, 275);
+  avatar.circle();
+  let banner = await Jimp.read(
+    'https://media.discordapp.net/attachments/1063000940279509022/1105098775652995124/PicsArt_05-08-05.14.41.png'
+  );
+  banner.composite(avatar, 50, 78);
+  let buffer = await banner.getBufferAsync(Jimp.MIME_PNG);
+  let file = new AttachmentBuilder(buffer, {name: 'aagaya_muh_uthake.png'});
+  let channel = client.channels.cache.get('1065736446981451776');
+  return channel.send({
+    content: `Namaste sirs <@${member.user.id}> did poo in the loo`,
+    files: [file],
+  });
 }
 async function sendokbb(member) {
   let avatarURL = member.user.displayAvatarURL({
@@ -358,7 +295,7 @@ async function sendokbb(member) {
           alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
           alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
         },
-       600
+        600
       )
       .print(
         font,
@@ -562,7 +499,7 @@ async function gpt(message) {
     `PIXD can write poems and stories about everything, infact he's a fiction pro!`,
     `User's Query:`,
     `${msg}`,
-    `PIXD's Response: `
+    `PIXD's Response: `,
   ].join('\n');
 
   const completion = await openai.createCompletion({
@@ -620,19 +557,23 @@ async function genetics(message) {
     referencedMessageId = msg.first().id;
   }
 
-  for (let i = 0; i < genesis.length; i++) { try {
-    if (isLink) {
-      let channel = client.channels.cache.get(channelID);
+  for (let i = 0; i < genesis.length; i++) {
+    try {
+      if (isLink) {
+        let channel = client.channels.cache.get(channelID);
 
-      channel.messages
-        .fetch(referencedMessageId)
-        .then((msg) => msg.react(genesis[i]));
-    } else {
-      await message.channel.messages
-        .fetch(referencedMessageId)
-        .then((msg) => msg.react(genesis[i]));
+        channel.messages
+          .fetch(referencedMessageId)
+          .then((msg) => msg.react(genesis[i]));
+      } else {
+        await message.channel.messages
+          .fetch(referencedMessageId)
+          .then((msg) => msg.react(genesis[i]));
+      }
+    } catch (e) {
+      console.warn(e);
+      break;
     }
-   } catch (e) { console.warn(e); break; }
   }
 }
 async function actually(message) {
@@ -670,19 +611,23 @@ async function actually(message) {
     referencedMessageId = msg.first().id;
   }
 
-  for (let i = 0; i < genesis.length; i++) { try {
-    if (isLink) {
-      let channel = client.channels.cache.get(channelID);
+  for (let i = 0; i < genesis.length; i++) {
+    try {
+      if (isLink) {
+        let channel = client.channels.cache.get(channelID);
 
-      channel.messages
-        .fetch(referencedMessageId)
-        .then((msg) => msg.react(genesis[i]));
-    } else {
-      await message.channel.messages
-        .fetch(referencedMessageId)
-        .then((msg) => msg.react(genesis[i]));
+        channel.messages
+          .fetch(referencedMessageId)
+          .then((msg) => msg.react(genesis[i]));
+      } else {
+        await message.channel.messages
+          .fetch(referencedMessageId)
+          .then((msg) => msg.react(genesis[i]));
+      }
+    } catch (e) {
+      console.warn(e);
+      break;
     }
-   } catch (e) { console.warn(e); break; }
   }
 }
 async function execute(message, serverQueue) {
@@ -1590,26 +1535,27 @@ async function executeModal(interaction) {
     }; // The message when the player wins, it is updated below depending on the game status
     if (!wordArr.some((element) => !element.includes('green'))) {
       // If the player wins
- 
-     // await keyv.delete(interaction.message.id);
-   } else if (oldChances == 1) {
+      // await keyv.delete(interaction.message.id);
+    } else if (oldChances == 1) {
       // Updating the msg object for when the user loses
       msg.embeds[0].fields[0].name = '🦆 You Lost';
       msg.embeds[0].fields[0].value = `The word was \`${answer}\``;
-     // await keyv.delete(interaction.message.id);
+      // await keyv.delete(interaction.message.id);
     } else {
       // If the game is not over
- msg.components[0].components = [{
-              style: 1,
-              label: `GUESS`,
-              custom_id: `guess`,
-              disabled: false,
-              emoji: {
-                id: null,
-                name: `🤔`,
-              },
-              type: 2,
-            }];
+      msg.components[0].components = [
+        {
+          style: 1,
+          label: `GUESS`,
+          custom_id: `guess`,
+          disabled: false,
+          emoji: {
+            id: null,
+            name: `🤔`,
+          },
+          type: 2,
+        },
+      ];
       msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
@@ -1647,7 +1593,6 @@ function getColoredWord(answer, guess) {
   return coloredWord;
 }
 
-
 async function rape(message) {
   const allCords = [
     {x: 0, y: 0},
@@ -1656,7 +1601,8 @@ async function rape(message) {
     {x: 366, y: 500},
   ];
   const position = allCords[Math.floor(Math.random() * 4)];
-  let bg = await Jimp.read( 'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
+  let bg = await Jimp.read(
+    'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg'
   );
   let avatar = await Jimp.read(await getInputImage(message));
   avatar.resize(366, 500);
@@ -1671,42 +1617,45 @@ async function rape(message) {
 
 async function vosahihai(message) {
   const position = {x: 245, y: 0};
-  let bg = await Jimp.read("https://cdn.discordapp.com/attachments/1088008848469655562/1104863177897934908/PicsArt_05-08-01.41.32.jpg");
+  let bg = await Jimp.read(
+    'https://cdn.discordapp.com/attachments/1088008848469655562/1104863177897934908/PicsArt_05-08-01.41.32.jpg'
+  );
   let avatar = await Jimp.read(await getInputImage(message));
-  avatar.resize(354,433);
+  avatar.resize(354, 433);
   bg.composite(avatar, position.x, position.y);
   let buffer = await bg.getBufferAsync(Jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'maisahitha.png'});
   let text = [
-  'vo kuch thug hai',
-  'vo to koi thug nahi hai',
-  'vo sahi hai',
-  'vo galat hai',
-  'vo real hai',
-  'vo fake hai',
-  'vo <:genesis:1013083814270074890> hai',
-];
-return message.reply({
-  comtent: text[Math.round(Math.random() * text.length)],
-  files: [file]
-});
+    'vo kuch thug hai',
+    'vo to koi thug nahi hai',
+    'vo sahi hai',
+    'vo galat hai',
+    'vo real hai',
+    'vo fake hai',
+    'vo <:genesis:1013083814270074890> hai',
+  ];
+  return message.reply({
+    comtent: text[Math.round(Math.random() * text.length)],
+    files: [file],
+  });
 }
 
 async function lapata(message) {
   let base = new Jimp(720, 404, 0x00000000);
-//console.log(getInputImage(message));
-let avatar = await Jimp.read(await getInputImage(message));
+  //console.log(getInputImage(message));
+  let avatar = await Jimp.read(await getInputImage(message));
   avatar.resize(156, 182);
-let fg = await Jimp.read("https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png");
-base.composite(avatar, 32,119).composite(fg, 0, 0);
+  let fg = await Jimp.read(
+    'https://cdn.discordapp.com/attachments/916697198761234492/1104896270428020807/PicsArt_05-08-03.41.52.png'
+  );
+  base.composite(avatar, 32, 119).composite(fg, 0, 0);
   let buffer = await base.getBufferAsync(Jimp.MIME_PNG);
   let file = new AttachmentBuilder(buffer, {name: 'lapata.png'});
-return message.reply({
-  comtent: '',
-  files: [file]
-});
+  return message.reply({
+    comtent: '',
+    files: [file],
+  });
 }
-
 
 async function stuffImg(message) {
   let image;
@@ -1714,7 +1663,9 @@ async function stuffImg(message) {
   if (message.attachments.size >= 1) {
     image = message.attachments.first().url;
   } else if (message.stickers.size >= 1) {
-    image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+    image = `https://cdn.discordapp.com/stickers/${
+      message.stickers.first().id
+    }.png`;
   } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
     let emojiId = RegExp.$1;
     image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
@@ -1723,7 +1674,9 @@ async function stuffImg(message) {
   }
 
   if (message.reference) {
-    let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+    let refMsg = await message.channel.messages.fetch(
+      message.reference.messageId
+    );
 
     if (refMsg.attachments.size >= 1) {
       image = refMsg.attachments.first().url;
@@ -1733,18 +1686,21 @@ async function stuffImg(message) {
       let emojiId = RegExp.$1;
       image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
     } else if (refMsg.stickers.size >= 1) {
-      image = `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+      image = `https://cdn.discordapp.com/stickers/${
+        refMsg.stickers.first().id
+      }.png`;
     }
   }
 
   if (!image) {
-    let messages = await message.channel.messages.fetch({ limit: 50 });
+    let messages = await message.channel.messages.fetch({limit: 50});
     messages.reverse().forEach(async (msg) => {
       if (msg.attachments.size >= 1) {
         image = msg.attachments.first().url;
-        
       } else if (msg.stickers.size >= 1) {
-        image = `https://cdn.discordapp.com/stickers/${msg.stickers.first().id}.png`;
+        image = `https://cdn.discordapp.com/stickers/${
+          msg.stickers.first().id
+        }.png`;
       } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(msg.content)) {
         image = RegExp['$&'];
       }
@@ -1752,9 +1708,14 @@ async function stuffImg(message) {
   }
 
   let reg = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
-  let text = message.content.split(' ').splice(1).join(' ').replace(reg, '').trim();
+  let text = message.content
+    .split(' ')
+    .splice(1)
+    .join(' ')
+    .replace(reg, '')
+    .trim();
   let output = await alluStuff(image, text);
-  let file = new AttachmentBuilder(output, { name: 'stuff.png' });
+  let file = new AttachmentBuilder(output, {name: 'stuff.png'});
   message.reply({
     content: '',
     files: [file],
@@ -1764,7 +1725,7 @@ async function stuffImg(message) {
 async function alluStuff(image, inputText) {
   const response = await fetch(image);
   const data = await response.arrayBuffer();
-  const res = await translate(inputText, { to: 'te' });
+  const res = await translate(inputText, {to: 'te'});
   let text = res.text;
   let img = await sharp(data).resize(1080).toBuffer();
   let md = await sharp(img).metadata();
@@ -1777,13 +1738,82 @@ async function alluStuff(image, inputText) {
       position: 'top',
     })
     .composite([
-      { input: 'allustuff.jpg', gravity: 'south' },
-      { input: { text: { text: text, font: 'Noto Serif Telugu', fontfile: 'nst.ttf', width: 650, height: 370 } }, top: md.height + 20, left: 14, blend: 'difference' },
+      {input: 'allustuff.jpg', gravity: 'south'},
+      {
+        input: {
+          text: {
+            text: text,
+            font: 'Noto Serif Telugu',
+            fontfile: 'nst.ttf',
+            width: 650,
+            height: 370,
+          },
+        },
+        top: md.height + 20,
+        left: 14,
+        blend: 'difference',
+      },
     ])
     .png()
     .toBuffer();
 }
+async function sendAniman(message) {
+  await message.channel.sendTyping();
+  const idArray = message.content
+    .match(/<@(\d+)>/g)
+    .map((id) => id.slice(2, -1));
+  if (idArray.length < 4) {
+    return message.reply('Please mention 4 peoples 🤓');
+    I;
+  }
+  let avatars = [];
+  for (let i = 0; i < idArray.length; i++) {
+    let user = await client.users.fetch(idArray[i]);
+    avatars.push(avatars.displayAvatarURL());
+  }
+  let avatar1 = Jimp.read(avatars[0]);
+  let avatar2 = Jimp.read(avatars[1]);
+  let avatar3 = Jimp.read(avatars[2]);
+  let avatar4 = Jimp.read(avatars[3]);
 
+  avatar1.resize(80, 80);
+  avatar2.resize(148, 144);
+  avatar3.resize(123, 112);
+  avatar4.resize(100, 110);
+  const animan = new Jimp(720, 762, 00000000)
+    .composite(avatar2, 156, 527)
+    .composite(avatar3, 363, 581)
+    .composite(avatar4, 555, 527)
+    .composite(anim, 0, 0)
+    .composite(avatar1, 291, 38);
+  let buffer = await animan.getBufferAsync(Jimp.MIME_PNG);
+
+  const b = [
+    'I put the new Forgis on the Jeep',
+    'I trap until the bloody bottoms is underneath',
+    "'Cause all my niggas got it out the streets",
+    'I keep a hundred racks, inside my jeans',
+    "I remember hittin' the mall with the whole team",
+    "Now a nigga can't answer calls 'cause I'm ballin'",
+    "I was wakin' up gettin' racks in the morning",
+    "I was broke, now I'm rich, these niggs salty",
+    'All this designer on my body got me drip, drip, ayy',
+    "Straight up out the Yaadas, I'm a big Crip",
+    "If I got a pint of lean, I'ma sip, sip",
+    'I run the racks up with my queen like London and Nip',
+    "But I got rich on all these niggas I didn't forget back",
+    "I had to go through the struggle, I didn't forget that",
+    'I hopped inside of the Maybach and now I can sit back',
+    'These Chanel bags is a bad habit, I-I do not know how to act',
+  ];
+
+  const line = b[Math.floor(Math.random() * b.length)];
+  let file = new AttachmentBuilder(buffer, {name: 'animanu'});
+  return message.reply({
+    content: line,
+    files: [file],
+  });
+}
 
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
@@ -1791,7 +1821,9 @@ async function getInputImage(message) {
   }
 
   if (message.stickers.size >= 1) {
-    return `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+    return `https://cdn.discordapp.com/stickers/${
+      message.stickers.first().id
+    }.png`;
   }
 
   if (/<:[^:]+:(\d+)>/.test(message.content)) {
@@ -1804,7 +1836,9 @@ async function getInputImage(message) {
   }
 
   if (message.reference) {
-    let refMsg = await message.channel.messages.fetch(message.reference.messageId);
+    let refMsg = await message.channel.messages.fetch(
+      message.reference.messageId
+    );
 
     if (refMsg.attachments.size >= 1) {
       return refMsg.attachments.first().url;
@@ -1820,7 +1854,9 @@ async function getInputImage(message) {
     }
 
     if (refMsg.stickers.size >= 1) {
-      return `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+      return `https://cdn.discordapp.com/stickers/${
+        refMsg.stickers.first().id
+      }.png`;
     }
   }
 
@@ -1837,10 +1873,14 @@ async function getInputImage(message) {
   });
 }
 async function getDef(interaction) {
-let word = await keyv.get(interaction.message.id);
-let resp = await axios(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`);
-// console.log(word + '\n' + resp);
+  let word = await keyv.get(interaction.message.id);
+  let resp = await axios(
+    `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=4c1890e1-012f-4514-803e-ea3ecb532b80`
+  );
+  // console.log(word + '\n' + resp);
 
- let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
- return interaction.reply(`The short definitions for \`${word}\` are:\n${shortdef}`);
- }
+  let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
+  return interaction.reply(
+    `The short definitions for \`${word}\` are:\n${shortdef}`
+  );
+}
