@@ -1773,10 +1773,10 @@ async function sendAniman(message) {
 }));
   }
 
-  let avatar1 = Jimp.read(avatars[0]);
-  let avatar2 = Jimp.read(avatars[1]);
-  let avatar3 = Jimp.read(avatars[2]);
-  let avatar4 = Jimp.read(avatars[3]);
+  let avatar1 = await Jimp.read(avatars[0]);
+  let avatar2 = await Jimp.read(avatars[1]);
+  let avatar3 = await Jimp.read(avatars[2]);
+  let avatar4 = await Jimp.read(avatars[3]);
 
   avatar1.resize(80, 80);
   avatar2.resize(148, 144);
