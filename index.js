@@ -1772,7 +1772,10 @@ async function sendAniman(message) {
    forceStatic: true
 }));
   }
-
+  let bg = await Jimp.read(
+    'https://cdn.discordapp.com/attachments/916697198761234492/1098731085187252344/PicsArt_04-21-03.34.30.png'
+  );
+  bg.resize(720, 762);
   let avatar1 = await Jimp.read(avatars[0]);
   let avatar2 = await Jimp.read(avatars[1]);
   let avatar3 = await Jimp.read(avatars[2]);
@@ -1786,7 +1789,7 @@ async function sendAniman(message) {
     .composite(avatar2, 156, 527)
     .composite(avatar3, 363, 581)
     .composite(avatar4, 555, 527)
-    .composite(anim, 0, 0)
+    .composite(bg, 0, 0)
     .composite(avatar1, 291, 38);
   let buffer = await animan.getBufferAsync(Jimp.MIME_PNG);
 
