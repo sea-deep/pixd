@@ -44,7 +44,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const prefix = 'p!';
-let keyv = new Keyv('mongodb://pixdy:tX98NZhU17aSTPgb@localhost:27017/pixdbot');
+let keyv = new Keyv('mongodb://pixdy:okbhaibudbak@pixd.jpul8rs.mongodb.net/?retryWrites=true&w=majority/pixdbot');
 //instance of the bot
 const client = new Client({
   intents: [
