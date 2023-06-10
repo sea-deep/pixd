@@ -7,7 +7,7 @@ const port = 9002;
 app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'));
 
 app.listen(port, () =>
-  console.log(`Your app is listening a http://localhost/${port}`)
+  console.log(`Your app is listening at http://localhost/${port}`)
 );
 
 const {
@@ -20,9 +20,9 @@ const {
 const path = require('path');
 const axios = require('axios');
 const functions = require('./2048functions.js');
-const {words, ALL_WORDS} = require('./words.json');
+const { words, ALL_WORDS } = require('./words.json');
 const emojis = require('./emojis.json');
-const {Configuration, OpenAIApi} = require('openai');
+const { Configuration, OpenAIApi } = require('openai');
 const GIFEncoder = require('gif-encoder-2');
 const sharp = require('sharp');
 const translate = require('google-translate-api-x');
@@ -52,7 +52,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
   ],
-  ws: {properties: {browser: 'Discord iOS'}},
+  ws: { properties: { browser: 'Discord iOS' } },
   partials: [Partials.Channel],
 });
 
@@ -65,13 +65,12 @@ client.once('ready', () => {
 client.once('reconnect', () => {
   console.log('Pixd is reconnecting...');
 });
-playDL.getFreeClientID().then((clientID) =>
-  playDL.setToken({
-    soundcloud: {
-      client_id: clientID,
-    },
-  })
-);
+playDL
+  .getFreeClientID()
+  .then((clientID) => playDL.setToken({ soundcloud: { client_id: clientID } }))
+  .catch((err) => {
+    console.error('Failed to get client ID:', err);
+  });
 client.on(Events.MessageCreate, async (message) => {
   try {
     if (message.author.bot) {
@@ -83,112 +82,127 @@ client.on(Events.MessageCreate, async (message) => {
     const command = args.shift().toLowerCase();
     switch (command) {
       case '2048':
-        await game2048(message);
+        await handleErrors(game2048, message);
         break;
       case 'actually':
-        await actually(message);
+        await handleErrors(actually, message);
         break;
       case 'padhaku':
-        await padhaku(message);
+        await handleErrors(padhaku, message);
         break;
       case 'gpt':
-        await gpt(message);
+        await handleErrors(gpt, message);
         break;
       case 'p':
       case 'play':
-        await execute(message, serverQueue);
+        await handleErrors(execute, message, serverQueue);
         break;
       case 'next':
       case 'skip':
-        await skip(message, serverQueue);
+        await handleErrors(skip, message, serverQueue);
         break;
       case 'skipto':
-        await skipto(message, serverQueue);
+        await handleErrors(skipto, message, serverQueue);
         break;
       case 'pause':
-        await pause(message, serverQueue);
+        await handleErrors(pause, message, serverQueue);
         break;
       case 'resume':
-        await resume(message, serverQueue);
+        await handleErrors(resume, message, serverQueue);
         break;
       case 'repeat':
       case 'loop':
-        await loopSong(message, serverQueue);
+        await handleErrors(loopSong, message, serverQueue);
         break;
       case 'np':
       case 'q':
       case 'queue':
-        await showQueue(message, serverQueue);
+        await handleErrors(showQueue, message, serverQueue);
         break;
       case 'clear':
-        await clear(message, serverQueue);
+        await handleErrors(clear, message, serverQueue);
         break;
       case 'shuffle':
-        await shuffle(message, serverQueue);
+        await handleErrors(shuffle, message, serverQueue);
         break;
       case 'seek':
-        await seek(message, serverQueue);
+        await handleErrors(seek, message, serverQueue);
         break;
       case 'animan':
-        await sendAniman(message);
+        await handleErrors(sendAniman, message);
         break;
       case 'genetics':
-        await genetics(message);
+        await handleErrors(genetics, message);
         break;
       case 'stop':
       case 'kick':
       case 'remove':
-        await kick(message, serverQueue);
+        await handleErrors(kick, message, serverQueue);
         break;
       case 'wordle':
-        await sendHelp(message);
+        await handleErrors(sendGame, message);
         break;
       case 'playwordle':
-        await sendGame(message);
+        await handleErrors(change, message);
         break;
       case 'rape':
-        await rape(message);
+        await handleErrors(rape, message);
         break;
       case 'vosahihai':
-        await vosahihai(message);
+        await handleErrors(vosahihai, message);
         break;
       case 'lapata':
-        await lapata(message);
+        await handleErrors(lapata, message);
         break;
       case 'allustuff':
-        await stuffImg(message);
+        await handleErrors(stuffImg, message);
+        break;
+      case 'nearyou':
+        await handleErrors(nearme, message);
+        break;
+      case 'goodness':
+        await handleErrors(goodness, message);
+        break;
+
+      default:
+        break;
+    }
+  } catch (err) {
+    console.error('An error occurred:', err);
+  }
+});
+
+client.on(Events.GuildMemberAdd, async (member) => {
+  try {
+    switch (member.guild.id) {
+      case '804902112700923954':
+        await handleErrors(sendokbb, member);
+        break;
+      case '1062998378293776384':
+        await handleErrors(sendPajeet, member);
         break;
       default:
         break;
     }
   } catch (err) {
-    console.error(err.message);
-  }
-});
-
-client.on(Events.GuildMemberAdd, async (member) => {
-  switch (member.guild.id) {
-    case '804902112700923954':
-      await sendokbb(member);
-      break;
-    case '1062998378293776384':
-      await sendPajeet(member);
-      break;
-    default:
-      break;
+    console.error('An error occurred:', err);
   }
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
-  switch (member.guild.id) {
-    case '804902112700923954':
-      await sendokbbl(member);
-      break;
-    case '1062998378293776384':
-      await sendPajeetl(member);
-      break;
-    default:
-      break;
+  try {
+    switch (member.guild.id) {
+      case '804902112700923954':
+        await handleErrors(sendokbbl, member);
+        break;
+      case '1062998378293776384':
+        await handleErrors(sendPajeetl, member);
+        break;
+      default:
+        break;
+    }
+  } catch (err) {
+    console.error('An error occurred:', err);
   }
 });
 
@@ -198,43 +212,54 @@ client.on(Events.InteractionCreate, async (interaction) => {
     switch (interaction.customId) {
       case '2048_up':
         await interaction.deferUpdate();
-        await moveUp(interaction.message);
+        await handleErrors(moveUp, interaction.message);
         break;
       case '2048_down':
         await interaction.deferUpdate();
-        await moveDown(interaction.message);
+        await handleErrors(moveDown, interaction.message);
         break;
       case '2048_left':
         await interaction.deferUpdate();
-        await moveLeft(interaction.message);
+        await handleErrors(moveLeft, interaction.message);
         break;
       case '2048_right':
         await interaction.deferUpdate();
-        await moveRight(interaction.message);
+        await handleErrors(moveRight, interaction.message);
         break;
       case 'guess':
-        await createModal(interaction);
+        await handleErrors(createModal, interaction);
+        break;
+      case 'htp':
+        await handleErrors(htp, interaction);
         break;
       case 'guessed':
-        await executeModal(interaction);
+        await handleErrors(executeModal, interaction);
         break;
       case 'getDef':
-        await getDef(interaction);
+        await handleErrors(getDef, interaction);
         break;
       default:
         break;
     }
   } catch (err) {
-    console.log(err);
+    console.log('An error occurred:', err);
   }
 });
 
 client.on(Events.ShardError, (error) => {
-  console.log(error);
+  console.log('A shard error occurred:', error);
   client.login(process.env.BOT_TOKEN);
 });
 
 client.login(process.env.BOT_TOKEN);
+
+async function handleErrors(func, ...args) {
+  try {
+    await func(...args);
+  } catch (err) {
+    console.error('An error occurred:', err);
+  }
+}
 
 async function sendokbbl(member) {
   let channel = client.channels.cache.get('804902112700923957');
@@ -1363,6 +1388,8 @@ function parse(input) {
   } else {
     return 0;
   }
+}async function change(message) {
+  return message.reply('Command changed to : `p!wordle`')
 }
 async function sendGame(message) {
   let msg = await message.reply({
@@ -1385,7 +1412,23 @@ async function sendGame(message) {
           },
         ],
       },
-    ],
+      {
+        type: 1,
+        components: [
+          {
+            style: 4,
+            label: `How to play?`,
+            custom_id: `htp`,
+            disabled: false,
+            emoji: {
+              id: null,
+              name: `❓`,
+            },
+            type: 2,
+          },
+        ],
+      },
+   ],
     embeds: [
       {
         type: 'rich',
@@ -1405,9 +1448,6 @@ async function sendGame(message) {
             value: `6`,
           },
         ],
-        footer: {
-          text: `Use ${prefix}help for rules and context about the game`,
-        },
       },
     ],
   });
@@ -1416,7 +1456,7 @@ async function sendGame(message) {
   let val = words[Math.floor(Math.random() * words.length)];
   await keyv.set(key, val, 75000000);
 }
-async function sendHelp(message) {
+async function htp(interaction) {
   const desc = [
     `• After each guess, the color of the tiles will change to show how close your guess was to the word.\n`,
     `**Tile color meanings:**\n`,
@@ -1427,7 +1467,8 @@ async function sendHelp(message) {
     `${emojis.green.v} ${emojis.green.a} ${emojis.gray.l} ${emojis.green.u} ${emojis.green.e}`,
     `The letter **L** is not in the word in any spot`,
   ].join(`\n`);
-  await message.channel.send({
+  await interaction.reply({
+    ephemeral: true,
     content: `**HOW TO PLAY**`,
     tts: false,
     embeds: [
@@ -1443,7 +1484,6 @@ async function sendHelp(message) {
     ],
   });
 }
-
 async function createModal(interaction) {
   if (interaction.message.content.includes(interaction.user.id)) {
     await interaction.showModal({
@@ -1526,9 +1566,6 @@ async function executeModal(interaction) {
               value: `Your performance: \`${count}/6\``,
             },
           ],
-          footer: {
-            text: `Use ${prefix}wordle for rules and context about the game`,
-          },
         },
       ],
     }; // The message when the player wins, it is updated below depending on the game status
@@ -1542,19 +1579,40 @@ async function executeModal(interaction) {
       // await keyv.delete(interaction.message.id);
     } else {
       // If the game is not over
-      msg.components[0].components = [
-        {
-          style: 1,
-          label: `GUESS`,
-          custom_id: `guess`,
-          disabled: false,
-          emoji: {
-            id: null,
-            name: `🤔`,
+      msg.components = [
+      {
+        type: 1,
+        components: [
+          {
+            style: 1,
+            label: `GUESS`,
+            custom_id: `guess`,
+            disabled: false,
+            emoji: {
+              id: null,
+              name: `🧐`,
+            },
+            type: 2,
           },
-          type: 2,
-        },
-      ];
+        ],
+      },
+      {
+        type: 1,
+        components: [
+          {
+            style: 4,
+            label: `How to play?`,
+            custom_id: `htp`,
+            disabled: false,
+            emoji: {
+              id: null,
+              name: `❓`,
+            },
+            type: 2,
+          },
+        ],
+      },
+   ],
       msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
@@ -1567,6 +1625,7 @@ async function executeModal(interaction) {
     });
   }
 }
+
 function getColoredWord(answer, guess) {
   let coloredWord = [];
   for (let i = 0; i < guess.length; i++) {
@@ -1818,7 +1877,60 @@ async function sendAniman(message) {
     files: [file],
   });
 }
+async function goodness (message) {
+  let m = await message.reply('Processing...');
+  let avatar = await getInputImage(message);
+  let av = await Jimp.read(avatar);
+  av.resize(157,157)
+  const encoder = new GIFEncoder(260, 296);
+  encoder.setDelay(50);
+  encoder.start();
+  for (let i = 0; i < 34; i++) {
+    const frame = i < 10 ? `0${i}` : `${i}`;
+    const file = path.resolve(`./goodness/frame_${frame}_delay-0.05s.gif`);
 
+    let banner = await Jimp.read(file);
+    banner.composite(av, 108, 139);
+    encoder.addFrame(banner.bitmap.data);
+  }
+  encoder.finish();
+  const buffer = encoder.out.getData();
+  let file = new AttachmentBuilder(buffer, {name: 'godnessgraciousness.gif'});
+  await message.reply({
+    content: ``,
+    files: [file],
+  });
+ await m.delete();
+
+}
+async function nearme (message) {
+let m = await message.reply('Processing...');
+    let avatar = await getInputImage(message);
+  let av = await Jimp.read(avatar);
+  av.resize(252,252);
+  const encoder = new GIFEncoder(360, 360);
+  encoder.setDelay(150);
+  encoder.start();
+  for (let i = 0; i < 60; i++) {
+    const frame = i < 10 ? `0${i}` : `${i}`;
+    const file = path.resolve(`./nearframes/frame_${frame}_delay-0.17s.gif`);
+
+    let banner = await Jimp.read(file);
+    banner
+      .composite(av, -21, 70);
+      
+encoder.addFrame(banner.bitmap.data);
+  }
+  encoder.finish();
+  const buffer = encoder.out.getData();
+  let file = new AttachmentBuilder(buffer, {name: 'godnessgraciousness.gif'});
+  await message.reply({
+    content: ``,
+    files: [file],
+  });
+  await m.delete();
+    
+}
 async function getInputImage(message) {
   if (message.attachments.size >= 1) {
     return message.attachments.first().url;
