@@ -58,7 +58,10 @@ const client = new Client({
 
 const keyv = new Map();
 const queue = new Map(); //map of guild ID and its respective queue
-
+let emptyDisk = "<:emptyDisk:1102228471448604823>";
+let redDisk = "<:redDisk:1102229231527809025>";
+let winDisk = "<:winDisk:1116818983996362912>";
+let yellowDisk = "<:yellowDisk:1102228894209294371>";
 client.once('ready', () => {
   console.log(`${client.user.tag} is online!`);
 });
@@ -139,6 +142,10 @@ client.on(Events.MessageCreate, async (message) => {
       case 'remove':
         await handleErrors(kick, message, serverQueue);
         break;
+      case 'connect4':
+    case 'c4':
+      await sendc4(message);
+      break;
       case 'wordle':
         await handleErrors(sendGame, message);
         break;
@@ -210,6 +217,34 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
     switch (interaction.customId) {
+     case 'one':
+       await interaction.deferUpdate();
+       await onButton(interaction, 0);
+       break;
+     case 'two':
+       await interaction.deferUpdate();
+       await onButton(interaction,1);
+       break;
+     case 'three':
+       await interaction.deferUpdate();
+       await onButton(interaction,2);
+       break;
+     case 'four':
+       await interaction.deferUpdate();
+       await onButton(interaction,3);
+       break;
+     case 'five':
+       await interaction.deferUpdate();
+       await onButton(interaction,4);
+       break;
+     case 'six':
+       await interaction.deferUpdate();
+       await onButton(interaction,5);
+       break;
+     case 'seven':
+       await interaction.deferUpdate();
+       await onButton(interaction,6);
+       break;
       case '2048_up':
         await interaction.deferUpdate();
         await handleErrors(moveUp, interaction.message);
@@ -1988,6 +2023,7 @@ async function getInputImage(message) {
     forceStatic: true,
   });
 }
+
 async function getDef(interaction) {
   let word = await keyv.get(interaction.message.id);
   let resp = await axios(
@@ -1999,4 +2035,402 @@ async function getDef(interaction) {
   return interaction.reply(
     `The short definitions for \`${word}\` are:\n${shortdef}`
   );
+}
+
+async function sendc4(message) {
+let desc = [
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+];
+let content =
+  message.mentions.users.size === 0
+    ? `${redDisk}<@${message.author.id}> challenged ${yellowDisk}**me**\nYour turn ${redDisk}<@${message.author.id}> :`
+    : `${redDisk}<@${message.author.id}> challenged the ${yellowDisk}<@${message.mentions.users.first().id}>\nYour turn ${redDisk}<@${message.author.id}> :`;
+
+message.channel.send({
+  channel_id: `${message.channel_id}`,
+  content: content,
+  tts: false,
+  embeds: [
+    {
+      type: 'rich',
+      title: `🔢 Connect 4`,
+      description: desc.join('\n'),
+      color: 0x8773ea,
+      footer: {
+        text: `The first player to connect 4 disks horizontally, vertically, or diagonally wins!`,
+      },
+      fields: [
+        {
+          name: '1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ \nClick the buttons to drop',
+          value: '',
+        },
+      ],
+      color: 0xffff00
+    },
+  ],
+  components: [
+    {
+      type: 1,
+      components: [
+        {
+          style: 2,
+          custom_id: `one`,
+          disabled: false,
+          emoji: {id: null, name: `1️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `two`,
+          disabled: false,
+          emoji: {id: null, name: `2️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `three`,
+          disabled: false,
+          emoji: {id: null, name: `3️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `four`,
+          disabled: false,
+          emoji: {id: null, name: `4️⃣`},
+          type: 2,
+        },
+      ],
+    },
+    {
+      type: 1,
+      components: [
+          {
+          style: 2,
+          custom_id: `five`,
+          disabled: false,
+          emoji: {id: null, name: `5️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `six`,
+          disabled: false,
+          emoji: {id: null, name: `6️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `seven`,
+          disabled: false,
+          emoji: {id: null, name: `7️⃣`},
+          type: 2,
+        },
+      ],
+    },
+  ],
+});
+}
+
+async function onButton(interaction, dropIn) {
+const message = interaction.message;
+const regex = /<@(\d+)>/g; //To extract mentions...
+const mentions = message.content
+  .match(regex)
+  .map((match) => match.slice(2, -1));
+  
+if (
+  mentions.length === 3 &&
+  interaction.member.user.id !== mentions[2]
+) {
+  if (!mentions.includes(interaction.member.user.id)) {
+    return interaction.reply({
+      content: `❌ **This is not your game**`,
+      ephemeral: true,
+    });
+  } else {
+    return interaction.reply({
+      content: `❌ **This is not your turn**`,
+      ephemeral: true,
+    });
+  }
+} else if (!mentions.includes(interaction.member.user.id)) {
+  return interaction.reply({
+    content: `❌ **This is not your game**`,
+    ephemeral: true,
+  });
+}
+
+
+if (mentions.length === 3) {
+  let components = message.components;
+  let playerEmote = mentions[0] === mentions[2] ? redDisk : yellowDisk;
+  let oppsID = mentions[0] === mentions[2] ? mentions[1] : mentions[0];
+  let oppsEmote = playerEmote === redDisk ? yellowDisk : redDisk;
+  let board = message.embeds[0].description.split('\n');
+  let newBoard = drop(board, playerEmote, dropIn);
+  let win = isWin(newBoard, playerEmote, 4);
+  newBoard = win ? win : newBoard;
+  let content = win
+    ? `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\nAnd ${playerEmote}<@${mentions[2]}> **won**!`
+    : `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**Your turn** ${oppsEmote}<@${oppsID}> :`;
+
+  if (!newBoard) {
+    return interaction.reply({
+    content: `❌ **This column is already filled.**`,
+    ephemeral: true,
+  });
+  }
+  await message.edit({
+    content: `${content}`,
+    embeds: [
+      {
+        type: `rich`,
+        description: newBoard.join('\n'),
+        color: 0xff0000,
+        fields: message.embeds[0].fields,
+        title: message.embeds[0].title,
+        footer: message.embeds[0].footer
+      },
+    ],
+    components: components,
+  });
+} else {
+  let components = message.components;
+  let content = message.content.split('\n');
+  let userDrop = drop(
+    message.embeds[0].description.split('\n'),
+    redDisk,
+    dropIn
+  );
+  let userWin = isWin(userDrop, redDisk, 4)
+  if (userWin) {
+    content[1] = `And you **won**.`;
+  }
+  let dropCall = autoDrop(userDrop);
+  let newDesc = dropCall.board;
+  let botWin = isWin(newDesc, yellowDisk, 4)
+
+  if (userWin) {
+    content[1] = `And ${redDisk}you **won**.`;
+    
+    
+  }
+  if (botWin) {
+    content[1] = `And ${redDisk}you **lost** 🤣.`;
+  }
+  newDesc = userWin
+            ? userWin
+            : botWin ? botWin : newDesc;
+            
+  return message.edit({
+    content: content.join('\n'),
+    embeds: [
+      {
+        type: `rich`,
+        description: newDesc.join('\n'),
+        color: 0xff0000,
+        fields: message.embeds[0].fields,
+        title: message.embeds[0].title,
+        footer: message.embeds[0].footer
+      },
+    ],
+    components: components,
+  });
+}
+}
+
+
+// Helper functions 
+function drop(board, playerEmoji, columnIndex) {
+  // Split each row into an array of cells
+  const rows = board.map((row) => row.split(' '));
+  // Iterate through rows from the bottom up
+  for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex--) {
+    // If an empty cell is found, place the player's disk
+    if (rows[rowIndex][columnIndex] === emptyDisk) {
+      rows[rowIndex][columnIndex] = playerEmoji;
+      break;
+    }
+  }
+  // Reconstruct the board after the move
+  let newBoard = rows.map((row) => row.join(' '));
+  // If the board has changed, return the new board; otherwise, return false
+  return newBoard.join() !== board.join() ? newBoard : false;
+}
+
+// Function to check if the player has won
+function isWin(boardArr, player, numToConnect) {
+  let winningEmoji= winDisk;
+  if (boardArr === false) {
+    return false;
+  }
+  // Split the board into an array of cells
+  const board = boardArr.map((line) => line.split(' '));
+  const numRows = board.length;
+  const numCols = board[0].length;
+
+  // Check rows for a win
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col <= numCols - numToConnect; col++) {
+      let found = true;
+      for (let i = 0; i < numToConnect; i++) {
+        if (board[row][col + i] !== player) {
+          found = false;
+          break;
+        }
+      }
+      if (found) {
+        // Replace player emoji with winning emoji
+        for (let i = 0; i < numToConnect; i++) {
+          board[row][col + i] = winningEmoji;
+        }
+        return board.map((line) => line.join(' '));
+      }
+    }
+  }
+
+  // Check columns for a win
+  for (let row = 0; row <= numRows - numToConnect; row++) {
+    for (let col = 0; col < numCols; col++) {
+      let found = true;
+      for (let i = 0; i < numToConnect; i++) {
+        if (board[row + i][col] !== player) {
+          found = false;
+          break;
+        }
+      }
+      if (found) {
+        // Replace player emoji with winning emoji
+        for (let i = 0; i < numToConnect; i++) {
+          board[row + i][col] = winningEmoji;
+        }
+        return board.map((line) => line.join(' '));
+      }
+    }
+  }
+
+  // Check diagonal (northeast to southwest) for a win
+  for (let row = numToConnect - 1; row < numRows; row++) {
+    for (let col = 0; col <= numCols - numToConnect; col++) {
+      let found = true;
+      for (let i = 0; i < numToConnect; i++) {
+        if (board[row - i][col + i] !== player) {
+          found = false;
+          break;
+        }
+      }
+      if (found) {
+        // Replace player emoji with winning emoji
+        for (let i = 0; i < numToConnect; i++) {
+          board[row - i][col + i] = winningEmoji;
+        }
+        return board.map((line) => line.join(' '));
+      }
+    }
+  }
+
+  // Check diagonal (northwest to southeast) for a win
+  for (let row = numToConnect - 1; row < numRows; row++) {
+    for (let col = numToConnect - 1; col < numCols; col++) {
+      let found = true;
+      for (let i = 0; i < numToConnect; i++) {
+        if (board[row - i][col - i] !== player) {
+          found = false;
+          break;
+        }
+      }
+      if (found) {
+        // Replace player emoji with winning emoji
+        for (let i = 0; i < numToConnect; i++) {
+          board[row - i][col - i] = winningEmoji;
+        }
+        return board.map((line) => line.join(' '));
+      }
+    }
+  }
+
+  // If no win is found, return false
+  return false;
+}
+
+function isGameOver(board, emptyEmote) {
+  for (let i = 0; i < board.length; i++) {
+    if (board[i].includes(emptyEmote)) {
+      return true;
+    }
+  }
+  return false;
+}
+function autoDrop(board) {
+  // Shuffle an array of column indices
+  const indices = shuffleArray([0, 1, 2, 3, 4, 5, 6]);
+
+  // Check each column for a winning move for both players, in a random order
+  for (let i = 0; i < 7; i++) {
+    const index = indices[i];
+
+    // Drop a yellow disk in column index and check if it results in a win
+    let testBoard1 = drop(board, yellowDisk, index);
+    if (isWin(testBoard1, yellowDisk, 4)) {
+      return { board: testBoard1, columnIndex: index };
+    }
+
+    // Drop a red disk in column index and check if it results in human's win
+    let testBoard2 = drop(board, redDisk, index);
+    if (isWin(testBoard2, redDisk, 4)) {
+      return { board: testBoard1, columnIndex: index };
+    }
+  }
+
+  // Shuffle the array of column indices again
+  shuffleArray(indices);
+
+  // Check each column for a winning move for yellow player, in a random order
+  for (let i = 0; i < 7; i++) {
+    const index = indices[i];
+
+    let testBoard3 = drop(board, yellowDisk, index);
+    if (isWin(testBoard3, yellowDisk, 3)) {
+      return { board: testBoard3, columnIndex: index };
+    }
+  }
+
+  // Shuffle the array of column indices once more
+  shuffleArray(indices);
+
+  // Check each column for a winning move for yellow player, in a random order
+  for (let i = 0; i < 7; i++) {
+    const index = indices[i];
+
+    let testBoard4 = drop(board, yellowDisk, index);
+    if (isWin(testBoard4, yellowDisk, 2)) {
+      return { board: testBoard4, columnIndex: index };
+    }
+  }
+
+  // Find all empty cells in the top row and drop a yellow disk in a random one
+  const indexes = board[0]
+    .split(' ')
+    .map((value, index) => {
+      if (value === emptyDisk) {
+        return index;
+      }
+    })
+    .filter((index) => index !== undefined);
+
+  const randomCol = indexes[Math.floor(Math.random() * indexes.length)];
+  return { board: drop(board, yellowDisk, randomCol), columnIndex: randomCol };
+}
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
