@@ -1,264 +1,180 @@
-function move(description, direction)
-{
+function move(description, direction) {
   let board = parseDesc(description);
 
-  switch (direction)
-  {
+  if (!board) {
+    throw new Error('Invalid board description');
+  }
+
+  switch (direction) {
     case 'right':
-
-      board = moveRight(board);
-
+      mergeRight();
+      moveRight();
       break;
 
     case 'left':
-
-      board = moveLeft(board);
-
+      mergeLeft();
+      moveLeft();
       break;
 
     case 'up':
-
-      board = moveUp(board);
-
+      mergeUp();
+      moveUp();
       break;
 
     case 'down':
-
-      board = moveDown(board);
-
+      mergeDown();
+      moveDown();
       break;
+
+    default:
+      throw new Error('Invalid direction');
   }
 
-  board = spawnRandom(board, 1);
+  spawnRandom(board, 1);
 
-  function moveRight(board)
-  {
-    for (let row = 0; row < board.length; row++)
-    {
-     	// slide all non-empty tiles to the right
+  return makeDesc(board);
 
-      for (let col = board[row].length - 2; col >= 0; col--)
-      {
-        if (board[row][col] !== '0')
-        {
-          let currentCol = col;
-
-          while (
-            currentCol + 1 < board[row].length &&
-
-            board[row][currentCol + 1] === '0'
-
-         )
-          {
-            board[row][currentCol + 1] = board[row][currentCol];
-
-            board[row][currentCol] = '0';
-
-            currentCol++;
-          }
-        }
-      }
-
-     	// merge adjacent identical tiles from right to left
-
-      for (let col = board[row].length - 2; col >= 0; col--)
-      {
-        if (
-          board[row][col] !== '0' &&
-
-          board[row][col] === board[row][col + 1]
-
-       )
-        {
-          board[row][col + 1] = (parseInt(board[row][col]) *2).toString();
-
-          board[row][col] = '0';
+  function mergeRight() {
+    for (let row = 0; row < board.length; row++) {
+      for (let col = board[row].length - 1; col >= 1; col--) {
+        if (board[row][col] !== '0' && board[row][col] === board[row][col - 1]) {
+          board[row][col] = (parseInt(board[row][col]) * 2).toString();
+          board[row][col - 1] = '0';
         }
       }
     }
-
-    return board;
   }
 
-  function moveLeft(board)
-  {
-    for (let row = 0; row < board.length; row++)
-    {
-     	// slide all non-empty tiles to the left
-
-      for (let col = 1; col < board[row].length; col++)
-      {
-        if (board[row][col] !== '0')
-        {
+  function moveRight() {
+    for (let row = 0; row < board.length; row++) {
+      for (let col = board[row].length - 1; col >= 1; col--) {
+        if (board[row][col] === '0') {
           let currentCol = col;
 
-          while (currentCol - 1 >= 0 && board[row][currentCol - 1] === '0')
-          {
-            board[row][currentCol - 1] = board[row][currentCol];
-
-            board[row][currentCol] = '0';
-
+          while (currentCol >= 1 && board[row][currentCol] === '0') {
+            board[row][currentCol] = board[row][currentCol - 1];
+            board[row][currentCol - 1] = '0';
             currentCol--;
           }
         }
       }
+    }
+  }
 
-     	// merge adjacent identical tiles from left to right
-
-      for (let col = 1; col < board[row].length; col++)
-      {
-        if (
-          board[row][col] !== '0' &&
-
-          board[row][col] === board[row][col - 1]
-
-       )
-        {
-          board[row][col - 1] = (parseInt(board[row][col]) *2).toString();
-
-          board[row][col] = '0';
+  function mergeLeft() {
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length - 1; col++) {
+        if (board[row][col] !== '0' && board[row][col] === board[row][col + 1]) {
+          board[row][col] = (parseInt(board[row][col]) * 2).toString();
+          board[row][col + 1] = '0';
         }
       }
     }
-
-    return board;
   }
 
-  function moveUp(board)
-  {
-    for (let col = 0; col < board[0].length; col++)
-    {
-     	// slide all non-empty tiles upwards
+  function moveLeft() {
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length - 1; col++) {
+        if (board[row][col] === '0') {
+          let currentCol = col;
 
-      for (let row = 1; row < board.length; row++)
-      {
-        if (board[row][col] !== '0')
-        {
-          let currentRow = row;
-
-          while (currentRow - 1 >= 0 && board[currentRow - 1][col] === '0')
-          {
-            board[currentRow - 1][col] = board[currentRow][col];
-
-            board[currentRow][col] = '0';
-
-            currentRow--;
+          while (currentCol < board[row].length - 1 && board[row][currentCol] === '0') {
+            board[row][currentCol] = board[row][currentCol + 1];
+            board[row][currentCol + 1] = '0';
+            currentCol++;
           }
         }
       }
+    }
+  }
 
-     	// merge adjacent identical tiles from top to bottom
-
-      for (let row = 1; row < board.length; row++)
-      {
-        if (
-          board[row][col] !== '0' &&
-
-          board[row][col] === board[row - 1][col]
-
-       )
-        {
-          board[row - 1][col] = (parseInt(board[row][col]) *2).toString();
-
-          board[row][col] = '0';
+  function mergeUp() {
+    for (let col = 0; col < board[0].length; col++) {
+      for (let row = 0; row < board.length - 1; row++) {
+        if (board[row][col] !== '0' && board[row][col] === board[row + 1][col]) {
+          board[row][col] = (parseInt(board[row][col]) * 2).toString();
+          board[row + 1][col] = '0';
         }
       }
     }
-
-    return board;
   }
 
-  function moveDown(board)
-  {
-    for (let col = 0; col < board[0].length; col++)
-    {
-     	// slide all non-empty tiles downwards
-
-      for (let row = board.length - 2; row >= 0; row--)
-      {
-        if (board[row][col] !== '0')
-        {
+  function moveUp() {
+    for (let col = 0; col < board[0].length; col++) {
+      for (let row = 0; row < board.length - 1; row++) {
+        if (board[row][col] === '0') {
           let currentRow = row;
 
-          while (
-            currentRow + 1 < board.length &&
-
-            board[currentRow + 1][col] === '0'
-
-         )
-          {
-            board[currentRow + 1][col] = board[currentRow][col];
-
-            board[currentRow][col] = '0';
-
+          while (currentRow < board.length - 1 && board[currentRow][col] === '0') {
+            board[currentRow][col] = board[currentRow + 1][col];
+            board[currentRow + 1][col] = '0';
             currentRow++;
           }
         }
       }
+    }
+  }
 
-     	// merge adjacent identical tiles from bottom to top
-
-      for (let row = board.length - 2; row >= 0; row--)
-      {
-        if (
-          board[row][col] !== '0' &&
-
-          board[row][col] === board[row + 1][col]
-
-       )
-        {
-          board[row + 1][col] = (parseInt(board[row][col]) *2).toString();
-
-          board[row][col] = '0';
+  function mergeDown() {
+    for (let col = 0; col < board[0].length; col++) {
+      for (let row = board.length - 1; row >= 1; row--) {
+        if (board[row][col] !== '0' && board[row][col] === board[row - 1][col]) {
+          board[row][col] = (parseInt(board[row][col]) * 2).toString();
+          board[row - 1][col] = '0';
         }
       }
     }
-
-    return board;
   }
 
-  return makeDesc(board);
+  function moveDown() {
+    for (let col = 0; col < board[0].length; col++) {
+      for (let row = board.length - 1; row >= 1; row--) {
+        if (board[row][col] === '0') {
+          let currentRow = row;
 
+          while (currentRow >= 1 && board[currentRow][col] === '0') {
+            board[currentRow][col] = board[currentRow - 1][col];
+            board[currentRow - 1][col] = '0';
+            currentRow--;
+          }
+        }
+      }
+    }
+  }
 }
 
-function spawnRandom(board, amount)
-{
-  const emptyTiles =[];
+function spawnRandom(board, amount) {
+  const emptyTiles = [];
 
- 	// find all the empty tiles
-
-  for (let row = 0; row < board.length; row++)
-  {
-    for (let col = 0; col < board[row].length; col++)
-    {
-      if (board[row][col] === '0')
-      {
+  // find all the empty tiles
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col < board[row].length; col++) {
+      if (board[row][col] === '0') {
         emptyTiles.push([row, col]);
       }
     }
   }
 
-  for (let i = emptyTiles.length - 1; i > 0; i--)
-  {
-    const j = Math.floor(Math.random() *(i + 1));
-
-   [emptyTiles[i], emptyTiles[j]] =[emptyTiles[j], emptyTiles[i]];
+  // Check if there are enough empty tiles to spawn the required amount
+  if (emptyTiles.length < amount) {
+    throw new Error('Insufficient empty tiles to spawn random numbers');
   }
 
- 	// spawn random numbers on the empty tiles
+  for (let i = emptyTiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [emptyTiles[i], emptyTiles[j]] = [emptyTiles[j], emptyTiles[i]];
+  }
 
-  for (let i = 0; i < amount; i++)
-  {
-    const[row, col] = emptyTiles[i];
-
-    const value = Math.random() < 0.75 ? '2' : '4';	// 2 has 75% chance, 4 has 25% chance
-
+  // spawn random numbers on the empty tiles
+  for (let i = 0; i < amount; i++) {
+    const [row, col] = emptyTiles[i];
+    const value = Math.random() < 0.80 ? '2' : '4'; // 2 has 75% chance, 4 has 25% chance
     board[row][col] = value;
   }
 
-  return board;	// return the modified board
-
+  return board; // return the modified board
 }
+
 
 function makeDesc(board)
 {
