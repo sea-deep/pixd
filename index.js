@@ -59,9 +59,9 @@ const client = new Client({
 const keyv = new Map();
 const queue = new Map(); //map of guild ID and its respective queue
 let emptyDisk = "<:emptyDisk:1102228471448604823>";
-let redDisk = "<:redDisk:1102229231527809025>";
-let winDisk = "<:winDisk:1116818983996362912>";
-let yellowDisk = "<:yellowDisk:1102228894209294371>";
+let redDisk = "<:redDisk:1117189714919829575>";
+let winDisk = "<:greenDisk:1117189780082528356>";
+let yellowDisk = "<:yellowDisk:1117189682317504563>";
 client.once('ready', () => {
   console.log(`${client.user.tag} is online!`);
 });
@@ -244,6 +244,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
      case 'seven':
        await interaction.deferUpdate();
        await onButton(interaction,6);
+       break;
+     case 'rematch':
+       await interaction.deferUpdate();
+       await rematchC4(interaction);
        break;
       case '2048_up':
         await interaction.deferUpdate();
@@ -2066,9 +2070,9 @@ message.channel.send({
       },
       fields: [
         {
-          name: '1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ \nClick the buttons to drop',
-          value: '',
-        },
+          name: '1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ \n__Click the buttons to drop__',
+          value: '`The highlighted button indicates the last move played.`',
+       },
       ],
       color: 0xffff00
     },
@@ -2149,26 +2153,25 @@ if (
   interaction.member.user.id !== mentions[2]
 ) {
   if (!mentions.includes(interaction.member.user.id)) {
-    return interaction.reply({
+    return interaction.followUp({
       content: `❌ **This is not your game**`,
       ephemeral: true,
     });
   } else {
-    return interaction.reply({
+    return interaction.followUp({
       content: `❌ **This is not your turn**`,
       ephemeral: true,
     });
   }
 } else if (!mentions.includes(interaction.member.user.id)) {
-  return interaction.reply({
+  return interaction.followUp({
     content: `❌ **This is not your game**`,
     ephemeral: true,
   });
 }
 
-
+let components = message.components;
 if (mentions.length === 3) {
-  let components = message.components;
   let playerEmote = mentions[0] === mentions[2] ? redDisk : yellowDisk;
   let oppsID = mentions[0] === mentions[2] ? mentions[1] : mentions[0];
   let oppsEmote = playerEmote === redDisk ? yellowDisk : redDisk;
@@ -2176,15 +2179,43 @@ if (mentions.length === 3) {
   let newBoard = drop(board, playerEmote, dropIn);
   let win = isWin(newBoard, playerEmote, 4);
   newBoard = win ? win : newBoard;
+  let gameOver = isGameOver(newBoard, emptyDisk);
   let content = win
     ? `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\nAnd ${playerEmote}<@${mentions[2]}> **won**!`
-    : `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**Your turn** ${oppsEmote}<@${oppsID}> :`;
+    : gameOver
+      ? `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**And it's a draw**!`
+      : `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**Your turn** ${oppsEmote}<@${oppsID}> :`;
 
   if (!newBoard) {
-    return interaction.reply({
+    return interaction.followUp({
     content: `❌ **This column is already filled.**`,
     ephemeral: true,
   });
+  }
+  components = components.map((component, ind) => {
+  component.components = component.components.map((button, index) => {
+    let i = ind === 1 ? index + 4 : index;
+    button.data.style = i === dropIn ? 1 : 2;
+    return button;
+  });
+  return component;
+});
+
+  if (gameOver || win) {
+    components =  [
+    {
+      type: 1,
+      components: [
+        {
+          label: 'Rematch',
+          style: 1,
+          custom_id: `rematch`,
+          disabled: false,
+          emoji: {id: null, name: `↪️`},
+          type: 2,
+        },
+    ]
+    }];
   }
   await message.edit({
     content: `${content}`,
@@ -2201,29 +2232,82 @@ if (mentions.length === 3) {
     components: components,
   });
 } else {
-  let components = message.components;
   let content = message.content.split('\n');
   let userDrop = drop(
     message.embeds[0].description.split('\n'),
     redDisk,
     dropIn
   );
-  let userWin = isWin(userDrop, redDisk, 4)
-  if (userWin) {
-    content[1] = `And you **won**.`;
-  }
+  let gameOver1 = isGameOver(userDrop, emptyDisk);
+  let userWin = isWin(userDrop, redDisk, 4);
   let dropCall = autoDrop(userDrop);
   let newDesc = dropCall.board;
-  let botWin = isWin(newDesc, yellowDisk, 4)
+ let gameOver2 = isGameOver(newDesc, emptyDisk); 
 
+  let botWin = isWin(newDesc, yellowDisk, 4);
+  components = components.map((component, ind) => {
+  component.components = component.components.map((button, index) => {
+    let i = ind === 1 ? index + 4 : index;
+    button.data.style = i == dropCall.columnIndex ? 1 : 2;
+    return button;
+  });
+  return component;
+});
+    console.log(components[0].components[0])
+ 
   if (userWin) {
     content[1] = `And ${redDisk}you **won**.`;
-    
-    
+    components =  [
+    {
+      type: 1,
+      components: [
+        {
+          label: 'Rematch',
+          style: 1,
+          custom_id: `rematch`,
+          disabled: false,
+          emoji: {id: null, name: `↪️`},
+          type: 2,
+        },
+    ]
+    }];
   }
   if (botWin) {
     content[1] = `And ${redDisk}you **lost** 🤣.`;
+    components =  [
+    {
+      type: 1,
+      components: [
+        {
+          label: 'Rematch',
+          style: 1,
+          custom_id: `rematch`,
+          disabled: false,
+          emoji: {id: null, name: `↪️`},
+          type: 2,
+        },
+    ]
+    }];
   }
+  if (gameOver1 || gameOver2) {
+     
+    content[1] = `**And it's a draw**!`,
+    components =  [
+    {
+      type: 1,
+      components: [
+        {
+          label: 'Rematch',
+          style: 1,
+          custom_id: `rematch`,
+          disabled: false,
+          emoji: {id: null, name: `↪️`},
+          type: 2,
+        },
+    ]
+    }];
+  }
+  
   newDesc = userWin
             ? userWin
             : botWin ? botWin : newDesc;
@@ -2359,74 +2443,16 @@ function isWin(boardArr, player, numToConnect) {
   return false;
 }
 
-function isGameOver(board, emptyEmote) {
+function isGameOver(board) {
+
   for (let i = 0; i < board.length; i++) {
-    if (board[i].includes(emptyEmote)) {
-      return true;
+    if (board[i].includes(emptyDisk)) {
+      return false;
     }
   }
-  return false;
+  return true;
 }
-function autoDrop(board) {
-  // Shuffle an array of column indices
-  const indices = shuffleArray([0, 1, 2, 3, 4, 5, 6]);
 
-  // Check each column for a winning move for both players, in a random order
-  for (let i = 0; i < 7; i++) {
-    const index = indices[i];
-
-    // Drop a yellow disk in column index and check if it results in a win
-    let testBoard1 = drop(board, yellowDisk, index);
-    if (isWin(testBoard1, yellowDisk, 4)) {
-      return { board: testBoard1, columnIndex: index };
-    }
-
-    // Drop a red disk in column index and check if it results in human's win
-    let testBoard2 = drop(board, redDisk, index);
-    if (isWin(testBoard2, redDisk, 4)) {
-      return { board: testBoard1, columnIndex: index };
-    }
-  }
-
-  // Shuffle the array of column indices again
-  shuffleArray(indices);
-
-  // Check each column for a winning move for yellow player, in a random order
-  for (let i = 0; i < 7; i++) {
-    const index = indices[i];
-
-    let testBoard3 = drop(board, yellowDisk, index);
-    if (isWin(testBoard3, yellowDisk, 3)) {
-      return { board: testBoard3, columnIndex: index };
-    }
-  }
-
-  // Shuffle the array of column indices once more
-  shuffleArray(indices);
-
-  // Check each column for a winning move for yellow player, in a random order
-  for (let i = 0; i < 7; i++) {
-    const index = indices[i];
-
-    let testBoard4 = drop(board, yellowDisk, index);
-    if (isWin(testBoard4, yellowDisk, 2)) {
-      return { board: testBoard4, columnIndex: index };
-    }
-  }
-
-  // Find all empty cells in the top row and drop a yellow disk in a random one
-  const indexes = board[0]
-    .split(' ')
-    .map((value, index) => {
-      if (value === emptyDisk) {
-        return index;
-      }
-    })
-    .filter((index) => index !== undefined);
-
-  const randomCol = indexes[Math.floor(Math.random() * indexes.length)];
-  return { board: drop(board, yellowDisk, randomCol), columnIndex: randomCol };
-}
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -2434,3 +2460,350 @@ function shuffleArray(array) {
   }
   return array;
 }
+
+async function rematchC4(interaction) {
+  
+    let message = interaction.message;
+    if (!message.content.includes(interaction.member.id)) {
+        return interaction.followUp(
+        {content: '❌ **This is not your game.**',
+       ephemeral: true
+       });
+    }
+ 
+
+  let content = interaction.message.content.split('\n');
+  content[1] = `**Your turn** ${redDisk}<@${interaction.message.mentions.parsedUsers.first().id}> :`;
+  let desc = [
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+];
+let components = [
+    {
+      type: 1,
+      components: [
+        {
+          style: 2,
+          custom_id: `one`,
+          disabled: false,
+          emoji: {id: null, name: `1️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `two`,
+          disabled: false,
+          emoji: {id: null, name: `2️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `three`,
+          disabled: false,
+          emoji: {id: null, name: `3️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `four`,
+          disabled: false,
+          emoji: {id: null, name: `4️⃣`},
+          type: 2,
+        },
+      ],
+    },
+    {
+      type: 1,
+      components: [
+          {
+          style: 2,
+          custom_id: `five`,
+          disabled: false,
+          emoji: {id: null, name: `5️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `six`,
+          disabled: false,
+          emoji: {id: null, name: `6️⃣`},
+          type: 2,
+        },
+        {
+          style: 2,
+          custom_id: `seven`,
+          disabled: false,
+          emoji: {id: null, name: `7️⃣`},
+          type: 2,
+        },
+      ],
+    },
+  ];
+  if (message.mentions.users.size !== 1) {
+let alreadyC = await keyv.get(interaction.member.id);
+    if (interaction.component.label == "Rematch" && !alreadyC) {
+      await keyv.set(interaction.member.id, true);
+      content = message.content.split('\n');
+      desc = message.embeds[0]. description.split('\n');
+     components =  [
+    {
+      type: 1,
+      components: [
+        {
+          label: 'Rematch (1/2)',
+          style: 1,
+          custom_id: `rematch`,
+          disabled: false,
+          emoji: {id: null, name: `↪️`},
+          type: 2,
+        },
+    ]
+    }];
+  
+  } else if (interaction.component.label == 'Rematch (1/2)') {
+      await keyv.delete(interaction.member.id);
+  }
+   }
+message.edit({
+  channel_id: `${message.channel_id}`,
+  content: content.join('\n'),
+  tts: false,
+  embeds: [
+    {
+      type: 'rich',
+      title: `🔢 Connect 4`,
+      description: desc.join('\n'),
+      color: 0x8773ea,
+      footer: message.embeds[0].footer,
+      fields: message.embeds[0].fields,
+      color: 0xffff00
+    },
+  ],
+  components: components,
+});
+}
+
+
+function autoDrop(board) {
+
+  const shuffledIndices = shuffleArray([0, 1, 2, 3, 4, 5, 6]);
+
+  // Check for winning moves for both players
+  for (let i = 0; i < 7; i++) {
+    const index = shuffledIndices[i];
+
+    // Check if dropping a yellow disk in column index results in a win
+    const testBoard1 = drop(board, yellowDisk, index);
+    if (isWin(testBoard1, yellowDisk, 4)) {
+      return { board: testBoard1, columnIndex: index };
+    }
+
+    // Check if dropping a red disk in column index results in a win for the human
+    const testBoard2 = drop(board, redDisk, index);
+    if (isWin(testBoard2, redDisk, 4)) {
+      return { board: testBoard1, columnIndex: index };
+    }
+  }
+
+  // Shuffle the indices again
+  shuffleArray(shuffledIndices);
+
+  // Check for potential winning moves for the yellow player
+  for (let i = 0; i < 7; i++) {
+    const index = shuffledIndices[i];
+
+    const testBoard3 = drop(board, yellowDisk, index);
+    if (isWin(testBoard3, yellowDisk, 3)) {
+      return { board: testBoard3, columnIndex: index };
+    }
+  }
+
+  // Shuffle the indices once more
+  shuffleArray(shuffledIndices);
+
+  // Check for potential winning moves for the yellow player again
+  for (let i = 0; i < 7; i++) {
+    const index = shuffledIndices[i];
+
+    const testBoard4 = drop(board, yellowDisk, index);
+    if (isWin(testBoard4, yellowDisk, 2)) {
+      return { board: testBoard4, columnIndex: index };
+    }
+  }
+
+  // Analyze opponent's playing style and adapt strategy
+  const opponentStyle = analyzeOpponentStyle(board);
+  if (opponentStyle === 'aggressive') {
+    // Incorporate randomness to introduce unpredictability against aggressive opponents
+    const randomCol = shuffledIndices[Math.floor(Math.random() * 7)];
+    return { board: drop(board, yellowDisk, randomCol), columnIndex: randomCol };
+  } else if (opponentStyle === 'defensive') {
+    // Block opponent's potential winning moves
+    const blockMove = blockOpponentWinningMove(board, redDisk);
+    if (blockMove) {
+      return blockMove;
+    }
+  }
+
+  // Find the most advantageous move based on the evaluation function
+  const bestMove = findBestMove(board, yellowDisk);
+  return { board: drop(board, yellowDisk, bestMove), columnIndex: bestMove };
+}
+
+// Helper function to shuffle an array in place
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Helper function to analyze opponent's playing style
+// Helper function to block opponent's potential winning moves
+function blockOpponentWinningMove(board, disk) {
+  for (let col = 0; col < 7; col++) {
+    const testBoard = drop(board, disk, col);
+    if (isWin(testBoard, disk, 4)) {
+      return { board: testBoard, columnIndex: col };
+    }
+  }
+  return null;
+}
+
+// Helper function to evaluate the board and find the best move
+function findBestMove(board, disk) {
+  let bestMove = -1;
+  let bestScore = -Infinity;
+
+  for (let col = 0; col < 7; col++) {
+    const testBoard = drop(board, disk, col);
+    const score = evaluateBoard(testBoard, disk);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = col;
+    }
+  }
+
+  return bestMove;
+}
+
+// Helper function to evaluate the board state based on its advantage for a given player
+
+function evaluateBoard(board, disk) {
+  const yellowDisk = 'Y';
+  const redDisk = 'R';
+  const emptyDisk = '-';
+
+  // Helper function to count consecutive disks in a row
+  const countConsecutive = (row, col, rowDirection, colDirection, targetDisk) => {
+    let count = 0;
+    while (
+      row >= 0 &&
+      row < board.length &&
+      col >= 0 &&
+      col < board[row].length &&
+      board[row][col] === targetDisk
+    ) {
+      count++;
+      row += rowDirection;
+      col += colDirection;
+    }
+    return count;
+  };
+
+  // Check for potential winning lines in all directions
+  const directions = [
+    [1, 0], // Vertical
+    [0, 1], // Horizontal
+    [1, 1], // Diagonal (down-right)
+    [-1, 1], // Diagonal (up-right)
+  ];
+
+  let score = 0;
+
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col < board[row].length; col++) {
+      if (board[row][col] === emptyDisk) {
+        for (const direction of directions) {
+          const [rowDirection, colDirection] = direction;
+          const opponentDisk = disk === yellowDisk ? redDisk : yellowDisk;
+
+          const consecutivePlayerDisks = countConsecutive(
+            row,
+            col,
+            rowDirection,
+            colDirection,
+            disk
+          );
+          const consecutiveOpponentDisks = countConsecutive(
+            row,
+            col,
+            rowDirection,
+            colDirection,
+            opponentDisk
+          );
+
+          // Evaluate the advantage based on the consecutive disks in a row
+          if (consecutivePlayerDisks === 4) {
+            // Winning move
+            score += 100;
+          } else if (consecutivePlayerDisks === 3 && consecutiveOpponentDisks === 0) {
+            // Potential winning move (3 player disks, no opponent disks)
+            score += 10;
+          } else if (consecutivePlayerDisks === 2 && consecutiveOpponentDisks === 0) {
+            // Advantageous move (2 player disks, no opponent disks)
+            score += 5;
+          } else if (consecutiveOpponentDisks === 3 && consecutivePlayerDisks === 0) {
+            // Block opponent's potential winning move (3 opponent disks, no player disks)
+            score -= 20;
+          }
+        }
+      }
+    }
+  }
+
+  return score;
+}
+
+function analyzeOpponentStyle(board) {
+  const emptyDisk = '-';
+  const opponentMoves = board.flat().filter((disk) => disk !== emptyDisk);
+
+  const consecutiveMoves = [];
+
+  for (let i = 0; i < opponentMoves.length; i++) {
+    const currentMove = opponentMoves[i];
+    const previousMove = consecutiveMoves[consecutiveMoves.length - 1];
+
+    if (currentMove === previousMove) {
+      consecutiveMoves.push(currentMove);
+    } else {
+      consecutiveMoves.length = 0;
+      consecutiveMoves.push(currentMove);
+    }
+
+    if (consecutiveMoves.length >= 3) {
+      return 'aggressive';
+    }
+  }
+
+  // If the opponent has frequently blocked potential winning moves
+  const potentialWinMoves = consecutiveMoves.filter((move) => move === 'Y');
+  if (potentialWinMoves.length > 2) {
+    return 'defensive';
+  }
+
+  // If the opponent's moves appear random or unpredictable
+  if (opponentMoves.length > 5 && opponentMoves.length % 2 === 1) {
+    return 'random';
+  }
+
+  // If the opponent's style cannot be determined
+  return 'unknown';
+}
+
