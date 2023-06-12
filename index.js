@@ -2317,7 +2317,7 @@ if (mentions.length === 3) {
     embeds: [
       {
         type: `rich`,
-        description: newDesc.join('\n'),
+        description: newDesc,
         color: 0xff0000,
         fields: message.embeds[0].fields,
         title: message.embeds[0].title,
