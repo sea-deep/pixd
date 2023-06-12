@@ -2333,7 +2333,7 @@ if (mentions.length === 3) {
 // Helper functions 
 function drop(board, playerEmoji, columnIndex) {
   // Split each row into an array of cells
-  const rows = board.map((row) => row.split(/(?<=>)(?=<)/);
+  const rows = board.map((row) => row.split(/(?<=>)(?=<)/));
   // Iterate through rows from the bottom up
   for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex--) {
     // If an empty cell is found, place the player's disk
