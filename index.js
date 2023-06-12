@@ -2043,13 +2043,13 @@ async function getDef(interaction) {
 
 async function sendc4(message) {
 let desc =[
-`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-];
+`${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ ];
 let content =
   message.mentions.users.size === 0
     ? `${redDisk}<@${message.author.id}> challenged ${yellowDisk}**me**\nYour turn ${redDisk}<@${message.author.id}> :`
@@ -2475,13 +2475,13 @@ async function rematchC4(interaction) {
   let content = interaction.message.content.split('\n');
   content[1] = `**Your turn** ${redDisk}<@${interaction.message.mentions.parsedUsers.first().id}> :`;
   let desc =[
-`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
- `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-];
+`${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ ];
 let components = [
     {
       type: 1,
