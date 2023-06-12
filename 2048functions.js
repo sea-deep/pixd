@@ -143,36 +143,43 @@ function move(description, direction) {
   }
 }
 
-function spawnRandom(board, amount) {
-  const emptyTiles = [];
+function spawnRandom(board, amount)
+{
+  const emptyTiles =[];
 
-  // find all the empty tiles
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (board[row][col] === '0') {
+ 	// find all the empty tiles
+
+  for (let row = 0; row < board.length; row++)
+  {
+    for (let col = 0; col < board[row].length; col++)
+    {
+      if (board[row][col] === '0')
+      {
         emptyTiles.push([row, col]);
       }
     }
   }
 
-  // Check if there are enough empty tiles to spawn the required amount
-  if (emptyTiles.length < amount) {
-    throw new Error('Insufficient empty tiles to spawn random numbers');
+  for (let i = emptyTiles.length - 1; i > 0; i--)
+  {
+    const j = Math.floor(Math.random() *(i + 1));
+
+   [emptyTiles[i], emptyTiles[j]] =[emptyTiles[j], emptyTiles[i]];
   }
 
-  for (let i = emptyTiles.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [emptyTiles[i], emptyTiles[j]] = [emptyTiles[j], emptyTiles[i]];
-  }
+ 	// spawn random numbers on the empty tiles
 
-  // spawn random numbers on the empty tiles
-  for (let i = 0; i < amount; i++) {
-    const [row, col] = emptyTiles[i];
-    const value = Math.random() < 0.80 ? '2' : '4'; // 2 has 75% chance, 4 has 25% chance
+  for (let i = 0; i < amount; i++)
+  {
+    const[row, col] = emptyTiles[i];
+
+    const value = Math.random() < 0.80 ? '2' : '4';	// 2 has 80% chance, 4 has 25% chance
+
     board[row][col] = value;
   }
 
-  return board; // return the modified board
+  return board;	// return the modified board
+
 }
 
 
