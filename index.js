@@ -1,4 +1,4 @@
-//require('dotenv').config();
+require('dotenv').config();
 
 const express = require('express');
 const app = express();
@@ -2042,13 +2042,13 @@ async function getDef(interaction) {
 }
 
 async function sendc4(message) {
-let desc = [
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+let desc =[
+`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
 ];
 let content =
   message.mentions.users.size === 0
@@ -2333,7 +2333,7 @@ if (mentions.length === 3) {
 // Helper functions 
 function drop(board, playerEmoji, columnIndex) {
   // Split each row into an array of cells
-  const rows = board.map((row) => row.split(' '));
+  const rows = board.map((row) => row.split(/(?<=>)(?=<)/);
   // Iterate through rows from the bottom up
   for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex--) {
     // If an empty cell is found, place the player's disk
@@ -2374,7 +2374,7 @@ function isWin(boardArr, player, numToConnect) {
         for (let i = 0; i < numToConnect; i++) {
           board[row][col + i] = winningEmoji;
         }
-        return board.map((line) => line.join(' '));
+        return board.map((line) => line.join(''));
       }
     }
   }
@@ -2394,7 +2394,7 @@ function isWin(boardArr, player, numToConnect) {
         for (let i = 0; i < numToConnect; i++) {
           board[row + i][col] = winningEmoji;
         }
-        return board.map((line) => line.join(' '));
+        return board.map((line) => line.join(''));
       }
     }
   }
@@ -2414,7 +2414,7 @@ function isWin(boardArr, player, numToConnect) {
         for (let i = 0; i < numToConnect; i++) {
           board[row - i][col + i] = winningEmoji;
         }
-        return board.map((line) => line.join(' '));
+        return board.map((line) => line.join(''));
       }
     }
   }
@@ -2434,7 +2434,7 @@ function isWin(boardArr, player, numToConnect) {
         for (let i = 0; i < numToConnect; i++) {
           board[row - i][col - i] = winningEmoji;
         }
-        return board.map((line) => line.join(' '));
+        return board.map((line) => line.join(''));
       }
     }
   }
@@ -2474,13 +2474,13 @@ async function rematchC4(interaction) {
 
   let content = interaction.message.content.split('\n');
   content[1] = `**Your turn** ${redDisk}<@${interaction.message.mentions.parsedUsers.first().id}> :`;
-  let desc = [
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
-  `${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk} ${emptyDisk}`,
+  let desc =[
+`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+`${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+ `${emptyDisk}${emptyDisk}${emptyDisk} ${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
 ];
 let components = [
     {
@@ -2564,7 +2564,7 @@ let alreadyC = await keyv.get(interaction.member.id);
     ]
     }];
   
-  } else if (interaction.component.label == 'Rematch (1/2)') {
+  } else if (interaction.component.label == 'Rematch (1/2)' && !alreadyC) {
       await keyv.delete(interaction.member.id);
   }
    }
@@ -2695,10 +2695,7 @@ function findBestMove(board, disk) {
 // Helper function to evaluate the board state based on its advantage for a given player
 
 function evaluateBoard(board, disk) {
-  const yellowDisk = 'Y';
-  const redDisk = 'R';
-  const emptyDisk = '-';
-
+  
   // Helper function to count consecutive disks in a row
   const countConsecutive = (row, col, rowDirection, colDirection, targetDisk) => {
     let count = 0;
@@ -2771,7 +2768,6 @@ function evaluateBoard(board, disk) {
 }
 
 function analyzeOpponentStyle(board) {
-  const emptyDisk = '-';
   const opponentMoves = board.flat().filter((disk) => disk !== emptyDisk);
 
   const consecutiveMoves = [];
