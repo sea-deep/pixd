@@ -143,9 +143,9 @@ client.on(Events.MessageCreate, async (message) => {
         await handleErrors(kick, message, serverQueue);
         break;
       case 'connect4':
-    case 'c4':
-      await sendc4(message);
-      break;
+      case 'c4':
+        await handleErrors(sendc4, message);
+        break;
       case 'wordle':
         await handleErrors(sendGame, message);
         break;
@@ -170,7 +170,6 @@ client.on(Events.MessageCreate, async (message) => {
       case 'goodness':
         await handleErrors(goodness, message);
         break;
-
       default:
         break;
     }
@@ -217,38 +216,38 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
     switch (interaction.customId) {
-     case 'one':
-       await interaction.deferUpdate();
-       await onButton(interaction, 0);
-       break;
-     case 'two':
-       await interaction.deferUpdate();
-       await onButton(interaction,1);
-       break;
-     case 'three':
-       await interaction.deferUpdate();
-       await onButton(interaction,2);
-       break;
-     case 'four':
-       await interaction.deferUpdate();
-       await onButton(interaction,3);
-       break;
-     case 'five':
-       await interaction.deferUpdate();
-       await onButton(interaction,4);
-       break;
-     case 'six':
-       await interaction.deferUpdate();
-       await onButton(interaction,5);
-       break;
-     case 'seven':
-       await interaction.deferUpdate();
-       await onButton(interaction,6);
-       break;
-     case 'rematch':
-       await interaction.deferUpdate();
-       await rematchC4(interaction);
-       break;
+      case 'one':
+        await interaction.deferUpdate();
+        await onButton(interaction, 0);
+        break;
+      case 'two':
+        await interaction.deferUpdate();
+        await onButton(interaction, 1);
+        break;
+      case 'three':
+        await interaction.deferUpdate();
+        await onButton(interaction, 2);
+        break;
+      case 'four':
+        await interaction.deferUpdate();
+        await onButton(interaction, 3);
+        break;
+      case 'five':
+        await interaction.deferUpdate();
+        await onButton(interaction, 4);
+        break;
+      case 'six':
+        await interaction.deferUpdate();
+        await onButton(interaction, 5);
+        break;
+      case 'seven':
+        await interaction.deferUpdate();
+        await onButton(interaction, 6);
+        break;
+      case 'rematch':
+        await interaction.deferUpdate();
+        await rematchC4(interaction);
+        break;
       case '2048_up':
         await interaction.deferUpdate();
         await handleErrors(moveUp, interaction.message);
