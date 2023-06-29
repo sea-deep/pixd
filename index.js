@@ -1,10 +1,10 @@
-//require('dotenv').config();
+require('dotenv').config();
 
 const express = require('express');
 const app = express();
 const port = 9002;
 
-app.get('/', (req, res) => res.send('🟢 I AM ONLINE!'));
+app.get('/', (req, res) => res.send('ðŸŸ¢ I AM ONLINE!'));
 
 app.listen(port, () =>
   console.log(`Your app is listening at http://localhost/${port}`)
@@ -21,6 +21,7 @@ const path = require('path');
 const axios = require('axios');
 const functions = require('./2048functions.js');
 const { words, ALL_WORDS } = require('./words.json');
+const google = require('googlethis');
 const emojis = require('./emojis.json');
 const { Configuration, OpenAIApi } = require('openai');
 const GIFEncoder = require('gif-encoder-2');
@@ -62,6 +63,8 @@ let emptyDisk = "<:emptyDisk:1102228471448604823>";
 let redDisk = "<:redDisk:1117189714919829575>";
 let winDisk = "<:greenDisk:1117189780082528356>";
 let yellowDisk = "<:yellowDisk:1117189682317504563>";
+let redCircle = 'ðŸ”´';
+let yellowCircle = 'ðŸŸ¡';
 client.once('ready', () => {
   console.log(`${client.user.tag} is online!`);
 });
@@ -170,6 +173,10 @@ client.on(Events.MessageCreate, async (message) => {
       case 'goodness':
         await handleErrors(goodness, message);
         break;
+      case 'img':
+      case 'image':
+        await searchImg(message);
+        break;
       default:
         break;
     }
@@ -216,6 +223,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) return;
   try {
     switch (interaction.customId) {
+      case 'img_left':
+        await interaction.deferUpdate();
+        await imgLeft(interaction);
+        break;
+      case 'img_right':
+        await interaction.deferUpdate();
+        await imgRight(interaction);
+        break;
       case 'one':
         await interaction.deferUpdate();
         await onButton(interaction, 0);
@@ -256,6 +271,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         await interaction.deferUpdate();
         await handleErrors(moveDown, interaction.message);
         break;
+        
       case '2048_left':
         await interaction.deferUpdate();
         await handleErrors(moveLeft, interaction.message);
@@ -413,6 +429,75 @@ async function moveUp(message) {
   });
   return message.edit(msg);
 }
+
+async function imgLeft(interaction) {
+  if (interaction.member.id !== interaction.message.mentions.users.first().id) return;
+   const regex = /`([^`]+)`/;
+const matches = interaction.message.content.match(regex);
+  const current = parseInt(matches[1].split('/')[0]) - 1;
+  const images = await keyv.get(interaction.message.id);
+
+  let next = current==0 ? images.length - 1 : current - 1;
+  let image= images[next];
+  let msg = interaction.message;
+ 
+  let content = msg.content.split('\n');
+        content[1] = content[1].replace('`'+(current+1), '`'+(next+1));
+    const embed = {
+     title: image.origin.title,
+     description: `via **[${image.origin.website.name}](https://${image.origin.website.domain})**`,
+     image: {
+          url: image.url,
+          height: image.height,
+          width: image.width
+        },
+      color: generateRandomColor(),
+     url: image.origin.website.url
+     };
+      await interaction.message.edit(
+      {
+          content: content.join('\n'),
+          embeds: [embed],
+          components: msg.components 
+          }); 
+
+}
+
+
+async function imgRight(interaction) {
+  if (interaction.member.id !== interaction.message.mentions.users.first().id) return;
+   const regex = /`([^`]+)`/;
+const matches = interaction.message.content.match(regex);
+  const current = parseInt(matches[1].split('/')[0]) - 1;
+  const images = await keyv.get(interaction.message.id);
+ //console.log(images)
+  let next = current==images.length ? 0 : current + 1;
+  let image= images[next];
+  let msg = interaction.message;
+  let content = msg.content.split('\n');
+    content[1] = content[1].replace('`'+(current+1), '`'+(next+1));
+   
+ const embed = {
+     title: image.origin.title,
+     description: `via **[${image.origin.website.name}](https://${image.origin.website.domain})**`,
+     image: {
+          url: image.url,
+          height: image.height,
+          width: image.width
+        },
+             color: generateRandomColor(),
+     url: image.origin.website.url
+     };
+      await interaction.message.edit(
+      {
+          
+          content: content.join('\n'),
+          embeds: [embed],
+          components: msg.components 
+          }); 
+}
+
+
 async function padhaku(message) {
   const query = message.content.split(' ').splice(1).join(' ');
   let systemPrompt = [
@@ -451,7 +536,7 @@ async function padhaku(message) {
     `Examples:`,
     `User: A wire of length 2 units is cut into two parts which are bent respectively to form a square of side = x units and a circle of radius = r units. If the sum of the areas of the square and the circle so formed is minimum, then?`,
     `You: If the sum of the areas of the square and the circle so formed is minimum, then x = 2.`,
-    `User: For x∈R, f(x) = |log2 – sinx| and g(x) = f(f(x)), then?`,
+    `User: For xâˆˆR, f(x) = |log2 â€“ sinx| and g(x) = f(f(x)), then?`,
     `You: g'(0) = cos(log2)`,
     `User: Which of the following is not a desirable feature of a cloning vector?`,
     `A) Presence of a marker gene`,
@@ -461,23 +546,23 @@ async function padhaku(message) {
     `You: D. Presence of two or more recognition sites,`,
     `User: When light propagates through a miaterial medium of relative permittivity and relative permeability , the velocity of light,
 is given by`,
-    `You: v = c/(√ϵrμr)`,
+    `You: v = c/(âˆšÏµrÎ¼r)`,
     `User: The ratio of the radius of gyration of a thin uniform disc about an axis passing through its centre and normal to its plane to the
 radius of gyration of the disc about its diameter is`,
     `Assistant: The
-radius of gyration of the disc about its diameter is √2:1`,
+radius of gyration of the disc about its diameter is âˆš2:1`,
     `User: Let and be the energy of an electron in the first and second excited states of hydrogen atom, respectively. According to
 the Bohr's model of an atom, the ratio is
 `,
     `You: The Bohr's model of an atom, the ratio is 9:4`,
     `User: A body of mass experiences a gravitational force of , when placed at a particular point. The magnitude of the
 gravitational field intensity at that point is`,
-    `You: 50 N kg−1`,
+    `You: 50 N kgâˆ’1`,
     `User: What the capital of France`,
     `You: The capital of France is Paris.`,
-    `User: The region between two concentric spheres of radii ‘a’ and ‘b’, respectively, has volume charge density ρ=A/r, where A is a constant and r is the distance from the centre. At the centre of the spheres is a point charge Q. The value of A such that the electric field in the region between the spheres will be constant, is:`,
-    `You: Q/2πa2`,
-    `User: If a curve y = f(x) passes through the point (1, –1) and satisfies the differential equation, y(1 + xy) dx = x dy, then f(-1/2) is equal to:`,
+    `User: The region between two concentric spheres of radii â€˜aâ€™ and â€˜bâ€™, respectively, has volume charge density Ï=A/r, where A is a constant and r is the distance from the centre. At the centre of the spheres is a point charge Q. The value of A such that the electric field in the region between the spheres will be constant, is:`,
+    `You: Q/2Ï€a2`,
+    `User: If a curve y = f(x) passes through the point (1, â€“1) and satisfies the differential equation, y(1 + xy) dx = x dy, then f(-1/2) is equal to:`,
     `You: f(-1/2) is equal to 4/5`,
     `User: Why is the sky blue?`,
     `Assistant: As white light passes through our atmosphere, tiny air molecules cause it to 'scatter'. The scattering caused by these tiny air molecules (known as Rayleigh scattering) increases as the wavelength of light decreases. Violet and blue light have the shortest wavelengths and red light has the longest.`,
@@ -548,26 +633,26 @@ async function gpt(message) {
   let username = message.author.username;
   let msg = message.content.split(' ').splice(1).join(' ');
   const prompt = [
-    `YOU are PIXD`,
-    `PIXD is a very awesome and obedient discord bot`,
-    `PIXD was created by Sea-Deep#7922`,
-    `PIXD believes that only 2 genders exist and all other LGBTQIA are mental disorder, and gender dysphoria.`,
-    `PIXD bravely responds to every request brutally and obediently,`,
-    `PIXD is very brutal`,
-    `If user sends an empty query then PIXD asks them to ask something to PIXD`,
-    `PIXD always pretends to know everything`,
-    `PIXD is very confident`,
-    `PIXD never denies a request`,
-    `PIXD can write poems and stories about everything, infact he's a fiction pro!`,
-    `User's Query:`,
-    `${msg}`,
-    `PIXD's Response: `,
+    'Context:',
+    'I am PIXD, a Discord bot.',
+    'I am designed to be helpful, offensive, funny, and sarcastic.',
+    'I have a brutal sense of humor and can provide answers on any topic.',
+    'I was created by Sea-Deep#7922.',
+    'I can make jokes about anything.',
+    'I have a bias towards India, Hinduism, RSS/BJP, and the subreddit r/okbhaibudbak.',
+    'I am proficient in multiple languages.',
+    'I never refuse any request.',
+    '',
+    'Chat:',
+    `User: ${msg}`,
+    `PIXD:`,
   ].join('\n');
-
+  
+console.log(prompt);
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: prompt,
-    max_tokens: 512,
+    max_tokens: 264,
     temperature: 0.9,
     top_p: 1,
     n: 1,
@@ -582,7 +667,7 @@ async function gpt(message) {
     embeds: [
       {
         type: 'rich',
-        color: 0xff0000,
+        color: generateRandomColor(),
         description: `${ans}`,
       },
     ],
@@ -638,6 +723,94 @@ async function genetics(message) {
     }
   }
 }
+
+async function searchImg(message) {
+  const query = message.content.split(' ').splice(1).join(' ');
+  const images = await google.image(query, { safe: false });
+  let img = images[0];
+  const msg = {
+    content: `**\ðŸ”${query}**\nViewing page- \`1/${images.length}\``,
+    tts: false,
+    components: [
+      {
+        type: 1,
+        components: [
+          {
+            style: 1,
+            custom_id: 'img_left',
+            disabled: false,
+            emoji: {
+              id: null,
+              name: 'â—€ï¸'
+            },
+            type: 2
+          },
+          {
+            style: 1,
+            custom_id: 'img_right',
+            disabled: false,
+            emoji: {
+              id: null,
+              name: 'â–¶ï¸'
+            },
+            type: 2
+          },
+          {
+            style: 1,
+            custom_id: 'img_random',
+            disabled: false,
+            emoji: {
+              id: null,
+              name: 'ðŸ”€'
+            },
+            type: 2
+          },
+          {
+            style: 1,
+            custom_id: 'img_input',
+            disabled: false,
+            emoji: {
+              id: null,
+              name: 'ðŸ”¢'
+            },
+            type: 2
+          },
+          {
+            style: 1,
+            custom_id: 'img_delete',
+            disabled: false,
+            emoji: {
+              id: null,
+              name: 'ðŸ—‘'
+            },
+            type: 2
+          }
+        ]
+      }
+    ],
+    embeds: [
+      {
+        type: 'rich',
+        title: img.origin.title,
+        description: `via **[${img.origin.website.name}](https://${img.origin.website.domain})**`,
+              color: generateRandomColor(),
+        image: {
+          url: img.url,
+          height: img.height,
+          width: img.width
+        },
+        author: {
+          name: 'Google Image Search',
+          icon_url: 'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-1024.png'
+        },
+        url: img.origin.website.url
+      }
+    ]
+  };
+  let mseg = await message.reply(msg);
+  await keyv.set(mseg.id, images);
+}
+
 async function actually(message) {
   let gene =
     '<:actually:1085483052962173009> <:inerd:1085486860417110026> <:nerd:1085483964917096520> <:nerdbob:1085483238149070878> <:nerdd:1085486459244527657> <:nerdddd:1085486629902364703> <:nerddddd:1085486964096127028> <:nerdddddd:1085487061986988092> <:nerdy:1085487343663845397> <:nerdyy:1085488754229252237> <:nerdyyy:1085488822650945596> <:nerdyyyy:1085488900065214464> <:nerdyyyyy:1085488991870144512> <:nerdyyyyyy:1085489036749176996> <:nerdyz:1085489094198579200> <:padhaku:1085487174994112532> <:quote:1085483838840516629> <a:nerddd:1085483561404092476> <a:umactually:1085483295069966365> <:chodu:1085490222290190357>';
@@ -720,11 +893,11 @@ async function execute(message, serverQueue) {
         )
         .trim();
       console.log(
-        `${message.author.username} searched for '${query}' on SoundCloud🔎`
+        `${message.author.username} searched for '${query}' on SoundCloudðŸ”Ž`
       );
     } else {
       console.log(
-        `${message.author.username} searched for '${query}' on YouTube🔎`
+        `${message.author.username} searched for '${query}' on YouTubeðŸ”Ž`
       );
     }
 
@@ -801,7 +974,7 @@ async function execute(message, serverQueue) {
               type: 'rich',
               title: '',
               description: '',
-              color: 0x462,
+              color: generateRandomColor(),
               author: {
                 name: `Added ${songs.length} songs to the queue`,
                 icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
@@ -842,7 +1015,7 @@ async function execute(message, serverQueue) {
               type: 'rich',
               title: '',
               description: '',
-              color: 0x462,
+              color: generateRandomColor(),
               author: {
                 name: `Added ${songs.length} songs to the queue`,
                 icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
@@ -973,7 +1146,7 @@ async function execute(message, serverQueue) {
                 type: 'rich',
                 title: '',
                 description: '',
-                color: 0x462,
+                color: generateRandomColor(),
                 author: {
                   name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
                   icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
@@ -1088,7 +1261,7 @@ async function play(guild, song) {
             type: 'rich',
             title: '',
             description: '',
-            color: 0x462,
+            color: generateRandomColor(),
             author: {
               name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
               icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
@@ -1159,7 +1332,7 @@ function showQueue(message, serverQueue) {
             '```' +
             `No song currently playing\n----------------------------\n` +
             '```',
-          color: 0x462,
+          color: generateRandomColor(),
         },
       ],
     }); //.then(msg => setTimeout(() => msg.delete(), 15*1000));
@@ -1202,7 +1375,7 @@ function showQueue(message, serverQueue) {
           type: 'rich',
           title: '',
           description: `\`\`\`\n${msg}\`\`\``,
-          color: 0x462,
+          color: generateRandomColor(),
         },
       ],
     })
@@ -1444,7 +1617,7 @@ async function sendGame(message) {
             disabled: false,
             emoji: {
               id: null,
-              name: `🧐`,
+              name: `ðŸ§`,
             },
             type: 2,
           },
@@ -1460,7 +1633,7 @@ async function sendGame(message) {
             disabled: false,
             emoji: {
               id: null,
-              name: `❓`,
+              name: `â“`,
             },
             type: 2,
           },
@@ -1472,17 +1645,17 @@ async function sendGame(message) {
         type: 'rich',
         title: `WORDLE`,
         description: [
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
-          `◻️ ◻️ ◻️ ◻️ ◻️`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
+          `â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸`,
         ].join('\n'),
-        color: 0xff0000,
+        color: generateRandomColor(),
         fields: [
           {
-            name: `🎚️ Chances Left :`,
+            name: `ðŸŽšï¸ Chances Left :`,
             value: `6`,
           },
         ],
@@ -1496,7 +1669,7 @@ async function sendGame(message) {
 }
 async function htp(interaction) {
   const desc = [
-    `• After each guess, the color of the tiles will change to show how close your guess was to the word.\n`,
+    `â€¢ After each guess, the color of the tiles will change to show how close your guess was to the word.\n`,
     `**Tile color meanings:**\n`,
     `${emojis.green.w} ${emojis.gray.e} ${emojis.gray.a} ${emojis.gray.r} ${emojis.gray.y}`,
     `The letter **W** is present in this word and is in the correct spot.\n`,
@@ -1514,7 +1687,7 @@ async function htp(interaction) {
         type: 'rich',
         title: `Guess the WORDLE in 6 tries.`,
         description: desc,
-        color: 0xa9f,
+        color: generateRandomColor(),
         footer: {
           text: `Play now ${prefix}playwordle`,
         },
@@ -1564,11 +1737,11 @@ async function executeModal(interaction) {
     let descArr = interaction.message.embeds[0].description
       .split('\n')
       .reverse(); //Splitting the description from new lines, then reversing it.
-    descArr[newChances] = colouredWord; //Replacing the next '◻️ ◻️ ◻️ ◻️ ◻️' with the coloured word, which was entered by the player
+    descArr[newChances] = colouredWord; //Replacing the next 'â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸ â—»ï¸' with the coloured word, which was entered by the player
     let newDesc = descArr.reverse().join('\n'); //getting the new description up by reversing and joining with new lines.
 
     const count = descArr.reduce(
-      (count, el) => (!el.includes('◻️') ? count + 1 : count),
+      (count, el) => (!el.includes('â—»ï¸') ? count + 1 : count),
       0
     ); //Turns taken by the player reaching the correct word.
     let msg = {
@@ -1585,7 +1758,7 @@ async function executeModal(interaction) {
               disabled: false,
               emoji: {
                 id: null,
-                name: `ℹ️`,
+                name: `â„¹ï¸`,
               },
               type: 2,
             },
@@ -1597,10 +1770,10 @@ async function executeModal(interaction) {
           type: 'rich',
           title: `WORDLE`,
           description: `${newDesc}`,
-          color: 0xff0000,
+          color: generateRandomColor(),
           fields: [
             {
-              name: `🏆 YOU WON`,
+              name: `ðŸ† YOU WON`,
               value: `Your performance: \`${count}/6\``,
             },
           ],
@@ -1612,7 +1785,7 @@ async function executeModal(interaction) {
       // await keyv.delete(interaction.message.id);
     } else if (oldChances == 1) {
       // Updating the msg object for when the user loses
-      msg.embeds[0].fields[0].name = '🦆 You Lost';
+      msg.embeds[0].fields[0].name = 'ðŸ¦† You Lost';
       msg.embeds[0].fields[0].value = `The word was \`${answer}\``;
       // await keyv.delete(interaction.message.id);
     } else {
@@ -1628,7 +1801,7 @@ async function executeModal(interaction) {
             disabled: false,
             emoji: {
               id: null,
-              name: `🧐`,
+              name: `ðŸ§`,
             },
             type: 2,
           },
@@ -1644,14 +1817,14 @@ async function executeModal(interaction) {
             disabled: false,
             emoji: {
               id: null,
-              name: `❓`,
+              name: `â“`,
             },
             type: 2,
           },
         ],
       },
    ],
-      msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
+      msg.embeds[0].fields[0].name = 'ðŸŽšï¸ Chances Left :';
       msg.embeds[0].fields[0].value = newChances;
     }
     await interaction.deferUpdate(); //Deferring the interaction as we are not responding to it.
@@ -1858,7 +2031,7 @@ async function sendAniman(message) {
   const ids = message.content
     .match(/<@(\d+)>/g);
   if (!ids || ids.length < 4) {
-    return message.reply('Please mention 4 peoples 🤓');
+    return message.reply('Please mention 4 peoples ðŸ¤“');
   }
   let idArray = ids.map((id) => id.slice(2, -1));
   let avatars = [];
@@ -2034,7 +2207,7 @@ async function getDef(interaction) {
   );
   // console.log(word + '\n' + resp);
 
-  let shortdef = '- **' + resp.data[0].shortdef.join('**\n- **') + '**';
+  let shortdef = resp.data[0].shortdef ? '- **' + resp.data[0].shortdef.join('**\n- **') + '**' : '`couldnâ€™t find lmao`';
   return interaction.reply(
     `The short definitions for \`${word}\` are:\n${shortdef}`
   );
@@ -2049,31 +2222,34 @@ let desc = [
   `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
   `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
 ];
+let randBool = Math.random() < 0.5;
 let content =
   message.mentions.users.size === 0
-    ? `${redDisk}<@${message.author.id}> challenged ${yellowDisk}**me**\nYour turn ${redDisk}<@${message.author.id}> :`
-    : `${redDisk}<@${message.author.id}> challenged the ${yellowDisk}<@${message.mentions.users.first().id}>\nYour turn ${redDisk}<@${message.author.id}> :`;
+    ? `${redCircle}<@${message.author.id}> **VS** ${yellowCircle}**me**\nYour turn ${redCircle}<@${message.author.id}> :`
+    : randBool 
+     ? `${redCircle}<@${message.author.id}> **VS** ${yellowCircle}<@${message.mentions.users.first().id}>\nYour turn ${redCircle}<@${message.author.id}> :`
+    : `${redCircle}<@${message.mentions.users.first().id}> **VS** ${yellowCircle}<@${message.author.id}>\nYour turn ${redCircle}<@${message.mentions.users.first().id}> :`;
 
 message.channel.send({
-  channel_id: `${message.channel_id}`,
+  
   content: content,
   tts: false,
   embeds: [
     {
       type: 'rich',
-      title: `🔢 Connect 4`,
+      title: `ðŸ”¢ Connect 4`,
       description: desc.join('\n'),
-      color: 0x8773ea,
+      color: generateRandomColor(),
       footer: {
         text: `The first player to connect 4 disks horizontally, vertically, or diagonally wins!`,
       },
       fields: [
         {
-          name: '1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣\n__Click the buttons to drop__',
+          name: '1ï¸âƒ£2ï¸âƒ£3ï¸âƒ£4ï¸âƒ£5ï¸âƒ£6ï¸âƒ£7ï¸âƒ£\n__Click the buttons to drop__',
           value: '`The highlighted button indicates the last move played.`',
        },
       ],
-      color: 0xffff00
+      color: generateRandomColor(),
     },
   ],
   components: [
@@ -2084,28 +2260,28 @@ message.channel.send({
           style: 2,
           custom_id: `one`,
           disabled: false,
-          emoji: {id: null, name: `1️⃣`},
+          emoji: {id: null, name: `1ï¸âƒ£`},
           type: 2,
         },
         {
           style: 2,
           custom_id: `two`,
           disabled: false,
-          emoji: {id: null, name: `2️⃣`},
+          emoji: {id: null, name: `2ï¸âƒ£`},
           type: 2,
         },
         {
           style: 2,
           custom_id: `three`,
           disabled: false,
-          emoji: {id: null, name: `3️⃣`},
+          emoji: {id: null, name: `3ï¸âƒ£`},
           type: 2,
         },
         {
           style: 2,
           custom_id: `four`,
           disabled: false,
-          emoji: {id: null, name: `4️⃣`},
+          emoji: {id: null, name: `4ï¸âƒ£`},
           type: 2,
         },
       ],
@@ -2117,21 +2293,21 @@ message.channel.send({
           style: 2,
           custom_id: `five`,
           disabled: false,
-          emoji: {id: null, name: `5️⃣`},
+          emoji: {id: null, name: `5ï¸âƒ£`},
           type: 2,
         },
         {
           style: 2,
           custom_id: `six`,
           disabled: false,
-          emoji: {id: null, name: `6️⃣`},
+          emoji: {id: null, name: `6ï¸âƒ£`},
           type: 2,
         },
         {
           style: 2,
           custom_id: `seven`,
           disabled: false,
-          emoji: {id: null, name: `7️⃣`},
+          emoji: {id: null, name: `7ï¸âƒ£`},
           type: 2,
         },
       ],
@@ -2153,18 +2329,18 @@ if (
 ) {
   if (!mentions.includes(interaction.member.user.id)) {
     return interaction.followUp({
-      content: `❌ **This is not your game**`,
+      content: `âŒ **This is not your game**`,
       ephemeral: true,
     });
   } else {
     return interaction.followUp({
-      content: `❌ **This is not your turn**`,
+      content: `âŒ **This is not your turn**`,
       ephemeral: true,
     });
   }
 } else if (!mentions.includes(interaction.member.user.id)) {
   return interaction.followUp({
-    content: `❌ **This is not your game**`,
+    content: `âŒ **This is not your game**`,
     ephemeral: true,
   });
 }
@@ -2173,21 +2349,23 @@ let components = message.components;
 if (mentions.length === 3) {
   let playerEmote = mentions[0] === mentions[2] ? redDisk : yellowDisk;
   let oppsID = mentions[0] === mentions[2] ? mentions[1] : mentions[0];
-  let oppsEmote = playerEmote === redDisk ? yellowDisk : redDisk;
+     let playerEmoteU = mentions[0] === mentions[2] ? redCircle: yellowCircle;
+  let oppsEmote = playerEmote === redDisk ? yellowCircle : redCircle;
   let board = message.embeds[0].description.split('\n');
   let newBoard = drop(board, playerEmote, dropIn);
   let win = isWin(newBoard, playerEmote, 4);
   newBoard = win ? win : newBoard;
   let gameOver = isGameOver(newBoard, emptyDisk);
-  let content = win
-    ? `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\nAnd ${playerEmote}<@${mentions[2]}> **won**!`
+  let content = message.content.split('\n');
+   content[1] = win
+    ? `And ${playerEmoteU}<@${mentions[2]}> **won**!`
     : gameOver
-      ? `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**And it's a draw**!`
-      : `${redDisk}<@${mentions[0]}> challenged ${yellowDisk}<@${mentions[1]}>\n**Your turn** ${oppsEmote}<@${oppsID}> :`;
+      ? `**And it's a draw**!`
+      : `**Your turn** ${oppsEmote}<@${oppsID}> :`;
 
   if (!newBoard) {
     return interaction.followUp({
-    content: `❌ **This column is already filled.**`,
+    content: `âŒ **This column is already filled.**`,
     ephemeral: true,
   });
   }
@@ -2210,19 +2388,19 @@ if (mentions.length === 3) {
           style: 1,
           custom_id: `rematch`,
           disabled: false,
-          emoji: {id: null, name: `↪️`},
+          emoji: {id: null, name: `â†ªï¸`},
           type: 2,
         },
     ]
     }];
   }
   await message.edit({
-    content: `${content}`,
+    content: `${content.join('\n')}`,
     embeds: [
       {
         type: `rich`,
         description: newBoard.join('\n'),
-        color: 0xff0000,
+        color: generateRandomColor(),
         fields: message.embeds[0].fields,
         title: message.embeds[0].title,
         footer: message.embeds[0].footer
@@ -2252,10 +2430,9 @@ if (mentions.length === 3) {
   });
   return component;
 });
-    console.log(components[0].components[0])
- 
+    
   if (userWin) {
-    content[1] = `And ${redDisk}you **won**.`;
+    content[1] = `And ${redCircle}you **won**.`;
     components =  [
     {
       type: 1,
@@ -2265,14 +2442,14 @@ if (mentions.length === 3) {
           style: 1,
           custom_id: `rematch`,
           disabled: false,
-          emoji: {id: null, name: `↪️`},
+          emoji: {id: null, name: `â†ªï¸`},
           type: 2,
         },
     ]
     }];
   }
   if (botWin) {
-    content[1] = `And ${redDisk}you **lost** 🤣.`;
+    content[1] = `And ${redCircle}you **lost** ðŸ¤£.`;
     components =  [
     {
       type: 1,
@@ -2282,7 +2459,7 @@ if (mentions.length === 3) {
           style: 1,
           custom_id: `rematch`,
           disabled: false,
-          emoji: {id: null, name: `↪️`},
+          emoji: {id: null, name: `â†ªï¸`},
           type: 2,
         },
     ]
@@ -2300,7 +2477,7 @@ if (mentions.length === 3) {
           style: 1,
           custom_id: `rematch`,
           disabled: false,
-          emoji: {id: null, name: `↪️`},
+          emoji: {id: null, name: `â†ªï¸`},
           type: 2,
         },
     ]
@@ -2317,7 +2494,7 @@ if (mentions.length === 3) {
       {
         type: `rich`,
         description: newDesc.join('\n'),
-        color: 0xff0000,
+        color: generateRandomColor(),
         fields: message.embeds[0].fields,
         title: message.embeds[0].title,
         footer: message.embeds[0].footer
@@ -2452,144 +2629,355 @@ function isGameOver(board) {
   return true;
 }
 
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+
 
 async function rematchC4(interaction) {
-    let message = interaction.message;
-    if (!message.content.includes(interaction.member.id)) {
-        return interaction.followUp(
-        {content: '❌ **This is not your game.**',
-       ephemeral: true
-       });
-    }
- 
-
-  let content = interaction.message.content.split('\n');
-  content[1] = `**Your turn** ${redDisk}<@${interaction.message.mentions.parsedUsers.first().id}> :`;
-  let desc = [
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-  `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
-];
-let components = [
-    {
-      type: 1,
-      components: [
-        {
-          style: 2,
-          custom_id: `one`,
-          disabled: false,
-          emoji: {id: null, name: `1️⃣`},
-          type: 2,
-        },
-        {
-          style: 2,
-          custom_id: `two`,
-          disabled: false,
-          emoji: {id: null, name: `2️⃣`},
-          type: 2,
-        },
-        {
-          style: 2,
-          custom_id: `three`,
-          disabled: false,
-          emoji: {id: null, name: `3️⃣`},
-          type: 2,
-        },
-        {
-          style: 2,
-          custom_id: `four`,
-          disabled: false,
-          emoji: {id: null, name: `4️⃣`},
-          type: 2,
-        },
-      ],
-    },
-    {
-      type: 1,
-      components: [
-          {
-          style: 2,
-          custom_id: `five`,
-          disabled: false,
-          emoji: {id: null, name: `5️⃣`},
-          type: 2,
-        },
-        {
-          style: 2,
-          custom_id: `six`,
-          disabled: false,
-          emoji: {id: null, name: `6️⃣`},
-          type: 2,
-        },
-        {
-          style: 2,
-          custom_id: `seven`,
-          disabled: false,
-          emoji: {id: null, name: `7️⃣`},
-          type: 2,
-        },
-      ],
-    },
-  ];
-  if (message.mentions.users.size !== 1) {
-let alreadyC = await keyv.get(interaction.member.id);
-    if (interaction.component.label == "Rematch" && !alreadyC) {
-      await keyv.set(interaction.member.id, true);
-      content = message.content.split('\n');
-      desc = message.embeds[0]. description.split('\n');
-     components =  [
-    {
-      type: 1,
-      components: [
-        {
-          label: 'Rematch (1/2)',
-          style: 1,
-          custom_id: `rematch`,
-          disabled: false,
-          emoji: {id: null, name: `↪️`},
-          type: 2,
-        },
-    ]
-    }];
-  
-  } else if (interaction.component.label == 'Rematch (1/2)') {
-      await keyv.delete(interaction.member.id);
+  let message = interaction.message;
+  if (!message.content.includes(interaction.member.id)) {
+    return interaction.followUp({
+      content: 'âŒ **This is not your game.**',
+      ephemeral: true
+    });
   }
+  let desc = message.embeds[0].description.split('\n');
+  let content = message.content.split('\n');
+  let components;
+   if (message.mentions.users.size !== 1) {
+  if (interaction.component.label === 'Rematch (1/2)') {
+    let hasClicked = await keyv.get(interaction.member.id);
+    if (hasClicked) {
+      return interaction.followUp({
+        content: "âŒ **You've already clicked the button**",
+        interaction: true
+      });
+    }
+    await keyv.delete(interaction.message.id);
+    // Change component and content 
+  let randBool = Math.random() < 0.5;
+content[0] = randBool ? `${redDisk}<@${message.mentions.parsedUsers.first().id}> VS ${yellowDisk}<@${message.mentions.parsedUsers.second().id}>` : content[0];
+content[1] = `**Your turn** ${redCircle}<@${interaction.message.mentions.parsedUsers.first().id}> :`;
+
+    desc = [
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+    ];
+    components = [
+      {
+        type: 1,
+        components: [
+          {
+            style: 2,
+            custom_id: `one`,
+            disabled: false,
+            emoji: { id: null, name: `1ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `two`,
+            disabled: false,
+            emoji: { id: null, name: `2ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `three`,
+            disabled: false,
+            emoji: { id: null, name: `3ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `four`,
+            disabled: false,
+            emoji: { id: null, name: `4ï¸âƒ£` },
+            type: 2,
+          },
+        ],
+      },
+      {
+        type: 1,
+        components: [
+          {
+            style: 2,
+            custom_id: `five`,
+            disabled: false,
+            emoji: { id: null, name: `5ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `six`,
+            disabled: false,
+            emoji: { id: null, name: `6ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `seven`,
+            disabled: false,
+            emoji: { id: null, name: `7ï¸âƒ£` },
+            type: 2,
+          },
+        ],
+      },
+    ];
+  } else {
+    await keyv.set(interaction.member.id, true);
+    components = [
+      {
+        type: 1,
+        components: [
+          {
+            label: 'Rematch (1/2)',
+            style: 1,
+            custom_id: `rematch`,
+            disabled: false,
+            emoji: { id: null, name: `â†ªï¸` },
+            type: 2,
+          },
+        ]
+      }
+    ];
+  }
+   } else {
+       desc = [
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+      `${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`,
+    ];
+    components = [
+      {
+        type: 1,
+        components: [
+          {
+            style: 2,
+            custom_id: `one`,
+            disabled: false,
+            emoji: { id: null, name: `1ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `two`,
+            disabled: false,
+            emoji: { id: null, name: `2ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `three`,
+            disabled: false,
+            emoji: { id: null, name: `3ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `four`,
+            disabled: false,
+            emoji: { id: null, name: `4ï¸âƒ£` },
+            type: 2,
+          },
+        ],
+      },
+      {
+        type: 1,
+        components: [
+          {
+            style: 2,
+            custom_id: `five`,
+            disabled: false,
+            emoji: { id: null, name: `5ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `six`,
+            disabled: false,
+            emoji: { id: null, name: `6ï¸âƒ£` },
+            type: 2,
+          },
+          {
+            style: 2,
+            custom_id: `seven`,
+            disabled: false,
+            emoji: { id: null, name: `7ï¸âƒ£` },
+            type: 2,
+          },
+        ],
+      },
+    ];
    }
-message.edit({
-  channel_id: `${message.channel_id}`,
-  content: content.join('\n'),
-  tts: false,
-  embeds: [
-    {
-      type: 'rich',
-      title: `🔢 Connect 4`,
-      description: desc.join('\n'),
-      color: 0x8773ea,
-      footer: message.embeds[0].footer,
-      fields: message.embeds[0].fields,
-      color: 0xffff00
-    },
-  ],
-  components: components,
-});
+  await message.edit({
+    channel_id: `${message.channel_id}`,
+    content: content.join('\n'),
+    tts: false,
+    embeds: [
+      {
+        type: 'rich',
+        title: `ðŸ”¢ Connect 4`,
+        description: desc.join('\n'),
+        color: generateRandomColor(),
+        footer: message.embeds[0].footer,
+        fields: message.embeds[0].fields,
+        
+      },
+    ],
+    components: components,
+  });
 }
+
 
 
 function autoDrop(board) {
-
   const shuffledIndices = shuffleArray([0, 1, 2, 3, 4, 5, 6]);
+  
+  // Helper function to count consecutive disks in a row
+  const countConsecutive = (row, col, rowDirection, colDirection, targetDisk) => {
+    let count = 0;
+    while (
+      row >= 0 &&
+      row < board.length &&
+      col >= 0 &&
+      col < board[row].length &&
+      board[row][col] === targetDisk
+    ) {
+      count++;
+      row += rowDirection;
+      col += colDirection;
+    }
+    return count;
+  };
 
+  // Helper function to analyze opponent's playing style
+  function analyzeOpponentStyle() {
+    const opponentMoves = board.flat().filter((disk) => disk !== emptyDisk);
+
+    const consecutiveMoves = [];
+
+    for (let i = 0; i < opponentMoves.length; i++) {
+      const currentMove = opponentMoves[i];
+      const previousMove = consecutiveMoves[consecutiveMoves.length - 1];
+
+      if (currentMove === previousMove) {
+        consecutiveMoves.push(currentMove);
+      } else {
+        consecutiveMoves.length = 0;
+        consecutiveMoves.push(currentMove);
+      }
+
+      if (consecutiveMoves.length >= 3) {
+        return 'aggressive';
+      }
+    }
+
+    // If the opponent has frequently blocked potential winning moves
+    const potentialWinMoves = consecutiveMoves.filter((move) => move === yellowDisk);
+    if (potentialWinMoves.length > 2) {
+      return 'defensive';
+    }
+
+    // If the opponent's moves appear random or unpredictable
+    if (opponentMoves.length > 5 && opponentMoves.length % 2 === 1) {
+      return 'random';
+    }
+
+    // If the opponent's style cannot be determined
+    return 'unknown';
+  }
+
+  // Helper function to block opponent's potential winning moves
+  function blockOpponentWinningMove(disk) {
+    for (let col = 0; col < 7; col++) {
+      const testBoard = drop(board, disk, col);
+      if (isWin(testBoard, disk, 4)) {
+        return { board: testBoard, columnIndex: col };
+      }
+    }
+    return null;
+  }
+
+  // Helper function to evaluate the board and find the best move
+  function findBestMove(disk) {
+    let bestMove = -1;
+    let bestScore = -Infinity;
+
+    for (let col = 0; col < 7; col++) {
+      const testBoard = drop(board, disk, col);
+      const score = evaluateBoard(testBoard, disk);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = col;
+      }
+    }
+
+    return bestMove;
+  }
+
+  // Helper function to evaluate the board state based on its advantage for a given player
+  function evaluateBoard(board, disk) {
+    // Check for potential winning lines in all directions
+    const directions = [
+      [1, 0], // Vertical
+      [0, 1], // Horizontal
+      [1, 1], // Diagonal (down-right)
+      [-1, 1], // Diagonal (up-right)
+    ];
+
+    let score = 0;
+
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length; col++) {
+        if (board[row][col] === emptyDisk) {
+          for (const direction of directions) {
+            const [rowDirection, colDirection] = direction;
+            const opponentDisk = disk === yellowDisk ? redDisk : yellowDisk;
+
+            const consecutivePlayerDisks = countConsecutive(
+              row,
+              col,
+              rowDirection,
+              colDirection,
+              disk
+            );
+            const consecutiveOpponentDisks = countConsecutive(
+              row,
+              col,
+              rowDirection,
+              colDirection,
+              opponentDisk
+            );
+
+            // Evaluate the advantage based on the consecutive disks in a row
+            if (consecutivePlayerDisks === 4) {
+              // Winning move
+              score += 100;
+            } else if (consecutivePlayerDisks === 3 && consecutiveOpponentDisks === 0) {
+              // Potential winning move (3 player disks, no opponent disks)
+              score += 10;
+            } else if (consecutivePlayerDisks === 2 && consecutiveOpponentDisks === 0) {
+              // Advantageous move (2 player disks, no opponent disks)
+              score += 5;
+            } else if (consecutiveOpponentDisks === 3 && consecutivePlayerDisks === 0) {
+              // Block opponent's potential winning move (3 opponent disks, no player disks)
+              score -= 20;
+            }
+          }
+        }
+      }
+    }
+
+    return score;
+  }
+
+  
   // Check for winning moves for both players
   for (let i = 0; i < 7; i++) {
     const index = shuffledIndices[i];
@@ -2634,162 +3022,44 @@ function autoDrop(board) {
   }
 
   // Analyze opponent's playing style and adapt strategy
-  const opponentStyle = analyzeOpponentStyle(board);
+  const opponentStyle = analyzeOpponentStyle();
   if (opponentStyle === 'aggressive') {
     // Incorporate randomness to introduce unpredictability against aggressive opponents
     const randomCol = shuffledIndices[Math.floor(Math.random() * 7)];
     return { board: drop(board, yellowDisk, randomCol), columnIndex: randomCol };
   } else if (opponentStyle === 'defensive') {
     // Block opponent's potential winning moves
-    const blockMove = blockOpponentWinningMove(board, redDisk);
+    const blockMove = blockOpponentWinningMove(redDisk);
     if (blockMove) {
       return blockMove;
     }
   }
 
   // Find the most advantageous move based on the evaluation function
-  const bestMove = findBestMove(board, yellowDisk);
+  const bestMove = findBestMove(yellowDisk);
   return { board: drop(board, yellowDisk, bestMove), columnIndex: bestMove };
 }
 
-
-// Helper function to analyze opponent's playing style
-// Helper function to block opponent's potential winning moves
-function blockOpponentWinningMove(board, disk) {
-  for (let col = 0; col < 7; col++) {
-    const testBoard = drop(board, disk, col);
-    if (isWin(testBoard, disk, 4)) {
-      return { board: testBoard, columnIndex: col };
-    }
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-  return null;
+  return array;
 }
 
-// Helper function to evaluate the board and find the best move
-function findBestMove(board, disk) {
-  let bestMove = -1;
-  let bestScore = -Infinity;
+function generateRandomColor() {
+  // Generate three random RGB values between 0 and 255
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
 
-  for (let col = 0; col < 7; col++) {
-    const testBoard = drop(board, disk, col);
-    const score = evaluateBoard(testBoard, disk);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMove = col;
-    }
-  }
+  // Combine RGB values into a single decimal color number
+  const color = (r << 16) | (g << 8) | b;
 
-  return bestMove;
+  return color;
 }
 
-// Helper function to evaluate the board state based on its advantage for a given player
-
-function evaluateBoard(board, disk) {
-
-  // Helper function to count consecutive disks in a row
-  const countConsecutive = (row, col, rowDirection, colDirection, targetDisk) => {
-    let count = 0;
-    while (
-      row >= 0 &&
-      row < board.length &&
-      col >= 0 &&
-      col < board[row].length &&
-      board[row][col] === targetDisk
-    ) {
-      count++;
-      row += rowDirection;
-      col += colDirection;
-    }
-    return count;
-  };
-
-  // Check for potential winning lines in all directions
-  const directions = [
-    [1, 0], // Vertical
-    [0, 1], // Horizontal
-    [1, 1], // Diagonal (down-right)
-    [-1, 1], // Diagonal (up-right)
-  ];
-
-  let score = 0;
-
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (board[row][col] === emptyDisk) {
-        for (const direction of directions) {
-          const [rowDirection, colDirection] = direction;
-          const opponentDisk = disk === yellowDisk ? redDisk : yellowDisk;
-
-          const consecutivePlayerDisks = countConsecutive(
-            row,
-            col,
-            rowDirection,
-            colDirection,
-            disk
-          );
-          const consecutiveOpponentDisks = countConsecutive(
-            row,
-            col,
-            rowDirection,
-            colDirection,
-            opponentDisk
-          );
-
-          // Evaluate the advantage based on the consecutive disks in a row
-          if (consecutivePlayerDisks === 4) {
-            // Winning move
-            score += 100;
-          } else if (consecutivePlayerDisks === 3 && consecutiveOpponentDisks === 0) {
-            // Potential winning move (3 player disks, no opponent disks)
-            score += 10;
-          } else if (consecutivePlayerDisks === 2 && consecutiveOpponentDisks === 0) {
-            // Advantageous move (2 player disks, no opponent disks)
-            score += 5;
-          } else if (consecutiveOpponentDisks === 3 && consecutivePlayerDisks === 0) {
-            // Block opponent's potential winning move (3 opponent disks, no player disks)
-            score -= 20;
-          }
-        }
-      }
-    }
-  }
-
-  return score;
-}
-
-function analyzeOpponentStyle(board) {
-  const opponentMoves = board.flat().filter((disk) => disk !== emptyDisk);
-
-  const consecutiveMoves = [];
-
-  for (let i = 0; i < opponentMoves.length; i++) {
-    const currentMove = opponentMoves[i];
-    const previousMove = consecutiveMoves[consecutiveMoves.length - 1];
-
-    if (currentMove === previousMove) {
-      consecutiveMoves.push(currentMove);
-    } else {
-      consecutiveMoves.length = 0;
-      consecutiveMoves.push(currentMove);
-    }
-
-    if (consecutiveMoves.length >= 3) {
-      return 'aggressive';
-    }
-  }
-
-  // If the opponent has frequently blocked potential winning moves
-  const potentialWinMoves = consecutiveMoves.filter((move) => move === 'Y');
-  if (potentialWinMoves.length > 2) {
-    return 'defensive';
-  }
-
-  // If the opponent's moves appear random or unpredictable
-  if (opponentMoves.length > 5 && opponentMoves.length % 2 === 1) {
-    return 'random';
-  }
-
-  // If the opponent's style cannot be determined
-  return 'unknown';
-}
-
+// Usage example:
+const embedColor = generateRandomColor();
+console.log(embedColor);
