@@ -12,17 +12,18 @@
   "dependencies": {
     "@discordjs/voice": "^0.16.0",
     "@types/node": "^18.0.6",
-    "discord.js": "^14.9.0",
-    "dotenv": "^16.0.3",
+    "axios": "^1.4.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "gif-encoder-2": "^1.0.5",
-    "jimp": "^0.22.7",
+    "google-translate-api-x": "^10.6.7",
+    "googlethis": "^1.7.1",
+    "jimp": "^0.22.8",
     "libsodium-wrappers": "^0.7.11",
     "node-fetch": "^3.2.6",
-    "openai": "^3.2.1",
+    "openai": "^3.3.0",
     "play-dl": "^1.9.6",
-    "google-translate-api-x": "^10.6.5",
-    "sharp": "^0.32.1",
-    "axios": "^1.4.0"
+    "sharp": "^0.32.1"
   }
 }
