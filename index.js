@@ -1192,7 +1192,7 @@ async function play(guild, song) {
     return;
   }
 
-  //if song is queued during timeout, clear timeout
+ 
   if (serverQueue.timeoutID != undefined) {
     console.log(`Timeout cleared for "${guild.name}"`);
     clearTimeout(serverQueue.timeoutID);
@@ -3059,8 +3059,3 @@ function generateRandomColor() {
 
   return color;
 }
-
-// Usage example:
-const embedColor = generateRandomColor();
-console.log(embedColor);
-
