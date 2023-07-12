@@ -316,7 +316,7 @@ async function handleErrors(func, ...args) {
 }
 
 async function sendokbbl(member) {
-  let channel = client.channels.cache.get('804902112700923957');
+  let channel = client.channels.cache.get('1128609011852390400');
   channel.send(`ayyo saar **${member.user.tag}** gayaa`);
 }
 async function sendPajeetl(member) {
@@ -350,7 +350,7 @@ async function sendokbb(member) {
     forceStatic: true,
   });
   let tag = member.user.tag;
-  let channel_id = '804902112700923957';
+  let channel_id = '1128609011852390400';
   let avatar = await Jimp.read(avatarURL);
   avatar.resize(100, 100);
   let font = await Jimp.loadFont(path.resolve('./fcb.fnt'));
