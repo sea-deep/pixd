@@ -728,11 +728,11 @@ console.log(prompt);
     model: 'text-davinci-003',
     prompt: prompt,
     max_tokens: 264,
-    temperature: 0.9,
+    temperature: 0.2,
     top_p: 1,
     n: 1,
-    presence_penalty: 0,
-    frequency_penalty: 0,
+    presence_penalty: -2,
+    frequency_penalty: -2,
   });
   let ans = completion.data.choices[0].text;
 
