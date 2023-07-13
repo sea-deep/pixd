@@ -38,8 +38,8 @@ const {
   createAudioResource,
   AudioPlayerStatus,
 } = require('@discordjs/voice');
-const { Client } = require('craiyon');
-const craiyon = new Client();
+const craiyon = require('craiyon');
+const craiyon.Client = new Client();
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
