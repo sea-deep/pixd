@@ -38,6 +38,8 @@ const {
   createAudioResource,
   AudioPlayerStatus,
 } = require('@discordjs/voice');
+const { Client } = require('craiyon');
+const craiyon = new Client();
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -159,24 +161,20 @@ client.on(Events.MessageCreate, async (message) => {
         await handleErrors(rape, message);
         break;
       case 'vosahihai':
-        await handleErrors(vosahihai, message);
-        break;
+        return handleErrors(vosahihai, message);
       case 'lapata':
-        await handleErrors(lapata, message);
-        break;
+        return handleErrors(lapata, message);
       case 'allustuff':
-        await handleErrors(stuffImg, message);
-        break;
+        return handleErrors(stuffImg, message);
       case 'nearyou':
-        await handleErrors(nearme, message);
-        break;
+        return handleErrors(nearme, message);
       case 'goodness':
-        await handleErrors(goodness, message);
-        break;
+        return handleErrors(goodness, message);
+      case 'genesis':
+        return handleErrors(generateImage, message);
       case 'img':
       case 'image':
-        await searchImg(message);
-        break;
+        return handleErrors(searchImg,message);
       default:
         break;
     }
@@ -429,6 +427,82 @@ async function moveUp(message) {
   });
   return message.edit(msg);
 }
+
+async function generateImage(message) {
+   const prompt = message.content.split(' ').splice(1).join(' ')
+   if (!prompt) {
+      message.reply('❌ **Please give something to genesis*');
+   }
+   let mes = await message.reply({
+         content: `>>> OK genesissing: **${prompt}** <a:loading:1049025849439043635>\nMight take a minute or two.`,
+     tts: false,
+     components: [
+       {
+         type: 1,
+         components: [
+           {
+             type: 2,
+             style: 4,
+             label: 'STOP',
+             custom_id: 'delete_btn',
+             disabled: false,
+             emoji: {
+               id: null,
+               name: '🛑',
+               }
+           },
+         ],
+       },
+     ],
+   });
+  try {
+  const response = await craiyon.generate({
+  prompt: prompt,
+});
+  } catch (e) {
+return mes.edit({
+        content: `>>> ayyo saar genesis failed :fail:`,
+        embed: {type: 'rich', description: `${e.message}`},
+        tts: false   
+});
+}
+
+  const attachments = [];
+result._images.forEach((base64Image, index) => {
+  const base64Data = base64Image.base64.replace(/^data:image\/\w+;base64,/, '');
+  const imageBuffer = Buffer.from(base64Data, 'base64');
+  const fileName = `${prompt}_${index}.jpg`; 
+  let attachment= new AttachmentBuilder(imageBuffer, {name: fileName});
+attachments.push(attachment);
+  });
+
+let editMessageResponse = await mes.edit({
+  content: `>>> Genesisation Done! \nHere is your **${prompt}**`,
+  components: [
+        {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              style: 4,
+              label: 'DELETE',
+              custom_id: 'delete_btn',
+              disabled: false,
+              emoji: {
+                id: null,
+                name: '🗑️',
+                }
+            },
+          ],
+        },
+      ],
+  files: attachments
+});
+
+return editMessageResponse;
+
+    }
+
 
 async function imgLeft(interaction) {
   if (interaction.member.id !== interaction.message.mentions.users.first().id) return;
