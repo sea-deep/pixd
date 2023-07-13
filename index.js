@@ -455,7 +455,7 @@ async function generateImage(message) {
        },
      ],
    });
-   let response;
+  let response;
   try {
   response = await craiyon.generate({
   prompt: prompt,
