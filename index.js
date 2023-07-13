@@ -468,7 +468,7 @@ return mes.edit({
 }
 
   const attachments = [];
-result._images.forEach((base64Image, index) => {
+response._images.forEach((base64Image, index) => {
   const base64Data = base64Image.base64.replace(/^data:image\/\w+;base64,/, '');
   const imageBuffer = Buffer.from(base64Data, 'base64');
   const fileName = `${prompt}_${index}.jpg`; 
