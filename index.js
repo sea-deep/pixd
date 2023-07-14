@@ -2176,7 +2176,7 @@ async function goodness (message) {
     const file = path.resolve(`./goodness/frame_${frame}_delay-0.05s.gif`);
 
     let banner = await Jimp.read(file);
-    banner.composite(av, 108, 135);
+    banner.composite(av, 104, 139);
     encoder.addFrame(banner.bitmap.data);
   }
   encoder.finish();
