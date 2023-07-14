@@ -75,7 +75,9 @@ client.once('reconnect', () => {
 });
 playDL
   .getFreeClientID()
-  .then((clientID) => playDL.setToken({ soundcloud: { client_id: clientID } }))
+  .then((clientID) => playDL.setToken({youtube : {
+          cookie : process.env.YT_COOKIES
+      }, soundcloud: { client_id: clientID } }))
   .catch((err) => {
     console.error('Failed to get client ID:', err);
   });
