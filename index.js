@@ -1674,7 +1674,8 @@ function parse(input) {
   } else {
     return 0;
   }
-}async function change(message) {
+}
+async function change(message) {
   return message.reply('Command changed to : `p!wordle`')
 }
 async function sendGame(message) {
@@ -2167,7 +2168,7 @@ async function goodness (message) {
   let m = await message.reply('Processing...');
   let avatar = await getInputImage(message);
   let av = await Jimp.read(avatar);
-  av.resize(157,157)
+  av.resize(160,157)
   const encoder = new GIFEncoder(260, 296);
   encoder.setDelay(50);
   encoder.start();
