@@ -674,7 +674,7 @@ gravitational field intensity at that point is`,
   });
   response = completion.data.choices[0].message.content.trim();
   const ans = response.trim();
-  return message.reply(ans);
+  return message.reply(content: ans, failIfNotExists: false);
 }
 async function moveDown(message) {
   const description = message.embeds[0].description;
@@ -726,7 +726,9 @@ async function gpt(message) {
   ].join('\n');
   
 console.log(prompt);
-  const completion = await openai.createCompletion({
+  let completion;
+try {
+  completion = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: prompt,
     max_tokens: 264,
@@ -736,6 +738,9 @@ console.log(prompt);
     presence_penalty: 0.25,
     frequency_penalty: 0.1,
   });
+} catch (e) {
+return message.reply(e.message);
+}
   let ans = completion.data.choices[0].text;
 
   return message.reply({
@@ -795,7 +800,7 @@ async function genetics(message) {
           .then((msg) => msg.react(genesis[i]));
       }
     } catch (e) {
-      console.warn(e);
+      console.log(e.message);
       break;
     }
   }
@@ -937,7 +942,7 @@ async function actually(message) {
           .then((msg) => msg.react(genesis[i]));
       }
     } catch (e) {
-      console.warn(e);
+      console.log(e.message);
       break;
     }
   }
