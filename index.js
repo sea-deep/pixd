@@ -674,7 +674,7 @@ gravitational field intensity at that point is`,
   });
   response = completion.data.choices[0].message.content.trim();
   const ans = response.trim();
-  return message.reply(content: ans, failIfNotExists: false);
+  return message.reply({content: ans, failIfNotExists: false});
 }
 async function moveDown(message) {
   const description = message.embeds[0].description;
@@ -745,6 +745,7 @@ return message.reply(e.message);
 
   return message.reply({
     content: ``,
+    failIfNotExists: false,
     tts: false,
     embeds: [
       {
