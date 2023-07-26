@@ -1,4 +1,4 @@
-export function move(description, direction) {
+ function move(description, direction) {
   const board = parseDesc(description);
 
   if (!board) {
@@ -111,7 +111,7 @@ export function move(description, direction) {
   return makeDesc(board);
 }
 
-export function spawnRandom(board, amount) {
+ function spawnRandom(board, amount) {
   const emptyTiles = [];
 
   // find all the empty tiles
@@ -138,7 +138,7 @@ export function spawnRandom(board, amount) {
   return board; // return the modified board
 }
 
-export function makeDesc(board) {
+ function makeDesc(board) {
   const emojiMap = {
     '0': '<:0_:1133755630633635952>',
     '2': '<:2_:1133755613172748320>',
@@ -158,7 +158,7 @@ export function makeDesc(board) {
   return newBoard.map((row) => row.join('')).join('\n');
 }
 
-export function parseDesc(description) {
+ function parseDesc(description) {
   const array = description.split('\n');
   const board = array.map((row) => row.split(/(?<=>)(?=<)/));
 
@@ -181,7 +181,7 @@ export function parseDesc(description) {
   return newBoard;
 }
 
-export function calculateScore(board) {
+ function calculateScore(board) {
   let score = 0;
 
   for (let i = 0; i < board.length; i++) {
@@ -195,7 +195,7 @@ export function calculateScore(board) {
   return score;
 }
 
-export function isGameOver(board) {
+ function isGameOver(board) {
   // Check if there are any empty tiles on the board
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
@@ -222,7 +222,7 @@ export function isGameOver(board) {
   return true;
 }
 
-export function message(params) {
+ function message(params) {
   return {
     content: '',
     tts: false,
@@ -355,4 +355,12 @@ export function message(params) {
   };
 }
 
-
+module.exports = {
+  move,
+  spawnRandom,
+  makeDesc,
+  parseDesc,
+  calculateScore,
+  isGameOver,
+  message,
+};
