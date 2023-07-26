@@ -1,4 +1,4 @@
-function move(description, direction) {
+export function move(description, direction) {
   const board = parseDesc(description);
 
   if (!board) {
@@ -9,49 +9,49 @@ function move(description, direction) {
 
   switch (direction) {
     case 'right':
-      for (let row = 0; row < board.length; row++) {
-        for (let col = board[row].length - 2; col >= 0; col--) {
-          if (board[row][col] !== '0') {
+      board.forEach((row) => {
+        for (let col = row.length - 2; col >= 0; col--) {
+          if (row[col] !== '0') {
             let nextCol = col + 1;
-            while (nextCol < board[row].length && board[row][nextCol] === '0') {
+            while (nextCol < row.length && row[nextCol] === '0') {
               nextCol++;
             }
 
-            if (nextCol < board[row].length && board[row][col] === board[row][nextCol]) {
-              board[row][nextCol] = (parseInt(board[row][col]) * 2).toString();
-              board[row][col] = '0';
+            if (nextCol < row.length && row[col] === row[nextCol]) {
+              row[nextCol] = (parseInt(row[col]) * 2).toString();
+              row[col] = '0';
               moved = true;
-            } else if (board[row][nextCol - 1] === '0') {
-              board[row][nextCol - 1] = board[row][col];
-              board[row][col] = '0';
+            } else if (row[nextCol - 1] === '0') {
+              row[nextCol - 1] = row[col];
+              row[col] = '0';
               moved = true;
             }
           }
         }
-      }
+      });
       break;
 
     case 'left':
-      for (let row = 0; row < board.length; row++) {
-        for (let col = 1; col < board[row].length; col++) {
-          if (board[row][col] !== '0') {
+      board.forEach((row) => {
+        for (let col = 1; col < row.length; col++) {
+          if (row[col] !== '0') {
             let prevCol = col - 1;
-            while (prevCol >= 0 && board[row][prevCol] === '0') {
+            while (prevCol >= 0 && row[prevCol] === '0') {
               prevCol--;
             }
 
-            if (prevCol >= 0 && board[row][col] === board[row][prevCol]) {
-              board[row][prevCol] = (parseInt(board[row][col]) * 2).toString();
-              board[row][col] = '0';
+            if (prevCol >= 0 && row[col] === row[prevCol]) {
+              row[prevCol] = (parseInt(row[col]) * 2).toString();
+              row[col] = '0';
               moved = true;
-            } else if (board[row][prevCol + 1] === '0') {
-              board[row][prevCol + 1] = board[row][col];
-              board[row][col] = '0';
+            } else if (row[prevCol + 1] === '0') {
+              row[prevCol + 1] = row[col];
+              row[col] = '0';
               moved = true;
             }
           }
         }
-      }
+      });
       break;
 
     case 'up':
@@ -111,10 +111,10 @@ function move(description, direction) {
   return makeDesc(board);
 }
 
-function spawnRandom(board, amount) {
+export function spawnRandom(board, amount) {
   const emptyTiles = [];
 
-  // Find all the empty tiles
+  // find all the empty tiles
   for (let row = 0; row < board.length; row++) {
     for (let col = 0; col < board[row].length; col++) {
       if (board[row][col] === '0') {
@@ -128,7 +128,7 @@ function spawnRandom(board, amount) {
     [emptyTiles[i], emptyTiles[j]] = [emptyTiles[j], emptyTiles[i]];
   }
 
-  // Spawn random numbers on the empty tiles
+  // spawn random numbers on the empty tiles
   for (let i = 0; i < amount; i++) {
     const [row, col] = emptyTiles[i];
     const value = Math.random() < 0.8 ? '2' : '4'; // 2 has 80% chance, 4 has 20% chance
@@ -138,53 +138,50 @@ function spawnRandom(board, amount) {
   return board; // return the modified board
 }
 
-function makeDesc(board) {
+export function makeDesc(board) {
   const emojiMap = {
-    '0': '<:00:1088197427980423319>',
-    '2': '<:02:1117786469193486379>',
-    '4': '<:04:1117786477204615219>',
-    '8': '<:08:1117786482011287612>',
-    '16': '<:016:1117786487229001748>',
-    '32': '<:032:1117786492270555187>',
-    '64': '<:064:1117786496800399402>',
-    '256': '<:256:1117786505889464452>',
-    '1024': '<:1024:1117786515980963930>',
-    '2048': '<:2048:1117786520313659423>',
-    '4096': '<:4096:1117786525002911885>',
+    '0': '<:0_:1133755630633635952>',
+    '2': '<:2_:1133755613172748320>',
+    '4': '<:4_:1133755575092646018>',
+    '8': '<:8_:1133755647314374746>',
+    '16': '<:16:1133755568046231614>',
+    '32': '<:32:1133755558575472650>',
+    '64': '<:64:1133755656638316544>',
+    '256': '<:128:1133755638623764582>',
+    '1024': '<:256:1133755585750372442>',
+    '2048': '<:512:1133755602934452256>',
+    '4096': '<:1024:1133755622173708309>',
   };
 
   const newBoard = board.map((row) => row.map((val) => emojiMap[val]));
 
-  let description = newBoard.map((row) => row.join(' ')).join('\n');
-
-  return description;
+  return newBoard.map((row) => row.join('')).join('\n');
 }
 
-function parseDesc(description) {
+export function parseDesc(description) {
   const array = description.split('\n');
-
-  const board = array.map((row) => row.split(' '));
+  const board = array.map((row) => row.split(/(?<=>)(?=<)/));
 
   const stringMap = {
-    '<:00:1088197427980423319>': '0',
-    '<:02:1117786469193486379>': '2',
-    '<:04:1117786477204615219>': '4',
-    '<:08:1117786482011287612>': '8',
-    '<:016:1117786487229001748>': '16',
-    '<:032:1117786492270555187>': '32',
-    '<:064:1117786496800399402>': '64',
-    '<:256:1117786505889464452>': '256',
-    '<:1024:1117786515980963930>': '1024',
-    '<:2048:1117786520313659423>': '2048',
-    '<:4096:1117786525002911885>': '4096',
+    '<:0_:1133755630633635952>': '0',
+    '<:2_:1133755613172748320>': '2',
+    '<:4_:1133755575092646018>': '4',
+    '<:8_:1133755647314374746>': '8',
+    '<:16:1133755568046231614>': '16',
+    '<:32:1133755558575472650>': '32',
+    '<:64:1133755656638316544>': '64',
+    '<:128:1133755638623764582>': '256',
+    '<:256:1133755585750372442>': '1024',
+    '<:512:1133755602934452256>': '2048',
+    '<:1024:1133755622173708309>': '4096',
   };
 
-  const newBoard = board.map((row) => row.map((val) => stringMap[val]));
+  const newBoard = board.map((row) => row.map((val) => (stringMap[val] ? stringMap[val] : val)));
 
   return newBoard;
 }
 
-function calculateScore(board) {
+export function calculateScore(board) {
   let score = 0;
 
   for (let i = 0; i < board.length; i++) {
@@ -198,7 +195,7 @@ function calculateScore(board) {
   return score;
 }
 
-function isGameOver(board) {
+export function isGameOver(board) {
   // Check if there are any empty tiles on the board
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
@@ -225,7 +222,7 @@ function isGameOver(board) {
   return true;
 }
 
-function message(params) {
+export function message(params) {
   return {
     content: '',
     tts: false,
@@ -358,12 +355,4 @@ function message(params) {
   };
 }
 
-module.exports = {
-  move: move,
-  isGameOver: isGameOver,
-  spawnRandom: spawnRandom,
-  calculateScore: calculateScore,
-  parseDesc: parseDesc,
-  makeDesc: makeDesc,
-  message: message,
-};
+
