@@ -688,12 +688,13 @@ async function moveDown(message) {
 }
 
 async function game2048(message) {
-  const board = [
-    `<:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319>`,
-    `<:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319>`,
-    `<:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319>`,
-    `<:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319> <:00:1088197427980423319>`,
-  ].join('\n');
+const emoji = '<:0_:1133755630633635952>';
+const board = [
+  `${emoji}${emoji}${emoji}${emoji}`,
+  `${emoji}${emoji}${emoji}${emoji}`,
+  `${emoji}${emoji}${emoji}${emoji}`,
+  `${emoji}${emoji}${emoji}${emoji}`,
+].join('\n');
 
   let newBoard = functions.spawnRandom(functions.parseDesc(board), 2);
   let description = functions.makeDesc(newBoard);
