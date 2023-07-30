@@ -1,0 +1,316 @@
+* {
+box-sizing:border-box;
+margin:0;
+padding:0
+}
+
+body {
+background-color:#1a1a1a;
+color:#e0e0e0;
+font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+background-color:#282828;
+color:#f0f0f0
+}
+
+.header,.footer {
+background-color:#333
+}
+
+.faq-item {
+border-color:#8e8e8e;
+margin:10px;
+border:1px solid;
+border-radius:10px;
+cursor:pointer
+}
+
+.faq-item h3 {
+color:#ffaa2c;
+font-size:20px;
+padding:10px
+}
+
+.faq-item p {
+color:#81b0f1;
+font-size:16px;
+padding:10px;
+display:none
+}
+
+.invite-button {
+background-color:#4040bf;
+display:flex;
+align-items:center;
+justify-content:center;
+background-color:#5865EF;
+color:#f0f0f0;
+font-size:18px;
+border:none;
+border-radius:5px;
+padding:10px 20px;
+margin-top:20px;
+text-decoration:none;
+cursor:pointer;
+transition:background-color .2s
+}
+
+.invite-button:hover {
+background-color:#5a5adf;
+background-color:#7B88FF
+}
+
+.container {
+display:flex;
+flex-direction:column
+}
+
+.header {
+background-color:#4d4d4d;
+height:80px;
+padding:0 20px
+}
+
+.header-content {
+display:flex;
+align-items:center;
+justify-content:space-between
+}
+
+.header_img {
+height:50px;
+width:auto;
+z-index:999
+}
+
+.logo {
+width:80px;
+height:auto;
+border-radius:40px
+}
+
+.main {
+flex-grow:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center
+}
+
+.desc {
+color:#f0f0f0;
+font-size:18px;
+z-index:-999;
+margin:20px;
+text-align:center
+}
+
+.faq {
+width:80%;
+margin:20px auto
+}
+
+.faq h2 {
+font-size:30px;
+text-align:center
+}
+
+.footer {
+display:flex;
+align-items:center;
+justify-content:center;
+height:80px
+}
+
+.footer p {
+font-size:16px
+}
+
+@media (min-width: 768px) {
+.menu-icon {
+display:none
+}
+
+.nav {
+display:flex;
+flex-direction:row;
+align-items:center;
+justify-content:flex-end;
+background-color:#333;
+width:100%;
+position:absolute;
+top:0;
+right:0
+}
+
+.nav.show {
+display:flex;
+animation:slideIn .3s forwards
+}
+
+.nav a {
+display:flex;
+align-items:center;
+color:#f0f0f0;
+text-decoration:none;
+font-size:20px;
+padding:10px 20px;
+transition:background-color .2s
+}
+
+.nav a:hover {
+background-color:#444
+}
+
+@keyframes slideIn {
+from {
+transform:translateY(-100%)
+}
+
+to {
+transform:translateY(0)
+}
+}
+}
+
+@media (max-width: 767px) {
+.menu-icon {
+display:block;
+position:relative;
+cursor:pointer
+}
+
+.menu-icon span {
+display:block;
+width:30px;
+height:4px;
+background-color:#f0f0f0;
+margin:8px 8px 8px auto
+}
+
+.nav {
+display:none;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background-color:#333;
+width:100%;
+position:absolute;
+top:80px;
+right:0
+}
+
+.nav.show {
+display:flex;
+flex-direction:column;
+animation:slideIn .3s forwards
+}
+
+.nav a {
+display:flex;
+align-items:center;
+color:#f0f0f0;
+text-decoration:none;
+font-size:20px;
+padding:10px 20px;
+transition:background-color .2s
+}
+
+.nav a:hover {
+background-color:#444
+}
+
+@keyframes slideIn {
+from {
+transform:translateY(-50%)
+}
+
+to {
+transform:translateY(0)
+}
+}
+}
+
+.bot-features {
+width:80%;
+margin:20px auto
+}
+
+.bot-features h2 {
+color:#f0f0f0;
+font-size:30px;
+text-align:center
+}
+
+.bot-features-item {
+margin:10px;
+border:1px solid #5865EF;
+border-radius:10px;
+color:#f0f0f0
+}
+
+.bot-features-item h3 {
+color:#dea63f;
+font-size:20px;
+padding:10px
+}
+
+.bot-features-item p {
+color:#bcdaf5;
+font-size:16px;
+padding:10px
+}
+
+.chat {
+margin-top:60px;
+background-color:#323338;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+border-radius:13px;
+width:300px;
+box-shadow:0 4px 8px rgba(0,0,0,0.9)
+}
+
+.chat b {
+font-size:18px
+}
+
+.chat img {
+width:55px;
+height:55px;
+margin-right:10px;
+border-radius:50px
+}
+
+.chat div {
+flex:1
+}
+
+.chat p {
+margin:5px 0;
+display:flex;
+align-items:center
+}
+
+#BOT {
+background-color:#5865EF;
+padding:2px 6px;
+margin-left:3px;
+border-radius:3px;
+font-weight:700;
+font-size:7px;
+margin-right:5px
+}
+
+#time {
+font-size:10px;
+color:#9397A0;
+margin-left:3px
+}

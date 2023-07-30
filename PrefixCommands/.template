@@ -1,0 +1,21 @@
+import {Client, Message } from "discord.js";
+
+export default {
+  name: "",
+  description: "",
+  aliases: [""],
+  usage: "",
+  guildOnly: true,
+  args: false,
+  permissions: {
+    bot: [],
+    user: [],
+  },
+  /**
+    * @param {Message} message
+    * @param {Client} client
+    */
+  execute: async (message, args, client) => {
+    await message.reply("A Simple Test Command, To edit this text, go into Commands/test.js");
+  }
+};

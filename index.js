@@ -1,0 +1,77 @@
+#!/usr/bin/env node
+import "dotenv/config";
+
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';
+
+const app = express();
+
+const staticPath = join(dirname(fileURLToPath(import.meta.url)), 'www');
+
+app.use(express.static(staticPath));
+
+app.get('/', (req, res) => res.redirect('/home'));
+app.get('/home', (req, res) => res.sendFile(join(staticPath, 'index.html')));
+app.get('/repo', (req, res) => res.redirect('https://github.com/susudeepa/pixd'));
+app.get('/invite', (req, res) => res.redirect('https://discord.com/api/oauth2/authorize?client_id=1026234292017299586&permissions=343634472000&scope=bot'));
+app.get('/:page', (req, res) => {
+  const pagePath = join(staticPath, `${req.params.page}.html`);
+  if (fs.existsSync(pagePath)) {
+    res.sendFile(pagePath);
+  } else {
+    res.status(404).sendFile(join(staticPath, '404.html'));
+  }
+});
+
+const port = process.env.PORT;
+app.listen(port, () => console.log(`Server is listening on port ${port}`));
+
+import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
+
+export const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+  ],
+  ws: { properties: { browser: 'Discord iOS' } },
+  partials: [Partials.Channel],
+});
+
+
+// Setting a Global Collection for Commands, Aliases, Buttons & Interactions and more
+client.prefixCommands = new Collection();
+client.slashCommands = new Collection();
+client.subCommands = new Collection();
+client.buttons = new Collection();
+client.modals = new Collection();
+client.selectMenus = new Collection();
+client.queue = new Collection();
+client.keyv = new Collection();
+
+// Slash Command Handler
+import("./Utilities/slashCommandHandler.js");
+
+// Prefix Command Handler
+import("./Utilities/prefixCommandHandler.js");
+
+  
+// Event Handler
+import("./Utilities/eventHandler.js");
+
+// Button Handler
+import("./Utilities/buttonHandler.js");
+
+// Modal Handler
+import("./Utilities/modalHandler.js");
+
+// String Select Menu Handler
+import("./Utilities/selectMenuHandler.js");
+
+
+// Logging in to the bot..
+client.login(process.env.TOKEN);
