@@ -1,3 +1,3 @@
 export default {
-    prefix: "+", // Defaults to !
+    prefix: "p!",
 };
