@@ -4,7 +4,7 @@ export default {
   name: "img",
   description: "Search image from Google.",
   aliases: ["image [query]"],
-  usage: "",
+  usage: "img thug",
   guildOnly: true,
   args: true,
   permissions: {
@@ -19,15 +19,16 @@ export default {
    const query = args.join(' '); 
    const images = await google.image(query, { safe: false }); 
    let img = images[0]; 
-   const msg = { 
-     content: `\🔍${query}\nViewing page- \`1/${images.length}\``, 
+   const msg = {
+     failIfNotExists: true,
+     content: `\🔍**${query}**\nViewing page- \`1/${images.length}\``, 
      tts: false, 
      components: [ 
        { 
          type: 1, 
          components: [ 
            { 
-             style: 1, 
+             style: 2, 
              custom_id: 'img_left', 
              disabled: false, 
              emoji: { 
@@ -37,7 +38,7 @@ export default {
              type: 2 
            }, 
            { 
-             style: 1, 
+             style: 2, 
              custom_id: 'img_right', 
              disabled: false, 
              emoji: { 
@@ -67,7 +68,7 @@ export default {
              type: 2 
            }, 
            { 
-             style: 1, 
+             style: 4, 
              custom_id: 'delete-btn', 
              disabled: false, 
              emoji: { 
