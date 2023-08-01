@@ -1,4 +1,5 @@
 export function findClosestMatch(commandName, commandList) {
+console.log(commandName, commandList)
   let closestMatch = null;
   let closestMatchDistance = Infinity;
 
