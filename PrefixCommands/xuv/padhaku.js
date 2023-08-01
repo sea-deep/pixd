@@ -15,7 +15,7 @@ export default {
     * @param {Message} message
     */
   execute: async (message, args) => {
-      const query = args.split(' ').splice(1).join(' '); 
+      const query = args.join(' '); 
    let systemPrompt = [ 
      `You a super smart AI robot who can answer tough and logical questions easily.`, 
      `Make responses by doing full research and maintaining accuracy.`, 
