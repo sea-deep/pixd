@@ -22,7 +22,7 @@ import { Client, Message } from "discord.js";
          (cmd) => cmd.aliases[0] !=="" && cmd.aliases.includes(commandName) 
        ); 
 if (!command) {
-      const closestMatch = findClosestMatch(commandName, client.prefixCommands.array());
+      const closestMatch = findClosestMatch(commandName, client.prefixCommands.keys());
       if (closestMatch) {
         return message.reply(`❓ **Did you mean \`${prefix}${closestMatch}\`?**`);
       } else {
