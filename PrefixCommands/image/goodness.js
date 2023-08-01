@@ -1,7 +1,8 @@
 import { AttachmentBuilder, Message } from "discord.js";
-import GIFEncoder from 'gif-encoder-2';
-import path from 'path';
-import { getInputImage } from "../../Helpers/helpersImage.js";
+import Jimp from "jimp"; 
+ import GIFEncoder from 'gif-encoder-2'; 
+ import path from 'path'; 
+ import { getInputImage } from "../../Helpers/helpersImage.js";
 export default {
   name: "goodness",
   description: "oh my goodness gracious",
