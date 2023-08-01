@@ -47,8 +47,9 @@ export default {
       `User: ${msg}`,
       `PIXD:`,
     ].join("\n");
+    let completion;
     try {
-    let completion = await openai.createCompletion({
+     completion = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: prompt,
       max_tokens: 264,
