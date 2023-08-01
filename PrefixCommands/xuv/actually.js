@@ -3,7 +3,7 @@ import { Message } from "discord.js";
 export default {
   name: "actually",
   description: "React with nerd emotes",
-  aliases: [""],
+  aliases: ["nerd"],
   usage: "actually [reply]|[message link]",
   guildOnly: true,
   args: false,
@@ -41,11 +41,18 @@ export default {
     }
 
     for (let i = 0; i < actual.length; i++) {
-      if (isLink) {
-        let channel = message.client.channels.cache.get(channelID);
-        channel.messages.fetch(referencedMessageId).then((msg) => msg.react(actual[i]));
-      } else {
-        await message.channel.messages.fetch(referencedMessageId).then((msg) => msg.react(actual[i]));
+      try {
+        if (isLink) {
+          let channel = message.client.channels.cache.get(channelID);
+          let msg = await channel.messages.fetch(referencedMessageId);
+          if (msg) await msg.react(actual[i]);
+        } else {
+          let msg = await message.channel.messages.fetch(referencedMessageId);
+          if (msg) await msg.react(actual[i]);
+        }
+      } catch (error) {
+        console.error("Error reacting to the message:", error);
+        break; // Break the loop after the error occurs
       }
     }
   },
