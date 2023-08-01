@@ -1,4 +1,4 @@
-import { AttachmentBuilder, Message } from "discord.js";
+import { AttachmentBuilder, Message, Client} from "discord.js";
 import Jimp from "jimp";
 
 export default {
@@ -14,8 +14,9 @@ export default {
   },
   /**
     * @param {Message} message
+    * @param {Client} client
     */
-  execute: async (message) => {
+  execute: async (message, args, client) => {
    await message.channel.sendTyping(); 
    const ids = message.content 
      .match(/<@(\d+)>/g); 
