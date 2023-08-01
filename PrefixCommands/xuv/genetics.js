@@ -3,7 +3,7 @@ import { Message } from "discord.js";
 export default {
   name: "genetics",
   description: "Reacts with genesis emojis",
-  aliases: [""],
+  aliases: ["g"],
   usage: "genetics <reply>|<message link>",
   guildOnly: true,
   args: false,
@@ -41,11 +41,18 @@ export default {
     }
 
     for (let i = 0; i < genesis.length; i++) {
-      if (isLink) {
-        let channel = client.channels.cache.get(channelID);
-        channel.messages.fetch(referencedMessageId).then((msg) => msg.react(genesis[i]));
-      } else {
-        await message.channel.messages.fetch(referencedMessageId).then((msg) => msg.react(genesis[i]));
+      try {
+        if (isLink) {
+          let channel = client.channels.cache.get(channelID);
+          let msg = await channel.messages.fetch(referencedMessageId);
+          if (msg) await msg.react(genesis[i]);
+        } else {
+          let msg = await message.channel.messages.fetch(referencedMessageId);
+          if (msg) await msg.react(genesis[i]);
+        }
+      } catch (error) {
+        console.error("Error reacting to the message:", error);
+        break; // Break the loop after the error occurs
       }
     }
   },
