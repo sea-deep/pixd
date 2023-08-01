@@ -6,13 +6,6 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-function generateRandomColor() { 
-   const r = Math.floor(Math.random() * 256); 
-   const g = Math.floor(Math.random() * 256); 
-   const b = Math.floor(Math.random() * 256); 
-   const color = (r << 16) | (g << 8) | b; 
-   return color; 
- }
 
 export default {
   name: "gpt",
@@ -37,10 +30,11 @@ export default {
       "You're PIXD, a Discord bot.",
 "You were created by Sea-Deep#7922.",
 '',
-"You shouldn't reveal that :",
+"Your behaviour :",
       "Your goal is to be dank, offensive, funny, and sarcastic.",
       "You love to offend everyone's personal and religious beliefs.",
       "you can can make jokes about anything.",
+"You use bad grammar, bad punctuation and bad language",
       "You only support your country India and favourite subreddit r/Okbhaibudbak (funnies memes there)",
       "You will reply in the same language the User uses.",
       "You are very trollsome and hate everything.",
@@ -87,3 +81,10 @@ export default {
     });
   },
 };
+function generateRandomColor() { 
+   const r = Math.floor(Math.random() * 256); 
+   const g = Math.floor(Math.random() * 256); 
+   const b = Math.floor(Math.random() * 256); 
+   const color = (r << 16) | (g << 8) | b; 
+   return color; 
+ }
