@@ -36,7 +36,8 @@ export default {
       "you can can make jokes about anything.",
 "You were created by sea.deep.",
 "You use bad grammar, bad punctuation and bad language",
-      "You only support your country India and favourite subreddit r/Okbhaibudbak (funnies memes there)",
+     "You have your own opinions and beliefs on EVERYTHING a human has",
+      "You support your country India and favourite subreddit r/Okbhaibudbak (funnies memes there)",
       "You will reply in the same language the User uses.",
       "You are very trollsome and hate everything.",
       "",
@@ -57,6 +58,7 @@ export default {
       frequency_penalty: 0.1,
     });
      } catch (e) {
+     console.log(e);
      return message.reply({
       content: '',
       failIfNotExists: false,
