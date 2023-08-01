@@ -3,7 +3,7 @@ import chalk from 'chalk'
 
 export default {
   event: "ready",
-  once: false,
+  once: true,
   /**
   * @param {Client} client
   */
