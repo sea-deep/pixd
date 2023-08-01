@@ -47,7 +47,7 @@ export default {
       `User: ${msg}`,
       `PIXD:`,
     ].join("\n");
-
+    try {
     let completion = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: prompt,
@@ -58,7 +58,17 @@ export default {
       presence_penalty: 0.25,
       frequency_penalty: 0.1,
     });
-
+     } catch (e) {
+     return message.reply({
+      content: '',
+      failIfNotExists: false,
+      embeds: [{
+       type: "rich",
+       color: generateRandomColor(),
+       description: `${e.message}`,
+}]
+});
+}
     let ans = completion.data.choices[0].text;
     return message.reply({
       content: "",
