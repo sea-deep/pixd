@@ -1,4 +1,10 @@
 import { Message } from "discord.js";
+import pkg from "openai"; 
+ const  { Configuration, OpenAIApi } = pkg; 
+ const configuration = new Configuration({ 
+   apiKey: process.env.OPENAI_API_KEY, 
+ }); 
+ const openai = new OpenAIApi(configuration);
 
 export default {
   name: "padhaku",
@@ -100,8 +106,10 @@ export default {
    ); 
   
    let response = ''; 
-   await message.channel.sendTyping(); 
-   let completion = await openai.createChatCompletion({ 
+   await message.channel.sendTyping();
+   let completion;
+  try {
+    completion = await openai.createChatCompletion({ 
      model: `gpt-3.5-turbo`, 
      messages: messages, 
      max_tokens: 2048, 
@@ -110,7 +118,10 @@ export default {
      n: 1, 
      presence_penalty: 0, 
      frequency_penalty: 0, 
-   }); 
+   });
+   } catch (e) {
+     return msg.reply("*An error occurred* :"+ e.message);
+   } 
    response = completion.data.choices[0].message.content.trim(); 
    const ans = response.trim(); 
    return message.reply({content: ans, failIfNotExists: false});
