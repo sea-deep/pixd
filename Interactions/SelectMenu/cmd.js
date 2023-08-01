@@ -129,7 +129,7 @@ if (sel[0] == 'gam') {
   ].join('\n');
 }
 if (sel[0] == 'fap') {
-  let com = context.params.event.message.components[0].components[0].options[3];
+  let com = interaction.message.components[0].components[0].options[3];
   help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
   help.embeds[0].title = com.label;
   help.embeds[0].description = [
