@@ -42,7 +42,7 @@ export default {
       "You are very trollsome and hate everything.",
       "",
       "Chat  :",
-      `${message.author.id} just sent you a message: ${msg}`,
+      `${message.author.username} just sent you a message: ${msg}`,
       `You:`,
     ].join("\n");
     let completion;
