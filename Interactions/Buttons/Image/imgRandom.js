@@ -10,7 +10,7 @@ export default {
     const images = client.keyv.get(interaction.message.id);
     
    const regex = /`([^`]+)`/;
-const matches = interaction.message.content.match(regex);
+const matches = interaction.message.embeds[0].footer.text.match(regex);
   const current = parseInt(matches[1].split('/')[0]) - 1;
   let next = Math.floor(Math.random() * images.length);
   let image= images[next];
