@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-const {GOOGLE_IMG_SCRAP} = require("google-img-scrap");
+import {GOOGLE_IMG_SCRAP} from "google-img-scrap";
 export default {
   name: "img",
   description: "Search image from Google.",
