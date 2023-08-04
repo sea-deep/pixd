@@ -85,7 +85,7 @@ export default {
          type: 'rich', 
          title: img.title, 
          description: `🔍**${query}**\nViewing page- \`1/${images.length}\``, 
-               color: 0x7292fa, 
+               color: getColor(img), 
          image: { 
            url: img.url, 
            height: img.height, 
@@ -103,3 +103,11 @@ export default {
    client.keyv.set(mseg.id, images);
   }
 };
+
+function getColor(image) {
+    const r = image.averageColorObject.r;
+    const g = image.averageColorObject.g;
+    const b = image.averageColorObject.b;
+    const color = (r << 16) | (g << 8) | b;  
+    return color;  
+}
