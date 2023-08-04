@@ -1,9 +1,9 @@
 import { Client, Message } from "discord.js";
-import google from "googlethis";
+const {GOOGLE_IMG_SCRAP} = require("google-img-scrap");
 export default {
   name: "img",
   description: "Search image from Google.",
-  aliases: ["image [query]"],
+  aliases: ["image", "mg"],
   usage: "img thug",
   guildOnly: true,
   args: true,
@@ -18,10 +18,10 @@ export default {
   execute: async (message, args, client) => {
    const query = args.join(' '); 
    const images = await google.image(query, { safe: false }); 
-   let img = images[0]; 
+   let img = images.result[0]; 
    const msg = {
      failIfNotExists: true,
-     content: `\🔍**${query}**\nViewing page- \`1/${images.length}\``, 
+     content: ``, 
      tts: false, 
      components: [ 
        { 
@@ -83,8 +83,8 @@ export default {
      embeds: [ 
        { 
          type: 'rich', 
-         title: img.origin.title, 
-         description: `via **[${img.origin.website.name}](https://${img.origin.website.domain})**`, 
+         title: img.title, 
+         description: `🔍**${query}**\nViewing page- \`1/${images.length}\``, 
                color: 0x7292fa, 
          image: { 
            url: img.url, 
@@ -95,7 +95,7 @@ export default {
            name: 'Google Image Search', 
            icon_url: 'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-1024.png' 
          }, 
-         url: img.origin.website.url 
+         url: img.originalUrl 
        } 
      ] 
    }; 
