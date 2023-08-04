@@ -48,8 +48,7 @@ export default {
         components: msg.components
       });
     } catch (error) {
-      console.error("An error occurred:", error);
-      interaction.reply("An error occurred while processing the command.");
+      console.error("An error occurred:", error);    
     }
   }
 };
