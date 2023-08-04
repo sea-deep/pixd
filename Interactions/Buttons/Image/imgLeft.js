@@ -15,26 +15,32 @@ const matches = interaction.message.content.match(regex);
   let next = current==0 ? images.length - 1 : current - 1;
   let image= images[next];
   let msg = interaction.message;
- 
-  let content = msg.content.split('\n');
-        content[1] = content[1].replace('`'+(current+1), '`'+(next+1));
     const embed = {
-     title: image.origin.title,
-     description: `via **[${image.origin.website.name}](https://${image.origin.website.domain})**`,
+     title: message.embeds[0].title,
+     description: `**[${image.title}](${image.originalUrl})**`,
      image: {
           url: image.url,
           height: image.height,
           width: image.width
         },
-      color: 0x666,
-     url: image.origin.website.url
+      color: getColor(image),
+      footer: {
+        text: msg.footer.replace('`'+(current+1), '`'+(next+1))
+      }
      };
     await interaction.deferUpdate();
       await interaction.message.edit(
       {
-          content: content.join('\n'),
+          content: '',
           embeds: [embed],
           components: msg.components 
           }); 
   }
+};
+function getColor(image) {
+    const r = image.averageColorObject.r;
+    const g = image.averageColorObject.g;
+    const b = image.averageColorObject.b;
+    const color = (r << 16) | (g << 8) | b;  
+    return color;  
 }
