@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 
 export default {
-  name: 'img_right',
+  name: 'img_random',
   /**
     * @param {Client} client
     */
