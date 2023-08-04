@@ -7,7 +7,7 @@ export default {
     */
   execute: async (interaction, client) => {   
     const regex = /`([^`]+)`/; 
-   const matches = interaction.message.content.match(regex); 
+   const matches = interaction.message.embeds[0].footer.text.match(regex); 
    const total = parseInt(matches[1].split('/')[1]) - 1; 
    const images = client.keyv.get(interaction.message.id); 
    let val = interaction.fields.getTextInputValue('input'); 
