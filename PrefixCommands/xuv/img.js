@@ -98,7 +98,7 @@ export default {
            icon_url: 'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-1024.png' 
          },
         footer: {
-        text: `viewing page- \`1/${images.length}\``,
+        text: `viewing page- \`1/${images.result.length}\``,
        }
        } 
      ] 
