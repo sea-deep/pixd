@@ -17,7 +17,9 @@ export default {
     */
   execute: async (message, args, client) => {
    const query = args.join(' '); 
-   const images = await google.image(query, { safe: false }); 
+   const images = await GOOGLE_IMG_SCRAP({
+  search: query,
+});
    let img = images.result[0]; 
    const msg = {
      failIfNotExists: true,
