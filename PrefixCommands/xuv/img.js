@@ -83,9 +83,9 @@ export default {
      embeds: [ 
        { 
          type: 'rich', 
-         title: img.title, 
-         description: `🔍**${query}**\nViewing page- \`1/${images.length}\``, 
-               color: getColor(img), 
+         description: `**[${img.title}](${img.originalUrl})**`, 
+         title: `🔍 ${query}`, 
+         color: getColor(img), 
          image: { 
            url: img.url, 
            height: img.height, 
@@ -94,8 +94,10 @@ export default {
          author: { 
            name: 'Google Image Search', 
            icon_url: 'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-1024.png' 
-         }, 
-         url: img.originalUrl 
+         },
+        footer: {
+        text: `viewing page- \`1/${images.length}\``,
+       }
        } 
      ] 
    }; 
