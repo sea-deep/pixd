@@ -3,44 +3,61 @@ import { Client } from "discord.js";
 export default {
   name: 'img_right',
   /**
-    * @param {Client} client
-    */
-  execute: async (interaction, client) => {   
-  if (interaction.member.id !== interaction.message.mentions.users.first().id) return;
-    const images = client.keyv.get(interaction.message.id);
-    
-   const regex = /`([^`]+)`/;
-const matches = interaction.message.embeds[0].footer.text.match(regex);
-  const current = parseInt(matches[1].split('/')[0]) - 1;
-  let next = current==images.length ? 0 : current + 1; 
-  let image= images[next];
-  let msg = interaction.message;
-    const embed = {
-     title: message.embeds[0].title,
-     description: `**[${image.title}](${image.originalUrl})**`,
-     image: {
+   * @param {Client} client
+   */
+  execute: async (interaction, client) => {
+    try {
+      if (!interaction.member || !interaction.message.mentions.users.first()) return;
+
+      const images = await client.keyv.get(interaction.message.id);
+
+      if (!images || images.length === 0) {
+        return interaction.reply("No images found.");
+      }
+
+      const regex = /`([^`]+)`/;
+      const matches = interaction.message.embeds[0].footer.text.match(regex);
+
+      if (!matches) {
+        return interaction.reply("Footer text doesn't match the expected format.");
+      }
+
+      const current = parseInt(matches[1].split('/')[0]) - 1;
+      const next = current === images.length - 1 ? 0 : current + 1;
+      const image = images[next];
+      const msg = interaction.message;
+
+      const embed = {
+        title: msg.embeds[0].title,
+        description: `**[${image.title}](${image.originalUrl})**`,
+        image: {
           url: image.url,
           height: image.height,
           width: image.width
         },
-      color: getColor(image),
-      footer: {
-        text: msg.footer.replace('`'+(current+1), '`'+(next+1))
-      }
-     };
-    await interaction.deferUpdate();
-      await interaction.message.edit(
-      {
-          content: '',
-          embeds: [embed],
-          components: msg.components 
-          }); 
+        color: getColor(image),
+        footer: {
+          text: msg.footer.text.replace('`' + (current + 1), '`' + (next + 1))
+        }
+      };
+
+      await interaction.deferUpdate();
+      await interaction.message.edit({
+        content: '',
+        embeds: [embed],
+        components: msg.components
+      });
+    } catch (error) {
+      console.error("An error occurred:", error);
+      interaction.reply("An error occurred while processing the command.");
+    }
   }
 };
+
 function getColor(image) {
-    const r = image.averageColorObject.r;
-    const g = image.averageColorObject.g;
-    const b = image.averageColorObject.b;
-    const color = (r << 16) | (g << 8) | b;  
-    return color;  
+  const r = image.averageColorObject.r;
+  const g = image.averageColorObject.g;
+  const b = image.averageColorObject.b;
+  const color = (r << 16) | (g << 8) | b;
+  return color;
 }
