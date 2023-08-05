@@ -17,11 +17,7 @@ export default {
 
       const regex = /`([^`]+)`/;
       const matches = interaction.message.embeds[0].footer.text.match(regex);
-
-      if (!matches) {
-        return interaction.reply("Footer text doesn't match the expected format.");
-      }
-
+ 
       const current = parseInt(matches[1].split('/')[0]) - 1;
       const next = current === images.length - 1 ? 0 : current + 1;
       const image = images[next];
