@@ -6,7 +6,7 @@ export default {
   once: true,
 
   execute(client) {
-    process.stdout(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}`);
+    process.stdout.write(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}`);
 
     client.keyv.set("uptime", Date.now());
   },
