@@ -23,7 +23,7 @@ export default {
   let image= images[next];
   let msg = interaction.message;
     const embed = {
-     title: message.embeds[0].title,
+     title: interaction.message.embeds[0].title,
      description: `**[${image.title}](${image.originalUrl})**`,
      image: {
           url: image.url,
