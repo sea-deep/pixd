@@ -15,8 +15,12 @@ export default {
       try {
         return await button.execute(interaction, client)
       } catch (err) {
-        process.stdout.write(`[${chalk.red("ButtonHandler")}] - ${err}`)
-        await interaction.reply({ content: '*There was an error while executing that button.*', ephemeral: true })
+        process.stdout.write(`[${chalk.red("ButtonHandler")}] - ${err}`);
+     try {
+        await interaction.reply({ content: '*There was an error while executing that button.*', ephemeral: true });
+      } catch(e) {
+         await interaction.followUp({ content: '*There was an error while executing that button.*', ephemeral: true });
+        }
       }
     }
     
