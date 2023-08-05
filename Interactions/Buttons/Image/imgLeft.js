@@ -25,8 +25,8 @@ const matches = interaction.message.embeds[0].footer.text.match(regex);
         },
       color: getColor(image),
       footer: {
-        text: msg.footer.replace('`'+(current+1), '`'+(next+1))
-      }
+          text: msg.embeds[0].footer.text.replace('`' + (current + 1), '`' + (next + 1))
+        }
      };
     await interaction.deferUpdate();
       await interaction.message.edit(
