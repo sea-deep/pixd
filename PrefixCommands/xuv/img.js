@@ -104,7 +104,7 @@ export default {
      ] 
    }; 
    let mseg = await message.reply(msg); 
-   client.keyv.set(mseg.id, images);
+   client.keyv.set(mseg.id, images.result);
   }
 };
 
