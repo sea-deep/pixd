@@ -1,9 +1,9 @@
-import { Client } from "discord.js";
-import chalk from 'chalk'
+import { client } from "../../index.js";
+import chalk from 'chalk';
 
 export default {
   event: "ready",
-  once: false,
+  once: true,
   /**
   * @param {Client} client
   */
