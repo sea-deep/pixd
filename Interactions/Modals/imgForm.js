@@ -40,7 +40,8 @@ export default {
         } 
       }; 
       
-      await interaction.deferUpdate(); 
+      await interaction.deferUpdate({ ephemeral: true  
+        }); 
       await interaction.message.edit({ 
         content: '', 
         embeds: [embed], 
