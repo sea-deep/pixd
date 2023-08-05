@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { client } from '../../,index.js';
 
 export default {
   name: "ping",
@@ -13,7 +13,6 @@ export default {
   },
   /**
    * @param {Message} message
-   * @param {Client} client
    */
   execute: async (message,args, client) => {
     let msg = await message.reply("Pong!");
