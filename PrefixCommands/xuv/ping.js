@@ -1,5 +1,5 @@
-import { client } from '../../,index.js';
-
+import { client } from '../../index.js';
+import { Message } from 'discord.js';
 export default {
   name: "ping",
   description: "A ping command",
