@@ -22,7 +22,7 @@ export default {
       }  
 
       const current = parseInt(matches[1].split('/')[0]) - 1; 
-      const next = valueee; 
+      const next = valueee - 1; 
       const image = images[next]; 
       const msg = interaction.message; 
       
