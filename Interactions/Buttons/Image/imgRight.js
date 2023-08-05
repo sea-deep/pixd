@@ -37,7 +37,7 @@ export default {
         },
         color: getColor(image),
         footer: {
-          text: msg.footer.text.replace('`' + (current + 1), '`' + (next + 1))
+          text: msg.embeds[0].footer.text.replace('`' + (current + 1), '`' + (next + 1))
         }
       };
 
