@@ -48,6 +48,7 @@ export default {
    prompt: prompt, 
  }); 
    } catch (e) { 
+ console.log(e);
  return mes.edit({ 
          content: `>>> ayyo saar genesis failed :fail:`, 
          embed: {type: 'rich', description: `${e.message}`}, 
