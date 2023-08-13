@@ -12,8 +12,12 @@ import { Client, Message } from "discord.js";
    execute: async (message, client) => { 
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
+console.log('res1: ', message.channel.id)
+
   if (message.channel.id === "1140305947852550275") {
+console.log('res2: ', message.content)
     if (message.content || message.content !== "") {
+
     const res = await translate(message.content, { to: 'te' }); 
    await message.channel.send(res.text);
 }
