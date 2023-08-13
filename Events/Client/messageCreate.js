@@ -11,12 +11,12 @@ import { Client, Message } from "discord.js";
      */ 
    execute: async (message, client) => { 
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
-     if (message.content.toLowerCase().startsWith(prefix) === false) return; 
      if (message.author.bot === true) return; 
   if (message.channel.id === "11140305947852550275") {
     const res = await translate(message.content, { to: 'te' }); 
    await message.channel.send(res.text);
 }
+     if (message.content.toLowerCase().startsWith(prefix) === false) return; 
 
      const args = message.content.slice(prefix.length).trim().split(/ +/); 
      const commandName = args.shift().toLowerCase(); 
