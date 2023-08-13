@@ -18,7 +18,7 @@ if (message.channel.id === "1140305947852550275") {
         await message.delete();
         const webhook = await message.channel.createWebhook({
             name: message.member.displayName,
-            avatar: message.member.displayAvatarUrl({
+            avatar: message.member.displayAvatarURL({
                 extension: 'webp',
                 forceStatic: true
             }),
