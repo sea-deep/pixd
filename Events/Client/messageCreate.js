@@ -2,7 +2,7 @@ import { Client, Message } from "discord.js";
  import config from "../../Configs/config.js"; 
  import { findClosestMatch } from "../../Helpers/stringMatch.js";
  const prefix = config.prefix; 
-  
+  import translate from "google-translate-api-x";
  export default { 
    event: "messageCreate", 
    /** 
@@ -47,5 +47,10 @@ if (!command) {
        process.stdout.write(`MessageCreate: ${err}\n`); 
        message.reply("*There was an error trying to execute that command!*"); 
      } 
-   }, 
+   },
+
+if (message.channel.id === "11140305947852550275") {
+    const res = await translate(message.content, { to: 'te' }); 
+   return message.channel.send(res.text);
+}
  };
