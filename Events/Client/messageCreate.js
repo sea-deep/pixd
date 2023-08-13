@@ -13,16 +13,6 @@ import { Client, Message } from "discord.js";
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
 
-channel.createWebhook({
-  name: 'Snek',
-  avatar: 'https://i.imgur.com/mI8XcpG.jpg',
-  reason: 'Needed a cool new Webhook'
-})
-webhook.send('hello!')
-  .then(message => console.log(`Sent message: ${message.content}`))
-  .catch(console.error);
-  
-  
  if (message.channel.id === "1140305947852550275") { 
      if (message.content || message.content !== "") {
       await message.delete();
