@@ -18,7 +18,7 @@ import { Client, Message } from "discord.js";
       await message.delete();
     const webhook = await message.channel.createWebhook({
   name: message.member.displayName,
-  avatar: message.member.getAvatarUrl({
+  avatar: message.member.displayAvatarUrl({
     extension: 'webp',
     forceStatic: true
   }),
