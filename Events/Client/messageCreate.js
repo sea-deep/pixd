@@ -12,16 +12,34 @@ import { Client, Message } from "discord.js";
    execute: async (message, client) => { 
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
-console.log('res1: ', message.channel.id)
 
-  if (message.channel.id === "1140305947852550275") {
-console.log('res2: ', message.content)
-    if (message.content || message.content !== "") {
+channel.createWebhook({
+  name: 'Snek',
+  avatar: 'https://i.imgur.com/mI8XcpG.jpg',
+  reason: 'Needed a cool new Webhook'
+})
+webhook.send('hello!')
+  .then(message => console.log(`Sent message: ${message.content}`))
+  .catch(console.error);
+  
+  
+ if (message.channel.id === "1140305947852550275") { 
+     if (message.content || message.content !== "") {
+      await message.delete();
+    const webhook = await message.channel.createWebhook({
+  name: message.member.displayName,
+  avatar: message.member.getAvatarUrl({
+    extension: 'webp',
+    forceStatic: true
+  }),
+  reason: 'allu'
+})
+     const res = await translate(message.content, { to: 'te' });  
+    await webhook.send(res.text);
+    await webhook.delete();
+ } 
+ }
 
-    const res = await translate(message.content, { to: 'te' }); 
-   await message.channel.send(res.text);
-}
-}
      if (message.content.toLowerCase().startsWith(prefix) === false) return; 
 
      const args = message.content.slice(prefix.length).trim().split(/ +/); 
