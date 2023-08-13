@@ -13,8 +13,10 @@ import { Client, Message } from "discord.js";
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
   if (message.channelId === "1140305947852550275") {
+    if (message.content) {
     const res = await translate(message.content, { to: 'te' }); 
    await message.channel.send(res.text);
+}
 }
      if (message.content.toLowerCase().startsWith(prefix) === false) return; 
 
