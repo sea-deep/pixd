@@ -13,23 +13,22 @@ import { Client, Message } from "discord.js";
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
 
- if (message.channel.id === "1140305947852550275") { 
-     if (message.content || message.content !== "") {
-      await message.delete();
-    const webhook = await message.channel.createWebhook({
-  name: message.member.displayName,
-  avatar: message.member.displayAvatarUrl({
-    extension: 'webp',
-    forceStatic: true
-  }),
-  reason: 'allu'
-})
-     const res = await translate(message.content, { to: 'te' });  
-    await webhook.send(res.text);
-    await webhook.delete();
- } 
- }
-
+if (message.channel.id === "1140305947852550275") {
+    if (message.content || message.content !== "") {
+        await message.delete();
+        const webhook = await message.channel.createWebhook({
+            name: message.member.displayName,
+            avatar: message.member.displayAvatarUrl({
+                extension: 'webp',
+                forceStatic: true
+            }),
+            reason: 'allu'
+        });
+        const res = await translate(message.content, { to: 'te' });
+        await webhook.send(res.text);
+        await webhook.delete();
+    }
+}
      if (message.content.toLowerCase().startsWith(prefix) === false) return; 
 
      const args = message.content.slice(prefix.length).trim().split(/ +/); 
