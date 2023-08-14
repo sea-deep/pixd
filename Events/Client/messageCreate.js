@@ -15,7 +15,6 @@ import { Client, Message } from "discord.js";
 
 if (message.channel.id === "1140305947852550275" || message.channel.id == "1140334592369364992") {
     if (message.content || message.content !== "") {
-        await message.delete();
         const webhook = await message.channel.createWebhook({
             name: message.member.displayName,
             avatar: message.member.displayAvatarURL({
@@ -25,6 +24,7 @@ if (message.channel.id === "1140305947852550275" || message.channel.id == "11403
             reason: 'allu'
         });
         const res = await translate(message.content, { to: 'te' });
+        await message.delete();     
         await webhook.send(res.text);
         await webhook.delete();
     }
