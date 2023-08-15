@@ -75,3 +75,6 @@ import("./Utilities/selectMenuHandler.js");
 
 // Logging in to the bot..
 client.login(process.env.TOKEN);
+// Setting current time to present the Uptiime
+1client.keyv.set("uptime", Date.now());
+  
