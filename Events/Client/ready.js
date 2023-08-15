@@ -4,11 +4,11 @@ import chalk from 'chalk';
 export default {
   event: "ready",
   once: true,
-
-  execute(client) {
+  /**  
+  * @param {Client} client     
+  */ 
+  execute: async (client) => {
     process.stdout.write(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}`);
-
-    client.keyv.set("uptime", Date.now());
   },
 };
 
