@@ -1,11 +1,12 @@
-import { REST, Routes } from "discord.js";
 import chalk from "chalk";
 import pkg from "glob";
-const { glob } = pkg
-import { promisify } from "node:util";
-const proGlob = promisify(glob);
-import { pathToFileURL } from "node:url";
+import { promisify } from "util";
+import { pathToFileURL } from "url";
 import { client } from "../index.js";
+import fetch from "node-fetch";
+
+const { glob } = pkg;
+const proGlob = promisify(glob);
 
 try {
   client.slashCommands.clear();
@@ -27,17 +28,41 @@ try {
     client.slashCommands.set(interaction.data.name, interaction);
     client.interactionsArray.push(interaction.data);
   }
-  const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
-  try {
-    const clientId = "1026234292017299586";
-    
-      await rest.put(Routes.applicationCommands(clientId), {
-        body: client.interactionsArray,
-      });
-     process.stdout.write(`[${chalk.blue("INFO")}] - Slash Command Registered!\n`);
-  } catch (err) {
-    process.stdout.write(`[${chalk.red("SlashCommandHandler")}] - ${err}\n`);
-  }
+
+  await registerSlashCommands(client.interactionsArray);
 } catch (err) {
-  process.stdout.write(`[${chalk.red("SlashCommandHandler")}] - ${err}\n`)
+  const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
+  process.stderr.write(`${errorOutput}\n`);
+}
+
+
+
+// Helper API function 
+async function registerSlashCommands(commandsArray) {
+  const clientId = "1026234292017299586";
+  const url = `https://discord.com/api/v10/applications/${clientId}/commands`;
+  const headers = {
+    "Authorization": `Bot ${process.env.TOKEN}`,
+    "Content-Type": "application/json",
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(commandsArray),
+    });
+
+    if (response.ok) {
+      const infoMessage = `[${chalk.blue("INFO")}] - Slash Command Registered!`;
+      process.stdout.write(`${infoMessage}\n`);
+    } else {
+      const errorMessage = await response.text();
+      const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${errorMessage}`;
+      process.stderr.write(`${errorOutput}\n`);
+    }
+  } catch (err) {
+    const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
+    process.stderr.write(`${errorOutput}\n`);
+  }
 }
