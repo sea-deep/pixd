@@ -9,7 +9,7 @@ export default {
   */ 
   execute: async (client) => {
     process.stdout.write(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}\n`);
-      let status = `p!help or /help; 
+      let status = `p!help or /help`; 
       await client.user.setActivity({
        name: `${status}`,
        type: ActivityType.Listening 
