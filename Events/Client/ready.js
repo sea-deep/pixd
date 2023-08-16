@@ -8,7 +8,7 @@ export default {
   * @param {Client} client     
   */ 
   execute: async (client) => {
-    process.stdout.write(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}`);
+    process.stdout.write(`[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}\n`);
   },
 };
 
