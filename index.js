@@ -58,7 +58,6 @@ client.keyv = new Collection();
 
 // Prefix Command Handler
 import("./Utilities/prefixCommandHandler.js");
-
   
 // Event Handler
 import("./Utilities/eventHandler.js");
@@ -70,7 +69,13 @@ import("./Utilities/buttonHandler.js");
 import("./Utilities/modalHandler.js");
 
 // String Select Menu Handler
-import("./Utilities/selectMenuHandler.js");
+import("./Utilities/stringSelectMenuHandler.js");
+
+// Messave Select Menu Handler
+import("./Utilities/messageSelectMenuHandler.js");
+
+// Register application commands 
+import("Utilities/registerCommands.js/");
 
 
 // Logging in to the bot..
