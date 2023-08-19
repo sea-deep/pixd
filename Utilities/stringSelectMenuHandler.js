@@ -15,7 +15,7 @@ try {
     const menuFile = await import(Files[i]);
     const stringSelectMenu = menuFile.default;
     if (stringSelectMenu.name) {
-      client.stringSelectMenus.set(stringSelectMenu.name, selectMenu);
+      client.stringSelectMenus.set(stringSelectMenu.name, stringSelectMenu);
     }
   }
   process.stdout.write(`[${chalk.blue("INFO")}] - StringSelectMenus Loaded!\n`);
