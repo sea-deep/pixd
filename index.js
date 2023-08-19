@@ -55,7 +55,7 @@ client.queue = new Collection();
 client.keyv = new Collection();
 
 // Slash Command Handler
-// import("./Utilities/slashCommandHandler.js");
+import("./Utilities/slashCommandHandler.js");
 
 // Prefix Command Handler
 import("./Utilities/prefixCommandHandler.js");
@@ -76,7 +76,7 @@ import("./Utilities/stringSelectMenuHandler.js");
 import("./Utilities/messageSelectMenuHandler.js");
 
 // Register application commands 
-import("Utilities/registerCommands.js/");
+import("./Utilities/registerCommands.js/");
 
 
 // Logging in to the bot..
