@@ -18,7 +18,7 @@ try {
       client.stringSelectMenus.set(stringSelectMenu.name, selectMenu);
     }
   }
-  process.stdout.write(`[${chalk.blue("INFO")}] - StringSelectMenus Registered!\n`);
+  process.stdout.write(`[${chalk.blue("INFO")}] - StringSelectMenus Loaded!\n`);
 } catch (err) {
   process.stdout.write(`[${chalk.red("StringSelectMenuHandler")}] - ${err}\n`);
 }
