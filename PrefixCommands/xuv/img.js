@@ -21,6 +21,7 @@ export default {
    const images = await GOOGLE_IMG_SCRAP({
   search: query,
 });
+    client.keyv.set(mseg.id, images.result);
    let img = images.result[0]; 
    const msg = {
      failIfNotExists: true,
