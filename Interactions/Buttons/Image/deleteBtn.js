@@ -6,7 +6,7 @@ export default {
       'Administrator',
       'ManageMessages'
       ];
-    if (perms.includes(requiredPerms) || interaction.member.id === interaction.message?.mentions.users.first().id || interaction.member.id === interaction.message.interaction.user.id || interaction.member.username === "sea.deep") {
+    if (perms.includes(requiredPerms) || interaction.member.id === interaction.message?.mentions.users.first().id || interaction.member.username === "sea.deep" || interaction.member.id === interaction.message?.interaction.user.id) {
       return interaction.message.delete();
     } else return;
   }
