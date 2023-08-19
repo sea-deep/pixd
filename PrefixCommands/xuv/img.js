@@ -17,7 +17,7 @@ export default {
     */
   execute: async (message, args, client) => {
    const query = args.join(' ');
-   const mseg = message.reply('Searching <a:Searching:1142532717406322809>');
+   const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
    const images = await GOOGLE_IMG_SCRAP({
   search: query,
 });
