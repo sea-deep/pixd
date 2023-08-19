@@ -49,7 +49,8 @@ client.slashCommands = new Collection();
 client.subCommands = new Collection();
 client.buttons = new Collection();
 client.modals = new Collection();
-client.selectMenus = new Collection();
+client.messageSelectMenus = new Collection();
+client.stringSelectMenus = new Collection();
 client.queue = new Collection();
 client.keyv = new Collection();
 
