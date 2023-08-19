@@ -24,6 +24,8 @@ try {
 
     client.slashCommands.set(interaction.data.name, interaction);
   }
+  const infoMessage = `[${chalk.blue("INFO")}] - Slash Commands Loaded!`;
+    process.stdout.write(`${infoMessage}\n`);
 
 } catch (err) {
   const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
