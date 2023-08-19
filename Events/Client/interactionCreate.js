@@ -49,7 +49,22 @@ export default {
         });
       }
     }
+
+    if (interaction.isMessageContextMenuCommand()) {
+      const command = client.messagsSelectMenus.get(interaction.commandName);
+
+      try {
+        return await command.execute(interaction, client);
+      } catch (err) {
+        process.stdout.write(`[${chalk.red("InteractionCreate")} (${chalk.red("Command")})] - ${err}\n`);
+        await interaction.reply({
+          content: "*There was an error while executing this command!*",
+          ephemeral: true,
+        });
+      }
+    }
     
+
     if (interaction.isModalSubmit()) {
       const modal = client.modals.get(interaction.customId);
       if (!modal) return;
