@@ -35,7 +35,7 @@ try {
   });
 
   if (response.ok) {
-    const infoMessage = `[${chalk.blue("INFO")}] - Slash Command Registered!`;
+    const infoMessage = `[${chalk.blue("INFO")}] - Application Commands Registered!`;
     process.stdout.write(`${infoMessage}\n`);
   } else {
     const errorMessage = await response.text();
