@@ -51,7 +51,7 @@ export default {
     }
 
     if (interaction.isMessageContextMenuCommand()) {
-      const command = client.messagsSelectMenus.get(interaction.commandName);
+      const command = client.messageSelectMenus.get(interaction.commandName);
 
       try {
         return await command.execute(interaction, client);
