@@ -16,7 +16,8 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
-   const query = args.join(' '); 
+   const query = args.join(' ');
+   const mseg = message.reply('Searching <a:Searching:1142532717406322809>');
    const images = await GOOGLE_IMG_SCRAP({
   search: query,
 });
@@ -103,8 +104,7 @@ export default {
        } 
      ] 
    }; 
-   let mseg = await message.reply(msg); 
-   client.keyv.set(mseg.id, images.result);
+   return mseg.edit(msg);
   }
 };
 
