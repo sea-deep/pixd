@@ -15,7 +15,7 @@ export default {
     let genesis = gene.split(" ");
     for (let i = 0; i < genesis.length; i++) {
       try {
-        await interaction.message.react(genesis[i]);
+        await interaction.targetMessage.react(genesis[i]);
       } catch (err) {
         await interaction.reply({
           content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
