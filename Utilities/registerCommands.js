@@ -16,11 +16,12 @@ const Files = SlashCommands.concat(MessageSelectMenuCommands);
 const commandsArray = [];
 for (let i = 0; i < Files.length; i++) {
   Files[i] = pathToFileURL(Files[i]);
+  console.log(Files[I])
   const interactionFile = await import(Files[i]);
   const interaction = interactionFile.default;
   commandsArray.push(interaction.data);
 }
-
+console.log(commandsArray)
 const url = `https://discord.com/api/v10/applications/${clientId}/commands`;
 const headers = {
   "Authorization": `Bot ${process.env.TOKEN}`,
@@ -39,10 +40,10 @@ try {
     process.stdout.write(`${infoMessage}\n`);
   } else {
     const errorMessage = await response.text();
-    const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${errorMessage}`;
+    const errorOutput = `[${chalk.red("CommandRegister")}] - ${errorMessage}`;
     process.stderr.write(`${errorOutput}\n`);
   }
 } catch (err) {
-  const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
+  const errorOutput = `[${chalk.red("CommandRegister")}] - ${JSON.stringify(err, null, 2)}`;
   process.stderr.write(`${errorOutput}\n`);
 }
