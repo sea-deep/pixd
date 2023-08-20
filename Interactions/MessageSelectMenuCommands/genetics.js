@@ -22,6 +22,8 @@ export default {
           content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
           ephemeral: true
         });
+      console.log(err);
+      break;
       }    
     }
     await interaction.followUp({
