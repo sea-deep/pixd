@@ -87,9 +87,9 @@ export default {
     {
       type: 'rich',
       title: `Tech Saport`,
-      description: `- </contact:000> : Send a message to developer\n- </ping:000> : Check latency and uptime.\n\n[Website](https://pixd.onrender.com/home) • [Invite](https://pixd.onrender.com/invite)`,      color: 0xbbab30,
+      description: `- </contact:000> : Send a message to developer\n- </ping:000> : Check latency and uptime.\n\n[Website](https://pixd.onrender.com/home) • [Invite](https://pixd.onrender.com/invite)\n[Terms Of Service and Privacy Policy](https://pixd.onrender.com/legal)`,      color: 0xbbab30,
       thumbnail: {
-        url: 'https://images-ext-2.discordapp.net/external/uFIhM0gaX0cTSdv3zispJ0ffhjOtel4mUcXISBFRgow/https/cdn.discordapp.com/emojis/898562618833383444.gif',
+        url: 'https://images-ext-2.discordapp.net/external/tFhoHS9MjXYHhgP8R0eBKW7sr1ZDbvOCYuLmzEa8KXU/https/cdn.discordapp.com/emojis/1142805565295308800.gif',
         height: 0,
         width: 0,
       },
