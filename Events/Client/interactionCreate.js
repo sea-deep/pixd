@@ -76,7 +76,7 @@ export default {
     }
     
     if (interaction.isStringSelectMenu()) {
-      const menu = client.selectMenus.get(interaction.customId);
+      const menu = client.stringSelectMenus.get(interaction.customId);
       if (!menu) return;
       try {
         return await menu.execute(interaction);
