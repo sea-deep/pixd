@@ -16,12 +16,13 @@ const Files = SlashCommands.concat(MessageSelectMenuCommands);
 const commandsArray = [];
 for (let i = 0; i < Files.length; i++) {
   Files[i] = pathToFileURL(Files[i]);
-  console.log(Files[i])
   const interactionFile = await import(Files[i]);
   const interaction = interactionFile.default;
+  if(interaction.data) {
   commandsArray.push(interaction.data);
+  }
 }
-console.log(commandsArray)
+// console.log(commandsArray)
 const url = `https://discord.com/api/v10/applications/${clientId}/commands`;
 const headers = {
   "Authorization": `Bot ${process.env.TOKEN}`,
