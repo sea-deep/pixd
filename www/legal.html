@@ -3,15 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <title>PIXD Bot - Terms of Service and Privacy Policy</title>
-    <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-   <script src="script.js" type="text/javascript" charset="utf-8"></script>
-
+    <style>
+        * {  
+  box-sizing:border-box;  
+  margin:0;  
+  padding:0  
+  }  
+  
+  body {  
+  background-color:#1a1a1a;  
+  color:#e0e0e0;  
+  font-family:Arial,sans-serif;  
+  margin:0;  
+  padding:0;  
+  font-family:Arial,sans-serif;  
+  margin:0;  
+  padding:0;  
+  background-color:#282828;  
+  color:#f0f0f0  
+  }  
+  
+  .header,.footer {  
+  background-color:#333  
+  }  
+  h2,h3 {
+    text-align: center;
+  }
+  h2 {
+    background-color: #e4c768;
+    width: 100%;
+    color: #000000;
+  }
+  .container {  
+  display:flex;  
+  flex-direction:column  
+  }  
+  
+  .header {  
+  background-color:#9f7031;  
+  height:60px;  
+  width: 100%; 
+  padding:0 20px; 
+  position: fixed; 
+  top: 0; 
+  }  
+  
+  .header-content {  
+  display:flex;  
+  align-items:center;  
+  justify-content:space-between  
+  }  
+  
+  .header_img {  
+  height:50px;  
+  width:auto;  
+  z-index:999; 
+  animation: popInOut 0.5s infinite linear; 
+  }  
+ @keyframes popInOut { 
+     0% { transform: scale(1); opacity: 0.8; } /* Start of the animation - initial pop-in effect */ 
+     50% { transform: scale(1.2); opacity: 1; } /* Middle of the animation - full size */ 
+     100% { transform: scale(1); opacity: 0.8; } /* End of the animation - pop-out effect */ 
+ } 
+  .logo {  
+  width:80px;  
+  height:auto;  
+  border-radius:40px  
+  }  
+  
+  .main {  
+  flex-grow:1;  
+  display:flex;  
+  flex-direction:column;  
+  align-items:right;  
+  justify-content:center;
+  }  
+  
+  
+  .footer p {  
+  font-size:16px  
+  }  
+  
+  @media (min-width: 768px) {  
+  .menu-icon {  
+  display:none  
+  }  
+  
+  .nav {  
+  display:flex;  
+  flex-direction:row;  
+  align-items:center;  
+  justify-content:flex-end; 
+  width:100%;  
+  position:absolute; 
+  top:0;  
+  right:0  
+  } 
+  
+  
+  .nav a {  
+  display:flex;  
+  align-items:center;  
+  color:#f0f0f0;  
+  text-decoration:none;  
+  font-size:20px;  
+  padding:10px 20px;  
+  border: 6px groove #4f3614; 
+  background-color: #593f1b; 
+  border-radius: 5px; 
+  transition:background-color .2s  
+  }  
+  
+  .nav a:hover {  
+  background-color:#444  
+  }  
+  
+  @keyframes slideIn {  
+  from {  
+  transform:translateX(-100%)  
+  }  
+  
+  to {  
+  transform:translateX(0)  
+  }  
+  }  
+  }  
+  
+  @media (max-width: 767px) {  
+  .menu-icon {  
+  display:block;  
+  position:relative;  
+  cursor:pointer  
+  }  
+  
+  .menu-icon span {  
+  display:block;  
+  width:30px;  
+  height:4px;  
+  background-color:#f0f0f0;  
+  margin:8px 8px 8px auto  
+  }  
+  
+  .nav {  
+  display:none;  
+  flex-direction:column;  
+  align-items: center;  
+  justify-content: center; 
+  width:50%; 
+  background-color: #493924; 
+  border-radius: 5px; 
+  border: 3px solid #211b13; 
+  position:fixed; 
+  top: 60px; 
+  right:0; 
+  }  
+  
+  .nav.show {  
+  display:flex;  
+  flex-direction:column;  
+  animation:slideIn .3s forwards  
+  }  
+  
+  .nav a {  
+  display:flex;  
+  align-items:center;  
+  color:#f0f0f0;  
+  text-decoration:none;  
+  font-size:20px;  
+  padding:10px 20px;  
+  width: 100%; 
+  border: 3px solid #211b13; 
+  transition:background-color .2s  
+  }  
+  
+  .nav a:hover {  
+  background-color:#444  
+  }  
+  
+  @keyframes slideIn {  
+  from {  
+  transform:translateX(50%)  
+  }  
+  
+  to {  
+  transform:translateX(0)  
+  }  
+  }  
+  }  
+  }
+    </style>
+    <script>
+       function toggleMenu() {  
+        var nav = document.getElementById("nav");  
+        nav.classList.toggle("show");  
+      }  
+  
+</script>
 </head>
 <body>
   <div class="containter">
     <div class="header">  
       <div class="header-content"> 
-        <img src="https://iili.io/HQm5MbI.md.png" alt="download_now.jpg" style="border-radius:50px;" class="header_img">
+        <a href="/download"> 
+        <img src="https://iili.io/HQm5MbI.md.png" alt="download_now.jpg" class="header_img"> </a> 
         <div class="menu-icon" onclick="toggleMenu()">  
           <span></span>  
           <span></span>  
@@ -26,7 +220,7 @@
       <a href="/legal">Legal</a>  
     </div> 
     <div class="main">
-                <h1 style="margin-top:60px">PIXD Bot - Terms of Service and Privacy Policy</h1>
+                <h1 style="margin-top:60px">PIXD Bot - Terms of Service and Privacy Policy :</h1>
 <h2><a id="terms-of-service">Terms of Service</a></h2>
        <h3>Usage Agreement</h3>
                 <p>By inviting the PIXD bot and using its features (commands, welcome system), you agree to the following Terms and Privacy Policy (Policy) of the bot.</p>
@@ -80,6 +274,10 @@
                     <p>Last Modified: July 16, 2023</p>
                  </div>
              </div>
-       </div>
+               </div>
+                  <div style="text-align: center; height: 40px; " class="footer">  
+      <p style="margin:5px;">© 2023 PIXD Bot. All rights reserved.</p>  
+    </div> 
+             
 </body>
 </html>
