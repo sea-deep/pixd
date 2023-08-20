@@ -16,7 +16,7 @@ const Files = SlashCommands.concat(MessageSelectMenuCommands);
 const commandsArray = [];
 for (let i = 0; i < Files.length; i++) {
   Files[i] = pathToFileURL(Files[i]);
-  console.log(Files[I])
+  console.log(Files[i])
   const interactionFile = await import(Files[i]);
   const interaction = interactionFile.default;
   commandsArray.push(interaction.data);
