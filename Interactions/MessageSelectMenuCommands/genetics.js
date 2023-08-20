@@ -18,13 +18,13 @@ export default {
       try {
         await interaction.targetMessage.react(genesis[i]);
       } catch (err) {
-        await interaction.followUp({
+             console.log(err);
+ 
+        return interaction.followUp({
           content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
           ephemeral: true
         });
-      console.log(err);
-      break;
-      }    
+       }    
     }
     await interaction.followUp({
           content: 'Reactions Added!',
