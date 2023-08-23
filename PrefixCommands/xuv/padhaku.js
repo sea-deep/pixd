@@ -125,6 +125,6 @@ export default {
    response = completion.data.choices[0].message.content.trim(); 
    const ans = response.trim();
    const chunks = ans.match(new RegExp(`.{1,2000}`, 'g'));
-   chunks.forEach(chunk => await message.reply({content: chunk, failIfNotExists: false}));
+   chunks.forEach(async chunk => await message.reply({content: chunk, failIfNotExists: false}));
   }
 };
