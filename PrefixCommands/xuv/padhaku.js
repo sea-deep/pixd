@@ -123,7 +123,8 @@ export default {
      return msg.reply("*An error occurred* :"+ e.message);
    } 
    response = completion.data.choices[0].message.content.trim(); 
-   const ans = response.trim(); 
-   return message.reply({content: ans, failIfNotExists: false});
+   const ans = response.trim();
+   const chunks = ans.match(new RegExp(`.{1,2000}`, 'g'));
+   chunks.forEach(chunk => await message.reply({content: chunk, failIfNotExists: false}));
   }
 };
