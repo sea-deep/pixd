@@ -24,7 +24,6 @@ export default {
     let channelId = "883299030359228457";
     let channel = client.channels.cache.get(channelId); 
    channel.send(`**${member.user.tag}** Left.`); 
- }
 }
     async function sendOkbb(member, client) {
         let channel = client.channels.cache.get('1128609011852390400'); 
