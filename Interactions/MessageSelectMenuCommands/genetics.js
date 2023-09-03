@@ -18,7 +18,7 @@ export default {
       try {
         await interaction.targetMessage.react(genesis[i]);
       } catch (err) {
-             console.log(err);
+             console.log("An error occurred: ", err);
  
         return interaction.followUp({
           content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
