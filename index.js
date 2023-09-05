@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import "dotenv/config";
+import 'dotenv/config';
 
-import { KeyValueStore } from './Helpers/helperUtil.js';
-import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
+import {Client, GatewayIntentBits, Partials, Collection} from 'discord.js';
+import {KeyValueStore} from './Helpers/helperUtil.js';
 
 export const client = new Client({
   intents: [
@@ -12,10 +12,9 @@ export const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
   ],
-  ws: { properties: { browser: 'Discord iOS' } },
+  ws: {properties: {browser: 'Discord iOS'}},
   partials: [Partials.Channel],
 });
-
 
 // Setting a Global Collection for Commands, Aliases, Buttons & Interactions and more
 client.prefixCommands = new Collection();
@@ -28,36 +27,34 @@ client.stringSelectMenus = new Collection();
 client.queue = new Collection();
 client.keyv = new KeyValueStore();
 
-// Website Handler 
-import("./Utilities/webpageHandler.js");
+// Website Handler
+import('./Utilities/webpageHandler.js');
 
 // Slash Command Handler
-import("./Utilities/slashCommandHandler.js");
+import('./Utilities/slashCommandHandler.js');
 
 // Prefix Command Handler
-import("./Utilities/prefixCommandHandler.js");
-  
+import('./Utilities/prefixCommandHandler.js');
+
 // Event Handler
-import("./Utilities/eventHandler.js");
+import('./Utilities/eventHandler.js');
 
 // Button Handler
-import("./Utilities/buttonHandler.js");
+import('./Utilities/buttonHandler.js');
 
 // Modal Handler
-import("./Utilities/modalHandler.js");
+import('./Utilities/modalHandler.js');
 
 // String Select Menu Handler
-import("./Utilities/stringSelectMenuHandler.js");
+import('./Utilities/stringSelectMenuHandler.js');
 
 // Messave Select Menu Handler
-import("./Utilities/messageSelectMenuHandler.js");
+import('./Utilities/messageSelectMenuHandler.js');
 
-// Register application commands 
-import("./Utilities/registerCommands.js");
-
+// Register application commands
+import('./Utilities/registerCommands.js');
 
 // Logging in to the bot..
 client.login(process.env.TOKEN);
 // Setting current time to present the Uptiime
-client.keyv.set("uptime", Date.now());
-  
+client.keyv.set('uptime', Date.now());
