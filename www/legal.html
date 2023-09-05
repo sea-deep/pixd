@@ -136,7 +136,53 @@
   }  
   }  
   }  
-  
+  @media (max-width: 768px) {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .header {
+                position: static;
+            }
+
+            .header-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .header_img {
+                margin-bottom: 20px;
+            }
+
+            .nav {
+                position: static;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: #493924;
+                border-radius: 5px;
+                border: 3px solid #211b13;
+                top: initial;
+                right: initial;
+                width: 100%;
+            }
+
+            .nav.show {
+                display: block;
+            }
+
+            .nav a {
+                width: 100%;
+            }
+
+            .main {
+                padding: 20px;
+            }
   @media (max-width: 767px) {  
   .menu-icon {  
   display:block;  
