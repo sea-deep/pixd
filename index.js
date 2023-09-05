@@ -5,13 +5,11 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
-
+import { KeyValueStore } from './Helpers/helperUtil.js';
 const app = express();
 
 const staticPath = join(dirname(fileURLToPath(import.meta.url)), 'www');
-
 app.use(express.static(staticPath));
-
 app.get('/', (req, res) => res.redirect('/home'));
 app.get('/home', (req, res) => res.sendFile(join(staticPath, 'index.html')));
 app.get('/repo', (req, res) => res.redirect('https://github.com/susudeepa/pixd'));
@@ -24,7 +22,6 @@ app.get('/:page', (req, res) => {
     res.status(404).sendFile(join(staticPath, '404.html'));
   }
 });
-
 const port = process.env.PORT;
 app.listen(port, () => console.log(`Server is listening on port ${port}`));
 
@@ -52,7 +49,7 @@ client.modals = new Collection();
 client.messageSelectMenus = new Collection();
 client.stringSelectMenus = new Collection();
 client.queue = new Collection();
-client.keyv = new Collection();
+client.keyv = new KeyValueStore();
 
 // Slash Command Handler
 import("./Utilities/slashCommandHandler.js");
