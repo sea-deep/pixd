@@ -7,7 +7,7 @@ import express from 'express';
 try {
 const app = express();
 
-const staticPath = join(dirname(fileURLToPath(import.meta.url)), 'www');
+const staticPath = join(dirname(fileURLToPath(import.meta.url)), '../www');
 app.use(express.static(staticPath));
 app.get('/', (req, res) => res.redirect('/home'));
 app.get('/home', (req, res) => res.sendFile(join(staticPath, 'index.html')));
