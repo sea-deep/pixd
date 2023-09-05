@@ -1,30 +1,7 @@
 #!/usr/bin/env node
 import "dotenv/config";
 
-import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';
 import { KeyValueStore } from './Helpers/helperUtil.js';
-const app = express();
-
-const staticPath = join(dirname(fileURLToPath(import.meta.url)), 'www');
-app.use(express.static(staticPath));
-app.get('/', (req, res) => res.redirect('/home'));
-app.get('/home', (req, res) => res.sendFile(join(staticPath, 'index.html')));
-app.get('/repo', (req, res) => res.redirect('https://github.com/susudeepa/pixd'));
-app.get('/invite', (req, res) => res.redirect('https://discord.com/api/oauth2/authorize?client_id=1026234292017299586&permissions=343634472000&scope=bot'));
-app.get('/:page', (req, res) => {
-  const pagePath = join(staticPath, `${req.params.page}.html`);
-  if (fs.existsSync(pagePath)) {
-    res.sendFile(pagePath);
-  } else {
-    res.status(404).sendFile(join(staticPath, '404.html'));
-  }
-});
-const port = process.env.PORT;
-app.listen(port, () => console.log(`Server is listening on port ${port}`));
-
 import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
 
 export const client = new Client({
@@ -50,6 +27,9 @@ client.messageSelectMenus = new Collection();
 client.stringSelectMenus = new Collection();
 client.queue = new Collection();
 client.keyv = new KeyValueStore();
+
+// Website Handler 
+import("./Utilities/webpageHandler.js");
 
 // Slash Command Handler
 import("./Utilities/slashCommandHandler.js");
