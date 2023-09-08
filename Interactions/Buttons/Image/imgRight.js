@@ -7,7 +7,7 @@ export default {
    */
   execute: async (interaction, client) => {
     try {
-      if (!interaction.member || !interaction.message.mentions.users.first()) return;
+      if (interaction.member.id !== interaction.message.mentions.users.first().id) return;
 
       const images = await client.keyv.get(interaction.message.id);
 
