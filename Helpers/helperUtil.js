@@ -27,4 +27,19 @@ export class KeyValueStore {
     const entry = this.data.get(key);
     return entry && (entry.ttl === null || entry.ttl >= Date.now());
   }
+
+  setTTL(key, newTTL) {
+    const entry = this.data.get(key);
+    if (entry) {
+      if (newTTL === null) {
+        entry.ttl = null;
+      } else if (typeof newTTL === 'number' && newTTL >= 0) {
+        entry.ttl = Date.now() + newTTL * 1000;
+      } else {
+        throw new Error('Invalid TTL value. TTL must be a positive number or null.');
+      }
+    } else {
+      throw new Error('Key does not exist in the store.');
+    }
+  }
 }
