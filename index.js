@@ -2,7 +2,7 @@
 import 'dotenv/config';
 
 import {Client, GatewayIntentBits, Partials, Collection} from 'discord.js';
-import {KeyValueStore} from './Helpers/helperUtil.js';
+import {KeyValueStore, sleep} from './Helpers/helperUtil.js';
 
 export const client = new Client({
   intents: [
@@ -26,6 +26,7 @@ client.messageSelectMenus = new Collection();
 client.stringSelectMenus = new Collection();
 client.queue = new Collection();
 client.keyv = new KeyValueStore();
+client.sleep = sleep;
 
 // Website Handler
 import('./Utilities/webpageHandler.js');
