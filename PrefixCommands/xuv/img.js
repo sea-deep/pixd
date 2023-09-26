@@ -21,7 +21,7 @@ export default {
    const images = await GOOGLE_IMG_SCRAP({
   search: query,
 });
-    client.keyv.set(mseg.id, images.result, 600);
+    client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
      failIfNotExists: true,
@@ -105,7 +105,14 @@ export default {
        } 
      ] 
    }; 
-   return mseg.edit(msg);
+    await mseg.edit(msg);
+    await client.sleep(30500); 
+    if(!client.keyv.has(mseg.id)) { 
+      await mseg.edit({   
+      content: '',   
+      embeds: [embed] 
+         }); 
+      }
   }
 };
 
