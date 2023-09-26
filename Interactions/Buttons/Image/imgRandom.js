@@ -44,6 +44,14 @@ export default {
         embeds: [embed], 
         components: msg.components  
       });
+       await client.keyv.setTTL(interaction.message.id, 30); 
+        await client.sleep(30500); 
+        if(!client.keyv.has(interaction.message.id)) { 
+          await interaction.message.edit({   
+          content: '',   
+          embeds: [embed] 
+          }); 
+        }
     } catch (error) {
       console.error("An error occurred:", error);     
     }
