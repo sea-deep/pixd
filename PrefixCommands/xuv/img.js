@@ -106,12 +106,12 @@ export default {
      ] 
    }; 
     let sent = await mseg.edit(msg);
-    await client.sleep(30500); 
+    await client.sleep(30200); 
     if(!client.keyv.has(mseg.id)) { 
       sent.channel.send("Editing");
       await mseg.edit({   
       content: '',   
-      embeds: sent.embeds,
+      embeds: msg.embeds,
        }); 
       }
   }
