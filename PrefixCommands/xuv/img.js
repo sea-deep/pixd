@@ -107,9 +107,8 @@ export default {
    }; 
     let sent = await mseg.edit(msg);
     await client.sleep(30500); 
-   console.log(client.keyv.has(sent.id), sent.id);
-    if(!client.keyv.has(sent.id)) { 
-      await sent.edit({   
+    if(!client.keyv.has(mseg.id)) { 
+      await mseg.edit({   
       content: '',   
       embeds: sent.embeds,
        }); 
