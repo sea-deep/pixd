@@ -110,8 +110,8 @@ export default {
     if(!client.keyv.has(sent.id)) { 
       await sent.edit({   
       content: '',   
-      embeds: sent.embeds
-         }); 
+      embeds: sent.embeds,
+       }); 
       }
   }
 };
