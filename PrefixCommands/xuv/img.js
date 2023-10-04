@@ -111,6 +111,7 @@ export default {
       await mseg.edit({   
       content: '',   
       embeds: msg.embeds,
+      components: []
        }); 
       }
   }
