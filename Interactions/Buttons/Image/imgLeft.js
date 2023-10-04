@@ -49,6 +49,7 @@ import { Client } from "discord.js";
        if(!client.keyv.has(interaction.message.id)) {
          await interaction.message.edit({  
          content: '',  
+         components: [],
          embeds: [embed]
          });
        }
