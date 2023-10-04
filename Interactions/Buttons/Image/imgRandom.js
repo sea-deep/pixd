@@ -49,6 +49,7 @@ export default {
         if(!client.keyv.has(interaction.message.id)) { 
           await interaction.message.edit({   
           content: '',   
+          components: [], 
           embeds: [embed] 
           }); 
         }
