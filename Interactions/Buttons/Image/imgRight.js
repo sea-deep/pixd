@@ -49,7 +49,8 @@ export default {
         await client.sleep(30500); 
         if(!client.keyv.has(interaction.message.id)) { 
           await interaction.message.edit({   
-          content: '',   
+          content: '',
+          components: [], 
           embeds: [embed] 
           }); 
         }
