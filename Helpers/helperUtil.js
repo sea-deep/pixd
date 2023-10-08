@@ -1,5 +1,4 @@
-const { MongoClient } = require('mongodb');
-
+import { MongoClient } from 'mongodb';
 
 export class KeyValueStore {
   constructor() {
@@ -47,7 +46,7 @@ export class KeyValueStore {
   }
 }
 
-class MongodbKeyValue {
+export class MongodbKeyValue {
   constructor(databaseUrl) {
     this.client = new MongoClient(databaseUrl, { const { MongoClient } = require('mongodb');
 : true, useUnifiedTopology: true });
@@ -100,9 +99,7 @@ class MongodbKeyValue {
     await this.client.close();
   }
 }
-
-module.exports = KeyValueStore;
-
+ 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
