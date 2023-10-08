@@ -1,14 +1,13 @@
 {
   "name": "PixD",
   "version": "1.0.0",
-  "description": "a discord bot",
+  "description": "A Discord bot for various functions and masti.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node index.js"
+    "start": "node index.js"
   },
   "type": "module",
-  "keywords": [],
+  "keywords": ["discord", "bot", "discord.js"],
   "author": "sea.deep",
   "license": "MIT",
   "dependencies": {
@@ -33,5 +32,9 @@
     "path": "^0.12.7",
     "play-dl": "^1.9.6",
     "sharp": "^0.32.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/susudeepa/pixd"
   }
 }
