@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 export default {
-  name: 'test',
+  name: 'getDef',
   /**
   * @param {Client} client
   */
