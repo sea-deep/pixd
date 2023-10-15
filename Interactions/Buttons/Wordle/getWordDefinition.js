@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 export default {
-  name: 'getDef',
+  name: 'getWordDef',
   /**
   * @param {Client} client
   */
