@@ -1,4 +1,5 @@
 import { Client } from 'discord.js';
+imoort { axios } from "axios";
 export default {
   name: 'getWordDef',
   /**
