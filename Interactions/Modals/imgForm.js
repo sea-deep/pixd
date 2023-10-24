@@ -48,8 +48,9 @@ export default {
         components: msg.components  
       });
        await client.keyv.setTTL(interaction.message.id, 30); 
-        await client.sleep(30500); 
-                try{
+       await client.sleep(30500); 
+       if(!client.keyv.has(interaction.message.id)) {
+       try{
           await interaction.message.edit({   
           content: '',   
           components: [], 
