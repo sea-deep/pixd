@@ -20,7 +20,8 @@ export default {
    const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
    const images = await GOOGLE_IMG_SCRAP({
     search: query,
-    limit: 100
+    limit: 100,
+    safeSearch: true
 });
     client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
