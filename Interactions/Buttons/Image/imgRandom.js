@@ -47,11 +47,12 @@ export default {
        await client.keyv.setTTL(interaction.message.id, 30); 
         await client.sleep(30500); 
         if(!client.keyv.has(interaction.message.id)) { 
+        try{
           await interaction.message.edit({   
           content: '',   
           components: [], 
           embeds: [embed] 
-          }); 
+          }); } catch (e) {console.log(e.message);}
         }
     } catch (error) {
       console.error("An error occurred:", error);     
