@@ -58,7 +58,7 @@ export default {
       frequency_penalty: 0.1,
     });
      } catch (e) {
-     console.log(e);
+     console.log(e.message);
      return message.reply({
       content: '',
       failIfNotExists: false,
