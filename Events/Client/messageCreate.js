@@ -9,7 +9,8 @@ import { Client, Message } from "discord.js";
      * @param {Client} client 
      * @param {Message} message 
      */ 
-   execute: async (message, client) => { 
+   execute: async (message, client) => {
+     if (config.restricted.includes(message.user.id)) return;
      if (message.content === `<@${client.user.id}>`) { message.reply(`**The Prefix is:** \`${prefix}\``) } 
      if (message.author.bot === true) return; 
 
