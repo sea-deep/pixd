@@ -20,7 +20,7 @@ export default {
         await interaction.reply({ content: '*There was an error while executing that button.*', ephemeral: true });
       } catch(e) {
          console.log("Error with button", interaction.customId, e.message);
-         await interaction.followUp({ content: '*There was an error while executing that button.*', ephemeral: true });
+        try { await interaction.followUp({ content: '*There was an error while executing that button.*', ephemeral: true }); } catch (e) {console.log("InteractionNotSent error handled!!");}
         }
       }
     }
