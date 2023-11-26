@@ -1,4 +1,5 @@
 import { Client, BaseInteraction } from "discord.js";
+import config from "../../Configs/config.js"; 
 import chalk from "chalk";
 
 export default {
@@ -8,6 +9,7 @@ export default {
     * @param {BaseInteraction} interaction
     */
   execute: async (interaction, client) => {
+   if(config.restricted.includes(interaction.member.id)) return;
     if (interaction.isButton()) {
       const button = client.buttons.get(interaction.customId)
       if (!button) return
