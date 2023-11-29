@@ -16,7 +16,6 @@ export default {
     * @param {Message} message
     */
   execute: async (message) => {
-  return;
   const allCords = [ 
      {x: 0, y: 0}, 
      {x: 366, y: 0}, 
