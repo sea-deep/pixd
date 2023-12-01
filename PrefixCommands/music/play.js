@@ -122,7 +122,7 @@ export default {
     let serverQueue = client.queue.get(message.guild.id);
     const voiceChannel = message.member.voice.channel;
     if (!voiceChannel) {
-      return message.react("<:error:1090721649621479506>");
+      return message.react("<:error:1090721649621479506>").catch((error) => console.error("Failed to add reactions:", error.message));
     }
     let song = {};
     let songs = [];
