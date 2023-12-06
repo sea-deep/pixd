@@ -53,7 +53,7 @@
  import('./Utilities/messageSelectMenuHandler.js'); 
   
  // Register application commands 
- import('./Utilities/registerCommands.js'); 
+ // import('./Utilities/registerCommands.js'); 
   
  // Logging in to the bot.. 
  client.login(process.env.TOKEN); 
