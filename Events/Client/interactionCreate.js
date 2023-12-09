@@ -82,7 +82,7 @@ export default {
       const menu = client.stringSelectMenus.get(interaction.customId);
       if (!menu) return;
       try {
-        return await menu.execute(interaction);
+        return await menu.execute(interaction, client);
       } catch (err) {
         process.stdout.write(`[${chalk.red("SelectMenuHandler")}] - ${err}`);
         await interaction.reply({ content: '*There was an error while executing that select menu.*', ephemeral: true });
