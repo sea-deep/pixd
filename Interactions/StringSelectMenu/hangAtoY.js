@@ -62,7 +62,7 @@ let I = indexOf(interaction.message.embeds[0].description);
          footer: interaction.message.embeds[0].footer,
          fields: [{ 
            name: interaction.message.embeds[0].fields[0].name,
-           value: `\`${res}\``
+           value: `\`${res.toUpperCase()}\``
          }]
        }],
        components: []
