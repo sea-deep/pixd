@@ -23,7 +23,7 @@ export default {
 ];
   
   if (!res) {
-let I = indexOf(interaction.message.embeds[0].description);
+let I = hangmanSteps.indexOf(interaction.message.embeds[0].description);
    let nextMan = hangmanSteps[I+1];
    if (I+1 == 7) {
      return interaction.message.edit({
