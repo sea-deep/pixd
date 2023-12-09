@@ -123,9 +123,10 @@ if (sel[0] == 'gam') {
   help.embeds[0].title = com.label;
   help.embeds[0].description = [
     '• `p!wordle` - Play the game wordle',
-    '• `p!c4` - Play the game Connect 4 <:be:1116345920515231744><:ta:1116345986961387641>',
-    '• `p!2048` - Play 2048 <:be:1116345920515231744><:ta:1116345986961387641>',
-    'more to come...',
+    '• `p!c4` - Play the game Connect 4',
+    '• `p!2048` - Play 2048',
+    '• `p!hangman` - Yet another word guessing game.',
+    '**more to come...**',
   ].join('\n');
 }
 if (sel[0] == 'fap') {
