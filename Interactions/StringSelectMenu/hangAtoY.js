@@ -7,6 +7,7 @@ export default {
     */
   execute: async (interaction, client) => {
    await interaction.deferUpdate();
+   if (interaction.message.mentions.users.first().id != interaction.member.id) return;
    let input= interaction.values[0].split('_')[1];
    let answer = client.keyv.get(`hangman${interaction.message.id}`);
    let current = interaction.message.embeds[0].fields[0].value.slice(1,-1).toLowerCase();
