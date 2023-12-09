@@ -183,7 +183,7 @@ export default {
     {
       "type": "rich",
       "title": `🚹 Hangman`,
-      "description": ````\n+---+\n|   |\n|   O\n|  /|\\\n|  / \\\n|\n=========\n````,
+     "description": "```\n+---+\n|   |\n|   O\n|  /|\\\n|  / \\\n|\n=========\n```",
       "color": 0x3c1b60,
       "fields": [
         {
