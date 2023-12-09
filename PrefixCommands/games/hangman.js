@@ -1,5 +1,5 @@
 import {Client, Message } from "discord.js";
-//import words from '../../Assets/hangman.json' assert { type: 'json' };
+import words from '../../Assets/hangman.json' assert { type: 'json' };
 
 
 export default {
@@ -202,7 +202,7 @@ export default {
 });
 
    let key = `hangman${msg.id}`;
-  // let val = 
-
+   let val =    let val = hangman.words[Math.floor(Math.random() * hangman.words.length)]; 
+  client.keyv.set(key, val);
   }
 };
