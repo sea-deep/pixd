@@ -1,5 +1,5 @@
 import {Client, Message } from "discord.js";
-import words from '../../Assets/hangman.json' assert { type: 'json' };
+import hangman from '../../Assets/hangman.json' assert { type: 'json' };
 
 
 export default {
