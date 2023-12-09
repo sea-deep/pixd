@@ -202,7 +202,7 @@ export default {
 });
 
    let key = `hangman${msg.id}`;
-   let val =    let val = hangman.words[Math.floor(Math.random() * hangman.words.length)]; 
+   let val = hangman.words[Math.floor(Math.random() * hangman.words.length)]; 
   client.keyv.set(key, val);
   }
 };
