@@ -18,6 +18,7 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
+  let val = hangman.words[Math.floor(Math.random() * hangman.words.length)]; 
   let msg = await message.channel.send({
   "content": `<@${message.author.id}>'s Game`,
   "tts": false,
@@ -191,7 +192,7 @@ export default {
       "fields": [
         {
           "name": `Guess:`,
-          "value": `\`_____\``
+          "value": `\`${'_'.repeat(val.length)}\``
         }
       ],
       "footer": {
