@@ -1,4 +1,6 @@
 import {Client, Message } from "discord.js";
+//import words from '../../Assets/hangman.json' assert { type: 'json' };
+
 
 export default {
   name: "hangman",
@@ -16,7 +18,7 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
-   await message.channel.send({
+  let msg = await message.channel.send({
   "content": `Test Game`,
   "tts": false,
   "components": [
@@ -193,10 +195,14 @@ export default {
         }
       ],
       "footer": {
-        "text": `Each time you make wrong letter, the hangman gets closer to Kota.`
+        "text": `Each time you make wrong guess, the hangman gets closer to Kota.`
       }
     }
   ]
 });
+
+   let key = `hangman${msg.id}`;
+  // let val = 
+
   }
 };
