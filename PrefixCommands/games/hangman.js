@@ -151,21 +151,7 @@ export default {
               "label": `Y`,
               "value": `hang_y`,
               "default": false
-            }
-          ],
-          "min_values": 1,
-          "max_values": 1,
-          "type": 3
-        }
-      ]
-    },
-    {
-      "type": 1,
-      "components": [
-        {
-          "custom_id": `HangZ`,
-          "placeholder": `Z`,
-          "options": [
+            },
             {
               "label": `Z`,
               "value": `hang_z`,
@@ -177,7 +163,7 @@ export default {
           "type": 3
         }
       ]
-    }
+    },
   ],
   "embeds": [
     {
