@@ -19,7 +19,7 @@ export default {
     */
   execute: async (message, args, client) => {
   let msg = await message.channel.send({
-  "content": `Test Game`,
+  "content": `<@$message.author.id}> Game`,
   "tts": false,
   "components": [
     {
