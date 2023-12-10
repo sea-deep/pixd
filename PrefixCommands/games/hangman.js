@@ -187,12 +187,12 @@ export default {
     {
       "type": "rich",
       "title": `🚹 Hangman`,
-     "description":  "```\n+---+\n|   \n|\n|\n|\n|\n=========\n```",
+      image: {url:'https://iili.io/JTa8KbI.png', width: 512, height:681},
       "color": 0x3c1b60,
       "fields": [
         {
           "name": `Guess:`,
-          "value": `\`${'_'.repeat(val.length)}\``
+          "value": `\`\`\`\n${'_'.repeat(val.length)}\n\`\`\``
         }
       ],
       "footer": {
