@@ -11,7 +11,7 @@ export default {
    let input= interaction.values[0].split('_')[1];
    let answer = client.keyv.get(`hangman${interaction.message.id}`);
    let current = interaction.message.embeds[0].fields[0].value.split("\n")[1].toLowerCase();
-  
+
   let res = hangman(answer, current, input);
 
   const hangmanSteps = [
@@ -32,7 +32,7 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
        content: interaction.message.content+ "\nGame Over.",
        embeds: [{
          title: interaction.message.embeds[0].title,
-         image: {url: nextMan, height:681, width:512},
+         image: {url: nextMan, height:256, width:192},
          footer: interaction.message.embeds[0].footer,
          fields: [{ 
            name: `The word was: ${answer.toUpperCase()}`,
@@ -46,7 +46,7 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
        content: interaction.message.content,
        embeds: [{
          title: interaction.message.embeds[0].title,
-         image: {url: nextMan, height:681, width:512},
+         image: {url: nextMan, height:256, width:192},
          footer: interaction.message.embeds[0].footer,
          fields: [{ 
            name: interaction.message.embeds[0].fields[0].name,
@@ -70,7 +70,7 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
        components: []
      });
   }
-  
+
   return interaction.message.edit({
        content: interaction.message.content,
        embeds: [{
@@ -82,10 +82,10 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
            value: `\`\`\`\n${res.toUpperCase()}\n\`\`\``
          }]
        }],
-  
+
      });
 }
-   
+
 
   }
 };
