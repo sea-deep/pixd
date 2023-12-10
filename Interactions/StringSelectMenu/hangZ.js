@@ -46,7 +46,7 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
        content: interaction.message.content,
        embeds: [{
          title: interaction.message.embeds[0].title,
-         image: {url: nextMan, height:681, width:512},
+         image: {url: nextMan, height:256, width:192},
          footer: interaction.message.embeds[0].footer,
          fields: [{ 
            name: interaction.message.embeds[0].fields[0].name,
