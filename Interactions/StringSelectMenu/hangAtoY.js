@@ -13,17 +13,17 @@ export default {
    let current = interaction.message.embeds[0].fields[0].value.slice(1,-1).toLowerCase();
   
   let res = hangman(answer, current, input);
-  const hangmanSteps = [
+
+const hangmanSteps = [
   "```\n+---+\n|   \n|\n|\n|\n|\n=========\n```",
   "```\n+---+\n|   |\n|\n|\n|\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|\n|\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|   |\n|\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|  /|\n|\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|  /|\\\n|\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|  /|\\\n|  /\n|\n=========\n```",
-  "```\n+---+\n|   |\n|   O\n|  /|\\\n|  / \\\n|\n=========\n```"
-];
-  
+  "```\n+---+\n|   |\n|   😰\n|\n|\n|\n=========\n```",
+  "```\n+---+\n|   |\n|   😨\n|   |\n|\n|\n=========\n```",
+  "```\n+---+\n|   |\n|   😦\n|  /|\\\n|\n|\n=========\n```",
+  "```\n+---+\n|   |\n|   😧\n|  /|\\\n|\n|\n=========\n```",
+  "```\n+---+\n|   |\n|   😮\n|  /|\\\n|  /\n|\n=========\n```",
+  "```\n+---+\n|   |\n|   😵\n|  /|\\\n|  / \\\n|\n=========\n```"
+];  
   if (!res) {
 let I = hangmanSteps.indexOf(interaction.message.embeds[0].description);
    let nextMan = hangmanSteps[I+1];
