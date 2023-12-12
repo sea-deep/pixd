@@ -20,13 +20,13 @@ export default {
       } catch (err) {
              console.log("An error occurred: ", err);
  
-        return interaction.followUp({
+        return interaction.editReply({
           content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
           ephemeral: true
         });
        }    
     }
-    await interaction.followUp({
+    await interaction.editReply({
           content: 'Reactions Added!',
           ephemeral: true
         });
