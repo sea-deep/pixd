@@ -98,10 +98,10 @@ if (sel[0] == 'xuv') {
   help.embeds[0].description = [
     '• `p!gpt` - Lund GPT',
     '• `p!padhaku` - Ask study related questions.',
-    '• `p!genesis` - Genesis AI images with prompt.',
-    '• `p!genetics <message link> or reply` - Genesis someone.',
-    '• `p!actually <message link> or reply` - 🤓 Reaction',
-  ].join('\n');
+    '• `p!genesis` - Genesis AI images with prompt (paused)',
+    '• `genetics` - Right click message select `🚀 Apps` then `React Genesis`',
+   '• `actually` - Right click message select `🚀 Apps` then `React Nerd`'
+].join('\n');
 }
 if (sel[0] == 'img') {
   let com = interaction.message.components[0].components[0].options[1];
