@@ -65,7 +65,7 @@ export default {
           {
             type: "rich",
             title: def.word,
-            description: def.definition,
+            description: def.definition.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
             color: 0x6969,
             fields: [
               {
@@ -74,7 +74,7 @@ export default {
               },
             ],
             author: {
-              name: def.author,
+              name: def.author.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
               url: `https://urbandictionary.com/`,
               icon_url: `https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr`,
             },
