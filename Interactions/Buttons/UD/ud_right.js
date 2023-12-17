@@ -9,8 +9,9 @@ export default {
     const maxPage = parseInt(btn.split("/")[1]) - 1;
     let goto = currentPage + 1;
     if(currentPage == maxPage) {goto = 0}
-
-    let res = await urban.search(msg.embeds[0].title);
+    
+    let term = await client.keyv.get(`ud${msg.id}`);
+    let res = await urban.search(term);
     let def = res.list[goto];
 
     await interaction.deferUpdate();
