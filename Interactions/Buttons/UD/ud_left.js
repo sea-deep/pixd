@@ -70,11 +70,11 @@ export default {
             fields: [
               {
                 name: "Example:",
-                value: def.example,
+                value: def.example.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
               },
             ],
             author: {
-              name: def.author.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
+              name: def.author,
               url: `https://urbandictionary.com/`,
               icon_url: `https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr`,
             },
