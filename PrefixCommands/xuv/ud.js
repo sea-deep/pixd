@@ -38,7 +38,7 @@ export default {
       },
       {
         style: 2,
-        label: `1/full`,
+        label: `1/${res.list.length}`,
         custom_id: `nulll`,
         disabled: true,
         type: 2,
