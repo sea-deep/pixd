@@ -15,6 +15,7 @@ export default {
     if(currentPage == 0) {goto = maxPage}
 
     let term = await client.keyv.get(`ud${msg.id}`);
+   console.log(`ud${msg.id}`);
     let res = await urban.search(term);
     let def = res.list[goto];
     await interaction.deferUpdate();
