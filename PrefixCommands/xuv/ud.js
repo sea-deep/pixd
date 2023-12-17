@@ -91,12 +91,12 @@ export default {
           {
             type: "rich",
             title: def.word,
-            description: def.definition,
+            description: def.definition.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
             color: 0x6969,
             fields: [
               {
                 name: "Example:",
-                value: def.example,
+                value: def.example.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
               },
             ],
             author: {
