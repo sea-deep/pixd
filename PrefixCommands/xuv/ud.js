@@ -73,6 +73,17 @@ export default {
         },
         type: 2,
       },
+      {
+        style: 5,
+        label: `Get the “${def.word}” mug.`,
+        url: `https://urbandictionary.store/products/mug?defid=${def.defid}`,
+        disabled: false,
+        emoji: {
+          id: null,
+          name: `🍵`,
+        },
+        type: 2,
+      },
     ],
   },
 ],
