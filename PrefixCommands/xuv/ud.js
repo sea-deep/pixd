@@ -18,7 +18,7 @@ export default {
    */
   execute: async (message, args, client) => {
     let res = await urban.search(args.join(" "));
-    def = res.list[0];
+    let def = res.list[0];
     await message.reply({
       content: "",
       tts: false,
