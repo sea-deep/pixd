@@ -112,7 +112,7 @@ export default {
           },
         ],
       });
-    await client.keyv.set(`ud${msg.id}`, args.join(" "), 3600000);
+    await client.keyv.set(`ud${msg.id}`, args.join(" "), 36000000);
     }
   },
 };
