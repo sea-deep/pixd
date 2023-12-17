@@ -38,7 +38,7 @@ export default {
         ],
       });
     } else {
-      client.keyv.set(`ud${message.id}, args.join(" "), 3600000);
+      client.keyv.set(`ud${message.id}`, args.join(" "), 3600000);
       let def = res.list[0];
       await message.reply({
         content: "",
