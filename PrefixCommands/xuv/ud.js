@@ -18,99 +18,99 @@ export default {
    */
   execute: async (message, args, client) => {
     let res = await urban.search(args.join(" "));
-   if(res.list.length == 0) {
-   return message.reply({
-      content: "",
-      tts: false,
-      embeds: [
-        {
-          type: "rich",
-          title: "Not found",
-          description: "Couldn't find a definition for this word.",
-          color: 0x6969,
-          author: {
-            name: 'urbandictionary',
-            url: "https://urbandictionary.com/",
-            icon_url: "https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr",
-          },
-        },
-      ],
-    });
-} else {
-
-    let def = res.list[0];
-    await message.reply({
-      content: "",
-      tts: false,
-      components: [
-  {
-    type: 1,
-    components: [
-      {
-        style: 1,
-        custom_id: `ud_left`,
-        disabled: false,
-        emoji: {
-          id: null,
-          name: `◀`,
-        },
-        type: 2,
-      },
-      {
-        style: 2,
-        label: `1/${res.list.length}`,
-        custom_id: `nulll`,
-        disabled: true,
-        type: 2,
-      },
-      {
-        style: 1,
-        custom_id: `ud_right`,
-        disabled: false,
-        emoji: {
-          id: null,
-          name: `▶`,
-        },
-        type: 2,
-      },
-      {
-        style: 5,
-        label: `Get the “${def.word}” mug.`,
-        url: `https://urbandictionary.store/products/mug?defid=${def.defid}`,
-        disabled: false,
-        emoji: {
-          id: null,
-          name: `🍵`,
-        },
-        type: 2,
-      },
-    ],
-  },
-],
-      embeds: [
-        {
-          type: "rich",
-          title: def.word,
-          description: def.definition,
-          color: 0x6969,
-          fields: [
-            {
-              name: "Example:",
-              value: def.example,
+    if (res.list.length == 0) {
+      return message.reply({
+        content: "",
+        tts: false,
+        embeds: [
+          {
+            type: "rich",
+            title: "Not found",
+            description: "Couldn't find a definition for this word.",
+            color: 0x6969,
+            author: {
+              name: "urbandictionary",
+              url: "https://urbandictionary.com/",
+              icon_url:
+                "https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr",
             },
-          ],
-          author: {
-            name: def.author,
-            url: `https://urbandictionary.com/`,
-            icon_url: `https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr`,
           },
-          footer: {
-            text: `👍:${def.thumbs_up} | 👎:${def.thumbs_down}`,
+        ],
+      });
+    } else {
+      let def = res.list[0];
+      await message.reply({
+        content: "",
+        tts: false,
+        components: [
+          {
+            type: 1,
+            components: [
+              {
+                style: 1,
+                custom_id: `ud_left`,
+                disabled: false,
+                emoji: {
+                  id: null,
+                  name: `◀`,
+                },
+                type: 2,
+              },
+              {
+                style: 2,
+                label: `1/${res.list.length}`,
+                custom_id: `nulll`,
+                disabled: true,
+                type: 2,
+              },
+              {
+                style: 1,
+                custom_id: `ud_right`,
+                disabled: false,
+                emoji: {
+                  id: null,
+                  name: `▶`,
+                },
+                type: 2,
+              },
+              {
+                style: 5,
+                label: `Get the “${def.word}” mug.`,
+                url: `https://urbandictionary.store/products/mug?defid=${def.defid}`,
+                disabled: false,
+                emoji: {
+                  id: null,
+                  name: `🍵`,
+                },
+                type: 2,
+              },
+            ],
           },
-          url: def.permalink,
-        },
-      ],
-    });
-   }
+        ],
+        embeds: [
+          {
+            type: "rich",
+            title: def.word,
+            description: def.definition,
+            color: 0x6969,
+            fields: [
+              {
+                name: "Example:",
+                value: def.example,
+              },
+            ],
+            author: {
+              name: def.author,
+              url: `https://urbandictionary.com/`,
+              icon_url: `https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/u8zidc2jnlhz3n1dcbrr`,
+            },
+            footer: {
+              text: `👍:${def.thumbs_up} | 👎:${def.thumbs_down}`,
+            },
+            url: def.permalink,
+          },
+        ],
+      });
+    }
   },
 };
