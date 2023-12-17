@@ -36,7 +36,7 @@ export default {
         },
       ],
     });
-}
+} else {
 
     let def = res.list[0];
     await message.reply({
@@ -100,5 +100,6 @@ export default {
         },
       ],
     });
+   }
   },
 };
