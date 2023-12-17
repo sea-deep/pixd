@@ -12,6 +12,7 @@ export default {
 
     let res = await urban.search(msg.embeds[0].title);
     let def = res.list[goto];
+    await interaction.deferUpdate();
     await interaction.message.edit({
         content: "",
         tts: false,
@@ -31,7 +32,7 @@ export default {
               },
               {
                 style: 2,
-                label: `1/${res.list.length}`,
+                label: `${goto}/${res.list.length}`,
                 custom_id: `nulll`,
                 disabled: true,
                 type: 2,
