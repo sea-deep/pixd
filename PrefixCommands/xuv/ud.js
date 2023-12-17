@@ -113,6 +113,7 @@ export default {
         ],
       });
     await client.keyv.set(`ud${msg.id}`, args.join(" "), 36000000);
+  console.log(`ud${msg.id}`)
     }
   },
 };
