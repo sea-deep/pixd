@@ -42,7 +42,7 @@ export default {
           footer: {
             text: `👍:${def.thumbs_up} | 👎:${def.thumbs_down}`,
           },
-          url: def.permalimk,
+          url: def.permalink,
         },
       ],
     });
