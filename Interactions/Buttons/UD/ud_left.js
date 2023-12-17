@@ -12,7 +12,7 @@ export default {
 
     let res = await urban.search(msg.embeds[0].title);
     let def = res.list[goto];
-    await interaction.reply({
+    await interaction.message.edit({
       content: "",
       tts: false,
       components: [
