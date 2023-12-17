@@ -1,7 +1,11 @@
+import { Client } from "discord.js";  
 import urban from "relevant-urban";
 
 export default {
   name: 'ud_right',
+   /**  
+     * @param {Client} client  
+     */  
   execute: async (interaction) => {
     const msg = interaction.message;
     const btn = msg.components[0].components[1].label;
