@@ -6,7 +6,7 @@ export default {
    /**  
      * @param {Client} client  
      */  
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     const msg = interaction.message;
     const btn = msg.components[0].components[1].label;
     const currentPage = parseInt(btn.split("/")[0]) - 1;
