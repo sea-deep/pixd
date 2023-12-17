@@ -17,8 +17,9 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
+    let res;
     try {
-    let res = await urban.search(args.join(" "));
+    res = await urban.search(args.join(" "));
     } catch(e) {
    return message.reply({
       content: "",
