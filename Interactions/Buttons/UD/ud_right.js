@@ -65,13 +65,13 @@ export default {
         embeds: [
           {
             type: "rich",
-            title: def.word,
+            title: def.word.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
             description: def.definition,
             color: 0x6969,
             fields: [
               {
                 name: "Example:",
-                value: def.example,
+                value: def.example.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
               },
             ],
             author: {
