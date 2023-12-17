@@ -30,6 +30,7 @@
     "openai": "^3.3.0",
     "mongodb": "^6.1.0",
     "path": "^0.12.7",
+    "relevant-urban": "^2.0.0",
     "play-dl": "^1.9.6",
     "sharp": "^0.32.4"
   },
