@@ -38,9 +38,9 @@ export default {
         ],
       });
     } else {
-      client.keyv.set(`ud${message.id}`, args.join(" "), 3600000);
+      
       let def = res.list[0];
-      await message.reply({
+      let msg =await message.reply({
         content: "",
         tts: false,
         components: [
@@ -112,6 +112,7 @@ export default {
           },
         ],
       });
+    await client.keyv.set(`ud${msg.id}`, args.join(" "), 3600000);
     }
   },
 };
