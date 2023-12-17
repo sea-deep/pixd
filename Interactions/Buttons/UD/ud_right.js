@@ -65,8 +65,8 @@ export default {
         embeds: [
           {
             type: "rich",
-            title: def.word.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
-            description: def.definition,
+            title: def.word,
+            description: def.definition.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
             color: 0x6969,
             fields: [
               {
