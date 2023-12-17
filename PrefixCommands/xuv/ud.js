@@ -40,7 +40,7 @@ export default {
     } else {
       
       let def = res.list[0];
-      let msg =await message.reply({
+      let msg = await message.reply({
         content: "",
         tts: false,
         components: [
