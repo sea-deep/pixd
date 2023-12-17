@@ -32,7 +32,7 @@ export default {
               },
               {
                 style: 2,
-                label: `${goto+1}/${res.list.length}`,
+                label: `${goto + 1}/${res.list.length}`,
                 custom_id: `nulll`,
                 disabled: true,
                 type: 2,
