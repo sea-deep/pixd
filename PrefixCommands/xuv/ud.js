@@ -22,6 +22,40 @@ export default {
     await message.reply({
       content: "",
       tts: false,
+      components: [
+  {
+    type: 1,
+    components: [
+      {
+        style: 1,
+        custom_id: `ud_left`,
+        disabled: false,
+        emoji: {
+          id: null,
+          name: `◀`,
+        },
+        type: 2,
+      },
+      {
+        style: 2,
+        label: `1/full`,
+        custom_id: `nulll`,
+        disabled: true,
+        type: 2,
+      },
+      {
+        style: 1,
+        custom_id: `ud_right`,
+        disabled: false,
+        emoji: {
+          id: null,
+          name: `▶`,
+        },
+        type: 2,
+      },
+    ],
+  },
+],
       embeds: [
         {
           type: "rich",
