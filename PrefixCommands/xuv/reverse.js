@@ -18,10 +18,13 @@ export default {
     */
   execute: async (message, args, client) => {
    const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
-   const images = await GOOGLE_IMG_INVERSE_ENGINE_URL(
+   let images;
+   try {
+    images = await GOOGLE_IMG_INVERSE_ENGINE_URL(
       await getCaptionInput(message),
       { limit: 5 }
     );
+   } catch(e) { return mseg.edit("❌ **Not Found**");}
     client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
