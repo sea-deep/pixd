@@ -68,40 +68,39 @@ export default {
       } else {
         // If the game is not over
         msg.components = [
-          {
-            type: 1,
-            components: [
-              {
-                style: 1,
-                label: `ENTER`,
-                custom_id: `guessWordle`,
-                disabled: false,
-                emoji: {
-                  id: null,
-                  name: `🧐`,
-                },
-                type: 2,
-              },
-            ],
+    {
+      type: 1,
+      components: [
+        {
+          style: 1,
+          label: `ENTER`,
+          custom_id: `guessWordle`,
+          disabled: false,
+          emoji: {
+            id: null,
+            name: `🤔`
           },
-           {
-            type: 1,
-            components: [
-              {
-                style: 4,
-                label: `How to play?`,
-                custom_id: `htpWordle`,
-                disabled: false,
-                emoji: {
-                  id: null,
-                  name: `❓`,
-                },
-                type: 2,
-              },
-             ],
+          type: 2
+        }
+      ]
+    },
+    {
+      type: 1,
+      components: [
+        {
+          style: 4,
+          label: `How to play?`,
+          custom_id: `htpWordle`,
+          disabled: false,
+          emoji: {
+            id: null,
+            name: `❓`
           },
-
-        ];
+          type: 2
+        }
+      ]
+    }
+  ];
         msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
         msg.embeds[0].fields[0].value = newChances;
       }
