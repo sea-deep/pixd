@@ -61,7 +61,7 @@ console.log(69)
           },
         ],
       };
-
+console.log(wordArr);
       if (!wordArr.some((element) => !element.includes('green'))) {
         // If the player wins
         // client.keyv.delete(interaction.message.id);
