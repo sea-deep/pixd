@@ -25,13 +25,13 @@ export default {
       type: 1,
       components: [
         {
-          style: 1,
+          style: 2,
           label: `ENTER`,
           custom_id: `guessWordle`,
           disabled: false,
           emoji: {
             id: null,
-            name: `🤔`
+            name: `🖋️`
           },
           type: 2
         }
