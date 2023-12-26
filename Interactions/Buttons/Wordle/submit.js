@@ -13,12 +13,12 @@ export default {
       const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
-console.log(  descArr[newChances] );
+//. console.log(  descArr[newChances] );
     const value = descArr[newChances].split(" ").map(flag => String.fromCodePoint(flag.codePointAt(0) - 127397)).join("").toLowerCase();
-console.log(value);
+//. console.log(value);
      const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
-     descArr[newChances] = colouredWord;
+     descArr[newChances-1] = colouredWord;
       let newDesc = descArr.reverse().join('\n');
       const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
 
