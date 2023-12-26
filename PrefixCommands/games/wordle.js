@@ -1,3 +1,4 @@
+
 import { Client, Message } from "discord.js";
 import words from '../../Assets/words.json' assert { type: 'json' };
 export default {
@@ -55,8 +56,9 @@ export default {
               },
              ],
           },
-
-        ],
+     ],
+       },
+    ],  
      embeds: [ 
        { 
          type: 'rich', 
@@ -79,7 +81,7 @@ export default {
        }, 
      ], 
    }); 
-  
+
    let key = msg.id; 
    let val = words.words[Math.floor(Math.random() * words.words.length)]; 
    client.keyv.set(key, val);
