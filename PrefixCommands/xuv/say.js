@@ -17,6 +17,7 @@ export default {
     */
   execute: async (message, args, client) => {
     await message.channel.send(args.join(' '));
+    console.log(args.join(' '));
     await message.delete();
 
   }
