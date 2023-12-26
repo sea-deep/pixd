@@ -14,10 +14,10 @@ export default {
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
     const value = descArr[newChances].split(" ").map(flag => String.fromCodePoint(flag.codePointAt(0) - 127397)).join("").toLowerCase();
+     const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
      descArr[newChances] = colouredWord;
       let newDesc = descArr.reverse().join('\n');
-      const wordArr = getColoredWord(answer, value);
       const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
 
       let msg = {
