@@ -14,11 +14,11 @@ export default {
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
 //. console.log(  descArr[newChances] );
-    const value = descArr[newChances].split(" ").map(flag => String.fromCodePoint(flag.codePointAt(0) - 127397)).join("").toLowerCase();
+    const value = descArr[newChances-1].split(" ").map(flag => String.fromCodePoint(flag.codePointAt(0) - 127397)).join("").toLowerCase();
 //. console.log(value);
      const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
-     descArr[newChances-1] = colouredWord;
+     descArr[newChances] = colouredWord;
       let newDesc = descArr.reverse().join('\n');
       const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
 
