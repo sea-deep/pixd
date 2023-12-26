@@ -65,7 +65,8 @@ export default {
         }
       ]
     }
-  ]      embeds: [
+  ],
+     embeds: [
           {
             type: 'rich',
             title: `WORDLE`,
