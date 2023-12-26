@@ -17,7 +17,7 @@ export default {
       try {
         return await button.execute(interaction, client)
       } catch (err) {
-        process.stdout.write(`[${chalk.red("ButtonHandler")}] - ${err}`);
+        console.log("Error in button:", interaction.customId, err);
      try {
         await interaction.reply({ content: '*There was an error while executing that button.*', ephemeral: true });
       } catch(e) {
