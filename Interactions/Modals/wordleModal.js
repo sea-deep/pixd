@@ -26,7 +26,7 @@ export default {
       type: 1,
       components: [
         {
-          style: 1,
+          style: 2,
           label: `EDIT`,
           custom_id: `guessWordle`,
           disabled: false,
@@ -37,7 +37,7 @@ export default {
           type: 2
         },
        {
-                style: 4,
+                style: 1,
                 label: `SUBMIT`,
                 custom_id: `wordleSubmit`,
                 disabled: false,
