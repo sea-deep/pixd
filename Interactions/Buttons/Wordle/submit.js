@@ -17,6 +17,7 @@ export default {
     const value = descArr[oldChances].replace(/:regional_indicator_(\w+):/g, (_, p1) => p1.toUpperCase()).replace(/\s/g, '');
 
      const wordArr = getColoredWord(answer, value);
+    console.log(answer, value);
      const colouredWord = wordArr.join(' ');
 console.log(descArr)
      descArr[newChances] = colouredWord;
