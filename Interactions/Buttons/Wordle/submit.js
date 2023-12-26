@@ -13,9 +13,10 @@ export default {
       const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
- 
+
+ console.log(descArr, oldChances)
+
     const value = descArr[oldChances].replace(/:regional_indicator_(\w+):/g, (_, p1) => p1.toUpperCase()).replace(/\s/g, '').toLowerCase();
-console.log(descArr, oldChances)
      const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
      descArr[newChances] = colouredWord;
