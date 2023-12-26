@@ -13,7 +13,7 @@ export default {
 
     if (words.ALL_WORDS.includes(value.toLowerCase())) {
       const chances = parseInt(interaction.message.embeds[0].fields[0].value);
-      const newChances = oldChances - 1;
+ 
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
       descArr[chances-1] = newWord;
       let newDesc = descArr.reverse().join('\n');
