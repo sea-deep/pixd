@@ -18,10 +18,13 @@ export default {
 
      const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
+console.log(descArr)
      descArr[newChances] = colouredWord;
-      let newDesc = descArr.reverse().join('\n');
-      const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
 
+      let newDesc = descArr.reverse().join('\n');
+
+      const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
+console.log(69)
       let msg = {
         content: `<@${interaction.user.id}>'s game`,
         tts: false,
