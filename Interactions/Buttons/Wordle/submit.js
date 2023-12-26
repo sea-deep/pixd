@@ -13,9 +13,9 @@ export default {
       const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
-  console.log(  descArr[newChances-1], descArr, newChances);
-    const value = descArr[newChances-1].split(" ").map(flag => String.fromCodePoint(flag.codePointAt(0) - 127397)).join("").toLowerCase();
- console.log(value);
+ 
+    const value = descArr[oldChances].replace(/:regional_indicator_(\w+):/g, (_, p1) => p1.toUpperCase()).replace(/\s/g, '');
+
      const wordArr = getColoredWord(answer, value);
      const colouredWord = wordArr.join(' ');
      descArr[newChances] = colouredWord;
