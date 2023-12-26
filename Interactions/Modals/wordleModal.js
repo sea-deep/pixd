@@ -12,10 +12,10 @@ export default {
     let newWord = [...value].map(char => `:regional_indicator_${char.toLowerCase()}:`).join(" ");
 
     if (words.ALL_WORDS.includes(value.toLowerCase())) {
-      const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);
+      const chances = parseInt(interaction.message.embeds[0].fields[0].value);
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
-      descArr[newChances] = newWord;
+      descArr[chances-1] = newWord;
       let newDesc = descArr.reverse().join('\n');
 
       let msg = {
@@ -27,12 +27,12 @@ export default {
       components: [
         {
           style: 1,
-          label: `ENTER`,
+          label: `EDIT`,
           custom_id: `guessWordle`,
           disabled: false,
           emoji: {
             id: null,
-            name: `🤔`
+            name: `🖋️`
           },
           type: 2
         },
@@ -43,7 +43,7 @@ export default {
                 disabled: false,
                 emoji: {
                   id: null,
-                  name: `🖨️`,
+                  name: `🔏`,
                 },
                 type: 2,
               }
@@ -75,7 +75,7 @@ export default {
             fields: [
               {
                 name:  '🎚️ Chances Left :',
-                value: newChances,
+                value: chances,
               },
             ],
           },
