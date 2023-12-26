@@ -14,18 +14,16 @@ export default {
       const newChances = oldChances - 1;
       let descArr = interaction.message.embeds[0].description.split('\n').reverse();
  
-    const value = descArr[oldChances].replace(/:regional_indicator_(\w+):/g, (_, p1) => p1.toUpperCase()).replace(/\s/g, '');
+    const value = descArr[oldChances].replace(/:regional_indicator_(\w+):/g, (_, p1) => p1.toLowerCase()).replace(/\s/g, '');
 
      const wordArr = getColoredWord(answer, value);
-    console.log(answer, value);
      const colouredWord = wordArr.join(' ');
-console.log(descArr)
      descArr[newChances] = colouredWord;
 
       let newDesc = descArr.reverse().join('\n');
 
       const count = descArr.reduce((count, el) => (!el.includes('◻️') ? count + 1 : count), 0);
-console.log(69)
+
       let msg = {
         content: `<@${interaction.user.id}>'s game`,
         tts: false,
@@ -62,17 +60,14 @@ console.log(69)
           },
         ],
       };
-console.log(wordArr);
+
       if (!wordArr.some((element) => !element.includes('green'))) {
         // If the player wins
-        // client.keyv.delete(interaction.message.id);
-      } else if (oldChances == 1) {
+     } else if (oldChances == 1) {
         // Updating the msg object for when the user loses
         msg.embeds[0].fields[0].name = '🦆 You Lost';
         msg.embeds[0].fields[0].value = `The word was \`${answer}\``;
-        // client.keyv.delete(interaction.message.id);
-      } else {
-        // If the game is not over
+           } else {
         msg.components = [
     {
       type: 1,
