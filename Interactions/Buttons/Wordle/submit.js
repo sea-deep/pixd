@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { getColoredWord } from '../../Helpers/helpersWordle.js';
+import { getColoredWord } from '../../../Helpers/helpersWordle.js';
 import words from '../../Assets/words.json' assert {type: "json"};
 export default {
   name: 'wordleSubmit',
