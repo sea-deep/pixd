@@ -120,7 +120,7 @@ export default {
      frequency_penalty: 0, 
    });
    } catch (e) {
-     return msg.reply("*An error occurred* :"+ e.message);
+     return message.reply("*An error occurred* :"+ e.message);
    } 
    response = completion.data.choices[0].message.content.trim(); 
    const ans = response.trim();
