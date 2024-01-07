@@ -1,4 +1,4 @@
 export default {
     prefix: "p!",
-    restricted: []
+    restricted: ["720286639691399218"]
 };
