@@ -1,6 +1,5 @@
 import { AttachmentBuilder, Message } from "discord.js";
-import nodeCraiyon from 'craiyon'; 
-const craiyon = new nodeCraiyon.Client();
+
 export default {
   name: "genesis",
   description: "Generate ai images",
@@ -42,27 +41,23 @@ export default {
         }, 
       ], 
     }); 
-   let response; 
+   let imageBuffer; 
    try { 
-   response = await craiyon.generate({ 
-   prompt: prompt, 
- }); 
+   imageBuffer = await createImage(prompt);
    } catch (e) { 
  console.log(e);
  return mes.edit({ 
          content: `>>> ayyo saar genesis failed :fail:`, 
-         embed: {type: 'rich', description: `${e.message}`}, 
+         embed: {type: 'rich', description: `${e}`}, 
          tts: false    
  }); 
  }
-   const attachments = []; 
- response._images.forEach((base64Image, index) => { 
-   const base64Data = base64Image.base64.replace(/^data:image\/\w+;base64,/, ''); 
-   const imageBuffer = Buffer.from(base64Data, 'base64'); 
-   const fileName = `${prompt}_${index}.jpg`;  
+ 
+    
+   const fileName = `${prompt}.jpg`;  
    let attachment= new AttachmentBuilder(imageBuffer, {name: fileName}); 
- attachments.push(attachment); 
-   }); 
+
+  
   
  let editMessageResponse = await mes.edit({ 
    content: `>>> Genesisation Done! \nHere is your **${prompt}**`, 
@@ -84,8 +79,52 @@ export default {
            ], 
          }, 
        ], 
-   files: attachments 
+   files: [attachment]
  }); 
  return editMessageResponse;
   }
 };
+
+
+
+
+async function createImages(prompt) {
+  const payload = {
+    cfg_scale: 7,
+    clip_guidance_preset: "FAST_BLUE",
+    weight: 1,
+    sampler: "K_DPM_2_ANCESTRAL",
+    samples: 1,
+    prompt: prompt + ', high resolution 4k, DSLR',
+    steps: 30,
+  };
+
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization:
+      "Bearer " +
+      process.env.SD_TOKEN,
+  };
+
+  try {
+    const response = await fetch(
+"https://api.wizmodel.com/sdapi/v1/txt2img", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    const responseData = await response.json();
+    
+    if (responseData.images.length > 0) {
+      const image = responseData.images[0];
+      const data = image.replace(/^data:image\/\w+;base64,/, "");
+      return Buffer.from(data, "base64");
+    } else {
+      throw new Error("No images found in the response.");
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
