@@ -88,7 +88,7 @@ export default {
 
 
 
-async function createImages(prompt) {
+async function createImage(prompt) {
   const payload = {
     cfg_scale: 7,
     clip_guidance_preset: "FAST_BLUE",
