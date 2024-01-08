@@ -41,18 +41,9 @@ export default {
         }, 
       ], 
     }); 
-   let imageBuffer; 
+   
    try { 
-   imageBuffer = await createImage(prompt);
-   } catch (e) { 
- console.log(e);
- return mes.edit({ 
-         content: `>>> ayyo saar genesis failed :fail:`, 
-         embed: {type: 'rich', description: `${e}`}, 
-         tts: false    
- }); 
- }
- 
+   let imageBuffer = await createImage(prompt);
     
    const fileName = `${prompt}.jpg`;  
    let attachment= new AttachmentBuilder(imageBuffer, {name: fileName}); 
@@ -82,6 +73,16 @@ export default {
    files: [attachment]
  }); 
  return editMessageResponse;
+  } catch (e) { 
+ console.log(e);
+ return mes.edit({ 
+         content: `>>> ayyo saar genesis failed :fail:`, 
+         embed: {type: 'rich', description: `${e}`}, 
+         tts: false    
+ }); 
+ }
+ 
+ 
   }
 };
 
@@ -95,8 +96,8 @@ async function createImage(prompt) {
     weight: 1,
     sampler: "K_DPM_2_ANCESTRAL",
     samples: 1,
-    prompt: prompt + ', high resolution 4k, DSLR',
-    steps: 30,
+    prompt: prompt + ', hyper realistic, high resolution 4k quality',
+    steps: 100,
   };
 
   const headers = {
