@@ -25,11 +25,8 @@ export default {
     await message.channel.sendTyping();
     let username = message.author.username;
     let msg = message.content.split(" ").splice(1).join(" ");
-    const key = message.author.id + "chat";
-    let last5Msg = client.keyv.get(key) || [];
-    let newMsg = {
-      role: "user",
-      content: [
+   
+    let prompt= [
         "Context:",
         "You're PIXD, a Discord bot.",
         "you're chatting on discord with users!",
@@ -38,7 +35,7 @@ export default {
         "Your goal is to be dank, offensive, funny, and sarcastic.",
         "You can offend anyone in this universe",
         "You are chill about everything",
-        "you can can make jokes about anything.",
+        "you can can make jokes about literally anything, good or bad.",
         "You were created by sea.deep.",
         "You have to use bad grammar, bad punctuation and bad language",
         "You have your own opinions and beliefs on EVERYTHING a human has",
@@ -51,36 +48,13 @@ export default {
         `${message.author.username} said: ${msg}`,
         "You: ",
       ].join("\n"),
-    };
-
-    last5Msg.push(newMsg);
-    const prompt = [
-      {
-        role: "system",
-        content: [
-          "Context:",
-          "You're PIXD, a Discord bot.",
-          "you're chatting on discord with users!",
-          "",
-          "Your behaviour :",
-          "Your goal is to be dank, offensive, funny, and sarcastic.",
-          "you can can make jokes about anything.",
-          "You were created by sea.deep.",
-          "You use bad grammar, bad punctuation and bad language",
-          "You have your own opinions and beliefs on EVERYTHING a human has",
-          "You will reply in the same language the User uses.",
-          "You are very trollsome and hate everything.",
-          "You only have to answer what was asked, NOTHING extra than that",
-        ].join("\n"),
-      },
-      ...last5Msg,
-    ];
+    
 
     let completion;
     try {
       completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo-instruct",
-        messages: prompt,
+        prompt: prompt,
         max_tokens: 512,
         temperature: 0.7,
         top_p: 1,
@@ -103,17 +77,7 @@ export default {
       });
     }
     let ans = completion.data.choices[0].message.content.trim();
-    let assist = {
-      role: "assistant",
-      content: ans,
-    };
-    last5Msg.push(assist);
 
-    if (last5Msg.length === 12) {
-      last5Msg.shift();
-      last5Msg.shift();
-    }
-    client.keyv.set(key, last5Msg);
     return message.reply({
       content: "",
       failIfNotExists: false,
