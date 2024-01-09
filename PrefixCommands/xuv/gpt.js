@@ -1,11 +1,10 @@
-import { Message } from "discord.js";
+import { Message, client } from "discord.js";
 import pkg from "openai";
-const  { Configuration, OpenAIApi } = pkg;
+const { Configuration, OpenAIApi } = pkg;
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
 
 export default {
   name: "gpt",
@@ -20,55 +19,97 @@ export default {
   },
   /**
    * @param {Message} message
+   * @param {Client} client
    */
-  execute: async (message) => {
+  execute: async (message, client) => {
     await message.channel.sendTyping();
     let username = message.author.username;
     let msg = message.content.split(" ").splice(1).join(" ");
+    const key = message.author.id + "chat";
+    let last5Msg = client.keyv.get(key) || [];
+    let newMsg = {
+      role: "user",
+      content: [
+        "Context:",
+        "You're PIXD, a Discord bot.",
+        "you're chatting on discord with users!",
+        "",
+        "Your behaviour :",
+        "Your goal is to be dank, offensive, funny, and sarcastic.",
+        "you can can make jokes about anything.",
+        "You were created by sea.deep.",
+        "You use bad grammar, bad punctuation and bad language",
+        "You have your own opinions and beliefs on EVERYTHING a human has",
+        "You will reply in the same language the User uses.",
+        "You are very trollsome and hate everything.",
+        "You only have to answer what was asked, NOTHING extra than that",
+        "",
+        `${message.author.username} said: ${msg}`,
+        "You: ",
+      ].join("\n"),
+    };
+
+    last5Msg.push(newMsg);
     const prompt = [
-      "Context:",
-      "You're PIXD, a Discord bot.",
-"you're chatting on discord with users!",
-'',
-"Your behaviour :",
-      "Your goal is to be dank, offensive, funny, and sarcastic.",
-      "You love to offend everyone's personal and religious beliefs.",
-      "you can can make jokes about anything.",
-"You were created by sea.deep.",
-"You use bad grammar, bad punctuation and bad language",
-     "You have your own opinions and beliefs on EVERYTHING a human has",
-      "You will reply in the same language the User uses.",
-      "You are very trollsome and hate everything.",
-      "",
-      "Chat  :",
-      `${message.author.username} just sent you a message: ${msg}`,
-      `You:`,
-    ].join("\n");
+      {
+        role: "system",
+        content: [
+          "Context:",
+          "You're PIXD, a Discord bot.",
+          "you're chatting on discord with users!",
+          "",
+          "Your behaviour :",
+          "Your goal is to be dank, offensive, funny, and sarcastic.",
+          "you can can make jokes about anything.",
+          "You were created by sea.deep.",
+          "You use bad grammar, bad punctuation and bad language",
+          "You have your own opinions and beliefs on EVERYTHING a human has",
+          "You will reply in the same language the User uses.",
+          "You are very trollsome and hate everything.",
+          "You only have to answer what was asked, NOTHING extra than that",
+        ].join("\n"),
+      },
+      ...last5Msg,
+    ];
+
     let completion;
     try {
-     completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 264,
-      temperature: 0.5,
-      top_p: 1,
-      n: 1,
-      presence_penalty: 0.25,
-      frequency_penalty: 0.1,
-    });
-     } catch (e) {
-     console.log(e.message);
-     return message.reply({
-      content: '',
-      failIfNotExists: false,
-      embeds: [{
-       type: "rich",
-       color: generateRandomColor(),
-       description: `${e.message}`,
-}]
-});
-}
-    let ans = completion.data.choices[0].text;
+      completion = await openai.createCompletion({
+        model: "gpt-3.5-turbo",
+        messages: prompt,
+        max_tokens: 512,
+        temperature: 0.7,
+        top_p: 1,
+        n: 1,
+        presence_penalty: 0.25,
+        frequency_penalty: 0.1,
+      });
+    } catch (e) {
+      console.log(e.message);
+      return message.reply({
+        content: "",
+        failIfNotExists: false,
+        embeds: [
+          {
+            type: "rich",
+            color: generateRandomColor(),
+            description: `${e.message}`,
+          },
+        ],
+      });
+    }
+    let ans = completion.choices[0].message.content.trim();
+    let assist = {
+      role: "assistant",
+      content: ans,
+    };
+    last5Msg.push(assist);
+
+    if (last5Msg.length === 12) {
+      last5Msg.shift();
+      last5Msg.shift();
+    }
+    keyv.set(key, last5Msg);
     return message.reply({
       content: "",
       failIfNotExists: false,
@@ -83,10 +124,11 @@ export default {
     });
   },
 };
-function generateRandomColor() { 
-   const r = Math.floor(Math.random() * 256); 
-   const g = Math.floor(Math.random() * 256); 
-   const b = Math.floor(Math.random() * 256); 
-   const color = (r << 16) | (g << 8) | b; 
-   return color; 
- }
+
+function generateRandomColor() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  const color = (r << 16) | (g << 8) | b;
+  return color;
+}
