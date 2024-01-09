@@ -74,7 +74,7 @@ export default {
 
     let completion;
     try {
-      completion = await openai.createCompletion({
+      completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: prompt,
         max_tokens: 512,
