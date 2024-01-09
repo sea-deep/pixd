@@ -1,4 +1,4 @@
-import { Message, client } from "discord.js";
+import { Message, Client } from "discord.js";
 import pkg from "openai";
 const { Configuration, OpenAIApi } = pkg;
 const configuration = new Configuration({
@@ -21,7 +21,7 @@ export default {
    * @param {Message} message
    * @param {Client} client
    */
-  execute: async (message, client) => {
+  execute: async (message,args, client) => {
     await message.channel.sendTyping();
     let username = message.author.username;
     let msg = message.content.split(" ").splice(1).join(" ");
