@@ -52,7 +52,7 @@ export default {
 
     let completion;
     try {
-      completion = await openai.createChatCompletion({
+      completion = await openai.createCompletion({
         model: "gpt-3.5-turbo-instruct",
         prompt: prompt,
         max_tokens: 512,
