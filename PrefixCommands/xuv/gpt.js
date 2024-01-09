@@ -77,7 +77,7 @@ const prompt = `
         ],
       });
     }
-    let ans = completion.data.choices[0].text`;
+    let ans = completion.data.choices[0].text;
 
     return message.reply({
       content: "",
