@@ -54,7 +54,7 @@ const prompt = `
 
     let completion;
     try {
-      completion = await openai.createCompletion({
+      completion = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt: prompt,
         max_tokens: 512,
