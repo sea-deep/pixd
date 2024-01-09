@@ -98,7 +98,7 @@ export default {
         ],
       });
     }
-    let ans = completion.choices[0].message.content.trim();
+    let ans = completion.data.choices[0].message.content.trim();
     let assist = {
       role: "assistant",
       content: ans,
