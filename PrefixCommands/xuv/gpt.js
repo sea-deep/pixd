@@ -77,7 +77,7 @@ const prompt = `
         ],
       });
     }
-    let ans = `${completion.data.choices}`;
+    let ans = `${JSON.stringify(completion.data.choices, null, 2)}`;
 
     return message.reply({
       content: "",
