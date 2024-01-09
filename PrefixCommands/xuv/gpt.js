@@ -109,7 +109,7 @@ export default {
       last5Msg.shift();
       last5Msg.shift();
     }
-    keyv.set(key, last5Msg);
+    client.keyv.set(key, last5Msg);
     return message.reply({
       content: "",
       failIfNotExists: false,
