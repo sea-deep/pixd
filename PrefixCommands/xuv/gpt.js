@@ -79,7 +79,7 @@ export default {
     let completion;
     try {
       completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo-instruct",
         messages: prompt,
         max_tokens: 512,
         temperature: 0.7,
