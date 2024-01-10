@@ -91,7 +91,7 @@ async function createImage(prompt) {
     weight: 1,
     sampler: "K_DPM_2_ANCESTRAL",
     samples: 1,
-    prompt: `${prompt}, hyper realistic, high resolution 4k quality`,
+    prompt: `${prompt}, high-resolution 4k quality`,
     steps: 100,
   };
 
