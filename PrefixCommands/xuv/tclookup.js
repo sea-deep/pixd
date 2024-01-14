@@ -17,12 +17,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let resp;
-    try {
-      resp = await lookup(args.join(' '));
-    } catch (e) { console.log(e)
-      return message.reply("An error occurred...\nMake sure you're putting the number in the international format `+91XXXXXXXXXX`");
-    }
+    let resp = await lookup(args.join(' '));
     return message.reply({
       content: "",
       embeds: [{
@@ -52,6 +47,6 @@ async function lookup(number) {
 
     return data;
   } catch (e) {
-    throw new Error("Error occurred? ", e);
+    console log("Error occurred? ", e);
   }
 }
