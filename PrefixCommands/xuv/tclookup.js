@@ -35,8 +35,9 @@ async function lookup(number) {
       installationId: process.env['TRUECALLER']
     };
 console.log(searchData)
+   let response;
     try {
-    const response = await truecallerjs.search(searchData);
+     response = await truecallerjs.search(searchData);
 } catch (e) {
     console.log("Error occurred? ", e);
   }
