@@ -34,13 +34,14 @@ async function lookup(number) {
       number: number,
       installationId: process.env['TRUECALLER']
     };
-console.log(searchData)
+// console.log(searchData)
    let response;
     try {
      response = await truecallerjs.search(searchData);
 } catch (e) {
     console.log("Error occurred? ", e);
   }
+   console.log(response.data.data)
     const r = response.data.data[0];
 
     const data = [
