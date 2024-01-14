@@ -26,7 +26,7 @@ export default {
   return;
 }
     let resp = await lookup(args.join(''));
-    await client.keyv.set("tctimer", true, 300000);
+    await client.keyv.set("tctimer", true, 30);
     return message.reply({
       content: "",
       embeds: [{
