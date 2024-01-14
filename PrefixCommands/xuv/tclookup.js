@@ -1,4 +1,3 @@
-import truecallerjs from "truecallerjs";
 import { Client, Message } from "discord.js";
 
 export default {
