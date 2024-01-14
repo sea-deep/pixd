@@ -5,7 +5,7 @@ export default {
   name: "truecaller",
   description: "Lookup Truecaller",
   aliases: ["tc"],
-  usage: "tc +916289522067",
+  usage: "tc +91XXXXXXZZZX",
   guildOnly: false,
   args: true,
   permissions: {
@@ -20,8 +20,8 @@ export default {
     let resp;
     try {
       resp = await lookup(args.join(' '));
-    } catch (e) {
-      return message.reply("An error occurred...?\nMake sure you're putting the number in the international format `+91XXXXXXXXXX`?");
+    } catch (e) { console.log(e)
+      return message.reply("An error occurred...\nMake sure you're putting the number in the international format `+91XXXXXXXXXX`");
     }
     return message.reply({
       content: "",
