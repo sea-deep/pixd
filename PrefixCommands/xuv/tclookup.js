@@ -17,7 +17,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let resp = await lookup(args.join(' '));
+    let resp = await lookup(args.join(''));
     return message.reply({
       content: "",
       embeds: [{
@@ -32,12 +32,12 @@ async function lookup(number) {
   try {
     const searchData = {
       number: number,
-      installationId: process.env.TRUECALLER
+      installationId: process.env['TRUECALLER']
     };
 
     const response = await truecallerjs.search(searchData);
 
-    const r = response?.data?.data[0];
+    const r = response.data.data[0];
 
     const data = [
       `**Name**: ${r?.name}`,
