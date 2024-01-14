@@ -16,7 +16,17 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
+    let timer = client.keyv.get("tctimer");
+    if (timer) {
+  message.reply("We're on cooldown for a few seconds, please wait...").then(cooldownMessage => {
+    setTimeout(() => {
+      cooldownMessage.delete().catch(console.error);
+    }, 3000);
+  });
+  return;
+}
     let resp = await lookup(args.join(''));
+    await client.keyv.set("tctimer", true, 300000);
     return message.reply({
       content: "",
       embeds: [{
@@ -54,11 +64,11 @@ async function lookup(number) {
     const data = await response.json();
     //  console.log(JSON.stringify(data.data[0], null, 2))
     let r = data.data[0];
-    let out = [
-      `**Name**: ${r?.name}`,
-      `**City**: ${r?.addresses[0]?.city}, ${r?.phones[0].countryCode}`,
-      `**Carrier**: ${r?.phones[0]?.carrier}`,
-    ].join("\n");
+let out = [
+  `**Name**: ${r?.name || "Not available"}`,
+  `**City**: ${r?.addresses[0]?.city || "Not available"}, ${r?.phones[0]?.countryCode || "Not available"}`,
+  `**Carrier**: ${r?.phones[0]?.carrier || "Not available"}`,
+].join("\n");
     return out;
   } catch (error) {
     console.error("Error:", error.message);
