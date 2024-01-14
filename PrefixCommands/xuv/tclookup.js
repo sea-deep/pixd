@@ -47,6 +47,6 @@ async function lookup(number) {
 
     return data;
   } catch (e) {
-    console log("Error occurred? ", e);
+    console.log("Error occurred? ", e);
   }
 }
