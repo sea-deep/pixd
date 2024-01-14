@@ -29,14 +29,17 @@ export default {
 };
 
 async function lookup(number) {
-  try {
+
     const searchData = {
       number: number,
       installationId: process.env['TRUECALLER']
     };
-
+console.log(searchData)
+    try {
     const response = await truecallerjs.search(searchData);
-
+} catch (e) {
+    console.log("Error occurred? ", e);
+  }
     const r = response.data.data[0];
 
     const data = [
@@ -46,7 +49,5 @@ async function lookup(number) {
     ].join("\n");
 
     return data;
-  } catch (e) {
-    console.log("Error occurred? ", e);
-  }
+  
 }
