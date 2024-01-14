@@ -41,7 +41,7 @@ async function lookup(number) {
 } catch (e) {
     console.log("Error occurred? ", e);
   }
-   console.log(response.data.data)
+   console.log(JSON.stringify(response,null, 2))
     const r = response.data.data[0];
 
     const data = [
