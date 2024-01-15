@@ -74,10 +74,12 @@ export default {
       }
 
       const searchMsg = await message.react("<:search:1090725319884951623>");
+    try {
       const search = await playDL.search(query, {
         limit: 1,
         source: searchSource,
       });
+    } catch(e) { console.log("Error while searching song", e.message")}
 
       await message.reactions.cache
         .get("1090725319884951623")
