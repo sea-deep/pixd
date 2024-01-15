@@ -31,7 +31,7 @@ async function play(guild, song, client) {
   const serverQueue = client.queue.get(guild.id);
   if (!song) {
     serverQueue.timeoutID = setTimeout(() => {
-      if (getVoiceConnection(guild.id) != undefined) {
+      if (getVoiceConnection(guild.id) !== undefined) {
         destroy(guild, client);
         serverQueue.timeoutID = undefined; //after timeout goes off, reset timeout value.
       } else {
@@ -39,72 +39,85 @@ async function play(guild, song, client) {
       }
     }, 10 * 60 * 1000); //10 min idle
 
-    if (serverQueue.loop == true) {
+    if (serverQueue.loop === true) {
       serverQueue.loop = false;
     }
     return;
   }
+
   clearTimeout(serverQueue.timeoutID);
   serverQueue.timeoutID = undefined;
 
-  let stream;
-  if (song.source === "yt" && song.seek > 0) {
-    stream = await playDL.stream(song.url, { seek: song.seek });
-  } else {
-    stream = await playDL.stream(song.url);
-  }
-
-  let resource = createAudioResource(stream.stream, {
-    inputType: stream.type,
-  });
-  serverQueue.connection.subscribe(serverQueue.player);
-  serverQueue.player.play(resource);
-
-  var errorListener = (error) => {
-    console.error(`Error: ${error.message} with resource ${error.resource.title}`);
-  };
-  serverQueue.player.on("error", errorListener);
-  serverQueue.player.once(AudioPlayerStatus.Idle, () => {
-    serverQueue.player.removeListener("error", errorListener);
-    if (serverQueue.loop && serverQueue.keep) {
-      serverQueue.songs.push(serverQueue.songs.shift());
+  try {
+    let stream;
+    if (song.source === "yt" && song.seek > 0) {
+      stream = await playDL.stream(song.url, { seek: song.seek });
     } else {
-      serverQueue.songs.shift();
-      if (serverQueue.loop === true) {
-        serverQueue.keep = true;
+      stream = await playDL.stream(song.url);
+    }
+
+    let resource = createAudioResource(stream.stream, {
+      inputType: stream.type,
+    });
+    serverQueue.connection.subscribe(serverQueue.player);
+    serverQueue.player.play(resource);
+
+    var errorListener = (error) => {
+      console.error(`Error: ${error.message} with resource ${error.resource.title}`);
+    };
+    serverQueue.player.on("error", errorListener);
+    serverQueue.player.once(AudioPlayerStatus.Idle, () => {
+      serverQueue.player.removeListener("error", errorListener);
+      if (serverQueue.loop && serverQueue.keep) {
+        serverQueue.songs.push(serverQueue.songs.shift());
+      } else {
+        serverQueue.songs.shift();
+        if (serverQueue.loop === true) {
+          serverQueue.keep = true;
+        }
+      }
+      play(guild, serverQueue.songs[0], client);
+    });
+
+    if (serverQueue.loop === true) {
+      // Handle loop logic here if needed
+    } else {
+      if (song.seek > 0) {
+        // Handle seek logic here if needed
+      } else {
+        serverQueue.textChannel.send({
+          content: "**Now Playing**",
+          tts: false,
+          embeds: [
+            {
+              type: "rich",
+              title: "",
+              description: "",
+              color: 0x462,
+              author: {
+                name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+                icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+              },
+            },
+          ],
+        });
       }
     }
-    play(guild, serverQueue.songs[0], client);
-  });
-
-  if (serverQueue.loop == true) {
-  } else {
-    if (song.seek > 0) {
-    } else {
-      serverQueue.textChannel.send({
-        content: "**Now Playing**",
-        tts: false,
-        embeds: [
-          {
-            type: "rich",
-            title: "",
-            description: "",
-            color: 0x462,
-            author: {
-              name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-              icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
-            },
-          },
-        ],
-      });
-    }
+  } catch (error) {
+    console.error(`Error while playing: ${error.message}`);
   }
 }
 
 function destroy(guild, client) {
-  getVoiceConnection(guild.id).destroy();
-  client.queue.delete(guild.id);
+  try {
+    getVoiceConnection(guild.id).destroy();
+    client.queue.delete(guild.id);
+  } catch (error) {
+    console.error(`Error while destroying connection: ${error.message}`);
+  }
 }
+
+
 
 export default {
   name: "play",
