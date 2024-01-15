@@ -79,7 +79,8 @@ export default {
         limit: 1,
         source: searchSource,
       });
-    } catch(e) { console.log("Error while searching song", e.message")}
+    } catch(e) { console.log("Error while searching song", e.message)
+}
 
       await message.reactions.cache
         .get("1090725319884951623")
