@@ -16,9 +16,10 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
+   try{
     await message.channel.send(args.join(' '));
     console.log(args.join(' '));
     await message.delete();
-
+   } catch(e) { console.log("Say Command Error handled");}
   }
 };
