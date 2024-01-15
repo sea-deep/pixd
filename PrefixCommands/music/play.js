@@ -79,7 +79,9 @@ export default {
         limit: 1,
         source: searchSource,
       });
-    } catch(e) { console.log("Error while searching song", e.message)
+    } catch(e) { console.log("Error while searching song", e.message);
+    return message.react("<:error:1090721649621479506>");
+
 }
 
       await message.reactions.cache
@@ -109,7 +111,11 @@ export default {
 
       if (source === "yt") {
         if (type === "video") {
+          try {
           const video = await playDL.video_info(args[0]);
+          } catch(e) { console.log("error while getting video info", e.message); 
+ return message.react("<:error:1090721649621479506>");
+}
           song = {
             title: video.video_details.title,
             url: video.video_details.url,
@@ -308,7 +314,13 @@ async function play(guild, song, client) {
   try {
     let stream;
     if (song.source === "yt" && song.seek > 0) {
+      try {
       stream = await playDL.stream(song.url, { seek: song.seek });
+      } catch (e) {
+     console.log("Caught an error while getting stream:", e.message);
+     return message.react("<:error:1090721649621479506>");
+   
+     }
     } else {
       try {
       stream = await playDL.stream(song.url);
