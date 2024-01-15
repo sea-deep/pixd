@@ -359,8 +359,6 @@ async function play(guild, song, client) {
     }
   } catch (error) {
     console.error(`Error while playing: ${error.message}`);
-    return message.react("<:error:1090721649621479506>");
-    }
   }
 }
 
