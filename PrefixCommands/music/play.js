@@ -310,7 +310,13 @@ async function play(guild, song, client) {
     if (song.source === "yt" && song.seek > 0) {
       stream = await playDL.stream(song.url, { seek: song.seek });
     } else {
+      try {
       stream = await playDL.stream(song.url);
+     } catch (e) {
+     console.log("Caught an error while getting stream:", e.message);
+     return message.react("<:error:1090721649621479506>");
+   
+}
     }
 
     let resource = createAudioResource(stream.stream, {
