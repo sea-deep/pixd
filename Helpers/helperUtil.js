@@ -157,6 +157,26 @@ export class MongodbKeyValue {
       throw new Error('Invalid TTL value. TTL must be a positive number or null.');
     }
   }
+  /**
+   * Get the remaining time to live (TTL) for a key in hours, minutes, and seconds.
+   * @param {string} key - The key.
+   * @returns {Object|null} An object with hours, minutes, and seconds properties representing the remaining TTL, or null if the key doesn't exist or has no expiration.
+   */
+  async getRemainingTTL(key) {
+    const entry = await this.collection.findOne({ key });
+
+    if (entry && entry.ttl !== null) {
+      const currentTime = Date.now();
+      const remainingTime = Math.max(0, entry.ttl - currentTime);
+      const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+      return { hours, minutes, seconds };
+    }
+
+    return null;
+  }
 
   /**
    * Close the MongoDB connection.
