@@ -82,8 +82,9 @@ export default {
             }
 
             const searchMsg = await message.react("<:search:1090725319884951623>");
+           let search;
             try {
-               const search = await playDL.search(query, {
+                search = await playDL.search(query, {
                   limit: 1,
                   source: searchSource,
                });
