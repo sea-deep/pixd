@@ -106,6 +106,6 @@ export default {
       ],
     });
     await client.keyv.set(message.id, items, 1800);
-    console.log(items)
+    console.log("messaging Id", message.id)
   },
 };
