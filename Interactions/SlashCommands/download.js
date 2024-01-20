@@ -62,8 +62,8 @@ export default {
     const apiUrl = 'https://filepursuit.p.rapidapi.com/';
     const response = await fetch(`${apiUrl}?${params}`, options);
     const results = await response.json();
-
-    if (results.status !== "success") return interaction.reply("**❌ | No results found for that search query...**");
+    console.log(results);
+    if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
     const items = Array.from(
       { length: Math.ceil(results.files_found.length / 10) },
