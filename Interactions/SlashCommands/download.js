@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, client } from "discord.js";
+import { ChatInputCommandInteraction, Client } from "discord.js";
 
 export default {
   data: {
