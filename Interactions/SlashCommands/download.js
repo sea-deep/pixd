@@ -65,12 +65,10 @@ export default {
     console.log(results);
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
-    const keysToKeep = ['file_name', 'file_size', 'time_ago', 'file_link', 'file_type'];
-
-
+   
   const items = [];
     for (let i = 0; i < results.files_found.length; i += 10) {
-        items.push(arr.slice(i, i + 10));
+        items.push(results.files_found.slice(i, i + 10));
     }
 
     let fields = [];
