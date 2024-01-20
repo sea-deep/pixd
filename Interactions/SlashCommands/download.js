@@ -100,6 +100,7 @@ export default {
           description: "",
           color: 0x2f9d97,
           fields: fields,
+          footer: {text: "Note: Some links may not work!"}
         },
       ],
     });
