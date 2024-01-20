@@ -51,7 +51,7 @@ export default {
       ...(type !== null && { type: type }),
       ...(sort !== null && { sort: sort }),
     });
-    
+
     const options = {
       method: "GET",
       headers: {
@@ -65,10 +65,20 @@ export default {
     console.log(results);
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
-    const items = Array.from(
-      { length: Math.ceil(results.files_found.length / 10) },
-      (_, index) => results.files_found.slice(index * 10, (index + 1) * 10)
-    );
+    const keysToKeep = ['file_name', 'file_size', 'time_ago', 'file_link', 'file_type'];
+
+const items = Array.from(
+  { length: Math.ceil(results.files_found.length / 10) },
+  (_, index) => results.files_found.slice(index * 10, (index + 1) * 10)
+    .map(obj => 
+      keysToKeep.reduce((acc, key) => {
+        if (obj.hasOwnProperty(key)) {
+          acc[key] = obj[key];
+        }
+        return acc;
+      }, {})
+    )
+);
 
     let fields = [];
     items[0].forEach((item, index) => {
@@ -79,7 +89,7 @@ export default {
     });
 
     let disabled = items.length < 2;
-    return interaction.reply({
+   let message = await interaction.reply({
       ephemeral: true,
       content: `Found **${results.files_found.length} results.**`,
       tts: false,
@@ -104,5 +114,6 @@ export default {
         },
       ],
     });
+    await client.keyv.set(message.id, items, 1800);
   },
 };
