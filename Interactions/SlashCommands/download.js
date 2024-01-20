@@ -65,6 +65,7 @@ export default {
    // console.log(results);
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
+const filesFound = results.files_found.slice(0, 30);
 
   let fields = Array.from({ length: Math.ceil(filesFound.length / 10) }, (_, chunkIndex) => {
     const startIndex = chunkIndex * 10;
