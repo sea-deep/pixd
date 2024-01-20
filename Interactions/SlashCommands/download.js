@@ -115,5 +115,6 @@ const items = Array.from(
       ],
     });
     await client.keyv.set(message.id, items, 1800);
+    console.log(items)
   },
 };
