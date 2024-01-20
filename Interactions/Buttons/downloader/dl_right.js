@@ -13,6 +13,8 @@ import { Client } from "discord.js";
     let goto = currentPage + 1;
     let disabled = goto === maxPage;
     let items = await client.keyv.get(msg.id);
+    console.log(items)
+    console.log("buttoning jd", msg.id)
     let fields = [];
     items[goto].forEach((item, index) => {
       fields.push({
