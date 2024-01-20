@@ -66,58 +66,34 @@ export default {
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
 
-  const chunks = [];
-    for (let i = 0; i < results.files_found.length; i += 15) {
-        chunks.push(results.files_found.slice(i, i + 15));
-    }
+  let fields = Array.from({ length: Math.ceil(filesFound.length / 10) }, (_, chunkIndex) => {
+    const startIndex = chunkIndex * 10;
+    return filesFound.slice(startIndex, startIndex + 10).map((item, index) => ({
+        name: `${startIndex + index + 1}. ${item.file_name}`,
+        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size : "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
+    }));
+}).filter(chunk => chunk.length > 0);
 
-    let fields = [];
-    chunks[0].forEach((item, index) => {
-      fields.push({
-        name: `${index+1}. ${item.file_name}`,
-        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
-      });
-    });
+await interaction.deferReply({
+  ephemeral: true
+});
 
-    await interaction.deferReply({ ephemeral: true });
-    await interaction.followUp({
+fields.forEach((field,i) =>{
+  await interaction.followUp({
       ephemeral: true,
-      content: `Found **${results.files_found.length} results.**`,
+      content: i===0?`Found **${results.files_found.length} results.**`:"",
       tts: false,
       embeds: [
         {
           type: "rich",
-          title: "🔍 "+interaction.options.getString("query"),
+          title: i===0?"🔍 "+interaction.options.getString("query"):"",
           description: "",
           color: 0x2f9d97,
-          fields: fields,
+          fields: field,
           footer: {text: "Note: Some links may not work!"}
         },
       ],
     });
-    if(chunks.length == 2) {
-      let fields2 = [];
-    chunks[1].forEach((item, index) => {
-      fields2.push({
-        name: `${index+1}. ${item.file_name}`,
-        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
-      });
-    });
-    await interaction.followUp({
-      ephemeral: true,
-      content: ``,
-      tts: false,
-      embeds: [
-        {
-          type: "rich",
-          title: "",
-          description: "",
-          color: 0x2f9d97,
-          fields: fields,
-          footer: {text: "Note: Some links may not work!"}
-        },
-      ],
-    });
-    }
-  },
+});
+},
 };
