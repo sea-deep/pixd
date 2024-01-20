@@ -79,7 +79,7 @@ export default {
       });
     });
 
-    let disabled = items.length < 2;
+  
     await interaction.reply({
       ephemeral: true,
       content: `Found **${results.files_found.length} results.**`,
