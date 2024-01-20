@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, CommandInteractionOptionResolver } from "discord.js";
+import { ChatInputCommandInteraction, Client } from "discord.js";
 
 export default {
   data: {
@@ -39,21 +39,20 @@ export default {
     ],
   },
   /**
-   * @param {CommandInteraction} interaction
+   * @param {ChatInputCommandInteraction} interaction
    * @param {Client} client
    */
   execute: async (interaction, client) => {
-    const options = new CommandInteractionOptionResolver(client, interaction.options.data);
-    let type = options.getString("type");
-    let sort = options.getString("sort");
+    let type = interaction.options.getString("type");
+    let sort = interaction.options.getString("sort");
 
     const params = new URLSearchParams({
-      q: options.getString("query"),
+      q: interaction.options.getString("query"),
       ...(type !== null && { type: type }),
       ...(sort !== null && { sort: sort }),
     });
 
-    const requestOptions = {
+    const options = {
       method: "GET",
       headers: {
         "X-RapidAPI-Key": process.env.RAPID_KEY,
@@ -61,7 +60,7 @@ export default {
       },
     };
     const apiUrl = 'https://filepursuit.p.rapidapi.com/';
-    const response = await fetch(`${apiUrl}?${params}`, requestOptions);
+    const response = await fetch(`${apiUrl}?${params}`, options);
     const results = await response.json();
    // console.log(results);
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
@@ -76,7 +75,7 @@ export default {
     chunks[0].forEach((item, index) => {
       fields.push({
         name: `${index+1}. ${item.file_name}`,
-        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** \`Click here\``,
+        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
       });
     });
 
@@ -88,7 +87,7 @@ export default {
       embeds: [
         {
           type: "rich",
-          title: "🔍 "+options.getString("query"),
+          title: "🔍 "+interaction.options.getString("query"),
           description: "",
           color: 0x2f9d97,
           fields: fields,
@@ -101,7 +100,7 @@ export default {
     chunks[1].forEach((item, index) => {
       fields2.push({
         name: `${index+1}. ${item.file_name}`,
-        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** \`Click here\``,
+        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
       });
     });
     await interaction.followUp({
