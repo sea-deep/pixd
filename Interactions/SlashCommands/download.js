@@ -79,9 +79,9 @@ await interaction.deferReply({
 });
 
 fields.forEach((field,i) =>{
-  await interaction.followUp({
+  interaction.followUp({
       ephemeral: true,
-      content: i===0?`Found **${results.files_found.length} results.**`:"",
+      content: `${i===0?`Found **${results.files_found.length} results.**`:""} (${i+1}/${fields.length})`,
       tts: false,
       embeds: [
         {
