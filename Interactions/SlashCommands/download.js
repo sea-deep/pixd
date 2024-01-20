@@ -71,10 +71,10 @@ export default {
     );
 
     let fields = [];
-    items[0].forEach((item) => {
+    items[0].forEach((item, index) => {
       fields.push({
-        name: item.file_name,
-        value: `**Type:** \`${item.file_type}\` • **Size:** \`${item.file_size}\` • **Added ${item.times_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
+        name: `${index+1}. ${item.file_name}`,
+        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
       });
     });
 
