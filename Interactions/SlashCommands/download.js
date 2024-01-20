@@ -67,8 +67,8 @@ export default {
 
 
   const chunks = [];
-    for (let i = 0; i < results.files_found.length; i += 25) {
-        chunks.push(results.files_found.slice(i, i + 25));
+    for (let i = 0; i < results.files_found.length; i += 15) {
+        chunks.push(results.files_found.slice(i, i + 15));
     }
 
     let fields = [];
