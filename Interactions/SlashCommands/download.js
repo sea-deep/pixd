@@ -67,18 +67,11 @@ export default {
 
     const keysToKeep = ['file_name', 'file_size', 'time_ago', 'file_link', 'file_type'];
 
-const items = Array.from(
-  { length: Math.ceil(results.files_found.length / 10) },
-  (_, index) => results.files_found.slice(index * 10, (index + 1) * 10)
-    .map(obj => 
-      keysToKeep.reduce((acc, key) => {
-        if (obj.hasOwnProperty(key)) {
-          acc[key] = obj[key];
-        }
-        return acc;
-      }, {})
-    )
-);
+
+  const items = [];
+    for (let i = 0; i < results.files_found.length; i += 10) {
+        items.push(arr.slice(i, i + 10));
+    }
 
     let fields = [];
     items[0].forEach((item, index) => {
