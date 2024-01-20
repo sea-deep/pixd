@@ -79,8 +79,8 @@ export default {
       });
     });
 
-
-    await interaction.reply({
+    await interaction.deferReply({ ephemeral: true });
+    await interaction.followUp({
       ephemeral: true,
       content: `Found **${results.files_found.length} results.**`,
       tts: false,
