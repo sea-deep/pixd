@@ -51,7 +51,7 @@ export default {
       ...(type !== null && { type: type }),
       ...(sort !== null && { sort: sort }),
     });
-
+    
     const options = {
       method: "GET",
       headers: {
@@ -59,7 +59,7 @@ export default {
         "X-RapidAPI-Host": "filepursuit.p.rapidapi.com",
       },
     };
-
+    const apiUrl = 'https://filepursuit.p.rapidapi.com/';
     const response = await fetch(`${apiUrl}?${params}`, options);
     const results = await response.json();
 
