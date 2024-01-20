@@ -62,17 +62,17 @@ export default {
     const apiUrl = 'https://filepursuit.p.rapidapi.com/';
     const response = await fetch(`${apiUrl}?${params}`, options);
     const results = await response.json();
-    console.log(results);
+   // console.log(results);
     if (results.status !== "success") return interaction.reply({content: "**❌ | No results found for that search query...**", ephemeral: true});
 
-   
-  const items = [];
-    for (let i = 0; i < results.files_found.length; i += 10) {
-        items.push(results.files_found.slice(i, i + 10));
+
+  const chunks = [];
+    for (let i = 0; i < results.files_found.length; i += 25) {
+        chunks.push(results.files_found.slice(i, i + 25));
     }
 
     let fields = [];
-    items[0].forEach((item, index) => {
+    chunks[0].forEach((item, index) => {
       fields.push({
         name: `${index+1}. ${item.file_name}`,
         value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
@@ -80,24 +80,14 @@ export default {
     });
 
     let disabled = items.length < 2;
-   let message = await interaction.reply({
+    await interaction.reply({
       ephemeral: true,
       content: `Found **${results.files_found.length} results.**`,
       tts: false,
-      components: [
-        {
-          type: 1,
-          components: [
-            { style: 1, custom_id: `dl_left`, disabled: true, emoji: { id: null, name: `◀` }, type: 2 },
-            { style: 1, label: `1/${items.length}`, custom_id: `dl_page`, disabled: true, type: 2 },
-            { style: 1, custom_id: `dl_right`, disabled: disabled, emoji: { id: null, name: `▶` }, type: 2 },
-          ],
-        },
-      ],
       embeds: [
         {
           type: "rich",
-          title: interaction.options.getString("query"),
+          title: "🔍 "+interaction.options.getString("query"),
           description: "",
           color: 0x2f9d97,
           fields: fields,
@@ -105,7 +95,29 @@ export default {
         },
       ],
     });
-    await client.keyv.set(message.id, items, 1800);
-    console.log("messaging Id", message.id)
+    if(chunks.length == 2) {
+      let fields2 = [];
+    chunks[1].forEach((item, index) => {
+      fields2.push({
+        name: `${index+1}. ${item.file_name}`,
+        value: `>>> **Type:** \`${item.file_type}\`\n**Size:** \`${item.file_size !== "" ? item.file_size: "N/A"}\`\n**Added ${item.time_ago}**\n**File link:** [\`Click here\`](${item.file_link})`,
+      });
+    });
+    await interaction.followUp({
+      ephemeral: true,
+      content: ``,
+      tts: false,
+      embeds: [
+        {
+          type: "rich",
+          title: "",
+          description: "",
+          color: 0x2f9d97,
+          fields: fields,
+          footer: {text: "Note: Some links may not work!"}
+        },
+      ],
+    });
+    }
   },
 };
