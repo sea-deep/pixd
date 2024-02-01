@@ -3,7 +3,7 @@ import { AttachmentBuilder, Message } from "discord.js";
 export default {
   name: "genesis",
   description: "Generate AI images",
-  aliases: ["imagine"],
+  aliases: ["imagine", "gen"],
   usage: "genesis [prompt]",
   guildOnly: false,
   args: true,
