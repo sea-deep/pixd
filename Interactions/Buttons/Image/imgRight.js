@@ -31,7 +31,7 @@ export default {
           height: image.height,
           width: image.width
         },
-        color: getColor(image),
+        color: 0xf0f0f0,
         footer: {
           text: msg.embeds[0].footer.text.replace('`' + (current + 1), '`' + (next + 1))
         }
@@ -61,10 +61,3 @@ export default {
   }
 };
 
-function getColor(image) {
-  const r = image.averageColorObject.r;
-  const g = image.averageColorObject.g;
-  const b = image.averageColorObject.b;
-  const color = (r << 16) | (g << 8) | b;
-  return color;
-}
