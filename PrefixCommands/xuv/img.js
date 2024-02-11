@@ -24,8 +24,8 @@ export default {
     safeSearch: false
 });
   console.log(images?.result[0]);
-  console.log(images?.result)
-    client.keyv.set(mseg.id, images.result, 30);
+  console.log(images?.result.length)
+  await client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
      failIfNotExists: true,
