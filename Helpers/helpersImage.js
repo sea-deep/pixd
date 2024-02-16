@@ -1,6 +1,6 @@
 export async function getInputImage(message, opt) {
-   let static = true;
-   if (opt.dynamic) { static = false }
+   let static = opt.dynamic ? false : true;
+   
    if (message.attachments.size >= 1) { 
      return message.attachments.first().url; 
    } 
