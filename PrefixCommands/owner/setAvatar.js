@@ -18,6 +18,7 @@ export default {
     */
   execute: async (message, args, client) => {
     if (message.author.id == "908287391217905684") {
+    console.log(getInputImage(message))
     await client.user.setAvatar(getInputImage(message));
     return message.reply("Done.");
     } 
