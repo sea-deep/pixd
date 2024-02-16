@@ -1,5 +1,5 @@
 export async function getInputImage(message, opt) {
-   let static = opt.dynamic ? false : true;
+   let state = opt.dynamic ? false : true;
    
    if (message.attachments.size >= 1) { 
      return message.attachments.first().url; 
@@ -48,13 +48,13 @@ export async function getInputImage(message, opt) {
    if (message.mentions.users.size >= 1) { 
      return message.mentions.users.first().displayAvatarURL({ 
        extension: 'png', 
-       forceStatic: static, 
+       forceStatic: state, 
      }); 
    } 
   
    return message.member.user.displayAvatarURL({ 
      extension: 'png', 
-     forceStatic: static, 
+     forceStatic: state, 
    }); 
  }
  
