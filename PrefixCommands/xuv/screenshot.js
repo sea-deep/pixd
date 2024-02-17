@@ -1,4 +1,4 @@
-import { Message, AttachmentBuilder } from "discord.js-mobile";
+import { Message, AttachmentBuilder } from "discord.js";
 import captureWebsite from 'capture-website';
 
 export default {
