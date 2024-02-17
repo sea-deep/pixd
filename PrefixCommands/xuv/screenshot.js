@@ -1,7 +1,7 @@
-import { Message, AttachmentBuilder } from "discord.js";
-import captureWebsite from 'capture-website';
+const { Message, AttachmentBuilder } = require("discord.js");
+const Screenshot = require('url-to-screenshot');
 
-export default {
+module.exports = {
   name: "screenshot",
   description: "Captures a screenshot of the specified website.",
   aliases: ["ss"],
@@ -13,9 +13,9 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    */
-  execute: async (message) => {
+   * @param {Message} message
+   */
+  async execute(message) {
     const urlRegex = /(?:^|\s)(https?:\/\/)?(www\.)?([^\s]+)/;
     const match = message.content.match(urlRegex);
     const isMobile = message.content.toLowerCase().includes('-m');
@@ -24,17 +24,35 @@ export default {
       const url = (match[1] ? match[1] : 'https://') + (match[2] ? match[2] : '') + match[3];
 
       try {
-        let screenshotBuffer;
+        const screenshot = new Screenshot(url);
+
         if (isMobile) {
-          screenshotBuffer = await captureWebsite.buffer(url, { emulateDevice: 'iPhone X' });
+          screenshot.width(320).height(480); // Set mobile dimensions
         } else {
-          screenshotBuffer = await captureWebsite.buffer(url);
+          screenshot.width(1024).height(768); // Set default dimensions
         }
 
-        await message.channel.send({ content: 'Screenshot of <' + url + '>:', files: [new AttachmentBuilder(screenshotBuffer, 'screenshot.png')] });
+        const imgBuffer = await screenshot.capture();
+
+        // Encode buffer to Base64
+        const base64Image = Buffer.from(imgBuffer).toString('base64');
+
+        // Create attachment from Base64 data and MIME type
+        const attachment = new AttachmentBuilder('data:image/png;base64,' + base64Image, 'screenshot.png');
+
+        await message.channel.send({ content: 'Screenshot of <' + url + '>:', files: [attachment] });
       } catch (error) {
         console.error('Error capturing screenshot:', error);
-        await message.channel.send('Error capturing screenshot: ' + error.message);
+
+        // Provide informative error message
+        let errorMessage = 'Failed to capture screenshot.';
+        if (error.code === 'ECONNREFUSED') {
+          errorMessage = 'Invalid URL or website inaccessible.';
+        } else if (error.type === 'ScreenshotError') {
+          errorMessage = 'Error generating screenshot: ' + error.message;
+        }
+
+        await message.channel.send(errorMessage);
       }
     } else {
       await message.channel.send("Invalid URL provided.");
