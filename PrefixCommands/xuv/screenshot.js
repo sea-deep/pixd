@@ -1,7 +1,7 @@
-const { Message, AttachmentBuilder } = require("discord.js");
-const Screenshot = require('url-to-screenshot');
+import { Message, AttachmentBuilder } from "discord.js";
+import Screenshot from 'url-to-screenshot';
 
-module.exports = {
+export default {
   name: "screenshot",
   description: "Captures a screenshot of the specified website.",
   aliases: ["ss"],
@@ -12,9 +12,6 @@ module.exports = {
     bot: [],
     user: [],
   },
-  /**
-   * @param {Message} message
-   */
   async execute(message) {
     const urlRegex = /(?:^|\s)(https?:\/\/)?(www\.)?([^\s]+)/;
     const match = message.content.match(urlRegex);
@@ -40,7 +37,7 @@ module.exports = {
         // Create attachment from Base64 data and MIME type
         const attachment = new AttachmentBuilder('data:image/png;base64,' + base64Image, 'screenshot.png');
 
-        await message.channel.send({ content: 'Screenshot of <' + url + '>:', files: [attachment] });
+        await message.channel.send({ content: `Screenshot of <${url}>:`, files: [attachment] });
       } catch (error) {
         console.error('Error capturing screenshot:', error);
 
