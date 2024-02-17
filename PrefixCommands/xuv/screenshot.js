@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, AttachmentBuilder} from "discord.js";
 import webshot from 'webshot';
 
 export default {
