@@ -14,11 +14,11 @@ export default {
   },
   async execute(message) {
     // Extract URL from message content using a more robust regex
-    const urlRegex = /^(?:https?:\/\/)?(?:www\.)?([^\s]+)/i; // Case-insensitive match
-    const match = message.content.match(urlRegex);
+    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+    const matches = message.content.match(urlRegex);
 
-    if (match && match[1]) {
-      const url = match[1]; // Captured URL
+    if (matches && matches.length > 0) {
+      const url = matches[0]; // First captured URL
 
       try {
         const screenshot = new Screenshot(url);
@@ -50,7 +50,7 @@ export default {
         await message.channel.send(errorMessage);
       }
     } else {
-      await message.channel.send("Invalid URL provided.");
+      await message.channel.send("No valid URL provided.");
     }
   }
 };
