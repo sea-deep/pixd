@@ -21,7 +21,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "gif-encoder-2": "^1.0.5",
-    "capture-website": "^4.1.0",
+    "url-to-screenshot": "^3.0.0",
     "glob": "^8.0.1",
     "google-translate-api-x": "^10.6.7",
     "google-img-scrap": "^1.1.1",
