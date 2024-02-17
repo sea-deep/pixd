@@ -13,21 +13,19 @@ export default {
     user: [],
   },
   async execute(message) {
-    const urlRegex = /(?:^|\s)(https?:\/\/)?(www\.)?([^\s]+)/;
+    // Extract URL from message content using a more robust regex
+    const urlRegex = /^(?:https?:\/\/)?(?:www\.)?([^\s]+)/i; // Case-insensitive match
     const match = message.content.match(urlRegex);
-    const isMobile = message.content.toLowerCase().includes('-m');
 
-    if (match && match[3]) {
-      const url = (match[1] ? match[1] : 'https://') + (match[2] ? match[2] : '') + match[3];
+    if (match && match[1]) {
+      const url = match[1]; // Captured URL
 
       try {
         const screenshot = new Screenshot(url);
 
-        if (isMobile) {
-          screenshot.width(320).height(480); // Set mobile dimensions
-        } else {
-          screenshot.width(1024).height(768); // Set default dimensions
-        }
+        // Set dimensions based on mobile flag
+        const isMobile = message.content.toLowerCase().includes('-m');
+        screenshot.width(isMobile ? 320 : 1024).height(isMobile ? 480 : 768);
 
         const imgBuffer = await screenshot.capture();
 
