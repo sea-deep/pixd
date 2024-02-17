@@ -1,5 +1,4 @@
 import { Message, AttachmentBuilder } from "discord.js";
-import Screenshot from 'url-to-screenshot';
 
 export default {
   name: "screenshot",
@@ -19,18 +18,24 @@ export default {
 
     if (matches && matches.length > 0) {
       const url = matches[0]; // First captured URL
+      const isMobile = message.content.toLowerCase().includes('-m');
 
       try {
-        const screenshot = new Screenshot(url);
+        // Make the fetch request
+        const response = await fetch(`https://dd355859-026d-456f-aea3-31fc9a34ebf2-00-2r3kcsupg6yi6.pike.replit.dev/screenshot?url=${url}&mobile=${isMobile}`, {
+          headers: {
+            Authorization: 'Ads' // Secret password
+          }
+        });
 
-        // Set dimensions based on mobile flag
-        const isMobile = message.content.toLowerCase().includes('-m');
-        screenshot.width(isMobile ? 320 : 1024).height(isMobile ? 480 : 768);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-        const imgBuffer = await screenshot.capture();
+        const imageBuffer = await response.arrayBuffer();
 
-        // Encode buffer to Base64
-        const base64Image = Buffer.from(imgBuffer).toString('base64');
+        // Convert image buffer to Base64
+        const base64Image = Buffer.from(imageBuffer).toString('base64');
 
         // Create attachment from Base64 data and MIME type
         const attachment = new AttachmentBuilder('data:image/png;base64,' + base64Image, 'screenshot.png');
@@ -41,10 +46,10 @@ export default {
 
         // Provide informative error message
         let errorMessage = 'Failed to capture screenshot.';
-        if (error.code === 'ECONNREFUSED') {
-          errorMessage = 'Invalid URL or website inaccessible.';
-        } else if (error.type === 'ScreenshotError') {
-          errorMessage = 'Error generating screenshot: ' + error.message;
+        if (error.message.includes('403')) {
+          errorMessage = 'Invalid secret password. Access denied.';
+        } else {
+          errorMessage = 'Error capturing screenshot: ' + error.message;
         }
 
         await message.channel.send(errorMessage);
