@@ -18,7 +18,7 @@ export default {
   execute: async (message, args, client) => {
     await message.reply({
      content: "",
-     files: [new AttachmentBuilder("../../Assets/donate.mp4", "donate.mp4")]
+     files: [new AttachmentBuilder("./Assets/donate.mp4", "donate.mp4")]
 });
   }
 };
