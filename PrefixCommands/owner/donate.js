@@ -1,4 +1,4 @@
-import {Client, Message } from "discord.js";
+import {AttachmentBuilder, Message } from "discord.js";
 
 export default {
   name: "donate",
