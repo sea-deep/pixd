@@ -50,9 +50,9 @@ if (!command) {
      /* const closestMatch = findClosestMatch(commandName, Array.from(client.prefixCommands.keys()));
       if (closestMatch) {
         return message.reply(`❓ **Did you mean \`${prefix}${closestMatch}\`?**`);
-    */  } else {
+      } else {
         return;
-      } 
+      } */
 }
      if (command.guildOnly && message.channel.type === "dm") { 
        return message.reply("❌ **I can't execute that command inside DMs!**"); 
