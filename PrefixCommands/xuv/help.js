@@ -60,7 +60,7 @@ export default {
               default: false,
             },
             {
-              label: `No-Fap Streak`,
+              label: `No-Fap Streak (Not working)`,
               value: `fap`,
               description: `No-Fap Streak counter!`,
               emoji: {
