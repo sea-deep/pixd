@@ -98,7 +98,10 @@ if (sel[0] == 'xuv') {
   help.embeds[0].description = [
     '• `p!gpt` - Lund GPT',
     '• `p!padhaku` - Ask study related questions.',
-    '• `p!genesis` - Genesis AI images with prompt (paused)',
+    '• `p!genesis` - Genesis AI images',
+    '• `p!img` - Search images on Google',
+    '• `p!lens` - Reverse search images on Google',
+    '• `p!ud` - Urban Dictionary definition of a word',
     '• `genetics` - Right click message select `🚀 Apps` then `React Genesis`',
    '• `actually` - Right click message select `🚀 Apps` then `React Nerd`'
 ].join('\n');
@@ -114,8 +117,7 @@ if (sel[0] == 'img') {
     '• `p!nearyou` - WHO ARE YOU',
     '• `p!goodness` - oh my goonesdness grciousness',
     '• `p!animan` - Put that new forgis on the jeep',
-    '• `p!koo` - Make a Koo (Indian twitter).',
-  ].join('\n');
+    ].join('\n');
 }
 if (sel[0] == 'gam') {
   let com = interaction.message.components[0].components[0].options[2];
