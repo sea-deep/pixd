@@ -109,7 +109,6 @@ if (sel[0] == 'img') {
   help.embeds[0].title = com.label;
   help.embeds[0].description = [
     '• `p!lapata` - Get Lapata.',
-    '• `p!rape` - Nirbhaya 👍',
     '• `p!allustuff` - Allu Arjun funnies',
     '• `p!vosahihai` - Hes right you know',
     '• `p!nearyou` - WHO ARE YOU',
