@@ -47,10 +47,10 @@ if (message.channel.id === "1140305947852550275" || message.channel.id == "11403
          (cmd) => cmd.aliases[0] !=="" && cmd.aliases.includes(commandName) 
        ); 
 if (!command) {
-      const closestMatch = findClosestMatch(commandName, Array.from(client.prefixCommands.keys()));
+     /* const closestMatch = findClosestMatch(commandName, Array.from(client.prefixCommands.keys()));
       if (closestMatch) {
         return message.reply(`❓ **Did you mean \`${prefix}${closestMatch}\`?**`);
-      } else {
+    */  } else {
         return;
       } 
 }
