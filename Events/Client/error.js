@@ -15,7 +15,7 @@ export default {
     if (errorChannel && errorChannel instanceof TextChannel) {
       const userId = '908287391217905684';
       const userMention = `<@${userId}>`;
-      const errorMessage = `[${chalk.red("ERROR")}] - An error occurred: ${userMention} ${error.message}`;
+      const errorMessage = `[${chalk.red("ERROR")}] - An error occurred: ${userMention} ${error}`;
       errorChannel.send(errorMessage);
     }
   },
