@@ -15,12 +15,6 @@ import { Client, Message } from "discord.js";
      if (message.author.bot === true) return; 
 
 
-if (message.content.startsWith("-boost")) {
-  let m = await message.guild.members.fetch(message.mentions.users.first().id);
-  await client.emit("guildMemberUpdate", message.member, m);
-}
-
-
 if (message.channel.id === "1140305947852550275" || message.channel.id == "1140334592369364992") {
     if (message.content || message.content !== "") {
         const webhook = await message.channel.createWebhook({
