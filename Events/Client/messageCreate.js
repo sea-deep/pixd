@@ -54,7 +54,7 @@ if (!command) {
         return;
       } */
 }
-     if (command.guildOnly && message.channel.type === "dm") { 
+     if (command?.guildOnly && message.channel.type === "dm") { 
        return message.reply("❌ **I can't execute that command inside DMs!**"); 
      } 
   
