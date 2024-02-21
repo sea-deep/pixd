@@ -58,7 +58,7 @@ if (!command) {
        return message.reply("❌ **I can't execute that command inside DMs!**"); 
      } 
   
-     if (command.args && !args.length) { 
+     if (command?.args && !args.length) { 
        let reply = `❌ **You didn't provide any arguments, ${message.author}!**`; 
        if (command.usage) { 
          reply += `\n**The proper usage would be:** \`${prefix}${command.usage}\``; 
