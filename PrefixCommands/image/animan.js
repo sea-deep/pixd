@@ -32,7 +32,7 @@ export default {
     forceStatic: true 
  })); 
    } 
-   let bg = await Jimp.read( 'https://cdn.discordapp.com/attachments/916697198761234492/1098731085187252344/PicsArt_04-21-03.34.30.png' 
+   let bg = await Jimp.read( 'https://iili.io/JM9Nh9j.png' 
    ); 
    bg.resize(720, 762); 
    let avatar1 = await Jimp.read(avatars[0]); 
