@@ -18,5 +18,5 @@ try {
     }
   }
   process.stdout.write(`[${chalk.blue("INFO")}] - Prefix Commands Loaded!\n`);
-} catch (err) { process.stdout.write(`[${chalk.red("PrefixCommandHandler")}] - ${err}\n`);
+} catch (err) { console.log("[PrefixCommandHandler]", err);
 }
