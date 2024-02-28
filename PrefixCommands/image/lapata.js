@@ -48,7 +48,7 @@ export default {
       base.composite(image, s[i].x, s[i].y);
     });
     
-   let fg = await Jimp.read('https://iili.io/JM9qUPf.md.png');    fg.resize(1928, 1322);
+   let fg = await Jimp.read('https://iili.io/JM9qUPf.png');    
    base.composite(fg, 0, 0); 
 
     
