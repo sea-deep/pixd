@@ -16,14 +16,18 @@ export default {
     * @param {Message} message
     */
   execute: async (message) => {
-   const position = {x: 245, y: 0}; 
-   let bg = await Jimp.read( 
-     'https://cdn.discordapp.com/attachments/1088008848469655562/1104863177897934908/PicsArt_05-08-01.41.32.jpg' 
-   ); 
-   let avatar = await Jimp.read(await getInputImage(message)); 
-   avatar.resize(354, 433); 
-   bg.composite(avatar, position.x, position.y); 
-   let buffer = await bg.getBufferAsync(Jimp.MIME_PNG); 
+   let base = new Jimp(1080, 855, 0x00000000); 
+   
+   let hand = await Jimp.read( 
+     'https://iili.io/JMFqZle.png' 
+   );
+     hand.resize(550, 720); 
+   let head = await Jimp.read(await getInputImage(message)); 
+    
+   head.resize(720, 800).rotate(15); 
+   base.composite(head, 200, 0).composite(hand, 5, 150);
+   
+   let buffer = await base.getBufferAsync(Jimp.MIME_PNG); 
    let file = new AttachmentBuilder(buffer, {name: 'maisahitha.png'}); 
    let text = [ 
      'vo kuch thug hai', 
@@ -31,11 +35,12 @@ export default {
      'vo sahi hai', 
      'vo galat hai', 
      'vo real hai', 
+     'vo sach hai',
      'vo fake hai', 
-     'vo <:genesis:1013083814270074890> hai', 
+     'vo <:genesis:992613277995642961> hai', 
    ]; 
    return message.reply({ 
-     comtent: text[Math.round(Math.random() * text.length)], 
+     content: text[Math.round(Math.random() * text.length)], 
      files: [file], 
    });
   }
