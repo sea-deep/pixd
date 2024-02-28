@@ -24,7 +24,7 @@ export default {
    ]; 
    const position = allCords[Math.floor(Math.random() * 4)]; 
    let bg = await Jimp.read( 
-     'https://media.discordapp.net/attachments/1046478392591138868/1083673636096987276/Bg.jpg' 
+     'https://iili.io/JM9yPol.jpg' 
    ); 
    let avatar = await Jimp.read(await getInputImage(message)); 
    avatar.resize(366, 500); 
