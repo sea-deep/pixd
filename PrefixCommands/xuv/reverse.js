@@ -93,7 +93,7 @@ export default {
          type: 'rich', 
          description: `**[${img.title}](${img.originalUrl})**`, 
          title: ` Detected: ${images.search}`, 
-         color: getColor(img), 
+         color: 0xff00ff, 
          image: { 
            url: img.url, 
            height: img.height, 
@@ -123,10 +123,3 @@ export default {
   }
 };
 
-function getColor(image) {
-    const r = image.averageColorObject.r;
-    const g = image.averageColorObject.g;
-    const b = image.averageColorObject.b;
-    const color = (r << 16) | (g << 8) | b;  
-    return color;  
-}
