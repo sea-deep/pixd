@@ -18,11 +18,16 @@ export default {
   execute: async (message, args, client) => {
    const query = args.join(' ');
    const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
-   const images = await GOOGLE_IMG_SCRAP({
+   let images;
+   try {
+    images = await GOOGLE_IMG_SCRAP({
     search: query,
-    limit: 100,
+    limit: 101,
     safeSearch: false
 });
+  } catch(e) { return mseg.edit(`An error occurred...: ${e.message}`); }
+
+
   await client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
