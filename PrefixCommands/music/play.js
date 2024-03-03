@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import "dotenv/config";
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
@@ -24,7 +22,7 @@ playDL
 
 export default {
   name: "play",
-  description: "Plays from YouTube or SoundCloud.",
+  description: "Plays from YouTube, SoundCloud, or Spotify.",
   aliases: ["p"],
   usage: "play <link>|<search query>",
   guildOnly: true,
