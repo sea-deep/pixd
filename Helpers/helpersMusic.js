@@ -4,11 +4,15 @@ import {
   AudioPlayerStatus,
 } from "@discordjs/voice";
 import playDL from "play-dl";
-import { Client } from "discord.js";
+import { Client, Message } from "discord.js";
 
+/**
+ * @param {Client} client
+ * @param {Message} message
+ */
 export async function play(guild, song, client, message) {
-  console.log(song);
   const serverQueue = client.queue.get(guild.id);
+
   if (!song) {
     serverQueue.timeoutID = setTimeout(
       () => {
@@ -19,12 +23,10 @@ export async function play(guild, song, client, message) {
           console.log("Bot was disconnected during the timeout.");
         }
       },
-      10 * 60 * 1000,
-    ); //10 min idle
+      2 * 60 * 1000,
+    ); //2 min idle
 
-    if (serverQueue.loop === true) {
-      serverQueue.loop = false;
-    }
+    serverQueue.loop = false;
     return;
   }
 
@@ -33,24 +35,28 @@ export async function play(guild, song, client, message) {
 
   try {
     let stream;
-    if (song.source === "yt" && song.seek > 0) {
+    if (song.source === "yt") {
       try {
         stream = await playDL.stream(song.url, {
-          seek: song.seek,
+          seek: song?.seek > 0 ? song.seek : 0,
         });
       } catch (e) {
         console.log("Caught an error while getting stream:", e.message);
         return message.react("<:error:1090721649621479506>");
       }
-    } else {
+    } else if (song.source === "sp") {
       try {
-        stream = await playDL.stream(song.url);
+        let search = await playDL.search(song.title, {
+          limit: 1,
+        });
+        stream = await playDL.stream(search[0].url);
       } catch (e) {
         console.log("Caught an error while getting stream:", e.message);
         return message.react("<:error:1090721649621479506>");
       }
     }
 
+    //discord part
     let resource = createAudioResource(stream.stream, {
       inputType: stream.type,
     });
@@ -76,30 +82,22 @@ export async function play(guild, song, client, message) {
       play(guild, serverQueue.songs[0], client);
     });
 
-    if (serverQueue.loop === true) {
-      // Handle loop logic here if needed
-    } else {
-      if (song.seek > 0) {
-        // Handle seek logic here if needed
-      } else {
-        serverQueue.textChannel.send({
-          content: "**Now Playing**",
-          tts: false,
-          embeds: [
-            {
-              type: "rich",
-              title: "",
-              description: "",
-              color: 0x462,
-              author: {
-                name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-                icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
-              },
-            },
-          ],
-        });
-      }
-    }
+    serverQueue.textChannel.send({
+      content: "**Now Playing**",
+      tts: false,
+      embeds: [
+        {
+          type: "rich",
+          title: "",
+          description: "",
+          color: 0x462,
+          author: {
+            name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+            icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+          },
+        },
+      ],
+    });
   } catch (error) {
     console.error(`Error while playing: ${error.message}`);
   }
