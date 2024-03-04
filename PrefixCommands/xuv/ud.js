@@ -41,6 +41,7 @@ export default {
       
       let def = res.list[0];
       let msg = await message.reply({
+        failIfNotExists: true,
         content: "",
         tts: false,
         components: [
