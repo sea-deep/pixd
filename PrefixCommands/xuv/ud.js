@@ -20,6 +20,7 @@ export default {
     let res = await urban.search(args.join(" "));
     if (res.list.length == 0) {
       return message.reply({
+        failIfNotExists: true,
         content: "",
         tts: false,
         embeds: [
