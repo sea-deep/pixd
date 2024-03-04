@@ -4,25 +4,21 @@ import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js"
 import { play, parse } from "../../Helpers/helpersMusic.js";
 import playDL from "play-dl";
 
-playDL
-  .getFreeClientID()
-  .then((clientID) => {
-    playDL.setToken({
-      youtube: {
-        cookie: process.env.YT_COOKIES,
-      },
-      soundcloud: {
-        client_id: clientID,
-      },
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to get client ID:", err);
-  });
+await playDL.setToken({
+  youtube: {
+    cookie: process.env.YT_COOKIES,
+  },
+  spotify: {
+    client_id: process.env.SPOT_ID,
+    client_secret: process.env.SPOT_SECRET,
+    refresh_token: process.env.SPOT_TOKEN,
+    market: 'US'
+  }
+});
 
 export default {
   name: "play",
-  description: "Plays from YouTube, SoundCloud, or Spotify.",
+  description: "Plays from YouTube or Spotify.",
   aliases: ["p"],
   usage: "play <link>|<search query>",
   guildOnly: true,
@@ -62,30 +58,16 @@ export default {
       if (!check) {
         return message.react("<:error:1090721649621479506>");
       } else if (check === "search") {
-        let searchSource = {
-          youtube: "video",
-        };
-        let query = message.content
-          .substring(message.content.indexOf(" "), message.content.length)
-          .trim();
-        if (args[0].trim() == "-sc" || args[0].trim() == "-soundcloud") {
-          searchSource = {
-            soundcloud: "tracks",
-          };
-          query = message.content
-            .substring(
-              message.content.indexOf(" ", message.content.indexOf(" ") + 1),
-              message.content.length,
-            )
-            .trim();
-        }
+        let query = args.join(" ");
 
         const searchMsg = await message.react("<:search:1090725319884951623>");
         let search;
         try {
           search = await playDL.search(query, {
             limit: 1,
-            source: searchSource,
+            source: {
+              youtube: "video",
+            },
           });
         } catch (e) {
           console.log("Error while searching song", e.message);
@@ -108,10 +90,6 @@ export default {
             durationTime: parse(search[0].durationInSec),
             source: "yt",
           };
-          if ("soundcloud" in searchSource) {
-            song.title = search[0].name;
-            song.source = "so";
-          }
           songs.push(song);
         }
       } else {
@@ -157,26 +135,55 @@ export default {
               };
               songs.push(song);
             });
+          }
+        } else if (source === "sp") {
+          if (type === "track") {
+            let track;
+            try {
+              track = await playDL.spotify(args[0]);
+            } catch (e) {
+              console.log("error while getting video info", e.message);
+              return message.react("<:error:1090721649621479506>");
+            }
+            // Making title better
+            let title = `${track.name} - ${track.artists
+              .map((a) => a.name)
+              .join(", ")}`;
+            song = {
+              title: title,
+              url: track.url,
+              duration: track.durationInSec,
+              durationTime: parse(track.durationInSec),
+              source: "sp",
+            };
+            songs.push(song);
+          } else if (type === "album" || type === "playlist") {
+            let playlist;
+            try {
+              playlist = await playDL.spotify(args[0]);
+            } catch (e) {
+              console.log(
+                "error while getting spotufy playlist info",
+                e.message,
+              );
+              return message.react("<:error:1090721649621479506>");
+            }
+            const tracks = await playlist.fetched_tracks.get("1");
 
-            message.channel.send({
-              content: "**Added to queue**",
-              tts: false,
-              embeds: [
-                {
-                  type: "rich",
-                  title: "",
-                  description: "",
-                  color: 0x462,
-                  author: {
-                    name: `Added ${songs.length} songs to the queue`,
-                    icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
-                  },
-                },
-              ],
+            tracks.forEach(function (track) {
+              let title = `${track.name} - ${track.artists
+                .map((a) => a.name)
+                .join(", ")}`;
+              song = {
+                title: title,
+                url: track.url,
+                duration: track.durationInSec,
+                durationTime: parse(track.durationInSec),
+                source: "sp",
+              };
+              songs.push(song);
             });
           }
-        } else if (source === "so") {
-          return message.react("<:error:1090721649621479506>");
         }
       }
 
@@ -210,28 +217,41 @@ export default {
           play(message.guild, serverQueue.songs[0], client, message);
         } else {
           serverQueue.songs = serverQueue.songs.concat(songs);
-          if (songs.length > 1) {
-          } else {
-            if (song.seek > 0) {
-              return message.react("<:seek:1090718780545581116>");
-            } else {
-              return message.channel.send({
-                content: "**Added to queue**",
-                tts: false,
-                embeds: [
-                  {
-                    type: "rich",
-                    title: "",
-                    description: "",
-                    color: 0x462,
-                    author: {
-                      name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-                      icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
-                    },
+
+          if (songs.length == 1) {
+            return message.channel.send({
+              content: "**Added to queue**",
+              tts: false,
+              embeds: [
+                {
+                  type: "rich",
+                  title: "",
+                  description: "",
+                  color: 0x462,
+                  author: {
+                    name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+                    icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
                   },
-                ],
-              });
-            }
+                },
+              ],
+            });
+          } else {
+            return message.channel.send({
+              content: "**Added to queue**",
+              tts: false,
+              embeds: [
+                {
+                  type: "rich",
+                  title: "",
+                  description: "",
+                  color: 0x462,
+                  author: {
+                    name: `Added ${songs.length} songs to the queue`,
+                    icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
+                  },
+                },
+              ],
+            });
           }
         }
       }
