@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { getLyrics } from "fetch-lyrics";
+import azlyrics from "azlyrics-lyric-scraper";
 
 export default {
   name: "lyrics",
@@ -34,11 +34,10 @@ export default {
   
     
    try {
-     getLyrics(title).then(async (lyrics) => {
-       title = lyrics.title;
-     })
+     let res1 = await azlyrics.searchSong('Mou Sukoshi Dake Yoasobi')
+     title = res.songs[0].autocomplete;
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return message.reply("❌ **No lyrics found for this song!**");
     }
 
@@ -48,7 +47,6 @@ export default {
       embeds: [
         {
           title: `Lyrics for - ${title}`,
-
           color: 0x2f3136,
         },
       ],
