@@ -31,7 +31,7 @@
     "mongodb": "^6.1.0",
     "google-translate-api-x": "^10.6.7",
     "path": "^0.12.7",
-    "fetch-lyrics": "^1.0.6",
+    "azlyrics-lyric-scraper": "^1.0.9-official",
     "relevant-urban": "^2.0.0",
     "play-dl": "^1.9.6",
     "sharp": "^0.32.4"
