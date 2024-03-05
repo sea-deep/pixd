@@ -34,7 +34,7 @@ export default {
   
     
    try {
-     let res = await azlyrics.searchSong('Mou Sukoshi Dake Yoasobi');
+     let res = await azlyrics.searchSong(title);
      title = res.songs[0].autocomplete;
     } catch (e) {
       console.log(e);
