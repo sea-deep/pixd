@@ -1,7 +1,7 @@
 import { getLyrics } from "fetch-lyrics";
 
 export default {
-  name: "lyrics",
+  name: "getLyrics",
   execute: async (interaction) => {
     let title = interaction.message.embeds[0].title.split(" - ")[1];
 
