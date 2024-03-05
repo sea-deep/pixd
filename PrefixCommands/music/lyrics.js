@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import azlyrics from "azlyrics-lyric-scraper";
+import { searchSong } from "../../Helpers/helpersMusic.js";
 
 export default {
   name: "lyrics",
@@ -32,15 +32,13 @@ export default {
       title = serverQueue.songs[0].title;
     }
   
-    
-   try {
-     let res = await azlyrics.searchSong(title);
-     title = res.songs[0].autocomplete;
-    } catch (e) {
-      console.log(e);
+   
+     let res = await searchSong(title);
+   if (res.songs.length === 0) {
       return message.reply("❌ **No lyrics found for this song!**");
     }
-
+     title = res.songs[0].autocomplete;
+ 
 
     await message.reply({
       content: "",
