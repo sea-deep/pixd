@@ -1,4 +1,3 @@
-import { getLyrics } from "fetch-lyrics";
 import azlyrics from "azlyrics-lyric-scraper";
 
 export default {
