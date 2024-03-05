@@ -32,14 +32,16 @@ export default {
       title = serverQueue.songs[0].title;
     }
   
+    
+   try {
      getLyrics(title).then(async (lyrics) => {
-        title = lyrics.title;
-       console.log(lyrics)
-       }).catch(async (e) => {
+       title = lyrics.title;
+     })
+    } catch (e) {
       console.log(e)
       return message.reply("❌ **No lyrics found for this song!**");
-    });
- 
+    }
+
 
     await message.reply({
       content: "",
