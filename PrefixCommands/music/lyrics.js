@@ -34,6 +34,7 @@ export default {
   
      getLyrics(title).then(async (lyrics) => {
         title = lyrics.title;
+       console.log(lyrics)
        }).catch(async (e) => {
       console.log(e)
       return message.reply("❌ **No lyrics found for this song!**");
