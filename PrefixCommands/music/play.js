@@ -4,17 +4,6 @@ import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js"
 import { play, parse } from "../../Helpers/helpersMusic.js";
 import playDL from "play-dl";
 
-await playDL.setToken({
-  youtube: {
-    cookie: process.env.YT_COOKIES,
-  },
-  spotify: {
-    client_id: process.env.SPOT_ID,
-    client_secret: process.env.SPOT_SECRET,
-    refresh_token: process.env.SPOT_TOKEN,
-    market: 'US'
-  }
-});
 
 export default {
   name: "play",
