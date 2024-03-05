@@ -2,6 +2,7 @@
  import 'dotenv/config'; 
   
  import {Client, GatewayIntentBits, Partials, Collection} from 'discord.js'; 
+ import playDL from 'play-dl';
  import {KeyValueStore, sleep} from './Helpers/helperUtil.js'; 
   
  export const client = new Client({ 
@@ -59,3 +60,17 @@
  client.login(process.env.TOKEN); 
  // Setting current time to present the Uptiime 
  client.keyv.set('uptime', Date.now());
+
+ (async () => {
+  await playDL.setToken({
+    youtube: {
+      cookie: process.env.YT_COOKIES,
+    },
+    spotify: {
+      client_id: process.env.SPOT_ID,
+      client_secret: process.env.SPOT_SECRET,
+      refresh_token: process.env.SPOT_TOKEN,
+      market: 'US'
+    }
+  });
+ })();
