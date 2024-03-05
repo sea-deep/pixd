@@ -59,7 +59,7 @@ export default {
               type: 2,
               style: 3,
               label: "Click Here",
-              custom_id: "lyrics",
+              custom_id: "getLyrics",
               disabled: false,
             },
           ],
