@@ -9,7 +9,8 @@ export default {
       ephemeral: true,
     });
     const call = await azlyrics.searchSong(title);
-    const lyrics = getLyrics(call.songs[0].url);
+    const lyrics = await getLyrics(call.songs[0].url);
+   console.log(lyrics)
     const chunks = lyrics.match(/[\s\S]{1,3900}/g);
 
     chunks.forEach(async (chunk) => {
@@ -29,6 +30,7 @@ export default {
 
 
 async function getLyrics(url) {
+  console.log(url)
    const r = await fetch(url);
 
     if (!r.ok) {
