@@ -32,10 +32,10 @@ export default {
       title = serverQueue.songs[0].title;
     }
    try {
-      console.log(title)
-     let call = await getLyrics(title);
-      title = call.title;
-
+     getLyrics(title).then(async (lyrics) => {
+        title = lyrics.title;
+       });
+   
 
     } catch (e) {
       console.log(e)
