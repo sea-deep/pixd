@@ -11,7 +11,7 @@ export default {
   name: "gpt",
   description: "Lul gpt",
   aliases: ["xd"],
-  usage: "p!gpt tell me a joke on hamsters",
+  usage: "xd tell me a joke on hamsters",
   guildOnly: false,
   args: true,
   permissions: {
