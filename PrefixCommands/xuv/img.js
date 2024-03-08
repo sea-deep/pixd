@@ -25,6 +25,7 @@ export default {
     limit: 101,
     safeSearch: false
 });
+ if (!images.result || images.result == 0) return mseg.edit("**❌ No image found for that query.**");
   } catch(e) { return mseg.edit(`An error occurred...: ${e.message}`); }
 
 
@@ -113,7 +114,7 @@ export default {
      ] 
    }; 
     let sent = await mseg.edit(msg);
-    await client.sleep(30200); 
+    await client.sleep(30100); 
     if(!client.keyv.has(mseg.id)) { 
       try {
        await mseg.edit({   
