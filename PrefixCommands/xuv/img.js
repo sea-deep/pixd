@@ -25,7 +25,7 @@ export default {
     limit: 101,
     safeSearch: false
 });
- if (!images.result || images.result == 0) return mseg.edit("**❌ No image found for that query.**");
+ if (!images.result || images.result.length == 0) return mseg.edit("**❌ No image found for that query.**");
   } catch(e) { return mseg.edit(`An error occurred...: ${e.message}`); }
 
 
