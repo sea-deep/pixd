@@ -10,7 +10,7 @@ export default {
     });
     const call = await searchSong(title);
     const lyrics = await getLyrics(call.songs[0].url);
-   console.log(lyrics)
+ //  console.log(lyrics)
     const chunks = lyrics.match(/[\s\S]{1,3900}/g);
 
     chunks.forEach(async (chunk) => {
