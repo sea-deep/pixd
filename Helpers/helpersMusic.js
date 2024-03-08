@@ -107,14 +107,6 @@ let htmlText = await proxify(formData,cookie)
   return lyrics;
 }
 
-async function main() {
-  let s = await searchSong('hello')
-  let url = s.songs[0].url;
-  let f = await getLyrics(url)
-  console.log(f)
-}
-main()
-
 /**
  * @param {Client} client
  * @param {Message} message
