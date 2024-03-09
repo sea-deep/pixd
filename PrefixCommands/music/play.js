@@ -157,7 +157,7 @@ export default {
               playlist = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log(
-                "error while getting spotufy playlist info",
+                "error while getting spotify playlist info",
                 e.message,
               );
               return message.react("<:error:1090721649621479506>");
@@ -182,7 +182,7 @@ export default {
           const so = await playDL.soundcloud(await soundCloudUrl(args[0].trim()));
           if (type === "track") {
             song = {
-              title: `${so.name} - ${so.publisher?.artist}`,
+              title: so.name,
               url: so.url,
               duration: so.durationInSec,
               durationTime: parse(so.durationInSec),
@@ -193,7 +193,7 @@ export default {
             const tracks = await so.all_tracks();
             tracks.forEach(function (track) {
               song = {
-                title: `${track.name} - ${track.publisher?.artist}`,
+                title: track.name,
                 url: track.url,
                 duration: track.durationInSec,
                 durationTime: parse(track.durationInSec),
