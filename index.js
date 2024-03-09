@@ -71,7 +71,10 @@ client.keyv.set('uptime', Date.now());
       client_secret: process.env.SPOT_SECRET, 
       refresh_token: process.env.SPOT_TOKEN, 
       market: 'US' 
-    }, 
+    },
+    SoundCloud: {
+      client_id: "P6O67Yliyfmd11yWk9jaYmOVKmh9LDEt",
+    },
     useragent: [ 
       "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36", 
       "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/110.0.5481.97 Safari/537.11", 
