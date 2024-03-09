@@ -152,7 +152,7 @@ console.log(args[0].trim())
           } else if (type === "album" || type === "playlist") {
             let playlist;
             try {
-              playlist = await playDL.spotify(args[0]);
+              playlist = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log(
                 "error while getting spotufy playlist info",
@@ -177,7 +177,7 @@ console.log(args[0].trim())
             });
           }
         } else if (source === "sc") {
-          const so = await playDL.soundcloud(request);
+          const so = await playDL.soundcloud(soundCloudUrl(args[0].trim());
           if (type === "track") {
             song = {
               title: `${track.name} - ${track.publisher?.artist}`,
