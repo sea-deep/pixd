@@ -126,6 +126,9 @@ export default {
             });
           }
         } else if (source === "sp") {
+          if (playDL.is_expired()) {
+     await playDL.refreshToken();
+       }
           if (type === "track") {
             let track;
             try {
