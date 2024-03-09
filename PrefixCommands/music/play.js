@@ -177,7 +177,7 @@ console.log(args[0].trim())
             });
           }
         } else if (source === "sc") {
-          const so = await playDL.soundcloud(soundCloudUrl(args[0].trim()));
+          const so = await playDL.soundcloud(await soundCloudUrl(args[0].trim()));
           if (type === "track") {
             song = {
               title: `${track.name} - ${track.publisher?.artist}`,
