@@ -36,9 +36,9 @@ export default {
       let check;
 
       try {
-        check =
-          (await playDL.validate(args[0].trim())) ||
-          "sc_" + (await playDL.so_validate(soundCloudUrl(args[0].trim())));
+console.log(args[0].trim())
+        check = (await playDL.validate(args[0].trim())) || "sc_" + (await playDL.so_validate(soundCloudUrl(args[0].trim())));
+
       } catch (error) {
         console.error("Error validating play-dl:", error.message);
         return message.react("<:error:1090721649621479506>");
