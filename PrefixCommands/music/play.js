@@ -132,7 +132,7 @@ console.log(args[0].trim())
           if (type === "track") {
             let track;
             try {
-              track = await playDL.spotify(args[0]);
+              track = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log("error while getting video info", e.message);
               return message.react("<:error:1090721649621479506>");
@@ -177,7 +177,7 @@ console.log(args[0].trim())
             });
           }
         } else if (source === "sc") {
-          const so = await playDL.soundcloud(soundCloudUrl(args[0].trim());
+          const so = await playDL.soundcloud(soundCloudUrl(args[0].trim()));
           if (type === "track") {
             song = {
               title: `${track.name} - ${track.publisher?.artist}`,
