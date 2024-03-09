@@ -5,19 +5,29 @@ import {
 } from "@discordjs/voice";
 import playDL from "play-dl";
 import { Client, Message } from "discord.js";
-import axios from 'axios';
 import cheerio from 'cheerio';
 
 let proxify = (data, jar) => {
     return new Promise((res, rej) => {
-        axios.post('https://www.4everproxy.com/query', new URLSearchParams(data), {
+        fetch('https://www.4everproxy.com/query', {
+            method: 'POST',
             headers: {
-                'cookie': jar,
-                'content-type': 'application/x-www-form-urlencoded',
+                'Cookie': jar,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                rej('Network response was not ok');
             }
-        }).then(response => {
-            res(response.data);
-        }).catch(error => {
+        })
+        .then(data => {
+            res(data);
+        })
+        .catch(error => {
             rej(error);
         });
     });
@@ -26,9 +36,13 @@ let proxify = (data, jar) => {
 let getConfig = () => {
     return new Promise(async (res, rej) => {
         try {
-            let response = await axios.get('https://www.4everproxy.com/');
-            let cookie = response.headers['set-cookie'][0].split(';')[0];
-            let $ = cheerio.load(response.data);
+            let response = await fetch('https://www.4everproxy.com/');
+            if (!response.ok) {
+                rej('Network response was not ok');
+            }
+            let cookie = response.headers.get('set-cookie').split(';')[0];
+            let text = await response.text();
+            let $ = cheerio.load(text);
             let serverList = [],
                 ipLocList = [];
             $('select[id=server_name] optgroup option').each((i, e) => {
@@ -105,7 +119,6 @@ export async function getLyrics(url) {
         .trim();
     return lyrics;
 }
-
 
 /**
  * @param {Client} client
