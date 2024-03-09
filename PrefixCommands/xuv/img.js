@@ -32,7 +32,7 @@ export default {
   await client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
-     failIfNotExists: true,
+     failIfNotExists: false,
      content: ``, 
      tts: false, 
      components: [ 
