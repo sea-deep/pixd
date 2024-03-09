@@ -36,6 +36,7 @@ export default {
       let check;
 
       try {
+   console.log("checking...");
         check = (await playDL.validate(args[0].trim())) || "so_" + (await playDL.so_validate(await soundCloudUrl(args[0].trim())));
     console.log(check);
 
@@ -45,6 +46,7 @@ export default {
       }
 
       if (!check) {
+     console.log("no check")
         return message.react("<:error:1090721649621479506>");
       } else if (check === "search") {
         let query = args.join(" ");
