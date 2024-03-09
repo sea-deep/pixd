@@ -1,13 +1,11 @@
-import "dotenv/config";
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
-import { play, parse } from "../../Helpers/helpersMusic.js";
+import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
 import playDL from "play-dl";
-
 
 export default {
   name: "play",
-  description: "Plays from YouTube or Spotify.",
+  description: "Plays from YouTube or Spotify or SoundCloud.",
   aliases: ["p"],
   usage: "play <link>|<search query>",
   guildOnly: true,
@@ -38,7 +36,9 @@ export default {
       let check;
 
       try {
-        check = await playDL.validate(args[0].trim());
+        check =
+          (await playDL.validate(args[0].trim())) ||
+          "sc_" + (await playDL.so_validate(soundCloudUrl(args[0].trim())));
       } catch (error) {
         console.error("Error validating play-dl:", error.message);
         return message.react("<:error:1090721649621479506>");
@@ -127,8 +127,8 @@ export default {
           }
         } else if (source === "sp") {
           if (playDL.is_expired()) {
-     await playDL.refreshToken();
-       }
+            await playDL.refreshToken();
+          }
           if (type === "track") {
             let track;
             try {
@@ -176,74 +176,98 @@ export default {
               songs.push(song);
             });
           }
+        } else if (source === "sc") {
+          const so = await playDL.soundcloud(request);
+          if (type === "track") {
+            song = {
+              title: `${track.name} - ${track.publisher?.artist}`,
+              url: so.url,
+              duration: so.durationInSec,
+              durationTime: parse(so.durationInSec),
+              source: "sc",
+            };
+            songs.push(song);
+          } else if (type === "playlist") {
+            const tracks = await so.all_tracks();
+            tracks.forEach(function (track) {
+              song = {
+                title: `${track.name} - ${track.publisher?.artist}`,
+                url: track.url,
+                duration: track.durationInSec,
+                durationTime: parse(track.durationInSec),
+                source: "sc",
+              };
+              songs.push(song);
+            });
+          }
         }
-      }
 
-      if (!serverQueue) {
-        const queueConstructor = {
-          textChannel: message.channel,
-          voiceChannel: voiceChannel,
-          connection: null,
-          songs: songs,
-          player: null,
-          loop: false,
-          keep: false,
-          timeoutID: undefined,
-        };
+        if (!serverQueue) {
+          const queueConstructor = {
+            textChannel: message.channel,
+            voiceChannel: voiceChannel,
+            connection: null,
+            songs: songs,
+            player: null,
+            loop: false,
+            keep: false,
+            timeoutID: undefined,
+          };
 
-        client.queue.set(message.guild.id, queueConstructor);
+          client.queue.set(message.guild.id, queueConstructor);
 
-        await startVoiceConnection(
-          {
-            channelId: voiceChannel.id,
-            guildId: message.guild.id,
-            adapterCreator: message.guild.voiceAdapterCreator,
-          },
-          client,
-          message,
-          queueConstructor,
-        );
-      } else {
-        if (serverQueue?.songs.length == 0) {
-          serverQueue.songs = serverQueue.songs.concat(songs);
-          play(message.guild, serverQueue.songs[0], client, message);
+          await startVoiceConnection(
+            {
+              channelId: voiceChannel.id,
+              guildId: message.guild.id,
+              adapterCreator: message.guild.voiceAdapterCreator,
+            },
+            client,
+            message,
+            queueConstructor,
+          );
         } else {
-          serverQueue.songs = serverQueue.songs.concat(songs);
-
-          if (songs.length == 1) {
-            return message.channel.send({
-              content: "**Added to queue**",
-              tts: false,
-              embeds: [
-                {
-                  type: "rich",
-                  title: "",
-                  description: "",
-                  color: 0x462,
-                  author: {
-                    name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-                    icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
-                  },
-                },
-              ],
-            });
+          if (serverQueue?.songs.length == 0) {
+            serverQueue.songs = serverQueue.songs.concat(songs);
+            play(message.guild, serverQueue.songs[0], client, message);
           } else {
-            return message.channel.send({
-              content: "**Added to queue**",
-              tts: false,
-              embeds: [
-                {
-                  type: "rich",
-                  title: "",
-                  description: "",
-                  color: 0x462,
-                  author: {
-                    name: `Added ${songs.length} songs to the queue`,
-                    icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
+            serverQueue.songs = serverQueue.songs.concat(songs);
+
+            if (songs.length == 1) {
+              return message.channel.send({
+                content: "**Added to queue**",
+                tts: false,
+                embeds: [
+                  {
+                    type: "rich",
+                    title: "",
+                    description: "",
+                    color: 0x462,
+                    author: {
+                      name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+                      icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
+                    },
                   },
-                },
-              ],
-            });
+                ],
+              });
+            } else {
+              return message.channel.send({
+                content: "**Added to queue**",
+                tts: false,
+                embeds: [
+                  {
+                    type: "rich",
+                    title: "",
+                    description: "",
+                    color: 0x462,
+                    author: {
+                      name: `Added ${songs.length} songs to the queue`,
+                      icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
+                    },
+                  },
+                ],
+              });
+            }
           }
         }
       }
