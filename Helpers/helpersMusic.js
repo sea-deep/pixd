@@ -239,3 +239,27 @@ export function parse(input) {
     return 0;
   }
 }
+
+
+export async function soundCloudUrl(url) {
+  const soundcloudUrlRegex = /^https:\/\/soundcloud\.com\/[^\/]+\/[^\/]+$/;
+  if (url.match(soundcloudUrlRegex)) {
+    return url;
+  }
+
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    const originalTrackUrlRegex = /<meta\s+property=["']og:url["']\s+content=["'](https:\/\/soundcloud\.com\/[^"']+)["']>/;
+    const match = html.match(originalTrackUrlRegex);
+
+    if (match && match[1]) {
+      return match[1];
+    } else {
+      throw new Error('Original track URL not found');
+    }
+  } catch (error) {
+    console.error('Error extracting track URL:', error);
+    return null;
+  }
+}
