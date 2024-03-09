@@ -180,7 +180,7 @@ console.log(args[0].trim())
           const so = await playDL.soundcloud(await soundCloudUrl(args[0].trim()));
           if (type === "track") {
             song = {
-              title: `${track.name} - ${track.publisher?.artist}`,
+              title: `${so.name} - ${so.publisher?.artist}`,
               url: so.url,
               duration: so.durationInSec,
               durationTime: parse(so.durationInSec),
