@@ -36,8 +36,8 @@ export default {
       let check;
 
       try {
-console.log(args[0].trim())
-        check = (await playDL.validate(args[0].trim())) || "sc_" + (await playDL.so_validate(await soundCloudUrl(args[0].trim())));
+        check = (await playDL.validate(args[0].trim())) || "so_" + (await playDL.so_validate(await soundCloudUrl(args[0].trim())));
+    console.log(check);
 
       } catch (error) {
         console.error("Error validating play-dl:", error.message);
@@ -176,7 +176,7 @@ console.log(args[0].trim())
               songs.push(song);
             });
           }
-        } else if (source === "sc") {
+        } else if (source === "so") {
           const so = await playDL.soundcloud(await soundCloudUrl(args[0].trim()));
           if (type === "track") {
             song = {
