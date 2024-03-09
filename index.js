@@ -72,7 +72,7 @@ client.keyv.set('uptime', Date.now());
       refresh_token: process.env.SPOT_TOKEN, 
       market: 'US' 
     },
-    SoundCloud: {
+    soundcloud: {
       client_id: process.env.SC_CLIENT,
     },
     useragent: [ 
