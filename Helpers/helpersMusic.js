@@ -214,8 +214,7 @@ export async function play(guild, song, client, message) {
           color: 0x462,
           author: {
             name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-            icon_url: `https://media.discordapp.net/attachments/1011986872500764672/1090737187869438033/icons8-cd.gif`,
-          },
+                                 icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,},
         },
       ],
     });
