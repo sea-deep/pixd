@@ -253,11 +253,7 @@ export async function searchSong(q) {
 };
 
 export async function getLyrics(url) {
-  if (resp.songs.length === 0) {
-    throw new Error("Song not found");
-  }
-  const title = resp.songs[0].autocomplete;
-  const { proxy_list, cookie } = await getConfig();
+ const { proxy_list, cookie } = await getConfig();
   const formData = {
     u: url,
     u_default: "https://www.google.com/",
