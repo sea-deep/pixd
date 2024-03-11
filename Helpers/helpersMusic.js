@@ -256,7 +256,6 @@ export async function getLyrics(url) {
   if (resp.songs.length === 0) {
     throw new Error("Song not found");
   }
-  const url = resp.songs[0].url;
   const title = resp.songs[0].autocomplete;
   const { proxy_list, cookie } = await getConfig();
   const formData = {
