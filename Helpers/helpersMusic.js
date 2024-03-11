@@ -173,7 +173,6 @@ export async function soundCloudUrl(url) {
 
 
 //lyrics part 
-
 const proxify = (data, jar) => {
   return new Promise((res, rej) => {
     request(
@@ -239,7 +238,7 @@ const getObjectByLocation = (el, array) => {
   );
 };
 
-const searchSong = async (q) => {
+export async function searchSong(q) {
   const { proxy_list, cookie } = await getConfig();
   const formData = {
     u: `https:/\/search.azlyrics.com/suggest.php?q=${encodeURIComponent(q)}`,
@@ -253,8 +252,7 @@ const searchSong = async (q) => {
   return JSON.parse(data);
 };
 
-export async function getLyrics(q) {
-  const resp = await searchSong(q);
+export async function getLyrics(url) {
   if (resp.songs.length === 0) {
     throw new Error("Song not found");
   }
