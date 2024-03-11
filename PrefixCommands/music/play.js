@@ -71,6 +71,7 @@ console.log(query);
           );
 
         if (search.length == 0) {
+         console.log("no video found");
           return message.react("<:error:1090721649621479506>");
         } else {
           song = {
@@ -80,6 +81,7 @@ console.log(query);
             durationTime: parse(search[0].durationInSec),
             source: "yt",
           };
+   console.log(song)
           songs.push(song);
         }
       } else {
