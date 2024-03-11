@@ -56,6 +56,7 @@ export default {
               youtube: "video",
             },
           });
+         console.log(search)
         } catch (e) {
           console.log("Error while searching song", e.message);
           return message.react("<:error:1090721649621479506>");
@@ -82,12 +83,13 @@ export default {
       } else {
         let source = check.split("_")[0];
         let type = check.split("_")[1];
-
+console.log(check)
         if (source === "yt") {
           if (type === "video") {
             let video;
             try {
               video = await playDL.video_basic_info(args.join(" "));
+console.log(video.video_details)
             } catch (e) {
               console.log("error while getting video info", e.message);
               return message.react("<:error:1090721649621479506>");
@@ -199,7 +201,6 @@ export default {
             });
           }
         }
-console.log(songs)
         if (!serverQueue) {
           const queueConstructor = {
             textChannel: message.channel,
