@@ -36,8 +36,7 @@ export default {
       let check;
 
       try {
-        check = await soundCloudUrl(await playDL.validate(args[0].trim()));
-      console.log(check);
+        check = await playDL.validate(await soundCloudUrl(args[0].trim()));
       } catch (error) {
         console.error("Error validating play-dl:", error.message);
         return message.react("<:error:1090721649621479506>");
@@ -88,7 +87,7 @@ export default {
           if (type === "video") {
             let video;
             try {
-              video = await playDL.video_info(args[0]);
+              video = await playDL.video_basic_info(args.join(" "));
             } catch (e) {
               console.log("error while getting video info", e.message);
               return message.react("<:error:1090721649621479506>");
