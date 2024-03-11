@@ -46,7 +46,6 @@ export default {
         return message.react("<:error:1090721649621479506>");
       } else if (check === "search") {
         let query = args.join(" ");
-console.log(query);
         const searchMsg = await message.react("<:search:1090725319884951623>");
         let search;
         try {
@@ -56,7 +55,6 @@ console.log(query);
               youtube: "video",
             },
           });
-         console.log(search)
         } catch (e) {
           console.log("Error while searching song", e.message);
           await searchMsg
@@ -205,6 +203,7 @@ console.log(video.video_details)
             });
           }
         }
+      }
         if (!serverQueue) {
           const queueConstructor = {
             textChannel: message.channel,
@@ -273,7 +272,7 @@ console.log("hiii")
               });
             }
           }
-        }
+        
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error.message);
