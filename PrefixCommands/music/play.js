@@ -36,8 +36,8 @@ export default {
       let check;
 
       try {
-        check = (await playDL.validate(args[0].trim())) || "so_" + (await playDL.so_validate(await soundCloudUrl(args[0].trim())));
-  
+        check = await soundCloudUrl(await playDL.validate(args[0].trim()));
+      console.log(check);
       } catch (error) {
         console.error("Error validating play-dl:", error.message);
         return message.react("<:error:1090721649621479506>");
@@ -200,7 +200,7 @@ export default {
             });
           }
         }
-
+console.log(songs)
         if (!serverQueue) {
           const queueConstructor = {
             textChannel: message.channel,
