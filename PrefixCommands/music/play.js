@@ -213,7 +213,7 @@ console.log(video.video_details)
             timeoutID: undefined,
           };
 
-          client.queue.set(message.guild.id, queueConstructor);
+         await client.queue.set(message.guild.id, queueConstructor);
 
           await startVoiceConnection(
             {
@@ -225,6 +225,7 @@ console.log(video.video_details)
             message,
             queueConstructor,
           );
+console.log("hiii")
         } else {
           if (serverQueue?.songs.length == 0) {
             serverQueue.songs = serverQueue.songs.concat(songs);
