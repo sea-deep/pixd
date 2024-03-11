@@ -45,6 +45,8 @@ import { Client } from "discord.js";
          components: msg.components   
        });
        await client.keyv.setTTL(interaction.message.id, 30);
+  console.log(client.keyv.has(interaction.message.id))
+  console.log(await client.keyv.has(interaction.message.id));
        await client.sleep(30500);
        if(!client.keyv.has(interaction.message.id)) {
         try{
