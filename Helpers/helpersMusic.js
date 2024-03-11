@@ -148,10 +148,7 @@ export function parse(input) {
 }
 
 export async function soundCloudUrl(url) {
-  const soundcloudUrlRegex = /^https:\/\/soundcloud\.com\/[^\/]+\/[^\/]+$/;
-  if (url.match(soundcloudUrlRegex)) {
-    return url;
-  }
+  if (!url.includes("on.soundcloud")) return url;
 
   try {
     const response = await fetch(url);
