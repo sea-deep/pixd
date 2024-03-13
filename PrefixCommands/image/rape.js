@@ -24,7 +24,7 @@ export default {
     ];
     const position = allCords[Math.floor(Math.random() * 4)];
     let url = await getInputImage(message);
-    const res = fetch(url);
+    const res = await fetch(url);
     const buffer = await res.arrayBuffer();
     const avatar = await sharp(buffer).resize(366, 500, {fit: "fill"}).toBuffer();
     const rapper = await sharp("./Assets/rap.jpg")
