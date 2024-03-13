@@ -44,7 +44,7 @@ export default {
             input: {
               text: {
                 text: text,
-                fontfile: "futura.otf",
+                fontfile: "./Assets/futura.otf",
                 width: 315,
                 height: 92,
                 alignment: "center",
