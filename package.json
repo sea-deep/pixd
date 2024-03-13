@@ -24,7 +24,6 @@
     "url-to-screenshot": "^3.0.0",
     "glob": "^8.0.1",
     "google-img-scrap": "^1.1.1",
-    "jimp": "^0.22.8",
     "libsodium-wrappers": "^0.7.11",
     "node-fetch": "^3.2.6",
     "openai": "^3.3.0",
