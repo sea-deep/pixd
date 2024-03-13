@@ -37,7 +37,7 @@ export default {
       encoder.start();
       for (let i = 0; i < 65; i++) {
         const frame = i < 10 ? `0${i}` : `${i}`;
-        const bg = `./Assets/okbb/frame_${frame}_delay-0.05s.gif`;
+        const bg = `./Assets/okbhaibudbak/frame_${frame}_delay-0.05s.gif`;
         const banner = sharp(bg).composite([
           { input: avatar, top: 6, left: 6, tile: true },
           {
