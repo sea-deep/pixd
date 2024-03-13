@@ -1,5 +1,5 @@
 import { AttachmentBuilder, Message, Client} from "discord.js";
-import Jimp from "jimp";
+import sharp from "sharp";
 
 export default {
   name: "animan",
@@ -17,7 +17,6 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
-   await message.channel.sendTyping(); 
    const ids = message.content 
      .match(/<@(\d+)>/g); 
    if (!ids || ids.length < 4) { 
@@ -27,31 +26,39 @@ export default {
    let avatars = []; 
    for (let i = 0; i < idArray.length; i++) { 
      let user = await client.users.fetch(idArray[i]); 
-    avatars.push(user.displayAvatarURL({ 
+    let url = user.displayAvatarURL({ 
     extension: 'png', 
     forceStatic: true 
- })); 
-   } 
-   let bg = await Jimp.read( 'https://iili.io/JM9Nh9j.png' 
-   ); 
-   bg.resize(720, 762); 
-   let avatar1 = await Jimp.read(avatars[0]); 
-   let avatar2 = await Jimp.read(avatars[1]); 
-   let avatar3 = await Jimp.read(avatars[2]); 
-   let avatar4 = await Jimp.read(avatars[3]); 
-  
-   avatar1.resize(80, 80); 
-   avatar2.resize(148, 144); 
-   avatar3.resize(123, 112); 
-   avatar4.resize(100, 110); 
-   const animan = new Jimp(720, 762)
-     .composite(avatar2, 156, 527) 
-     .composite(avatar3, 363, 581) 
-     .composite(avatar4, 555, 527) 
-     .composite(bg, 0, 0) 
-     .composite(avatar1, 291, 38); 
-   let buffer = await animan.getBufferAsync(Jimp.MIME_PNG); 
-  
+ }); 
+     const res = await fetch (url);
+     const buffer = await res.arrayBuffer();
+     avatars.push(buffer);
+   }
+    const options = {
+      fit: "fill"
+    };
+   let bg = await sharp("./Assets/animan.png").resize(720, 762,options).toBuffer();
+   let avatar1 = await sharp(avatars[0]).resize(80,80,options).toBuffer();
+   let avatar2 = await sharp(avatars[1]).resize(148, 144, options).toBuffer(); 
+   let avatar3 = await sharp(avatars[2]).resize(123, 112, options).toBuffer();
+   let avatar4 = await sharp(avatars[3]).resize(100, 110, options).toBuffer(); 
+
+   const animan = await sharp({
+     create: {
+       width: 720,
+       height: 762,
+       channels: 4,
+       background: { r: 0, g: 0, b: 0, alpha: 0 },
+     }
+   }).composite([
+     {input: avatar2, top:527, left: 156},
+     {input: avatar3, top: 581, left: 363},
+     {input: avatar4, top: 527, left: 555},
+     {input: bg, top: 0, left: 0},
+     {input: avatar1, top: 38, left: 291}
+   ]).png().toBuffer();
+     
+   
    const b = [ 
      'I put the new Forgis on the Jeep', 
      'I trap until the bloody bottoms is underneath', 
@@ -72,7 +79,7 @@ export default {
    ]; 
   
    const line = b[Math.floor(Math.random() * b.length)]; 
-   let file = new AttachmentBuilder(buffer, {name: 'animan.png'}); 
+   let file = new AttachmentBuilder(animan, {name: 'animan.png'}); 
    return message.reply({ 
      content: line, 
      files: [file], 
