@@ -48,7 +48,7 @@ export default {
                 width: 315,
                 height: 92,
                 align: "center",
-                justify: true
+                justify: true,
                 font: "Futura Condensed Bold",
               },
             },
