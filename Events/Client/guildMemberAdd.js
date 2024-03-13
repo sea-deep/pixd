@@ -33,11 +33,11 @@ export default {
       let text = `@${member.user.username} just joined the server`;
       let channel_id = "1128609011852390400";
       const encoder = new GIFEncoder(427, 320);
-      encoder.setDelay(50);
+      encoder.setDelay(100);
       encoder.start();
-      for (let i = 0; i < 65; i++) {
+      for (let i = 0; i < 33; i++) {
         const frame = i < 10 ? `0${i}` : `${i}`;
-        const bg = `./Assets/okbhaibudbak/frame_${frame}_delay-0.05s.gif`;
+        const bg = `./Assets/okbhaibudbak/frame_${frame}_delay-0.1s.gif`;
         const banner = sharp(bg).composite([
           { input: avatar, top: 6, left: 6 },
           {
