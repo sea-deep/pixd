@@ -47,7 +47,7 @@ export default {
                 fontfile: "./Assets/futura.otf",
                 width: 315,
                 height: 92,
-                alignment: "center",
+                align: "center",
                 font: "Futura Condensed Bold",
               },
             },
