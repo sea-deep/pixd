@@ -1,4 +1,4 @@
-import { GuildMember, Client } from "discord.js";
+import { AttachmentBuilder, GuildMember, Client } from "discord.js";
 import GIFEncoder from "gif-encoder-2";
 import sharp from "sharp";
 export default {
