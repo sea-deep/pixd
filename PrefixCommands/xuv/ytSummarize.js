@@ -89,6 +89,7 @@ async function summarizeVideo(url, lang) {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
    result = await model.generateContent(prompt);
   } catch (e) {
+    console.log(e.message);
     throw new Error("AI model is overloaded, please try again later");
   }
   const text = result.response.text();
