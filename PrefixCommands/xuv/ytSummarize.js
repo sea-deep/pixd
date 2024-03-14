@@ -90,7 +90,7 @@ async function summarizeVideo(url, lang) {
    result = await model.generateContent(prompt);
   } catch (e) {
     console.log(e.message);
-    throw new Error("AI model is overloaded, please try again later");
+    throw new Error(e);
   }
   const text = result.response.text();
   return {
