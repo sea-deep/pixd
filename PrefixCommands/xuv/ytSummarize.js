@@ -21,6 +21,17 @@ export default {
     */
   execute: async (message, args, client) => {
     let match = message.content.match(/(https?|ftp):\/\/[^\s/$.?#].[^\s]*/i);
+    if (!match || match.length === 0) {
+      let er = await message.reply({
+        content: '',
+        embeds: [{
+          title: "An error occurred:",
+          description: "Not a valid YouTube URL",
+        }]
+      });
+      await client.sleep(10000);
+      return er.delete();
+    }
     let langMatch = message.content.match(/-(\w{2})/);
     let arg = match[0];
     let lang = langMatch ? langMatch[1] : "en";
