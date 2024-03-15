@@ -42,7 +42,7 @@ export default {
       ]).png()
       .toBuffer();
     const vosahi = await sharp(sahi).resize(1080, 855, {position: "top"}).png().toBuffer();
-
+//test
     let file = new AttachmentBuilder(vosahi, { name: "maisahitha.png" });
     let text = [
       "vo kuch thug hai",
