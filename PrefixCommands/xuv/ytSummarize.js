@@ -74,7 +74,8 @@ async function summarizeVideo(url, lang) {
     throw new Error("Failed to fetch video info");
   }
   let subtitles = await getSubtitles(ytInfo.video_details.id, lang);
-  if (!subtitles) return false;
+  if (!subtitles) throw new Error("Failed to fetch subtitles for this video");
+  
   const prompt = [
     `Summarize the following YouTube video thoroughly. Please include all important information presented in the video.`,
     `Title: ${ytInfo.video_details.title} by Channel: ${ytInfo.video_details.channel.name}`,
@@ -97,7 +98,7 @@ async function summarizeVideo(url, lang) {
       summary: text,
       title: ytInfo.video_details.title,
       thumbnail: ytInfo.video_details.thumbnails[0].url
-    };;
+    };
 }
 
 async function fetchData(url) {
