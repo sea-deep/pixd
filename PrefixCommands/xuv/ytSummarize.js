@@ -32,7 +32,7 @@ export default {
       await client.sleep(10000);
       return er.delete();
     }
-    let langMatch = message.content.match(/-(\w{2})/);
+    let langMatch = message.content.match(/ (\w{2,4})-(\w{2,4})\b/);
     let arg = match[0];
     let lang = langMatch ? langMatch[1] : "en";
     let call;
