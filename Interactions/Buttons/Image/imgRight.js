@@ -1,15 +1,13 @@
 import { Client } from "discord.js";  
   
  export default {  
-   name: 'img_left',  
+   name: 'img_right',  
    /**  
      * @param {Client} client  
      */  
    execute: async (interaction, client) => { 
     if (interaction.member.id !== interaction.message.mentions.users.first().id) return; 
-    console.log("image right button triggered")
    await interaction.deferUpdate(); 
-   console.log("image right 3 button triggered") 
        const images = await client.keyv.get(interaction.message.id);  
   
        if (!images || images.length === 0) {
