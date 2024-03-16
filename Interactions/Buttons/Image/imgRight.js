@@ -7,7 +7,9 @@ import { Client } from "discord.js";
      */  
    execute: async (interaction, client) => { 
     if (interaction.member.id !== interaction.message.mentions.users.first().id) return; 
+    console.log("image right button triggered")
    await interaction.deferUpdate(); 
+   console.log("image right 3 button triggered") 
        const images = await client.keyv.get(interaction.message.id);  
   
        if (!images || images.length === 0) {
@@ -46,7 +48,7 @@ import { Client } from "discord.js";
        };  
   
        
-       await interaction.message.edit({  
+     await interaction.message.edit({  
          content: '',  
          embeds: [embed],
        });
