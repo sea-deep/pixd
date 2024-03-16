@@ -7,6 +7,7 @@ export default {
      * @param {Client} client  
      */  
   execute: async (interaction, client) => {
+    await interaction.deferUpdate();
     const msg = interaction.message;
     const btn = msg.components[0].components[1].label;
     const currentPage = parseInt(btn.split("/")[0]) - 1;
@@ -19,8 +20,7 @@ console.log(`ud${msg.id}`);
     let res = await urban.search(term);
     let def = res.list[goto];
 
-    await interaction.deferUpdate();
-    await interaction.message.edit({
+    return interaction.message.edit({
         content: "",
         tts: false,
         components: [
