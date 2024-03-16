@@ -11,6 +11,8 @@ export default {
   * @param {Client} client
   */
   execute: async (interaction, client) => {
+    await interaction.deferUpdate();
+    
   let message = interaction.message;
   let content = message.content.split('\n');
   let components;
@@ -64,7 +66,6 @@ export default {
     desc = Array(6).fill(`${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}${emptyDisk}`);
     components = createComponents();
   }
-  await interaction.deferUpdate();
   await message.edit({
     content: content.join('\n'),
     tts: false,
