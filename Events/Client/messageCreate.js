@@ -45,11 +45,11 @@ export default {
     } 
 
     if (command?.args && !args.length) { 
-      let reply = `❌ **You didn't provide any arguments, ${message.author}!**`; 
+      let reply = `❌ **You didn't provide any arguments**`; 
       if (command.usage) { 
         reply += `\n**The proper usage would be:** \`${prefix}${command.usage}\``; 
       } 
-      return message.channel.send({
+      return message.reply({
        content: '',
        embeds: [{
         description: reply,
@@ -61,7 +61,7 @@ export default {
     try { 
       command.execute(message, args, client); 
     } catch (err) { 
-      process.stdout.write(`MessageCreate: ${err}\n`); 
+      process.stdout.write(`Error in MessageCreate: ${err}\n`); 
       message.reply({
        content: '',
        embeds: [{
