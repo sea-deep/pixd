@@ -55,7 +55,7 @@ export async function startVoiceConnection(
         } catch (error) {
           console.log(`Forcibly destroyed the bot.`);
           connection.destroy();
-          client.queue.delete(message.guild.id);
+          client.queue.delete(params.guildId);
         }
       },
     );
@@ -63,7 +63,7 @@ export async function startVoiceConnection(
     const userCheck = setInterval(() => {
       if (
         voiceChannel.members.size == 1 &&
-        getVoiceConnection(message.guild.id) != undefined
+        getVoiceConnection(params.guildId) != undefined
       ) {
         clearInterval(userCheck);
         destroy(message.guild, client);
@@ -75,12 +75,12 @@ export async function startVoiceConnection(
     try {
       play(message.guild, queueConstructor.songs[0], client);
     } catch (e) {
-      console.log("error while playing", e.message);
+      console.log("error while playing: ", e.message);
       return message.react("<:error:1090721649621479506>");
     }
   } catch (err) {
-    console.log(err);
-    client.queue.delete(message.guild.id);
-    return message.channel.send(err);
+    console.log("Unexpected error with Voice connection handler:", err.message);
+    client.queue.delete(params.guildId);
+    return message.channel.send(err.message);
   }
 }
