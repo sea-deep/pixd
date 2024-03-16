@@ -8,6 +8,8 @@ export default {
     * @param {Client} client
     */
   async execute(interaction, client) {
+    await interaction.deferUpdate();
+          
     const value = interaction.fields.getTextInputValue('answer').toLowerCase();
     let newWord = [...value].map(char => `:regional_indicator_${char.toLowerCase()}:`).join(" ");
 
@@ -71,7 +73,7 @@ export default {
             type: 'rich',
             title: `WORDLE`,
             description: `${newDesc}`,
-            color: 0x562fff,
+            color: client.color,
             fields: [
               {
                 name:  '🎚️ Chances Left :',
@@ -83,16 +85,15 @@ export default {
       };
 
      
-        // If the game is not over
-  //      msg.components =
-      
-
-      await interaction.deferUpdate();
       await interaction.message.edit(msg);
     } else {
-      await interaction.reply({
-        content: 'Please enter a valid word.',
+      await interaction.followUp({
+        content: '',
         ephemeral: true,
+        embeds: [{
+          description: '**Please enter a valid word**.',
+          color: client.color
+        }]
       });
     }
   }
