@@ -6,4 +6,4 @@ export default {
     await interaction.deferUpdate();
     return c4Button(interaction, 3);
   }
-}
+};
