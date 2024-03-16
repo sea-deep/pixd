@@ -2,6 +2,7 @@ import { Client } from 'discord.js';
 import axios from "axios";
 export default {
   name: 'getWordDef',
+  deferReply: true,
   /**
   * @param {Client} client
   */
@@ -12,8 +13,8 @@ export default {
 `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${key}`);
 
    let shortdef = resp.data[0].shortdef ? '- **' + resp.data[0].shortdef.join('**\n- **') + '**' : '`couldn’t find lmao`'; 
-   return interaction.reply( 
+   return interaction.followUp( 
      `The definitions for \`${word}\` are:\n${shortdef}` 
    );
   }
-}
+};
