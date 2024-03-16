@@ -2,7 +2,7 @@ export default {
   name: 'img_input',
   execute: async (interaction) => {
       if (interaction.message.mentions.users.first().id === interaction.user.id) { 
-     await interaction.showModal({ 
+     return interaction.showModal({ 
        custom_id: `imgInputForm`,
        title: `Jump to a page.`, 
        components: [ 
@@ -24,10 +24,13 @@ export default {
        ], 
      }); 
    } else { 
-     await interaction.reply({ 
+     await interaction.deferReply({
+       ephemeral: true,
+     });
+     return interaction.followUp({ 
        content: '❌ *This is not your message.*', 
        ephemeral: true, 
      }); 
    }
   }
-}
+};
