@@ -43,6 +43,9 @@ export default {
    * @param {Client} client
    */
   execute: async (interaction, client) => {
+    await interaction.deferReply({
+     ephemeral: true
+    });
     let type = interaction.options.getString("type");
     let sort = interaction.options.getString("sort");
 
@@ -75,9 +78,6 @@ const filesFound = results.files_found.slice(0, 30);
     }));
 }).filter(chunk => chunk.length > 0);
 
-await interaction.deferReply({
-  ephemeral: true
-});
 
 fields.forEach(async (field,i) =>{
   await interaction.followUp({
