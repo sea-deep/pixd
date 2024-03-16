@@ -97,7 +97,7 @@ export default {
          type: 'rich', 
          description: `**[${img.title}](${img.originalUrl})**`, 
          title: `🔍 ${query}`, 
-         color: 0xf0f0f0, 
+         color: client.color, 
          image: { 
            url: img.url, 
            height: img.height, 
@@ -122,7 +122,7 @@ export default {
        embeds: msg.embeds,
        components: []
        });
-      } catch (e) {console.log(e.message);}
+      } catch (e) {console.log("Error while removing the components in img command");}
      }
   }
 };
