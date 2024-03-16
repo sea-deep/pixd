@@ -2,7 +2,9 @@ import { move, message2048, parseDesc, calculateScore } from "../../../Helpers/h
 
 export default {
   name: '2048down',
+  deferUpdate: true,
   execute: async (interaction) => {
+   await interaction.deferUpdate();
       const description = interaction.message.embeds[0].description; 
    let newDescription = move(description, 'down'); 
   
@@ -10,7 +12,6 @@ export default {
      description: newDescription, 
      score: calculateScore(parseDesc(newDescription)), 
    }); 
-   await interaction.deferUpdate();
    return interaction.message.edit(msg);
   }
-}
+};
