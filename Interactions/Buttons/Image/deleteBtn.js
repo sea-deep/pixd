@@ -18,7 +18,7 @@ export default {
            description: "**You cannot delete this message.**",
            color: client.color
          }]
-       })
+       });
     }
   }
 };
