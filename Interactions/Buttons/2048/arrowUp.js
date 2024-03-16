@@ -3,14 +3,14 @@ import { move, message2048, parseDesc, calculateScore } from "../../../Helpers/h
 export default {
   name: '2048up',
   execute: async (interaction) => {
-      const description = interaction.message.embeds[0].description; 
+   await interaction.deferUpdate();
+   const description = interaction.message.embeds[0].description; 
    let newDescription = move(description, 'up'); 
   
    let msg = message2048({ 
      description: newDescription, 
      score: calculateScore(parseDesc(newDescription)), 
    }); 
-    await interaction.deferUpdate();
    return interaction.message.edit(msg);
   }
 }
