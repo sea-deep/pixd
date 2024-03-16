@@ -24,6 +24,9 @@ export default {
    * @param {Client} client
    */
   execute: async(interaction, client) => {
+    await interaction.deferReply({
+      ephemeral:true
+    });
     let msg = interaction.options.getString('message');
    let attachment = interaction.options.getAttachment('attachment');
   let channelId = "1051571067606544575";
@@ -42,9 +45,9 @@ export default {
     }
   await channel.send(query);
 
-  return interaction.reply({
+  return interaction.followUp({
     content: 'Your message has been sent to the devalepor!',
     ephemeral: true
-  })
+  });
   }
 };
