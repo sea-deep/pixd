@@ -13,4 +13,4 @@ export default {
    }); 
    return interaction.message.edit(msg);
   }
-}
+};
