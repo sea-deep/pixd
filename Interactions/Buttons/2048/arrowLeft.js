@@ -4,8 +4,7 @@ export default {
   name: '2048left',
   execute: async(interaction) => {
    await interaction.deferUpdate();
-        
-      const description = interaction.message.embeds[0].description; 
+   const description = interaction.message.embeds[0].description; 
    let newDescription = move(description, 'left'); 
   
    let msg = message2048({ 
