@@ -12,7 +12,13 @@ export default {
   execute: async (message, client) => {
     if (config.restricted.includes(message.author.id)) return;
     if (message.content === `<@${client.user.id}>`) {
-      message.reply(`**The Prefix is:** \`${prefix}\``);
+      message.reply({
+       content: '',
+       embeds: [{
+        description: `**The Prefix is:** \`${prefix}\``,
+        color: client.color
+      }] 
+     });
     } 
     if (message.author.bot) return;
 
@@ -29,7 +35,13 @@ export default {
     }
 
     if (command?.guildOnly && message.channel.type === "dm") { 
-      return message.reply("❌ **I can't execute that command inside DMs!**"); 
+      return message.reply({
+       content: '',
+       embeds: [{
+        description: "❌ **I can't execute that command inside DMs!**",
+        color: client.color
+      }] 
+     }); 
     } 
 
     if (command?.args && !args.length) { 
@@ -37,14 +49,26 @@ export default {
       if (command.usage) { 
         reply += `\n**The proper usage would be:** \`${prefix}${command.usage}\``; 
       } 
-      return message.channel.send(reply); 
+      return message.channel.send({
+       content: '',
+       embeds: [{
+        description: reply,
+        color: client.color
+      }] 
+     }); 
     } 
 
     try { 
       command.execute(message, args, client); 
     } catch (err) { 
       process.stdout.write(`MessageCreate: ${err}\n`); 
-      message.reply("*There was an error trying to execute that command!*"); 
+      message.reply({
+       content: '',
+       embeds: [{
+        description: "*There was an error trying to execute that command!*",
+        color: client.color
+      }] 
+     }); 
     } 
   },
 };
