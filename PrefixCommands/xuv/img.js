@@ -118,8 +118,7 @@ export default {
     if(!client.keyv.has(mseg.id)) { 
       try {
        await mseg.edit({   
-       content: '',   
-       embeds: msg.embeds,
+       content: '', 
        components: []
        });
       } catch (e) {console.log("Error while removing the components in img command");}
