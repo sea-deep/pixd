@@ -2,8 +2,10 @@ import { getLyrics, searchSong  } from "../../../Helpers/helpersMusic.js";
 
 export default {
   name: "getLyrics",
-  deferReply: true,
   execute: async (interaction) => {
+    await interaction.deferReply({
+      ephemeral: true
+    });
     let title = interaction.message.embeds[0].title.split(" - ")[1];
     
     const call = await searchSong(title);
