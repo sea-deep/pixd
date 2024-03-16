@@ -6,8 +6,7 @@ export default {
     * @param {Client} client 
     */ 
   execute: async (interaction, client) => {
-       await interaction.deferUpdate({ ephemeral: true  
-        }); 
+       await interaction.deferUpdate(); 
       const regex = /`([^`]+)`/;  
       const matches = interaction.message.embeds[0].footer.text.match(regex);  
       const total = parseInt(matches[1].split('/')[1]) - 1;  
@@ -16,9 +15,13 @@ export default {
       const valueee = Number(val); 
       
       if (isNaN(valueee) || valueee >= total || valueee < 0) {  
-        return interaction.reply({  
-          content: "Not a valid number!",  
-          ephemeral: true  
+        return interaction.followUp({  
+          content: "",  
+          ephemeral: true,
+          embeds: [{
+            description: 'Not a valid number!',
+            color: client.color
+          }]
         }); 
       }  
 
@@ -35,7 +38,7 @@ export default {
           height: image.height, 
           width: image.width 
         }, 
-        color: 0xf0f0f0, 
+        color: client.color, 
         footer: { 
           text: msg.embeds[0].footer.text.replace('`' + (current + 1), '`' + (next + 1)) 
         } 
@@ -49,11 +52,14 @@ export default {
        await client.keyv.setTTL(interaction.message.id, 30); 
        await client.sleep(30500); 
        if(!client.keyv.has(interaction.message.id)) {
+        try{
           await interaction.message.edit({   
           content: '',   
-          components: [], 
-          embeds: [embed] 
+          components: [],
           });
+        }  catch (e) {
+          console.log("Error while removing components in image command:", e.message);
+        }
       }
   } 
 }; 
