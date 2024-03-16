@@ -27,6 +27,7 @@ client.stringSelectMenus = new Collection();
 client.queue = new Collection(); 
 client.keyv = new KeyValueStore(); 
 client.sleep = sleep; 
+client.color = 0xe08e67;
 
 // Website Handler 
 import('./Utilities/webpageHandler.js'); 
