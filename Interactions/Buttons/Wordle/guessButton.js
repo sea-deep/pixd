@@ -23,11 +23,11 @@ export default {
          }, 
        ], 
      }); 
-   } else { 
+   } else {
      await interaction.reply({ 
        content: '❌ *This is not your game.*', 
        ephemeral: true, 
      }); 
    }
   }
-}
+};
