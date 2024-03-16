@@ -8,6 +8,7 @@ export default {
     * @param {Client} client
     */
   async execute(interaction, client) {
+      await interaction.deferUpdate();
       const answer = client.keyv.get(interaction.message.id);
       
       const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);
@@ -106,8 +107,7 @@ export default {
         msg.embeds[0].fields[0].name = '🎚️ Chances Left :';
         msg.embeds[0].fields[0].value = newChances;
       }
-
       await interaction.deferUpdate();
       await interaction.message.edit(msg);
   }
-}
+};
