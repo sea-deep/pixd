@@ -32,6 +32,7 @@ export default {
       embeds: [{
         title: args.join(''),
         description: resp,
+        color: 0xe08e67
       }],
     });
   }
@@ -42,7 +43,7 @@ async function lookup(number) {
   const headers = {
     "user-agent": "Truecaller/11.75.5 (Android;10)",
     Authorization:
-      "Bearer "+ process.env['TRUECALLER'],
+      "Bearer "+ process.env.TRUECALLER,
   };
   const params = {
     q: number,
@@ -62,8 +63,7 @@ async function lookup(number) {
     );
 
     const data = await response.json();
-    //  console.log(JSON.stringify(data.data[0], null, 2))
-    let r = data.data[0];
+  let r = data.data[0];
 let out = [
   `**Name**: ${r?.name || "Not available"}`,
   `**City**: ${r?.addresses[0]?.city || "Not available"}, ${r?.phones[0]?.countryCode || "Not available"}`,
