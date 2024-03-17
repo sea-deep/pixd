@@ -28,7 +28,6 @@ export default {
 
     if (args.length === 0) {
       serverQueue.player.stop();
-      console.log(`Skipped ${serverQueue.songs[0].title}.`);
       return message.react("<:skip:1090718541143097464>");
     }
 
