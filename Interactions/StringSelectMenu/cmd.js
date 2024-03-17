@@ -81,7 +81,7 @@ components: [
       type: 'rich',
       title: `Tech Saport`,
       description: `</suggest:000> : Send a message to developer\n~~</subscribe:000> : Get updates!~~`,
-      color: 0xbbab30,
+      color: 0xe08e67,
       thumbnail: {
         url: 'https://images-ext-2.discordapp.net/external/uFIhM0gaX0cTSdv3zispJ0ffhjOtel4mUcXISBFRgow/https/cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
