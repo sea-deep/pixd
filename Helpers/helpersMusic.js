@@ -98,7 +98,7 @@ export async function play(guild, song, client, message) {
           type: "rich",
           title: "",
           description: "",
-          color: 0x462,
+          color: 0xe08e67,
           author: {
             name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
                                  icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,},
