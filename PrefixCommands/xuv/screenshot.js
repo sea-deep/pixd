@@ -25,7 +25,7 @@ export default {
       return message.reply({
         content: "",
         embeds: [{
-          description: "❎| Please give a valid url",
+          description: "❎| **Please give a valid url**",
           color: 0xe08e67
         }]
       });
@@ -43,7 +43,7 @@ export default {
         return message.reply({
           content: "",
           embeds: [{
-            description: "❎| An error occurred while capturing screenshot.",
+            description: "❎ | **An error occurred while capturing screenshot**",
             color: 0xe08e67
           }]
         });
@@ -55,7 +55,7 @@ export default {
 
       await message.channel.send({
         content: '', files: [attachment], embeds: [{
-          description: `**Screenshot for: ${url}`, color: 0xe08e67
+          description: `**Screenshot for: _${url}_**`, color: 0xe08e67
         }]
       });
   }
