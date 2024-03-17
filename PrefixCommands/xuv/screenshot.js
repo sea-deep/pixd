@@ -1,4 +1,5 @@
-import { Message, AttachmentBuilder } from "discord.js";
+import fetch from "node-fetch";
+import { AttachmentBuilder, Message } from "discord.js";
 
 export default {
   name: "screenshot",
@@ -11,51 +12,51 @@ export default {
     bot: [],
     user: [],
   },
+  /**
+   * @param {Message} message
+   */
   async execute(message) {
-    // Extract URL from message content using a more robust regex
-    const urlRegex = /(https?:\/\/[^\s]+)/gi;
-    const matches = message.content.match(urlRegex);
+    await message.channel.sendTyping();
+    const text = message.content;
+    const urlPattern = /(https?:\/\/)?(www\.)?(\w+\.\w+)/g;
+    const urls = text.match(urlPattern);
 
-    if (matches && matches.length > 0) {
-      const url = matches[0]; // First captured URL
-      const isMobile = message.content.toLowerCase().includes('-m');
-
-      try {
-        // Make the fetch request
-        const response = await fetch(`https://dd355859-026d-456f-aea3-31fc9a34ebf2-00-2r3kcsupg6yi6.pike.replit.dev/screenshot?url=${url}&mobile=${isMobile}`, {
-          headers: {
-            Authorization: 'Ads' // Secret password
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const imageBuffer = await response.arrayBuffer();
-
-        // Convert image buffer to Base64
-        const base64Image = Buffer.from(imageBuffer).toString('base64');
-
-        // Create attachment from Base64 data and MIME type
-        const attachment = new AttachmentBuilder('data:image/png;base64,' + base64Image, 'screenshot.png');
-
-        await message.channel.send({ content: `Screenshot of <${url}>:`, files: [attachment] });
-      } catch (error) {
-        console.error('Error capturing screenshot:', error);
-
-        // Provide informative error message
-        let errorMessage = 'Failed to capture screenshot.';
-        if (error.message.includes('403')) {
-          errorMessage = 'Invalid secret password. Access denied.';
-        } else {
-          errorMessage = 'Error capturing screenshot: ' + error.message;
-        }
-
-        await message.channel.send(errorMessage);
-      }
-    } else {
-      await message.channel.send("No valid URL provided.");
+    if (!urls || urls.length === 0) {
+      return message.reply({
+        content: "",
+        embeds: [{
+          description: "❎| Please give a valid url",
+          color: 0xe08e67
+        }]
+      });
     }
+
+    let url = urls[0].trim()
+      .toLowerCase()
+      .replace(/^(https?:\/\/)?/, "https://")
+      .replace(/^https?:\/\/(www\.)?/, "https://");
+    const isMobile = message.content.toLowerCase().includes('-m');
+
+      const response = await fetch(`https://fetch-ss.onrender.com/screenshot?url=${url}&mobile=${isMobile}&password=${process.env.SS_PASS}`);
+
+      if (!response.ok) {
+        return message.reply({
+          content: "",
+          embeds: [{
+            description: "❎| An error occurred while capturing screenshot.",
+            color: 0xe08e67
+          }]
+        });
+      }
+
+      const imageBuffer = await response.arrayBuffer();
+      const ss = Buffer.from(imageBuffer);
+      const attachment = new AttachmentBuilder(ss, 'screenshot.png');
+
+      await message.channel.send({
+        content: '', files: [attachment], embeds: [{
+          description: `**Screenshot for: ${url}`, color: 0xe08e67
+        }]
+      });
   }
 };
