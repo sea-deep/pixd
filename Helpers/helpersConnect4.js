@@ -18,20 +18,32 @@ export async function c4Button(interaction, dropIn) {
  ) { 
    if (!mentions.includes(interaction.member.user.id)) { 
      return interaction.followUp({ 
-       content: `❌ **This is not your game**`, 
+       content: '', 
        ephemeral: true, 
+       embeds: [{
+         description: `❌ **This is not your game**`,
+         color: 0xe08e67
+       }]
      }); 
    } else { 
      return interaction.followUp({ 
-       content: `❌ **This is not your turn**`, 
+       content: '', 
        ephemeral: true, 
+       embeds: [{
+         description: `❌ **This is not your turn**`,
+         color: 0xe08e67
+       }]
      }); 
    } 
  } else if (!mentions.includes(interaction.member.user.id)) { 
    return interaction.followUp({ 
-     content: `❌ **This is not your game**`, 
-     ephemeral: true, 
-   }); 
+       content: '', 
+       ephemeral: true, 
+       embeds: [{
+         description: `❌ **This is not your game**`,
+         color: 0xe08e67
+       }]
+     }); 
  } 
   
  let components = message.components; 
@@ -54,9 +66,13 @@ export async function c4Button(interaction, dropIn) {
   
    if (!newBoard) { 
      return interaction.followUp({ 
-     content: `❌ **This column is already filled.**`, 
-     ephemeral: true, 
-   }); 
+       content: '', 
+       ephemeral: true, 
+       embeds: [{
+         description: `❌ **This column is already filled.**`,
+         color: 0xe08e67
+       }]
+     }); 
    } 
    components = components.map((component, ind) => { 
    component.components = component.components.map((button, index) => { 
@@ -106,9 +122,13 @@ message.embeds[0].description.split('\n'),
    );
       if (!userDrop) { 
      return interaction.followUp({ 
-     content: `❌ **This column is already filled.**`, 
-     ephemeral: true, 
-   }); 
+       content: '', 
+       ephemeral: true, 
+       embeds: [{
+         description: `❌ **This column is already filled.**`,
+         color: 0xe08e67
+       }]
+     }); 
    } 
 
    let gameOver1 = isGameOver(userDrop, emptyDisk); 
@@ -481,10 +501,8 @@ function autoDrop(board) {
      } 
    } 
   
-   // Shuffle the indices again 
    shuffleArray(shuffledIndices); 
   
-   // Check for potential winning moves for the yellow player 
    for (let i = 0; i < 7; i++) { 
      const index = shuffledIndices[i]; 
   
@@ -494,11 +512,9 @@ function autoDrop(board) {
      } 
    } 
   
-   // Shuffle the indices once more 
    shuffleArray(shuffledIndices); 
-  
-   // Check for potential winning moves for the yellow player again 
-   for (let i = 0; i < 7; i++) { 
+    
+    for (let i = 0; i < 7; i++) { 
      const index = shuffledIndices[i]; 
   
      const testBoard4 = drop(board, yellowDisk, index); 
@@ -507,21 +523,17 @@ function autoDrop(board) {
      } 
    } 
   
-   // Analyze opponent's playing style and adapt strategy 
    const opponentStyle = analyzeOpponentStyle(); 
    if (opponentStyle === 'aggressive') { 
-     // Incorporate randomness to introduce unpredictability against aggressive opponents 
      const randomCol = shuffledIndices[Math.floor(Math.random() * 7)]; 
      return { board: drop(board, yellowDisk, randomCol), columnIndex: randomCol }; 
    } else if (opponentStyle === 'defensive') { 
-     // Block opponent's potential winning moves 
      const blockMove = blockOpponentWinningMove(redDisk); 
      if (blockMove) { 
        return blockMove; 
      } 
    } 
   
-   // Find the most advantageous move based on the evaluation function 
    const bestMove = findBestMove(yellowDisk); 
    return { board: drop(board, yellowDisk, bestMove), columnIndex: bestMove }; 
  } 
