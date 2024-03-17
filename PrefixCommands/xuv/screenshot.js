@@ -55,7 +55,7 @@ export default {
 
       await message.channel.send({
         content: '', files: [attachment], embeds: [{
-          description: `**Screenshot for: _${url}_**`, color: 0xe08e67
+          description: `**Screenshot for: __${url}__**`, color: 0xe08e67
         }]
       });
   }
