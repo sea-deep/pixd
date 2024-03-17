@@ -15,6 +15,7 @@ export default {
    * @param {Message} message
    */
   execute: async (message, args) => {
+    const prompt = args.join(' ');
     const mes = await message.reply({
       content: '',
       tts: false,
