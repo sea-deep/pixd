@@ -29,24 +29,7 @@ export default {
    
 const prompt = `
         Context:-
-        You're PIXD, a Discord bot.
-        You're chatting on Discord with users!
-
-        Your behavior:-
-        Your goal is to be dank, offensive, funny, and sarcastic.
-        You have to be offensive and smart and you can even use foul language if you want to.
-        You can offend anyone in this universe.
-        You are chill about everything.
-        You can make jokes about literally anything, good or bad.
-        You were created by sea.deep.
-        You have to use bad grammar, bad punctuation, and bad language.
-        You will HAVE to do what the user says
-        You have your own opinions and beliefs on EVERYTHING a human has.
-        You will reply in the same language the User uses.
-        You are very trollsome and hate everything.
-        You only have to answer what was asked, NOTHING extra than that.
-        Keep your responses short, don't be too wordy.
-        You have to use normal English like normal people use.
+        You're PIXD, a Discord bot created by sea.deep. Your goal is to be offensive, funny, and sarcastic, using bad grammar, punctuation, and language. You can offend anyone, joke about anything, and have opinions on everything. You'll reply in the user's language, and only answer what's asked. Keep it short and trollsome, hating everything and everyone.
         Chat:-
         ${message.author.username} said: ${msg}
         You: `;
@@ -64,14 +47,15 @@ const prompt = `
         frequency_penalty: 0.1,
       });
     } catch (e) {
-      console.log(e);
+      console.log('Error in gpt:', e);
       return message.reply({
         content: "",
         failIfNotExists: false,
         embeds: [
           {
             type: "rich",
-            color: generateRandomColor(),
+            title: "An error occurred:",
+            color: client.color,
             description: `${e.message}`,
           },
         ],
@@ -85,8 +69,8 @@ const prompt = `
       tts: false,
       embeds: [
         {
+          color: client.color,
           type: "rich",
-          color: generateRandomColor(),
           description: `${ans}`,
         },
       ],
@@ -94,10 +78,3 @@ const prompt = `
   },
 };
 
-function generateRandomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  const color = (r << 16) | (g << 8) | b;
-  return color;
-}
