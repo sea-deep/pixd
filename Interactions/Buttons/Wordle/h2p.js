@@ -22,7 +22,7 @@ export default {
          type: 'rich', 
          title: `Guess the WORDLE in 6 tries.`, 
          description: desc, 
-         color: 0xA50021, 
+         color: 0xe08e67, 
          footer: { 
            text: `Play now p!wordle`, 
          }, 
