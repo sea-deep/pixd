@@ -19,7 +19,7 @@ export default {
         embeds: [
           {
             description: chunk,
-            color: 0x2f3136,
+            color: 0xe08e67,
           },
         ],
         ephemeral: true,
