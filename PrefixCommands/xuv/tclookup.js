@@ -18,12 +18,15 @@ export default {
   execute: async (message, args, client) => {
     let timer = client.keyv.get("tctimer");
     if (timer) {
-  message.reply("We're on cooldown for a few seconds, please wait...").then(cooldownMessage => {
-    setTimeout(() => {
-      cooldownMessage.delete().catch(console.error);
-    }, 3000);
+   let er = await message.reply({
+    content: "",
+    embeds: [{
+      description: "⌚ | We're on cooldown for a few seconds, please wait...",
+      color: client.color
+    }]
   });
-  return;
+  await client.sleep(5000);
+  return er.delete();
 }
     let resp = await lookup(args.join(''));
     await client.keyv.set("tctimer", true, 30);
