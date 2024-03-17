@@ -35,7 +35,6 @@ export async function play(guild, song, client, message) {
   clearTimeout(serverQueue.timeoutID);
   serverQueue.timeoutID = undefined;
 
-  try {
     let stream;
     if (song.source === "yt") {
       try {
@@ -106,9 +105,6 @@ export async function play(guild, song, client, message) {
         },
       ],
     });
-  } catch (error) {
-    console.error(`Error while playing: ${error.message}`);
-  }
 }
 
 /**
