@@ -43,7 +43,7 @@ export default {
        type: 'rich', 
        title: `🔢 Connect 4`, 
        description: desc.join('\n'), 
-       color: 0x7289da, 
+       color: 0xe08e67, 
        footer: { 
          text: `The first player to connect 4 disks horizontally, vertically, or diagonally wins!`, 
        }, 
