@@ -28,7 +28,7 @@ export default {
             type: "rich",
             title: "Not found",
             description: "Couldn't find a definition for this word.",
-            color: 0x6969,
+            color: client.color,
             author: {
               name: "urbandictionary",
               url: "https://urbandictionary.com/",
