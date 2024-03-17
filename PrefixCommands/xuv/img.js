@@ -17,7 +17,13 @@ export default {
     */
   execute: async (message, args, client) => {
    const query = args.join(' ');
-   const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
+   const mseg = await message.reply({
+     content: '',
+     embeds: [{
+       description: 'Searching <a:Searching:1142532717406322809>',
+       color: client.color
+     }]
+   });
    let images;
    try {
     images = await GOOGLE_IMG_SCRAP({
@@ -25,8 +31,23 @@ export default {
     limit: 101,
     safeSearch: false
 });
- if (!images.result || images.result.length == 0) return mseg.edit("**❌ No image found for that query.**");
-  } catch(e) { return mseg.edit(`An error occurred...: ${e.message}`); }
+ if (!images.result || images.result.length == 0) return mseg.edit({
+   content: "",
+   embeds: [{
+     description: "**❌ No image found for that query.**",
+     color: client.color
+   }]
+ });
+  } catch(e) {
+    return mseg.edit({
+      content: '',
+      embeds: [{
+        description: `An error occurred...: ${e.message}`,
+        color: client.color
+      }]
+    });
+    
+  }
 
 
   await client.keyv.set(mseg.id, images.result, 30);
