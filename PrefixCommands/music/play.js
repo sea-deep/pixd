@@ -69,7 +69,6 @@ export default {
           );
 
         if (search.length == 0) {
-         console.log("no video found");
           return message.react("<:error:1090721649621479506>");
         } else {
           song = {
@@ -79,19 +78,16 @@ export default {
             durationTime: parse(search[0].durationInSec),
             source: "yt",
           };
-   console.log(song)
           songs.push(song);
         }
       } else {
         let source = check.split("_")[0];
         let type = check.split("_")[1];
-console.log(check)
         if (source === "yt") {
           if (type === "video") {
             let video;
             try {
               video = await playDL.video_basic_info(args.join(" "));
-console.log(video.video_details)
             } catch (e) {
               console.log("error while getting video info", e.message);
               return message.react("<:error:1090721649621479506>");
@@ -228,7 +224,6 @@ console.log(video.video_details)
             message,
             queueConstructor,
           );
-console.log("hiii")
         } else {
           if (serverQueue?.songs.length == 0) {
             serverQueue.songs = serverQueue.songs.concat(songs);
@@ -245,7 +240,7 @@ console.log("hiii")
                     type: "rich",
                     title: "",
                     description: "",
-                    color: 0x462,
+                    color: 0xe08e67,
                     author: {
                       name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
                       icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
@@ -262,7 +257,7 @@ console.log("hiii")
                     type: "rich",
                     title: "",
                     description: "",
-                    color: 0x462,
+                    color: 0xe08e67,
                     author: {
                       name: `Added ${songs.length} songs to the queue`,
                       icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
