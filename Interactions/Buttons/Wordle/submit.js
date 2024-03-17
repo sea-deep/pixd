@@ -8,6 +8,16 @@ export default {
     * @param {Client} client
     */
   async execute(interaction, client) {
+   if (interaction.message.mentions.users.first().id !== interaction.user.id) {
+        return interaction.reply({ 
+       content: '',
+       ephemeral: true, 
+       embeds: [{
+         description: '❌ *This is not your game.*',
+         color: 0xe08e67
+       }]
+      }); 
+      }
       await interaction.deferUpdate();
       const answer = client.keyv.get(interaction.message.id);
       
@@ -52,7 +62,7 @@ export default {
             type: 'rich',
             title: `WORDLE`,
             description: `${newDesc}`,
-            color: 0x562fff,
+            color: 0xe08e67,
             fields: [
               {
                 name: `🏆 YOU WON`,
