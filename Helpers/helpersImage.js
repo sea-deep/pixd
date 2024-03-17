@@ -11,13 +11,15 @@ export async function getInputImage(message, opt) {
      }.png`; 
    } 
   
-   if (/<:[^:]+:(\d+)>/.test(message.content)) { 
-     let emojiId = RegExp.$1; 
+   let match = message.content.match(/<:[^:]+:(\d+)>/);
+   if (match) { 
+     let emojiId = match[1]; 
      return `https://cdn.discordapp.com/emojis/${emojiId}.png`; 
    } 
   
-   if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) { 
-     return RegExp['$&']; 
+   match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+   if (match) { 
+     return match[0]; 
    } 
   
    if (message.reference) { 
@@ -29,12 +31,14 @@ export async function getInputImage(message, opt) {
        return refMsg.attachments.first().url; 
      } 
   
-     if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) { 
-       return RegExp['$&']; 
+     match = refMsg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+     if (match) { 
+       return match[0]; 
      } 
   
-     if (/<:[^:]+:(\d+)>/.test(refMsg.content)) { 
-       let emojiId = RegExp.$1; 
+     match = refMsg.content.match(/<:[^:]+:(\d+)>/);
+     if (match) { 
+       let emojiId = match[1]; 
        return `https://cdn.discordapp.com/emojis/${emojiId}.png`; 
      } 
   
@@ -57,7 +61,7 @@ export async function getInputImage(message, opt) {
      forceStatic: state, 
    }); 
  }
- 
+
 export async function getCaptionInput(message) {
   let image = null;
 
@@ -65,11 +69,17 @@ export async function getCaptionInput(message) {
     image = message.attachments.first().url;
   } else if (message.stickers.size >= 1) {
     image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
-  } else if (/<:[^:]+:(\d+)>/.test(message.content)) {
-    const emojiId = RegExp.$1;
-    image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-  } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(message.content)) {
-    image = RegExp['$&'];
+  } else {
+    let match = message.content.match(/<:[^:]+:(\d+)>/);
+    if (match) {
+      const emojiId = match[1];
+      image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+    } else {
+      match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+      if (match) {
+        image = match[0];
+      }
+    }
   }
 
   if (!image && message.reference) {
@@ -77,26 +87,33 @@ export async function getCaptionInput(message) {
 
     if (refMsg.attachments.size >= 1) {
       image = refMsg.attachments.first().url;
-    } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(refMsg.content)) {
-      image = RegExp['$&'];
-    } else if (/<:[^:]+:(\d+)>/.test(refMsg.content)) {
-      const emojiId = RegExp.$1;
-      image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-    } else if (refMsg.stickers.size >= 1) {
-      image = `https://cdn.discordapp.com/stickers/${refMsg.stickers.first().id}.png`;
+    } else {
+      let match = refMsg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+      if (match) {
+        image = match[0];
+      } else {
+        match = refMsg.content.match(/<:[^:]+:(\d+)>/);
+        if (match) {
+          const emojiId = match[1];
+          image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+        }
+      }
     }
   }
 
   if (!image) {
-    const messages = await message.channel.messages.fetch({ limit: 10, cache: false});
-    messages.reverse().forEach((msg) => {
+    const messages = await message.channel.messages.fetch({ limit: 10, cache: false });
+    messages.forEach((msg) => {
       if (!image) {
         if (msg.attachments.size >= 1) {
           image = msg.attachments.first().url;
         } else if (msg.stickers.size >= 1) {
           image = `https://cdn.discordapp.com/stickers/${msg.stickers.first().id}.png`;
-        } else if (/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i.test(msg.content)) {
-          image = RegExp['$&'];
+        } else {
+          const match = msg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+          if (match) {
+            image = match[0];
+          }
         }
       }
     });
@@ -104,5 +121,3 @@ export async function getCaptionInput(message) {
 
   return image;
 }
-
-
