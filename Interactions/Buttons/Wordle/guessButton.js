@@ -1,7 +1,16 @@
 export default {
   name: 'guessWordle',
   execute: async (interaction) => {
-      if (interaction.message.mentions.users.first().id === interaction.user.id) { 
+      if (interaction.message.mentions.users.first().id !== interaction.user.id) {
+    return interaction.reply({ 
+       content: '',
+       ephemeral: true, 
+       embeds: [{
+         description: '❌ *This is not your game.*',
+         color: 0xe08e67
+       }]
+      }); 
+      }
      await interaction.showModal({ 
        custom_id: `guessedWordle`,
        title: `Enter your guess`, 
@@ -23,11 +32,5 @@ export default {
          }, 
        ], 
      }); 
-   } else {
-     await interaction.reply({ 
-       content: '❌ *This is not your game.*', 
-       ephemeral: true, 
-     }); 
-   }
   }
 };
