@@ -30,16 +30,6 @@ export default {
     const rapper = await sharp("./Assets/rap.jpg")
       .resize(732, 1000)
       .composite([
-        {
-          input: {
-            create: {
-              width: 366,
-              height: 500,
-              channels: 4,
-              background: { r: 0, g: 0, b: 0, alpha: 1 },
-            },
-          },
-        },
         { input: avatar, top: position.y, left: position.x },
       ])
       .png()
