@@ -1,4 +1,3 @@
-
 import { Client, Message } from "discord.js";
 import words from '../../Assets/words.json' assert { type: 'json' };
 export default {
@@ -66,7 +65,7 @@ export default {
            `◻️ ◻️ ◻️ ◻️ ◻️`, 
            `◻️ ◻️ ◻️ ◻️ ◻️`, 
          ].join('\n'), 
-         color: 0xC56699, 
+         color: 0xe08e67, 
          fields: [ 
            { 
              name: `🎚️ Chances Left :`, 
