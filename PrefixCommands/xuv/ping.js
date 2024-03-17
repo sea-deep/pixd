@@ -25,6 +25,7 @@ export default {
       tts: false,
       embeds: [{
         type: "rich",
+        color: client.color,
         description: [
           `**Latency:** \`${msg.createdTimestamp - message.createdTimestamp}ms\``,
           `**API Latency:** \`${Math.round(client.ws.ping)}ms\``,
