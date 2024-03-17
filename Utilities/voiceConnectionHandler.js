@@ -49,8 +49,8 @@ export async function startVoiceConnection(
       async (oldState, newState) => {
         try {
           await Promise.race([
-            entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
-            entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+            entersState(connection, VoiceConnectionStatus.Signalling, 5000),
+            entersState(connection, VoiceConnectionStatus.Connecting, 5000),
           ]);
         } catch (error) {
           console.log(`Forcibly destroyed the bot.`);
@@ -75,7 +75,7 @@ export async function startVoiceConnection(
     try {
       play(message.guild, queueConstructor.songs[0], client);
     } catch (e) {
-      console.log("error while playing: ", e.message);
+      console.log("Error while playing: ", e.message);
       return message.react("<:error:1090721649621479506>");
     }
   } catch (err) {
@@ -84,3 +84,4 @@ export async function startVoiceConnection(
     return message.channel.send(err.message);
   }
 }
+
