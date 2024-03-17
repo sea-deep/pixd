@@ -59,8 +59,7 @@ export default {
       return message.react("<:skip:1090718541143097464>");
     }
 
-    console.log(`Removed ${serverQueue.songs[pos].title} from the queue.`);
-    message.react("<:skip:1090718541143097464>");
+message.react("<:skip:1090718541143097464>");
     serverQueue.songs.splice(pos, 1);
     serverQueue.keep = false;
   },
