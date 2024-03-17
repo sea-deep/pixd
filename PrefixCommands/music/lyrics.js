@@ -35,7 +35,13 @@ export default {
    
      let res = await searchSong(title);
    if (res.songs.length === 0) {
-      return message.reply("❌ **No lyrics found for this song!**");
+      return message.reply({ 
+       content: '',
+       embeds: [{
+         description: 'Couldn’t find any lyrics for this song.',
+         color: 0xe08e67
+       }]
+     }); 
     }
      title = res.songs[0].autocomplete;
  
@@ -45,7 +51,7 @@ export default {
       embeds: [
         {
           title: `Lyrics for - ${title}`,
-          color: 0x2f3136,
+          color: 0xe08e67,
         },
       ],
       components: [
