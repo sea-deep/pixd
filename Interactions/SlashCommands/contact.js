@@ -41,13 +41,17 @@ export default {
     if(attachment) {
       let img = new AttachmentBuilder(attachment.url, { name: attachment.filename});
       query.content += '\n**Attachment**-';
-      query.files = [ img ]
+      query.files = [ img ];
     }
   await channel.send(query);
 
-  return interaction.followUp({
-    content: 'Your message has been sent to the devalepor!',
-    ephemeral: true
-  });
+  return interaction.followUp({ 
+       content: '',
+       ephemeral: true, 
+       embeds: [{
+         description: '✅ Your message has been sent',
+         color: 0xe08e67
+       }]
+     }); 
   }
 };
