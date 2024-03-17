@@ -89,7 +89,7 @@ fields.forEach(async (field,i) =>{
           type: "rich",
           title: i===0?"🔍 "+interaction.options.getString("query"):"",
           description: "",
-          color: 0x2f9d97,
+          color: 0xe08e67,
           fields: field,
           footer: {text: "Note: Some links may not work!"}
         },
