@@ -95,7 +95,7 @@ export default {
             type: "rich",
             title: def.word,
             description: def.definition.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
-            color: 0x6969,
+            color: client.color,
             fields: [
               {
                 name: "Example:",
