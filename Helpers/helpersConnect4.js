@@ -190,7 +190,7 @@ message.embeds[0].description.split('\n'),
        { 
          type: `rich`, 
          description: newDesc.join('\n'), 
-         color: 0x7289da, 
+         color: 0xe08e67, 
          fields: message.embeds[0].fields, 
          title: message.embeds[0].title, 
          footer: message.embeds[0].footer 
