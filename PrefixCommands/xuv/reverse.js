@@ -17,14 +17,28 @@ export default {
     * @param {Client} client
     */
   execute: async (message, args, client) => {
-   const mseg = await message.reply('Searching <a:Searching:1142532717406322809>');
+   const mseg = await message.reply({
+     content: '',
+     embeds: [{
+       description: 'Searching <a:Searching:1142532717406322809>',
+       color: client.color
+     }]
+   });
    let images;
    try {
     images = await GOOGLE_IMG_INVERSE_ENGINE_URL(
       await getCaptionInput(message),
       { limit: 5 }
     );
-   } catch(e) { return mseg.edit("❌ **Not Found**");}
+   } catch(e) {
+    return mseg.edit({
+     content: '',
+     embeds: [{
+       description: "❎ | Couldn't find any image ",
+       color: client.color
+     }]
+   });
+   }
     client.keyv.set(mseg.id, images.result, 30);
    let img = images.result[0]; 
    const msg = {
@@ -93,7 +107,7 @@ export default {
          type: 'rich', 
          description: `**[${img.title}](${img.originalUrl})**`, 
          title: ` Detected: ${images.search}`, 
-         color: 0xff00ff, 
+         color: client.color, 
          image: { 
            url: img.url, 
            height: img.height, 
