@@ -26,6 +26,7 @@ export default {
         content: '',
         embeds: [{
           title: "An error occurred:",
+          color: client.color,
           description: "Not a valid YouTube URL",
         }]
       });
@@ -44,6 +45,7 @@ export default {
         embeds: [{
           title: "An error occurred:",
           description: e.message,
+          color: client.color
         }]
       });
       await client.sleep(10000);
@@ -54,7 +56,7 @@ export default {
       embeds: [{
         title: `Summary for: ${call.title}:`,
         description: call.summary,
-        color: 0xf0f0f0,
+        color: client.color,
         thumbnail: {
           url: call.thumbnail,
           height:0,
