@@ -37,7 +37,8 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
          fields: [{ 
            name: `The word was: ${answer.toUpperCase()}`,
            value: interaction.message.embeds[0].fields[0].value
-         }]
+         }],
+         color: 0xe08e67
        }],
        components: []
      });
@@ -51,7 +52,8 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
          fields: [{ 
            name: interaction.message.embeds[0].fields[0].name,
            value: interaction.message.embeds[0].fields[0].value
-         }]
+         }],
+         color: 0xe08e67
        }],
      });
 } else {
@@ -67,7 +69,8 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
            value: `\`\`\`\n${res.toUpperCase()}\n\`\`\``
          }]
        }],
-       components: []
+       components: [],
+       color: 0xe08e67
      });
   }
 
@@ -80,7 +83,8 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
          fields: [{ 
            name: interaction.message.embeds[0].fields[0].name,
            value: `\`\`\`\n${res.toUpperCase()}\n\`\`\``
-         }]
+         }],
+         color: 0xe08e67
        }],
 
      });
