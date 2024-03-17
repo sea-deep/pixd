@@ -33,6 +33,7 @@ let I = hangmanSteps.indexOf(interaction.message.embeds[0].image.url);
        embeds: [{
          title: interaction.message.embeds[0].title,
          image: {url: nextMan, height:256, width:192},
+         color: 0xe08e67,
          footer: interaction.message.embeds[0].footer,
          fields: [{ 
            name: `The word was: ${answer.toUpperCase()}`,
