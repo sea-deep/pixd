@@ -94,7 +94,7 @@ export default {
       type: 'rich',
       title: `Tech Saport`,
       description: `- </contact:000> : Send a message to developer\n- \`p!ping\`: Check latency and uptime.\n\n[Website](https://pixd.onrender.com/home) • [Invite](https://pixd.onrender.com/invite)`,
-      color: 0xbbab30,
+      color: 0xe08e67,
       thumbnail: {
         url: 'https://images-ext-2.discordapp.net/external/uFIhM0gaX0cTSdv3zispJ0ffhjOtel4mUcXISBFRgow/https/cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
