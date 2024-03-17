@@ -15,15 +15,12 @@ export default {
    * @param {Message} message
    */
   execute: async (message, args) => {
-    const prompt = args.join(' ');
-
-    if (!prompt) {
-      return message.reply('❌ **Please provide something for genesis.**');
-    }
-
     const mes = await message.reply({
-      content: `>>> OK genesissing: **${prompt}** <a:loading:1049025849439043635>\nMight take a minute or two.`,
+      content: '',
       tts: false,
+      embeds: [{
+        description: `>>> OK genesissing: **${prompt}** <a:loading:1049025849439043635>\nMight take a minute or two.`,
+      }],
       components: [
         {
           type: 1,
@@ -50,7 +47,10 @@ export default {
       const attachment = new AttachmentBuilder(imageBuffer, { name: fileName });
 
       const editMessageResponse = await mes.edit({
-        content: `>>> Genesisation Done! \nHere is your **${prompt}**`,
+        content: '',
+        embeds: [{
+          description: `>>> Genesisation Done! \nHere is your **${prompt}**`,
+        }],
         components: [
           {
             type: 1,
@@ -76,8 +76,11 @@ export default {
     } catch (e) {
       console.error(e);
       return mes.edit({
-        content: `>>> Ayyo saar genesis failed :fail:`,
-        embed: { type: 'rich', description: `${e}` },
+        content: '',
+        embed: {
+        type: 'rich',
+        title: `>>> Ayyo saar genesis failed :fail:`,
+        description: `${e}` },
         tts: false,
       });
     }
