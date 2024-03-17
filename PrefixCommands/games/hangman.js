@@ -188,7 +188,7 @@ export default {
       "type": "rich",
       "title": `🚹 Hangman`,
       image: {url:'https://iili.io/JTa8KbI.png', width: 192, height:256},
-      "color": 0x3c1b60,
+      "color": 0xe08e67,
       "fields": [
         {
           "name": `Guess:`,
