@@ -342,7 +342,7 @@ export function message2048(params) {
         type: 'rich',
         title: `2️⃣0️⃣4️⃣8️⃣.`,
         description: `${params.description}`,
-        color: 0x0e874f,
+        color: 0xe08e67,
         fields: [
           {
             name: `Score:`,
