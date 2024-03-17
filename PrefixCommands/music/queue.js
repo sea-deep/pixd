@@ -46,14 +46,17 @@ export default {
     }
 
     message.channel.send({
-      content: '**Queue**',
+      content: '',
       tts: false,
       embeds: [
         {
           type: 'rich',
-          title: '',
+          title: 'Music Queue',
           description: `${msg}`,
-          color: 0x462,
+          color: 0xe08e67,
+          footer: {
+            text: `Total songs in queue: ${serverQueue.songs.length-1}`
+          }
         },
       ],
     });
