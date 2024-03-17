@@ -88,7 +88,7 @@ export async function getCaptionInput(message) {
   }
 
   if (!image) {
-    const messages = await message.channel.messages.fetch({ limit: 50 });
+    const messages = await message.channel.messages.fetch({ limit: 10, cache: false});
     messages.reverse().forEach((msg) => {
       if (!image) {
         if (msg.attachments.size >= 1) {
