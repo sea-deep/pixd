@@ -73,7 +73,7 @@ export async function startVoiceConnection(
       }
     }, 60 * 1000);
     try {
-      play(message.guild, queueConstructor.songs[0], client);
+      play(message.guild, queueConstructor.songs[0], client, message);
     } catch (e) {
       console.log("Error while playing: ", e.message);
       return message.react("<:error:1090721649621479506>");
