@@ -10,9 +10,9 @@ export default {
    */
   execute: async (interaction) => {
     return interaction.reply({
-        content: `**Command list** :`,
-  tts: false,
-  components: [
+        content: ``,
+       tts: false,
+      components: [
     {
       type: 1,
       components: [
@@ -21,7 +21,7 @@ export default {
           placeholder: `Select Category`,
           options: [
             {
-              label: `XUV 780 technology`,
+              label: `2047 AI Technology`,
               value: `xuv`,
               description: `Top 10 ai gadgets that will change ur life 🤫🤫🤫`,
               emoji: {
@@ -31,6 +31,17 @@ export default {
               },
               default: false,
             },
+            {
+              label: `Helpful Utilities`,
+              value: `uti`,
+              description: `Utility commands only found within this bot.`,
+              emoji: {
+                id: `1219696858339737761`,
+                name: `typing`,
+                animated: false,
+              },
+              default: false,
+            },            
             {
               label: `Image Generation`,
               value: `img`,
@@ -54,7 +65,7 @@ export default {
               default: false,
             },
             {
-              label: `No-Fap Streak`,
+              label: `No-Fap Streak (Not working)`,
               value: `fap`,
               description: `No-Fap Streak counter!`,
               emoji: {
@@ -87,9 +98,17 @@ export default {
     {
       type: 'rich',
       title: `Tech Saport`,
-      description: `- </contact:000> : Send a message to developer\n- </ping:000> : Check latency and uptime.\n\n[Website](https://pixd.onrender.com/home) • [Invite](https://pixd.onrender.com/invite)\n[Terms Of Service and Privacy Policy](https://pixd.onrender.com/legal)`,      color: 0xe08e67,
+      description: [
+        '* </contact:000> - send a message to the developer.',
+      '* `p!ping` - check ping status and uptime.',
+      '* `p!donate` - send me 10 rupees in UPI.',
+      '',
+      '[Website](https://pixd.onrender.com/home)   •   [Invite me](https://pixd.onrender.com/invite)',
+      ].join("\n"),
+      color: 0xe08e67,
+      footer: {text:'Send me new commands’ suggestions using the /contact command'},
       thumbnail: {
-        url: 'https://images-ext-2.discordapp.net/external/tFhoHS9MjXYHhgP8R0eBKW7sr1ZDbvOCYuLmzEa8KXU/https/cdn.discordapp.com/emojis/1142805565295308800.gif',
+        url: 'https://cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
         width: 0,
       },
