@@ -9,7 +9,7 @@ const help = {
       type: 'rich',
       title: '',
       description: '',
-      footer: {text:'Send me suggestions for new commands using the /contact command'},
+      footer: {text:'Send me new commands’ suggestions using the /contact command'},
       thumbnail: {
         url: '',
         height: 0,
