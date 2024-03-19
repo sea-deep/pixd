@@ -38,7 +38,7 @@ export default {
         try {
           return subCommand.execute(interaction, client);
         } catch (err) {
-          comsole.log("Error in subcommand:", interaction.commandName, interaction.subCommandName, err );
+          console.log("Error in subcommand:", interaction.commandName, interaction.subCommandName, err );
          return interaction.followUp({
           content: '',
           ephemeral: true,
@@ -55,7 +55,7 @@ export default {
       try {
         return command.execute(interaction, client);
       } catch (err) {
-        comsole.log("Error in slash command:", interaction.commandName, err );
+        console.log("Error in slash command:", interaction.commandName, err );
          return interaction.followUp({
           content: '',
           ephemeral: true,
@@ -73,7 +73,7 @@ export default {
       try {
         return command.execute(interaction, client);
       } catch (err) {
-        comsole.log("Error in Msg Context Menu:", interaction.commandName, interaction, err );
+        console.log("Error in Msg Context Menu:", interaction.commandName, interaction, err );
           await interaction.followUp({
           content: '',
           ephemeral: true,
@@ -92,7 +92,7 @@ export default {
       try {
         return await modal.execute(interaction, client);
       } catch (err) {     
-        comsole.log("Error in Modal:", interaction.customId, err );
+        console.log("Error in Modal:", interaction.customId, err );
           await interaction.followUp({
           content: '',
           ephemeral: true,
@@ -110,7 +110,7 @@ export default {
       try {
         return await menu.execute(interaction, client);
       } catch (err) {
-        comsole.log("Error in Select Menu:", interaction.customId, err );
+        console.log("Error in Select Menu:", interaction.customId, err );
           await interaction.followUp({
           content: '',
           ephemeral: true,
