@@ -10,7 +10,9 @@ const help = {
       title: '',
       color: 0xe08e67,
       description: '',
-      footer: {text:'Send me new commands’ suggestions using the /contact command'},
+      footer: {text:'Send me new commands’ suggestions using the /contact command',
+        icon_url: 'https://cdn.discordapp.com/emojis/1142805565295308800.gif'
+      },
       author: {
         name: "",
         icon_url: ""
