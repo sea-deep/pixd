@@ -8,23 +8,23 @@ const help = {
     {
       type: 'rich',
       title: '',
+      color: 0xe08e67,
       description: '',
       footer: {text:'Send me new commands’ suggestions using the /contact command'},
-      thumbnail: {
-        url: '',
-        height: 0,
-        width: 0,
-      },
+      author: {
+        name: "",
+        icon_url: ""
+      }
     },
   ],
 };
 
 if (sel[0] == 'xuv') {
   let com = interaction.message.components[0].components[0].options[0];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
-    '* `p!gpt <query>` - Lund GPT',
+    '* `p!gpt <query>` - Danky dank GPT',
     '* `p!padhaku <query>` - Ask study related questions.',
     '* `p!genesis <prompt>` - Genesis AI images',
     '* `p!ytsum <youtube URL>` - summarise a youtube video'
@@ -32,8 +32,8 @@ if (sel[0] == 'xuv') {
 }
 if (sel[0] == 'uti') {
   let com = interaction.message.components[0].components[0].options[1];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!ud <word>` - get a word definition from urban dictionary',
     '* `p!img <query>` - search images from google',
@@ -42,8 +42,8 @@ if (sel[0] == 'uti') {
 }
 if (sel[0] == 'img') {
   let com = interaction.message.components[0].components[0].options[2];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!lapata [image] or <mentions>` - Get Lapata.',
     '* `p!allustuff [image]+[text]` - Allu Arjun funnies',
@@ -55,8 +55,8 @@ if (sel[0] == 'img') {
 }
 if (sel[0] == 'gam') {
   let com = interaction.message.components[0].components[0].options[3];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!wordle` - Play the game wordle',
     '* `p!c4` - Play the game Connect 4',
@@ -66,8 +66,8 @@ if (sel[0] == 'gam') {
 }
 if (sel[0] == 'fap') {
   let com = interaction.message.components[0].components[0].options[4];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!addme` - Start your journey',
     '* `p!win` - Add a day in your streak everyday.',
@@ -78,8 +78,8 @@ if (sel[0] == 'fap') {
 }
 if (sel[0] == 'son') {
   let com = interaction.message.components[0].components[0].options[5];
-  help.embeds[0].thumbnail.url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
-  help.embeds[0].title = com.label;
+  help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
+  help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!play <search or url> - play any song or playlist from YouTube, Spotify and SoundCloud.',
     '* `p!pause` - pause the song.',
