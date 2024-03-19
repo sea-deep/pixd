@@ -103,7 +103,6 @@ export default {
   embeds: [
     {
       type: 'rich',
-      title: `Tech Saport`,
       description: [
         '* </contact:000> - send a message to the developer.',
       '* `p!ping` - check ping status and uptime.',
