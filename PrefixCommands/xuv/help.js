@@ -115,11 +115,10 @@ export default {
       footer: {text:'Send me new commands’ suggestions using the /contact command',
         icon_url: 'https://cdn.discordapp.com/emojis/1142805565295308800.gif'
       },
-      thumbnail: {
-        url: 'https://cdn.discordapp.com/emojis/898562618833383444.gif',
-        height: 0,
-        width: 0,
-      },
+      author: {
+        name: "Tech Saport",
+        icon_url: "https://cdn.discordapp.com/emojis/898562618833383444.gif"
+      }
     },
   ],
     });
