@@ -105,13 +105,14 @@ export default {
       type: 'rich',
       title: `Tech Saport`,
       description: [
-        `- </contact:000> : Send a message to developer.`,
-      '`p!ping`: Check ping status and uptime.',
-      '`p!donate`: Send 10 rupees in UPI.',
+        `* </contact:000> : send a message to the developer.`,
+      '`* `p!ping`: check ping status and uptime.',
+      '* `p!donate` - send me 10 rupees in UPI.',
       '',
       `[Website](https://pixd.onrender.com/home)   •   [Invite me](https://pixd.onrender.com/invite)`,
       ].join("\n"),
       color: 0xe08e67,
+      footer: {text:'Send me new commands’ suggestions using the /contact command'},
       thumbnail: {
         url: 'https://cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
