@@ -7,7 +7,6 @@ const help = {
   embeds: [
     {
       type: 'rich',
-      title: '',
       color: 0xe08e67,
       description: '',
       footer: {text:'Send me new commands’ suggestions using the /contact command',
