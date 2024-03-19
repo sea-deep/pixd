@@ -16,7 +16,7 @@ export default {
     */
   execute: async (message) => {
     await message.reply({
-        content: `**Command list** :`,
+        content: ``,
   tts: false,
   components: [
     {
