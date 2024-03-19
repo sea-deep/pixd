@@ -106,7 +106,9 @@ export default {
       '[Website](https://pixd.onrender.com/home)   •   [Invite me](https://pixd.onrender.com/invite)',
       ].join("\n"),
       color: 0xe08e67,
-      footer: {text:'Send me new commands’ suggestions using the /contact command'},
+      footer: {text:'Send me new commands’ suggestions using the /contact command',
+        icon_url: 'https://cdn.discordapp.com/emojis/1142805565295308800.gif'
+      },
       thumbnail: {
         url: 'https://cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
