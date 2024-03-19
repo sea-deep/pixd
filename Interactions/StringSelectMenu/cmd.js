@@ -82,7 +82,7 @@ if (sel[0] == 'son') {
   help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
   help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
-    '* `p!play <search or url> - play any song or playlist from YouTube, Spotify and SoundCloud.',
+    '* `p!play <search or url>` - play any song or playlist from YouTube, Spotify and SoundCloud.',
     '* `p!pause` - pause the song.',
     '* `p!resume` - resume the song.',
     '* `p!stop` - stop playing and clear queue.',
