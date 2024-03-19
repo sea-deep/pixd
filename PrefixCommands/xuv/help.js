@@ -27,7 +27,7 @@ export default {
           placeholder: `Select Category`,
           options: [
             {
-              label: `XUV 780 technology`,
+              label: `2047 AI Technology`,
               value: `xuv`,
               description: `Top 10 ai gadgets that will change ur life 🤫🤫🤫`,
               emoji: {
@@ -37,6 +37,17 @@ export default {
               },
               default: false,
             },
+            {
+              label: `Helpful Utilities`,
+              value: `uti`,
+              description: `Utility commands only found within this bot.`,
+              emoji: {
+                id: `1219696858339737761`,
+                name: `typing`,
+                animated: false,
+              },
+              default: false,
+            },            
             {
               label: `Image Generation`,
               value: `img`,
@@ -93,10 +104,16 @@ export default {
     {
       type: 'rich',
       title: `Tech Saport`,
-      description: `- </contact:000> : Send a message to developer\n- \`p!ping\`: Check latency and uptime.\n\n[Website](https://pixd.onrender.com/home) • [Invite](https://pixd.onrender.com/invite)`,
+      description: [
+        `- </contact:000> : Send a message to developer.`,
+      '`p!ping`: Check ping status and uptime.',
+      '`p!donate`: Send 10 rupees in UPI.',
+      '',
+      `[Website](https://pixd.onrender.com/home)   •   [Invite me](https://pixd.onrender.com/invite)`,
+      ].join("\n"),
       color: 0xe08e67,
       thumbnail: {
-        url: 'https://images-ext-2.discordapp.net/external/uFIhM0gaX0cTSdv3zispJ0ffhjOtel4mUcXISBFRgow/https/cdn.discordapp.com/emojis/898562618833383444.gif',
+        url: 'https://cdn.discordapp.com/emojis/898562618833383444.gif',
         height: 0,
         width: 0,
       },
