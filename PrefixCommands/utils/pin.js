@@ -281,7 +281,7 @@ async function listPin(message, args, client) {
     content: "",
     embeds: [
       {
-        description: `**List of pins in the server:** ${pinList}`,
+        description: `**List of pins in the server:** \n${pinList}`,
         color: client.color,
       },
     ],
