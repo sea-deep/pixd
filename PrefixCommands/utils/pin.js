@@ -92,20 +92,18 @@ async function createPin(message, args, client) {
         ? (await message.fetchReference()).attachments.size > 0
           ? (await message.fetchReference()).attachments.first().url
           : null
-        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test(
+        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg)(\?.*)?)/i.test(
             pinContentString
           )
-        ? pinContentString.match(
-            /(https?:\/\/.*\.(?:png|jpg|mp4|gif|jpeg))/i
-          )[0]
+        ? pinContentString.match(/(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg)(\?.*)?)/i)[0]
         : null,
     content: message.reference
       ? (await message.fetchReference()).content.trim() === ''
         ? null
-        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test((await message.fetchReference()).content)
+        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg)(\?.*)?)/i.test((await message.fetchReference()).content)
          ? null
          : (await message.fetchReference()).content
-      : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test(pinContentString)
+      : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg)(\?.*)?)/i.test(pinContentString)
         ? null
         : pinContentString.trim() !== ""
           ? pinContentString.trim()
