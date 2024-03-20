@@ -177,6 +177,20 @@ export class MongodbKeyValue {
 
     return null;
   }
+  
+  /**
+   * Retrieve all key-value pairs from the MongoDB collection.
+   * @returns {Array<Object>} An array of objects representing key-value pairs.
+   */
+  async all() {
+    try {
+      const allEntries = await this.collection.find().toArray();
+      return allEntries.map(entry => ({ key: entry.key, value: entry.value }));
+    } catch (error) {
+      console.error('Failed to retrieve all entries from MongoDB:', error);
+      throw error;
+    }
+  }
 
   /**
    * Close the MongoDB connection.
