@@ -226,7 +226,7 @@ async function removePin(message, args, client) {
       ],
     });
   }
-   if(message.author.id !== pin.owner) {
+   if(message.author.id !== pinContent.owner) {
    return message.reply({
       content: "",
       embeds: [
