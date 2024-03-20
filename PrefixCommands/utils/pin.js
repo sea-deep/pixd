@@ -21,18 +21,15 @@ export default {
       case "create":
       case "new":
       case "edit":
-        await createPin(message, args, client);
-        break;
+        return createPin(message, args, client);
       case "remove":
       case "delete":
       case "del":
-        await removePin(message, args, client);
-        break;
+        return removePin(message, args, client);
       case "list":
-        await listPin(message, args, client);
-        break;
+        return listPin(message, args, client);
       default:
-        await viewPin(message, args, client);
+        return viewPin(message, args, client);
     }
   },
 };
