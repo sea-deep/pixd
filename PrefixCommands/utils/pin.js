@@ -49,7 +49,31 @@ async function createPin(message, args, client) {
       ],
     });
   }
-
+  let restricted = [
+     'add',
+     'create',
+     'new',
+     'edit',
+     'remove',
+     'delete',
+     'del',
+     'list'
+    ];
+  if (restricted.includes(args[1].trim().toLowerCase())) {
+    return message.reply({
+      content: "",
+      embeds: [
+        {
+          description: "❌ **You cannot create a tag with this name.**",
+          color: client.color,
+        },
+      ],
+    });
+  }
+  await client.pinsDB.connect();
+  
+  
+  
   const pinContentString = args.slice(2).join(" ");
 
   let pinContent = {
