@@ -229,7 +229,17 @@ async function removePin(message, args, client) {
       ],
     });
   }
-
+   if(message.author.id !== pin.owner) {
+   return message.reply({
+      content: "",
+      embeds: [
+        {
+          description: "❌ **You cannot delete this pin.**",
+          color: client.color,
+        },
+      ],
+    });
+   }
   await client.pinsDB.delete(pinName);
   await client.pinsDB.close();
 
