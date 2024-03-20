@@ -72,7 +72,18 @@ async function createPin(message, args, client) {
   }
   await client.pinsDB.connect();
   
-  
+  let pin = await client.pinsDB.get(message.guild.id + args[1].trim().toLowerCase());
+  if(pin && message.author.id !== pin.owner) {
+   return message.reply({
+      content: "",
+      embeds: [
+        {
+          description: "❌ **You cannot update this pin.**",
+          color: client.color,
+        },
+      ],
+    });
+  }
   
   const pinContentString = args.slice(2).join(" ");
 
