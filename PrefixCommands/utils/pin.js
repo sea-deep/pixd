@@ -71,7 +71,8 @@ async function createPin(message, args, client) {
   
   let pin = await client.pinsDB.get(message.guild.id + args[1].trim().toLowerCase());
   if(pin && message.author.id !== pin.owner) {
-   return message.reply({
+    await client.pinsDB.close();
+    return message.reply({
       content: "",
       embeds: [
         {
@@ -108,6 +109,7 @@ async function createPin(message, args, client) {
   };
 
   if (!pinContent.content && !pinContent.attachment) {
+    await client.pinsDB.close();
     return message.reply({
       content: "",
       embeds: [
@@ -119,7 +121,6 @@ async function createPin(message, args, client) {
     });
   }
 
-  await client.pinsDB.connect();
   await client.pinsDB.set(
     message.guild.id + args[1].trim().toLowerCase(),
     pinContent
