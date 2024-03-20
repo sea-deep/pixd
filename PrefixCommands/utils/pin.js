@@ -103,11 +103,11 @@ async function createPin(message, args, client) {
           )[0]
         : null,
     content: message.reference
-      ? (await message.fetchReference).content.trim() === ''
+      ? (await message.fetchReference()).content.trim() === ''
         ? null
-        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test((await message.fetchReference).content)
+        : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test((await message.fetchReference()).content)
          ? null
-         : (await message.fetchReference).content
+         : (await message.fetchReference()).content
       : /(https?:\/\/.*\.(?:png|mp4|jpg|gif|jpeg))/i.test(pinContentString)
         ? null
         : pinContentString.trim() !== ""
