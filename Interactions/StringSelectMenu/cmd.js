@@ -39,6 +39,8 @@ if (sel[0] == 'uti') {
     '* `p!ud <word>` - get a word definition from urban dictionary',
     '* `p!img <query>` - search images from google',
     '* `p!lens [image]` - reverse search an image from google',
+    '* `p!screenshot <website link>` - get screenshot from a webpage',
+    '* `p!pin <create|list|delete|edit>` - Manage pins or tags in this server.'
    ].join('\n');
 }
 if (sel[0] == 'img') {
