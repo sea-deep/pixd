@@ -79,29 +79,29 @@ export default {
             name: "user4",
             description: "Another user.",
             required: true
+          }
+        ]
+      },
+      {
+        type: 1,
+        name: "allustuff",
+        description: "RDJ stuff but allu",
+        options: [
+          {
+            type: 3,
+            name: "caption",
+            description: "The caption text for the image",
+            required: true
           },
           {
-            type: 1,
-            name: "allustuff",
-            description: "RDJ stuff but allu",
-            options: [
-              {
-                type: 3,
-                name: "caption",
-                description: "The caption text for the image",
-                required: true
-              },
-              {
-                type: 3,
-                name: "image-url",
-                description: "An image URL."
-              },
-              {
-                type: 11,
-                name: "image-file",
-                description: "Upload an image from your file system."
-              }
-            ]
+            type: 3,
+            name: "image-url",
+            description: "An image URL."
+          },
+          {
+            type: 11,
+            name: "image-file",
+            description: "Upload an image from your file system."
           }
         ]
       }
