@@ -4,7 +4,7 @@ export default {
   subCommand: 'img vosahihai',
   async execute(interaction) {
     await interaction.deferReply();
-    const url = await getInputImage(interaction.options);
+    const url = await getInputImage(interaction);
     const res = await fetch(url);
     const buffer = await res.arrayBuffer();
     let options = { fit: "fill", background: { r: 0, g: 0, b: 0, alpha: 0 } };
@@ -49,8 +49,8 @@ export default {
   }
 };
 
-async function getInputImage(options) {
-  const opt = options._hoistedOptions;
+async function getInputImage(interaction) {
+  const opt = interaction.options._hoistedOptions;
   if(opt && opt.length !== 0) {
   switch (opt[0].name) {
   case "user":
