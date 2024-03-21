@@ -3,4 +3,4 @@ export default {
   async execute(interaction) {
     return await interaction.reply("Seriously?");
   }
-}
+};
