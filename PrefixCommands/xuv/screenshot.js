@@ -18,7 +18,7 @@ export default {
   async execute(message) {
     await message.channel.sendTyping();
     const text = message.content;
-    const urlPattern = /(https?:\/\/)?(www\.)?(\w+\.\w+)/g;
+    const urlPattern = /(https?:\/\/)?(www\.)?(\w+\.\w+)(\/[^?#]*)?(\?[^#]*)?(#.*)?/g;
     const urls = text.match(urlPattern);
 
     if (!urls || urls.length === 0) {
