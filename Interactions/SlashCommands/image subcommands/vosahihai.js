@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-
+import { AttachmentBuilder } from 'discord.js';
 export default {
   subCommand: 'img vosahihai',
   async execute(interaction) {
