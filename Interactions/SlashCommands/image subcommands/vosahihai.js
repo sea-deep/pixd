@@ -3,6 +3,7 @@ import sharp from 'sharp';
 export default {
   subCommand: 'img vosahihai',
   async execute(interaction) {
+    if (interaction) { console.log('yesssss')}
     await interaction.deferReply();
     const url = await getInputImage(interaction);
     const res = await fetch(url);
