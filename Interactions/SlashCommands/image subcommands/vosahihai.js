@@ -51,6 +51,7 @@ export default {
 
 async function getInputImage(options) {
   const opt = options._hoistedOptions;
+  if(opt && opt.length !== 0) {
   switch (opt[0].name) {
   case "user":
     return opt[0].user.displayAvatarURL({
@@ -62,9 +63,11 @@ async function getInputImage(options) {
   case 'image-file':
     return opt[0].attachment.url;
   default:
-    return interaction.user.displayAvatarURL({
+    break;
+  }
+  }
+  return interaction.user.displayAvatarURL({
       forceStatic: true,
       extension: 'png'
     });
-  }
 }
