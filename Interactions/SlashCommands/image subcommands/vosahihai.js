@@ -3,7 +3,6 @@ import { AttachmentBuilder } from 'discord.js';
 export default {
   subCommand: 'img vosahihai',
   async execute(interaction) {
-    if (interaction) { console.log('yesssss')}
     await interaction.deferReply();
     const url = await getInputImage(interaction);
     const res = await fetch(url);
@@ -49,26 +48,3 @@ export default {
     });
   }
 };
-
-async function getInputImage(interaction) {
-  const opt = interaction.options._hoistedOptions;
-  if(opt && opt.length !== 0) {
-  switch (opt[0].name) {
-  case "user":
-    return opt[0].user.displayAvatarURL({
-      forceStatic: true,
-      extension: 'png'
-    });
-  case 'image-url':
-    return opt[0].match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
-  case 'image-file':
-    return opt[0].attachment.url;
-  default:
-    break;
-  }
-  }
-  return interaction.user.displayAvatarURL({
-      forceStatic: true,
-      extension: 'png'
-    });
-}
