@@ -73,7 +73,7 @@ async function getOverlays(interaction) {
     console.log(neededDuplicates); //del
     while (neededDuplicates > 0) {
       const duplicatedElements = overlays.slice(0, neededDuplicates);
-      overlays.concat(duplicatedElements);
+      overlays.push(...duplicatedElements);
     console.log(overlays); //del
     }
   } else { 
