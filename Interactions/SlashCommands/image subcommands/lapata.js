@@ -6,7 +6,7 @@ export default {
   async execute(interaction) {
     await interaction.deferReply();
     let overlays = await getOverlays(interaction);
-        const s = [
+    const s = [
       { w: 359, h: 437, x: 145, y: 334 },
       { w: 195, h: 289, x: 938, y: 398 },
       { w: 117, h: 245, x: 1371, y: 451 },
@@ -53,12 +53,7 @@ async function getOverlays(interaction) {
     for (let i = 0; i < options.length; i++) {
       switch (options[i].name) {
         case 'image-url':
-          const imageUrl = await options[i].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i);
-          if (imageUrl) {
-            const response = await fetch(imageUrl[0]);
-            const buffer = await response.arrayBuffer();
-            overlays.push(buffer);
-          }
+           overlays.push(options[i].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0]);
           break;
         case 'image-file':
           overlays.push(options[i].attachment.url);
@@ -85,11 +80,8 @@ async function getOverlays(interaction) {
   
   // Convert URLs to buffers
   overlays = await Promise.all(overlays.map(async (overlay) => {
-    if (typeof overlay === 'string') {
       const response = await fetch(overlay);
       return await response.arrayBuffer();
-    }
-    return overlay;
   }));
   
   return overlays;
