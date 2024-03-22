@@ -5,7 +5,7 @@ export default {
   async execute(interaction) {
     await interaction.deferReply();
     try {
-      const prompt = interaction.getString('prompt');
+      const prompt = interaction.options.getString('prompt');
       const imageBuffer = await createImage(prompt);
       const fileName = `${prompt}.jpg`;
       const attachment = new AttachmentBuilder(imageBuffer, { name: fileName });
