@@ -1,7 +1,7 @@
 import { AttachmentBuilder } from 'discord.js';
 
 export default {
-  subCommands: 'img genesis',
+  subCommands: 'xuv genesis',
   async execute(interaction) {
     await interaction.deferReply();
     try {
