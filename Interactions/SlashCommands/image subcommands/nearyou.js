@@ -1,12 +1,13 @@
 import { getInputImageInt } from '../../../Helpers/helpersImage.js';
 import sharp from 'sharp';
+import GIFEncoder from "gif-encoder-2";
 import { AttachmentBuilder } from 'discord.js';
 
 export default {
   subCommand: 'img nearyou',
   async execute(interaction) {
     await interaction.deferReply();
-    let url = await getInputImageInt(message);
+    let url = await getInputImageInt(interaction);
     let res = await fetch(url);
     let buffer = await res.arrayBuffer();
     let avatar = await sharp(buffer).resize(252, 252).toBuffer();
