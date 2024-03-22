@@ -1,4 +1,4 @@
-const commands = {
+export default {
   data: {
     name: "xuv",
     description: "AI commands from the future",
@@ -63,5 +63,3 @@ const commands = {
     ]
   }
 };
-
-export default commands;
