@@ -1,10 +1,12 @@
 import sharp from 'sharp';
 import { AttachmentBuilder } from 'discord.js';
+import { getInputImageInt } from '../../../Helpers/helpersImage.js';
+
 export default {
   subCommand: 'img vosahihai',
   async execute(interaction) {
     await interaction.deferReply();
-    const url = await getInputImage(interaction);
+    const url = await getInputImageInt(interaction);
     const res = await fetch(url);
     const buffer = await res.arrayBuffer();
     let options = { fit: "fill", background: { r: 0, g: 0, b: 0, alpha: 0 } };
