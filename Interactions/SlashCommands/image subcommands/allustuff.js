@@ -7,7 +7,7 @@ export default {
   subCommand: 'img allustuff',
   async execute(interaction) {
     await interaction.deferReply();
-    const image = await getCaptionInput(message);
+    const image = await getCaptionInputInt(interaction);
     const text = await interaction.options._hoistedOptions[0].value;
 const response = await fetch(image);
     const data = await response.arrayBuffer();
