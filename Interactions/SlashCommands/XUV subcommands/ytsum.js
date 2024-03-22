@@ -3,7 +3,7 @@ import play from "play-dl";
 
 export default {
   subCommand: 'xuv ytsummarise',
-  async execute (interaction) {
+  async execute (interaction, client) {
     await interaction.deferReply();
     let lang = interaction.getString('lang-code');
     let url = interaction.getString('yt-url');
