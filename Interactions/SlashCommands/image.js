@@ -23,12 +23,6 @@ export default {
     options: [
       {
         type: 1,
-        name: "lapata",
-        description: "Become lapata or make someone lapata.",
-        options: options
-      },
-      {
-        type: 1,
         name: "rap",
         description: "Rapper Rapunzel Rappu Singh.",
         options: options
@@ -104,7 +98,29 @@ export default {
             description: "Upload an image from your file system."
           }
         ]
-      }
+      },
+      {
+        type: 1,
+        name: "lapata",
+        description: "Become lapata or make someone lapata.",
+        options: options.concat([
+          {
+            type: 6,
+            name: "user2",
+            description: "A user.",
+          },
+          {
+            type: 6,
+            name: "user3",
+            description: "Next user.",
+          },
+          {
+            type: 6,
+            name: "user4",
+            description: "Other user.",
+          },
+        ])
+      },
     ]
   }
 };
