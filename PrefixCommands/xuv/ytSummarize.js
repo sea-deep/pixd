@@ -127,7 +127,7 @@ async function convertString(inputString) {
 async function getSubtitles(videoID, lang) {
   const data = await fetchData(`https://youtube.com/watch?v=${videoID}`);
 
-  if (!data.includes("captionTracks")) throw new Error("No captions found for this video");;
+  if (!data.includes("captionTracks")) throw new Error("No captions found for this video");
 
   const regex = /"captionTracks":(\[.*?\])/;
   const [match] = regex.exec(data);
@@ -139,7 +139,7 @@ async function getSubtitles(videoID, lang) {
         vssId && (vssId.endsWith(`.${lang}`) || vssId.endsWith(`a.${lang}`)),
     ) || captionTracks.find(({ vssId }) => vssId && vssId.match(`.${lang}`));
 
-  if (!subtitle || (subtitle && !subtitle.baseUrl)) throw new Error(`No subtitles in "${lang}" language found for this video`);;
+  if (!subtitle || (subtitle && !subtitle.baseUrl)) throw new Error(`No subtitles in "${lang}" language found for this video`);
 
   const transcript = await fetchData(subtitle.baseUrl);
   const lines = transcript
