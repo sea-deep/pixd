@@ -146,12 +146,12 @@ async function getInputImageInt(interaction) {
 
 async function getCaptionInputInt(interaction) {
   const opt = interaction.options._hoistedOptions;
-  if(opt && opt.length !== 0) {
-  switch (opt[0].name) {
+  if(opt.length > 1) {
+  switch (opt[1].name) {
     case 'image-url':
-     return opt[0].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
+     return opt[1].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
     case 'image-file':
-     return opt[0].attachment.url;
+     return opt[1].attachment.url;
    default:
      break;
   }
