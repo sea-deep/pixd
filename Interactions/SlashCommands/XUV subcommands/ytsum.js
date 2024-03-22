@@ -36,7 +36,7 @@ export default {
       }]
     });
   }
-}
+};
 
 
 async function summarizeVideo(url, lang) {
