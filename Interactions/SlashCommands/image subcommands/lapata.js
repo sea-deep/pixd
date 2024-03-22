@@ -4,6 +4,7 @@ import sharp from "sharp";
 export default {
   subCommand: 'img lapata',
   async execute(interaction) {
+    await interaction.deferReply();
     let overlays = await getOverlays(interaction);
         const s = [
       { w: 359, h: 437, x: 145, y: 334 },
