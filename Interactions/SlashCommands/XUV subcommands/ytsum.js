@@ -5,8 +5,8 @@ export default {
   subCommand: 'xuv ytsummarise',
   async execute (interaction, client) {
     await interaction.deferReply();
-    let lang = interaction.getString('lang-code');
-    let url = interaction.getString('yt-url');
+    let url = interaction.options.getString('yt-url');
+    let lang = interaction.options.getString('lang-code');
     let call;
     try {
      call = await summarizeVideo(url, lang);
@@ -39,7 +39,7 @@ export default {
 };
 
 
-async function summarizeVideo(url, lang) {
+async function summarizeVideo(url, lang="en") {
   let check = play.yt_validate(url);
   if (check !== "video") throw new Error("Not a valid YouTube URL");
   
