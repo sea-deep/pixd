@@ -52,6 +52,11 @@ const commands = {
             name: "yt-url",
             description: "A YouTube video URL",
             required: true
+          },
+          {
+            type: 3,
+            name: "lang-code",
+            description: "Language code of the subtitles language, like for Hindi, its hi. (Defaults to en)",
           }
         ]
       }
