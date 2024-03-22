@@ -132,7 +132,7 @@ async function getInputImageInt(interaction) {
       extension: 'png'
     });
   case 'image-url':
-    return opt[0].match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
+    return opt[0].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
   case 'image-file':
     return opt[0].attachment.url;
   default:
