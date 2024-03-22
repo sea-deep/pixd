@@ -9,7 +9,12 @@ export default {
     let lang = interaction.options.getString('lang-code');
     let call;
     try {
-     call = await summarizeVideo(url, lang);
+let call;
+if (lang) {
+  call = await summarizeVideo(url, lang);
+} else {
+  call = await summarizeVideo(url);
+}
     } catch(e) {
       let er = await interaction.followUp({
         content: '',
