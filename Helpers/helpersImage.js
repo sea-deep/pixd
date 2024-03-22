@@ -121,7 +121,7 @@ export async function getCaptionInput(message) {
   return image;
 }
 
-async function getInputImageInt(interaction) {
+export async function getInputImageInt(interaction) {
   const opt = interaction.options._hoistedOptions;
  if(opt && opt.length !== 0) {
    switch (opt[0].name) {
@@ -144,7 +144,7 @@ async function getInputImageInt(interaction) {
     });
 }
 
-async function getCaptionInputInt(interaction) {
+export async function getCaptionInputInt(interaction) {
   const opt = interaction.options._hoistedOptions;
   if(opt.length > 1) {
   switch (opt[1].name) {
@@ -174,3 +174,4 @@ async function getCaptionInputInt(interaction) {
     });
    return image;
  }
+
