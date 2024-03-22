@@ -59,6 +59,10 @@ async function getOverlays(interaction) {
           overlays.push(options[i].attachment.url);
           break;
         default:
+          console.log('yee', await options[i].user.displayAvatarURL({
+            format: 'png',
+            size: 128,
+          })); //del
           overlays.push(await options[i].user.displayAvatarURL({
             format: 'png',
             size: 128,
@@ -66,10 +70,11 @@ async function getOverlays(interaction) {
       }
     }
     const neededDuplicates = 5 - overlays.length;
-    console.log(neededDuplicates)
+    console.log(neededDuplicates); //del
     if (neededDuplicates > 0) {
       const duplicatedElements = overlays.slice(0, neededDuplicates);
-      overlays.push(...duplicatedElements);
+      overlays.concat(duplicatedElements);
+    console.log(overlays); //del
     }
   } else { 
     let url = await interaction.user.displayAvatarURL({
