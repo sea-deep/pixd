@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import play from "play-dl";
-
+const genAI = new GoogleGenerativeAI(process.env.GOOGLEAI_KEY);
 export default {
   subCommand: 'xuv ytsummarise',
   async execute (interaction, client) {
