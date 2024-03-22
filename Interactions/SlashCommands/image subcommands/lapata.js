@@ -37,7 +37,7 @@ export default {
       .toBuffer();
 
     let file = new AttachmentBuilder(lapata, { name: "lapata.png" });
-    return message.reply({
+    return interaction.followUp({
       content: "",
       files: [file],
     });
