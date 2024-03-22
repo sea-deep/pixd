@@ -34,10 +34,11 @@ export default {
           }),
       );
 
-      const neededDuplicates = 5 - overlays.length;
+      let neededDuplicates = 5 - overlays.length;
       while (neededDuplicates > 0) {
         const duplicatedElements = overlays.slice(0, neededDuplicates);
         overlays.push(...duplicatedElements);
+        neededDuplicates = 5 - overlays.length;
       }
     } else {
       let url = await getInputImage(message);
