@@ -9,7 +9,7 @@ const openai = new OpenAIApi(configuration);
 export default {
   subCommand: 'xuv gpt',
   async execute(interaction) {
-    const msg = interaction.getString('message');
+    const msg = interaction.options.getString('message');
     await interaction.deferReply();
     
     const prompt = `
