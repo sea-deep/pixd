@@ -131,7 +131,7 @@ export async function getInputImageInt(interaction) {
         extension: 'png'
      });
    case 'image-url':
-     return opt[0].value.match(/(https?:\/\/\S+\ .(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0];
+     return interaction.options.getString('image-url');
    case 'image-file':
      return opt[0].attachment.url;
    default:
