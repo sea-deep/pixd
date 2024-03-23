@@ -9,7 +9,7 @@ const openai = new OpenAIApi(configuration);
 export default {
   subCommand: 'xuv gpt',
   async execute(interaction) {
-    const query = interaction.getString('message');
+    const query = interaction.options.getString('message');
     await interaction.deferReply();
 
     const systemPrompt = `You're a super smart AI robot capable of answering tough and logical questions with ease. Make responses by conducting thorough research and maintaining accuracy.`;
