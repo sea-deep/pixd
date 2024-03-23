@@ -25,10 +25,10 @@ if (sel[0] == 'xuv') {
   help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
   help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
-    '* `p!gpt <query>` - Danky dank GPT',
-    '* `p!padhaku <query>` - Ask study related questions.',
-    '* `p!genesis <prompt>` - Genesis AI images',
-    '* `p!ytsum <youtube URL>` - summarise a youtube video'
+    '* `p!gpt <query>` - <:slash:1220953479921799218> Danky dank GPT',
+    '* `p!padhaku <query>` - <:slash:1220953479921799218> Ask study related questions.',
+    '* `p!genesis <prompt>` - <:slash:1220953479921799218> Genesis AI images',
+    '* `p!ytsum <youtube URL>` - <:slash:1220953479921799218> summarise a youtube video'
    ].join('\n');
 }
 if (sel[0] == 'uti') {
@@ -48,12 +48,12 @@ if (sel[0] == 'img') {
   help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
   help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
-    '* `p!lapata [image] or <mentions>` - Get Lapata.',
-    '* `p!allustuff [image]+[text]` - Allu Arjun funnies',
-    '* `p!vosahihai [image] or <mentions>` - Hes right you know',
-    '* `p!nearyou [image] or <mention>` - WHO ARE YOU',
-    '* `p!goodness [image] or <mention>` - oh my goodness gracious',
-    '* `p!animan <4 mentions>` - Put that new forgis on the jeep',
+    '* `p!lapata [image] or <mentions>` - <:slash:1220953479921799218> get Lapata.',
+    '* `p!allustuff [image]+[text]` - <:slash:1220953479921799218> Allu Arjun funnies',
+    '* `p!vosahihai [image] or <mentions>` - <:slash:1220953479921799218> Hes right you know',
+    '* `p!nearyou [image] or <mention>` - <:slash:1220953479921799218> WHO ARE YOU',
+    '* `p!goodness [image] or <mention>` - <:slash:1220953479921799218> oh my goodness gracious',
+    '* `p!animan <4 mentions>` - <:slash:1220953479921799218> put that new forgis on the jeep',
     ].join('\n');
 }
 if (sel[0] == 'gam') {
@@ -62,7 +62,7 @@ if (sel[0] == 'gam') {
   help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
     '* `p!wordle` - Play the game wordle',
-    '* `p!c4` - Play the game Connect 4',
+    '* `p!c4` -  Play the game Connect 4',
     '* `p!2048` - Play 2048',
     '* `p!hangman` - Yet another word guessing game.',
   ].join('\n');
