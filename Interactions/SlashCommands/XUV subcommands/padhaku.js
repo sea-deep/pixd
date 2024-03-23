@@ -7,7 +7,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export default {
-  subCommand: 'xuv gpt',
+  subCommand: 'xuv padhaku',
   async execute(interaction) {
     const query = interaction.options.getString('message');
     await interaction.deferReply();
