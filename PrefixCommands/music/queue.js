@@ -1,8 +1,9 @@
 import { Client, Message } from "discord.js";
+
 export default {
   name: "queue",
   description: "Shows the queue.",
-  aliases: ["np", "q"],
+  aliases: ["np", "q", "nowplaying"],
   usage: "queue",
   guildOnly: false,
   args: false,
@@ -14,52 +15,17 @@ export default {
     * @param {Message} message
     * @param {Client} client
     */
-
   execute: async (message, args, client) => {
     let serverQueue = client.queue.get(message.guild.id);
 
-    if (!message.member.voice.channel) {
-      let er = await message.reply({
-          content: '',
-          embeds: [
-            {
-              author: {
-                name: '❌ Please join a  voice channel first.',
-              },
-              color: client.color,
-            },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
-    }
-    if (!serverQueue || serverQueue.songs.length == 0) {
-      return message.channel.send({
-        content: 'Queue',
-        tts: false,
-        embeds: [
-          {
-            type: 'rich',
-            title: '',
-            description:
-              `No song currently playing\n----------------------------\n`,
-            color: client.color,
-          },
-        ],
-      });
-    }
-
-    const nowPlaying = serverQueue.songs[0];
-    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n`;
+    const nowPlaying = (serverQueue && serverQueue.songs.length !== 0) ? serverQueue.songs[0] : '*No song is currently being played*';
+    const playingNext = (serverQueue && serverQueue.songs.length > 1) ? serverQueue.songs[1] : '*No song is in queue.*';
+    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n${playingNext.title}`;
     
-    for (let i = 1; i < Math.min(serverQueue.songs.length, 11); i++) {
-      const song = serverQueue.songs[i];
-      msg += `${i}. ${song.title}\n`;
-    }
-
-    message.channel.send({
+    let m = {
       content: '',
       tts: false,
+      components: [],
       embeds: [
         {
           type: 'rich',
@@ -67,18 +33,29 @@ export default {
           description: `${msg}`,
           color: client.color,
           footer: {
-            text: `Total songs in queue: ${serverQueue.songs.length-1}`
+            text: `Total songs in queue: ${serverQueue.songs.length - 1}`
           }
         },
       ],
-    });
+    };
+    if (serverQueue && serverQueue.songs.length > 2) {
+      m.components.push({
+        type: 1,
+        components: [
+          {
+            style: 1,
+            label: `See remaining queue`,
+            custom_id: `showQueue`,
+            disabled: false,
+            emoji: {
+              id: null,
+              name: `📜`
+            },
+            type: 2
+          }
+        ]
+      });
+    }
+    return message.channel.send(m);
   },
 };
-
-async function deleteMessage(msg) {
-  try {
-    return msg.delete();
-  } catch (e) {
-    return;
-  }
-}
