@@ -46,7 +46,7 @@ export default {
 
       try {
         check = await playDL.validate(await soundCloudUrl(args[0].trim()));
-      } catch (error) {
+      } catch (err) {
         let er = await message.reply({
           content: '',
           embeds: [
@@ -54,7 +54,7 @@ export default {
               author: {
                 name: '❌ An unexpected error occurred while validating your query.',
               },
-              description: error.message,
+              description: err.message,
               color: client.color,
             },
           ],
@@ -382,8 +382,8 @@ export default {
           }
         }
       }
-    } catch (error) {
-      console.error('An unexpected error occurred:', error.message);
+    } catch (err) {
+      console.error('An unexpected error occurred:', err.message);
       let er = await message.reply({
         content: '',
         embeds: [
@@ -391,7 +391,7 @@ export default {
             author: {
               name: '❌ An unexpected error occurred.',
             },
-            description: error.message,
+            description: err.message,
             color: client.color,
           },
         ],
