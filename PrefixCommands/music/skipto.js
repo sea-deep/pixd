@@ -24,7 +24,7 @@ export default {
         embeds: [
           {
             author: {
-              name: '❌ No song to skip.',
+              name: '❌ Please join a  voice channel first',
             },
             color: client.color,
           },
