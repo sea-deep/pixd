@@ -14,12 +14,13 @@ export default {
       chunk.forEach((item, index) => song += `${i + index + 2}. ${item}\n`); 
       chunks.push(song); 
     }
-    
+   
     for (let chunk of chunks) {
+      console.log(chunk)
       await interaction.followUp({
         content: '',
         embeds: [{
-          description: chunk,
+          description: `${chunk}`,
           color: client.color
         }],
         ephemeral: true
