@@ -57,3 +57,11 @@ export default {
   
   }
 };
+
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
+}
