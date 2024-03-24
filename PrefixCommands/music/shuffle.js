@@ -58,3 +58,11 @@ export default {
   message.react('<:shuffle:1090732407931543681>');
   }
 };
+
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
+}
