@@ -19,7 +19,19 @@ export default {
     let serverQueue = client.queue.get(message.guild.id);
 
     if (!message.member.voice.channel) {
-      return message.react('<:error:1090721649621479506>');
+      let er = await message.reply({
+          content: '',
+          embeds: [
+            {
+              author: {
+                name: '❌ Please join a  voice channel first.',
+              },
+              color: client.color,
+            },
+          ],
+        });
+        await client.sleep(5000);
+        return deleteMessage(er);
     }
     if (!serverQueue || serverQueue.songs.length == 0) {
       return message.channel.send({
@@ -31,14 +43,14 @@ export default {
             title: '',
             description:
               `No song currently playing\n----------------------------\n`,
-            color: 0x462,
+            color: client.color,
           },
         ],
       });
     }
 
     const nowPlaying = serverQueue.songs[0];
-    let msg = `Now playing: ${nowPlaying.title}\n----------------------------\n`;
+    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n`;
     
     for (let i = 1; i < Math.min(serverQueue.songs.length, 11); i++) {
       const song = serverQueue.songs[i];
@@ -53,7 +65,7 @@ export default {
           type: 'rich',
           title: 'Music Queue',
           description: `${msg}`,
-          color: 0xe08e67,
+          color: client.color,
           footer: {
             text: `Total songs in queue: ${serverQueue.songs.length-1}`
           }
@@ -62,3 +74,11 @@ export default {
     });
   },
 };
+
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
+}
