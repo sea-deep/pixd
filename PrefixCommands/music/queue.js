@@ -20,7 +20,7 @@ export default {
 
     const nowPlaying = (serverQueue && serverQueue.songs.length !== 0) ? serverQueue.songs[0] : '*No song is currently being played*';
     const playingNext = (serverQueue && serverQueue.songs.length > 1) ? serverQueue.songs[1] : '*No song is in queue.*';
-    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n${playingNext.title}`;
+    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n1. ${playingNext.title}`;
     
     let m = {
       content: '',
@@ -33,7 +33,7 @@ export default {
           description: `${msg}`,
           color: client.color,
           footer: {
-            text: `Total songs in queue: ${serverQueue.songs.length - 1}`
+            text: `total songs in queue: ${serverQueue.songs.length - 1}`
           }
         },
       ],
