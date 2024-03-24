@@ -19,10 +19,34 @@ export default {
   let pos = parseInt(args[0]);
   let song;
   if (!message.member.voice.channel) {
-    return message.react('<:error:1090721649621479506>');
+    let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ No song to skip.',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.react('<:error:1090721649621479506>');
+    let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ No track to jump to',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   if (isNaN(pos)) {
     //skip by keyword
@@ -41,13 +65,49 @@ export default {
       });
     }
     if (pos < 0) {
-      return message.react('<:error:1090721649621479506>');
+      let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ Failed to skip to the given track',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
     }
   } else if (pos < 0 || pos > serverQueue.songs.length - 1) {
-    return message.react('<:error:1090721649621479506>');
+    let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ Failed to skip to the given track',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   if (pos == 0) {
-    return message.react('<:error:1090721649621479506>');
+    let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ Failed to skip to the given track',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   song = serverQueue.songs.splice(pos, 1); //remove the song (splice returns array)
   serverQueue.songs.splice(1, 0, song[0]); //make it the next song
