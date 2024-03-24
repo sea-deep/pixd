@@ -19,11 +19,11 @@ export default {
     let serverQueue = client.queue.get(message.guild.id);
   if (!message.member.voice.channel) {
     let er = await message.reply({
-          content: '',
+          content: ``,
           embeds: [
             {
               author: {
-                name: '❌ Please join a  voice channel first.',
+                name: `❌ Please join a  voice channel first.`,
               },
               color: client.color,
             },
@@ -34,11 +34,11 @@ export default {
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
                let er = await message.reply({
-          content: '',
+          content: ``,
           embeds: [
             {
               author: {
-                name: '❌ No song to seek.',
+                name: `❌ No song to seek.`,
               },
               color: client.color,
             },
@@ -47,13 +47,13 @@ export default {
         await client.sleep(5000);
         return deleteMessage(er);
   }
-  if (serverQueue.songs[0].source != 'yt') {
+  if (serverQueue.songs[0].source != `yt`) {
                let er = await message.reply({
-          content: '',
+          content: ``,
           embeds: [
             {
               author: {
-                name: '❌ Cannot seek into this track'
+                name: `❌ Cannot seek into this track`
               },
               color: client.color,
             },
@@ -68,14 +68,26 @@ export default {
   let maxTime = parse(maxDuration);
   if (timeToSeek > maxDuration || timeToSeek < 0) {
     console.log(`Seek failed, requested ${timeToSeek}, max is ${maxDuration}`);
-    return message.react('<:error:1090721649621479506>');
+         let er = await message.reply({
+          content: ``,
+          embeds: [
+            {
+              author: {
+                name: `❌ Seek failed, requested ${timeToSeek}, max is ${maxDuration}`,
+              },
+              color: client.color,
+            },
+          ],
+        });
+        await client.sleep(5000);
+        return deleteMessage(er);
   }
   let currentSong = serverQueue.songs[0];
   currentSong.seek = timeToSeek;
   currentSong.seekTime = seekTime;
   serverQueue.songs.unshift(currentSong);
   serverQueue.player.stop();
-  return message.react('<:seek:1090718780545581116>');
+  return message.react(`<:seek:1090718780545581116>`);
   }
 };
 /**
