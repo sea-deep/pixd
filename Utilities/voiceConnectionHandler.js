@@ -76,12 +76,45 @@ export async function startVoiceConnection(
       play(message.guild, queueConstructor.songs[0], client, message);
     } catch (e) {
       console.log("Error while playing: ", e.message);
-      return message.react("<:error:1090721649621479506>");
+      let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ An unexpected error occurred while playing the song.',
+            },
+            description: e.message,
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
     }
   } catch (err) {
     console.log("Unexpected error with Voice connection handler:", err.message);
     client.queue.delete(params.guildId);
-    return message.channel.send(err.message);
+    let er = await message.reply({
+      content: '',
+      embeds: [
+        {
+          author: {
+            name: '❌ An unexpected error occurred with the Voice connection handler.',
+          },
+          description: err.message,
+          color: client.color,
+        },
+      ],
+    });
+    await client.sleep(5000);
+    return deleteMessage(er);
   }
 }
 
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
+}
