@@ -19,12 +19,12 @@ export default {
   let pos = parseInt(args[0]);
   let song;
   if (!message.member.voice.channel) {
-    let er = await message.reply({
+      let er = await message.reply({
         content: '',
         embeds: [
           {
             author: {
-              name: '❌ Please join a  voice channel first',
+              name: '❌ Please join a  voice channel first.',
             },
             color: client.color,
           },
