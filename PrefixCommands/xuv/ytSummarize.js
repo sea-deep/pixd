@@ -54,14 +54,12 @@ export default {
     return message.reply({
       content: '',
       embeds: [{
-        title: `Summary for: ${call.title}:`,
+        author: {
+          name: `Summary for: ${call.title}:`,
+          icon_url: call.thumbnail,
+        },
         description: call.summary,
         color: client.color,
-        thumbnail: {
-          url: call.thumbnail,
-          height:0,
-          width:0
-        }
       }]
     });
   }
@@ -86,7 +84,7 @@ async function summarizeVideo(url, lang) {
     subtitles,
     "----------------",
     "Please ensure the summary is in English.",
-    "Summarise the video in around 10 to 15 small points, you can adjust it as per requirement."
+    "Summarise the video in around 10 to 15 easy bite sized points, you can adjust it as per requirement."
   ].join("\n");
   let result;
   try {
