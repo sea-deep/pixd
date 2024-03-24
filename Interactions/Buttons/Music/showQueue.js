@@ -21,7 +21,8 @@ export default {
         embeds: [{
           description: chunk,
           color: client.color
-        }]
+        }],
+        ephemeral: true
       });
     }
   }
