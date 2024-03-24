@@ -27,7 +27,6 @@ export async function play(guild, song, client, message) {
       },
       2 * 60 * 1000,
     ); //2 min idle
-
     serverQueue.loop = false;
     return;
   }
@@ -35,78 +34,81 @@ export async function play(guild, song, client, message) {
   clearTimeout(serverQueue.timeoutID);
   serverQueue.timeoutID = undefined;
 
-    let stream;
+  let stream;
+  try {
     if (song.source === "yt") {
-      try {
-        stream = await playDL.stream(song.url, {
-          seek: song?.seek > 0 ? song.seek : 0,
-        });
-      } catch (e) {
-        console.log("Caught an error while getting stream:", e.message);
-        return message.react("<:error:1090721649621479506>");
-      }
+      stream = await playDL.stream(song.url, {
+        seek: song?.seek > 0 ? song.seek : 0,
+      });
     } else if (song.source === "sp") {
-      try {
-        let search = await playDL.search(song.title, {
-          limit: 1,
-        });
-        stream = await playDL.stream(search[0].url);
-      } catch (e) {
-        console.log("Caught an error while getting stream:", e.message);
-        return message.react("<:error:1090721649621479506>");
-      }
+      let search = await playDL.search(song.title, {
+        limit: 1,
+      });
+      stream = await playDL.stream(search[0].url);
     } else if (song.source === "sc") {
-      try {
-        stream = await playDL.stream(song.url);
-      } catch (e) {
-        console.log("Caught an error while getting stream:", e.message);
-        return message.react("<:error:1090721649621479506>");
-      }
+      stream = await playDL.stream(song.url);
     }
-
-    //discord part
-    let resource = createAudioResource(stream.stream, {
-      inputType: stream.type,
-    });
-    serverQueue.connection.subscribe(serverQueue.player);
-    serverQueue.player.play(resource);
-
-    var errorListener = (error) => {
-      console.error(
-        `Error: ${error.message} with resource ${error.resource.title}`,
-      );
-    };
-    serverQueue.player.on("error", errorListener);
-    serverQueue.player.once(AudioPlayerStatus.Idle, () => {
-      serverQueue.player.removeListener("error", errorListener);
-      if (serverQueue.loop && serverQueue.keep) {
-        serverQueue.songs.push(serverQueue.songs.shift());
-      } else {
-        serverQueue.songs.shift();
-        if (serverQueue.loop === true) {
-          serverQueue.keep = true;
-        }
-      }
-      play(guild, serverQueue.songs[0], client);
-    });
-
-    serverQueue.textChannel.send({
-      content: "**Now Playing**",
-      tts: false,
+  } catch (error) {
+    console.error("An unexpected error occurred while getting the stream:", error.message);
+    let er = await message.reply({
+      content: '',
       embeds: [
         {
-          type: "rich",
-          title: "",
-          description: "",
-          color: 0xe08e67,
           author: {
-            name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-                                 icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,},
+            name: `❌ An unexpected error occurred while getting the stream for ${song.title}.`,
+          },
+          description: error.message,
+          color: client.color,
         },
       ],
     });
-}
+    await client.sleep(5000);
+    return deleteMessage(er);
+  }
 
+  // Discord part
+  let resource = createAudioResource(stream.stream, {
+    inputType: stream.type,
+  });
+  serverQueue.connection.subscribe(serverQueue.player);
+  serverQueue.player.play(resource);
+
+  var errorListener = (error) => {
+    console.error(
+      `Error: ${error.message} with resource ${error.resource.title}`,
+    );
+  };
+  serverQueue.player.on("error", errorListener);
+  serverQueue.player.once(AudioPlayerStatus.Idle, () => {
+    serverQueue.player.removeListener("error", errorListener);
+    if (serverQueue.loop && serverQueue.keep) {
+      serverQueue.songs.push(serverQueue.songs.shift());
+    } else {
+      serverQueue.songs.shift();
+      if (serverQueue.loop === true) {
+        serverQueue.keep = true;
+      }
+    }
+    play(guild, serverQueue.songs[0], client, message);
+  });
+
+  serverQueue.textChannel.send({
+    content: "**Now Playing**",
+    tts: false,
+    embeds: [
+      {
+        type: "rich",
+        title: "",
+        description: "",
+        color: 0xe08e67,
+        author: {
+          name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
+          icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
+        },
+      },
+    ],
+  });
+}
 /**
  * @param {Client} client
  */
@@ -269,4 +271,12 @@ export async function getLyrics(url) {
     .replace(/<\/?i[^>]*>/g, "")
     .trim();
   return lyrics;
+}
+
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
 }
