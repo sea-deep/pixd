@@ -114,3 +114,12 @@ export default {
   serverQueue.player.stop(); //skip current playing song
   }
 };
+
+
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
+}
