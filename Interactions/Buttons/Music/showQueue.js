@@ -12,7 +12,7 @@ export default {
       let chunk = remaining.slice(i, i + 20);
       console.log(chunk)
       let song = "";
-      chunk.forEach((item, index) => song += `${i + index + 2}. ${item}\n`); 
+      chunk.forEach((item, index) => song += `${i + index + 2}. ${item.title}\n`); 
       chunks.push(song); 
     }
    
