@@ -47,6 +47,9 @@ export default {
       }]
     });
     await client.sleep(3000);
+    try {
+    await mseg.delete();
+    } catch(e) {}
     return this.execute(message, args, client);
   }
 
