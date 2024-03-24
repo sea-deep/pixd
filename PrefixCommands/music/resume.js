@@ -38,7 +38,7 @@ export default {
           embeds: [
             {
               author: {
-                name: '❌ No song to resum.',
+                name: '❌ No song to resume.',
               },
               color: client.color,
             },
