@@ -39,14 +39,15 @@ export default {
    }]
  });
   } catch(e) {
-    return mseg.edit({
+    await mseg.edit({
       content: '',
       embeds: [{
-        description: `An error occurred...: ${e.message}`,
+        description: `An error occurred...: ${e.message}\n\nRETRYING IN 3 SECONDS`,
         color: client.color
       }]
     });
-    
+    await client.sleep(3000);
+    return this.execute(message, args, client);
   }
 
 
