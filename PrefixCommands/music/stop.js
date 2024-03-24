@@ -18,14 +18,44 @@ export default {
   execute: async (message, args, client) => {
     let serverQueue = client.queue.get(message.guild.id);
       if (!message.member.voice.channel) {
-    return message.react('<:error:1090721649621479506>');
+      let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ Please join a  voice channel first.',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   if (!serverQueue) {
-    return message.react('<:error:1090721649621479506>');
+          let er = await message.reply({
+        content: '',
+        embeds: [
+          {
+            author: {
+              name: '❌ No song to stop...',
+            },
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
   }
   message.react('<:stop:1090718630628573245>');
   serverQueue.connection.destroy();
   client.queue.delete(message.guild.id);
   }
+};
+async function deleteMessage(msg) {
+  try {
+    return msg.delete();
+  } catch (e) {
+    return;
+  }
 }
-;
