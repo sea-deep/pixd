@@ -18,18 +18,40 @@ export default {
   execute: async (message, args, client) => {
   let serverQueue = client.queue.get(message.guild.id);
   if (!message.member.voice.channel) {
-    return message.react('<:error:1090721649621479506>');
+    let er = await message.reply({
+          content: '',
+          embeds: [
+            {
+              author: {
+                name: '❌ Please join a  voice channel first.',
+              },
+              color: client.color,
+            },
+          ],
+        });
+        await client.sleep(5000);
+        return deleteMessage(er);
   }
   if (!serverQueue || serverQueue.songs.length == 0) {
-    return message.react('<:error:1090721649621479506>');
+           let er = await message.reply({
+          content: '',
+          embeds: [
+            {
+              author: {
+                name: '❌ No song to loop.',
+              },
+              color: client.color,
+            },
+          ],
+        });
+        await client.sleep(5000);
+        return deleteMessage(er);
   }
   serverQueue.loop = !serverQueue.loop; //loop the queue
   serverQueue.keep = !serverQueue.keep; //and keep the current song
   if (serverQueue.loop) {
-    console.log(`Looping the queue.`);
     return message.react('<:loop:1090721294779162756>');
   } else {
-    console.log('Disabled the loop.');
     return message.react('<:unloop:1090721386848333934>');
   }
   
