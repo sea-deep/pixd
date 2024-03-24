@@ -18,9 +18,9 @@ export default {
   execute: async (message, args, client) => {
     let serverQueue = client.queue.get(message.guild.id);
 
-    const nowPlaying = (serverQueue && serverQueue.songs.length !== 0) ? serverQueue.songs[0] : '*No song is currently being played*';
-    const playingNext = (serverQueue && serverQueue.songs.length > 1) ? serverQueue.songs[1] : '*No song is in queue.*';
-    let msg = `**Now playing:**\n${nowPlaying.title}\n**Playing Next:**\n1. ${playingNext.title}`;
+    const nowPlaying = (serverQueue && serverQueue.songs.length !== 0) ? serverQueue.songs[0].title : '*No song is currently being played*';
+    const playingNext = (serverQueue && serverQueue.songs.length > 1) ? serverQueue.songs[1].title : '*No song is in queue.*';
+    let msg = `**Now playing:**\n${nowPlaying}\n**Playing Next:**\n1. ${playingNext}`;
     
     let m = {
       content: '',
