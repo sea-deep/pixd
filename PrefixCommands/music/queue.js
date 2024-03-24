@@ -33,7 +33,7 @@ export default {
           description: `${msg}`,
           color: client.color,
           footer: {
-            text: `total songs in queue: ${serverQueue.songs.length - 1}`
+            text: `total songs in queue: ${(serverQueue && serverQueue.songs.length !== 0) ? serverQueue.songs.length - 1 : '0'}`
           }
         },
       ],
@@ -43,7 +43,7 @@ export default {
         type: 1,
         components: [
           {
-            style: 1,
+            style: 4,
             label: `See remaining queue`,
             custom_id: `showQueue`,
             disabled: false,
