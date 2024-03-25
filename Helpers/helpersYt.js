@@ -14,15 +14,15 @@ export async function getVideoInfo(videoUrl) {
     id: videoId,
   });
 
-  const videoInfo = response.data?.items[0]?.snippet;
-  const channelInfo = response.data?.items[0]?.snippet?.channelTitle;
+  const videoInfo = response.data.items[0].snippet;
+  const channelInfo = response.data.items[0].snippet?.channelTitle;
   const duration = convertDurationToSeconds(
-    response.data?.items[0]?.contentDetails?.duration
+    response.data.items[0]?.contentDetails.duration
   );
 
   return {
     title: videoInfo?.title,
-    description: videoInfo?.description,
+    description: videoInfo.description,
     channelName: channelInfo,
     duration: duration,
     videoId: videoId,
