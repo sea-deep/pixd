@@ -1,37 +1,39 @@
-const { google } = require('googleapis');
+const {google} = require('googleapis');
 
 const API_KEY = process.env.GOOGLE_KEY;
 const youtube = google.youtube({
-      version: 'v3',
-      auth: API_KEY,
-    });
-
+  version: 'v3',
+  auth: API_KEY,
+});
 
 export async function getVideoInfo(videoUrl) {
- 
-    const videoId = extractVideoId(videoUrl);
+  const videoId = extractVideoId(videoUrl);
 
-    const response = await youtube.videos.list({
-      part: 'snippet,contentDetails',
-      id: videoId,
-    });
+  const response = await youtube.videos.list({
+    part: 'snippet,contentDetails',
+    id: videoId,
+  });
 
-    const videoInfo = response.data?.items[0]?.snippet;
-    const channelInfo = response.data?.items[0]?.snippet?.channelTitle;
-    const duration = convertDurationToSeconds(response.data?.items[0]?.contentDetails?.duration);
+  const videoInfo = response.data?.items[0]?.snippet;
+  const channelInfo = response.data?.items[0]?.snippet?.channelTitle;
+  const duration = convertDurationToSeconds(
+    response.data?.items[0]?.contentDetails?.duration
+  );
 
-    return {
-      title: videoInfo?.title,
-      description: videoInfo?.description,
-      channelName: channelInfo,
-      duration: duration,
-      videoId: videoId,
-      url: `https://www.youtube.com/watch?v=${videoId}`
-    };
+  return {
+    title: videoInfo?.title,
+    description: videoInfo?.description,
+    channelName: channelInfo,
+    duration: duration,
+    videoId: videoId,
+    url: `https://www.youtube.com/watch?v=${videoId}`,
+  };
 }
 
 function extractVideoId(url) {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/);
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/
+  );
   return match && match[1];
 }
 
@@ -65,7 +67,9 @@ export async function getPlaylistTracks(playlistUrl) {
         pageToken: nextPageToken,
       });
 
-      const videoIds = response.data.items.map(item => item.contentDetails.videoId).join(',');
+      const videoIds = response.data.items
+        .map((item) => item.contentDetails.videoId)
+        .join(',');
 
       const videosResponse = await youtube.videos.list({
         part: 'contentDetails',
@@ -96,7 +100,7 @@ function extractPlaylistId(url) {
   const match = url.match(/(?:list=)([^\s&]+)/);
   return match && match[1];
 }
- 
+
 export async function searchVideo(query) {
   try {
     const youtube = google.youtube({
@@ -108,7 +112,7 @@ export async function searchVideo(query) {
       part: 'snippet',
       q: query,
       type: 'video',
-      maxResults: 1, 
+      maxResults: 1,
     });
 
     if (response.data.items.length === 0) {
