@@ -31,11 +31,6 @@ export async function getVideoInfo(videoUrl) {
 }
 export async function searchVideos(query) {
   try {
-    const youtube = google.youtube({
-      version: 'v3',
-      auth: API_KEY,
-    });
-
     const response = await youtube.search.list({
       part: 'snippet',
       q: query,
