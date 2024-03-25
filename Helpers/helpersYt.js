@@ -86,7 +86,7 @@ export async function getPlaylistTracks(playlistUrl) {
         const videoInfo = videosResponse.data.items[index];
         const trackInfo = {
           title: item.snippet.title,
-          videoUrl: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`,
+          url: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`,
           duration: convertDurationToSeconds(videoInfo.contentDetails.duration),
         };
         tracks.push(trackInfo);
