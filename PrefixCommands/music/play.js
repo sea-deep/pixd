@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
 import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
-import { getplaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
+import { getPlaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
 import playDL from "play-dl";
 
 
@@ -156,7 +156,7 @@ export default {
           } else if (type === 'playlist') {
             let playlist;
             try {
-              playlist = await getplaylistTracks(args[0].trim());
+              playlist = await getPlaylistTracks(args[0].trim());
             } catch (e) {
               console.log('Error while getting video info', e.message);
               let er = await message.channel.send({
