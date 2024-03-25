@@ -29,12 +29,13 @@ export async function getVideoInfo(videoUrl) {
     url: `https://www.youtube.com/watch?v=${videoId}`,
   };
 }
-export async function searchVideos(query) {
+export async function searchVideo(query) {
   try {
     const response = await youtube.search.list({
       part: 'snippet',
       q: query,
       type: 'video',
+      maxResults: 1
     });
 
     const videoIds = response.data.items.map(item => item.id.videoId).join(',');
@@ -53,7 +54,7 @@ export async function searchVideos(query) {
       };
     });
 
-    return videos;
+    return videos[0];
   } catch (error) {
     console.error('Error searching videos:', error.message);
     throw error;
