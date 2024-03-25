@@ -7,7 +7,7 @@ import playDL from "play-dl";
 import { Client, Message } from "discord.js";
 import request from "request";
 import cheerio from "cheerio";
-import { searchVideos } from './helpersYt.js';
+import { searchVideo } from './helpersYt.js';
 /**
  * @param {Client} client
  * @param {Message} message
