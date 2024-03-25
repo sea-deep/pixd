@@ -1,15 +1,15 @@
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
-import { playDL, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
-import { getplayDLlistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
-import playDL from "playDL-dl";
+import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
+import { getplaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
+import playDL from "play-dl";
 
 
 export default {
-  name: 'playDL',
-  description: 'playDLs from YouTube or Spotify or SoundCloud.',
+  name: 'play',
+  description: 'plays from YouTube or Spotify or SoundCloud.',
   aliases: ['p'],
-  usage: 'playDL <link>|<search query>',
+  usage: 'play <link>|<search query>',
   guildOnly: true,
   args: true,
   permissions: {
@@ -153,10 +153,10 @@ export default {
               source: 'yt',
             };
             songs.push(song);
-          } else if (type === 'playDLlist') {
-            let playDLlist;
+          } else if (type === 'playlist') {
+            let playlist;
             try {
-              playDLlist = await getplayDLlistTracks(args[0].trim());
+              playlist = await getplaylistTracks(args[0].trim());
             } catch (e) {
               console.log('Error while getting video info', e.message);
               let er = await message.channel.send({
@@ -176,7 +176,7 @@ export default {
             }
             
 
-            playDLlist.forEach(function (video) {
+            playlist.forEach(function (video) {
               song = {
                 title: video.title,
                 url: video.url,
@@ -224,13 +224,13 @@ export default {
               source: 'sp',
             };
             songs.push(song);
-          } else if (type === 'album' || type === 'playDLlist') {
-            let playDLlist;
+          } else if (type === 'album' || type === 'playlist') {
+            let playlist;
             try {
-              playDLlist = await playDL.spotify(args[0].trim());
+              playlist = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log(
-                'error while getting spotify playDLlist info',
+                'error while getting spotify playlist info',
                 e.message
               );
               let er = await message.channel.send({
@@ -248,7 +248,7 @@ export default {
               await client.sleep(5000);
               return deleteMessage(er);
             }
-            const tracks = await playDLlist.fetched_tracks.get('1');
+            const tracks = await playlist.fetched_tracks.get('1');
 
             tracks.forEach(function (track) {
               let title = `${track.name} - ${track.artists
@@ -277,7 +277,7 @@ export default {
               source: 'sc',
             };
             songs.push(song);
-          } else if (type === 'playDLlist') {
+          } else if (type === 'playlist') {
             const tracks = await so.all_tracks();
             tracks.forEach(function (track) {
               song = {
@@ -298,7 +298,7 @@ export default {
           voiceChannel: voiceChannel,
           connection: null,
           songs: songs,
-          playDLer: null,
+          player: null,
           loop: false,
           keep: false,
           timeoutID: undefined,
@@ -319,7 +319,7 @@ export default {
       } else {
         if (serverQueue?.songs.length == 0) {
           serverQueue.songs = serverQueue.songs.concat(songs);
-          playDL(message.guild, serverQueue.songs[0], client, message);
+          play(message.guild, serverQueue.songs[0], client, message);
         } else {
           serverQueue.songs = serverQueue.songs.concat(songs);
 
