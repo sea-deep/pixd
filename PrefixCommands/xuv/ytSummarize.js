@@ -97,8 +97,8 @@ async function summarizeVideo(url, lang) {
   const text = result.response.text();
   return {
       summary: text,
-      title: ytInfo.video_details.title,
-      thumbnail: ytInfo.video_details.thumbnails[0].url
+      title: ytInfo.title,
+      thumbnail: ytInfo.thumbnail
     };
 }
 
