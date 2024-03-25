@@ -69,7 +69,7 @@ export async function getPlaylistTracks(playlistUrl) {
       const response = await youtube.playlistItems.list({
         part: 'snippet,contentDetails',
         playlistId: playlistId,
-        maxResults: 50, // Maximum number of results per page
+        maxResults: 50, 
         pageToken: nextPageToken,
       });
 
