@@ -1,4 +1,4 @@
-const {google} = require('googleapis');
+import {google} from 'googleapis';
 
 const API_KEY = process.env.GOOGLE_KEY;
 const youtube = google.youtube({
