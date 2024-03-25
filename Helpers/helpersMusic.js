@@ -3,7 +3,7 @@ import {
   createAudioResource,
   AudioPlayerStatus,
 } from "@discordjs/voice";
-import playDL from "play-dl";
+import play from "play-dl";
 import { Client, Message } from "discord.js";
 import request from "request";
 import cheerio from "cheerio";
@@ -37,14 +37,14 @@ export async function play(guild, song, client, message) {
   let stream;
   try {
     if (song.source === "yt") {
-      stream = await playDL.stream(song.url, {
+      stream = await play.stream(song.url, {
         seek: song?.seek > 0 ? song.seek : 0,
       });
     } else if (song.source === "sp") {
       let search = await searchVideo(song.title);
-      stream = await playDL.stream(search.url);
+      stream = await play.stream(search.url);
     } else if (song.source === "sc") {
-      stream = await playDL.stream(song.url);
+      stream = await play.stream(song.url);
     }
   } catch (error) {
     console.log("An unexpected error occurred while getting the stream:", error);
