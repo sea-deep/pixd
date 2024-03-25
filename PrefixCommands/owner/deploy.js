@@ -17,7 +17,6 @@ export default {
     */
   execute: async (message, args, client) => {
     if (message.author.id == "908287391217905684") {
-  //  console.log(getInputImage(message))
     await fetch(process.env.DEPLOY_HOOK);
     await client.destroy();
     return message.reply('Deploy started!');
