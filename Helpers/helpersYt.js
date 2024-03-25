@@ -31,11 +31,6 @@ export async function getVideoInfo(videoUrl) {
 }
 export async function searchVideo(query) {
   try {
-    const youtube = google.youtube({
-      version: 'v3',
-      auth: API_KEY,
-    });
-
     const response = await youtube.search.list({
       part: 'snippet',
       q: query,
@@ -53,23 +48,17 @@ export async function searchVideo(query) {
       description: video.snippet.description,
       channelName: video.snippet.channelTitle,
       videoId: video.id.videoId,
+      url: `https://www.youtube.com/watch?v=${video.id.videoId}`
     };
 
     return videoInfo;
   } catch (error) {
-    console.error('Error searching video:', error.message);
     throw error;
   }
 }
 export async function getPlaylistTracks(playlistUrl) {
   try {
     const playlistId = extractPlaylistId(playlistUrl);
-
-    const youtube = google.youtube({
-      version: 'v3',
-      auth: API_KEY,
-    });
-
     const tracks = [];
 
     let nextPageToken = null;
