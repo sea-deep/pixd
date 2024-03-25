@@ -1,15 +1,15 @@
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
-import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
-import { getPlaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
-import play from "play-dl";
+import { playDL, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
+import { getplayDLlistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
+import playDL from "playDL-dl";
 
 
 export default {
-  name: 'play',
-  description: 'Plays from YouTube or Spotify or SoundCloud.',
+  name: 'playDL',
+  description: 'playDLs from YouTube or Spotify or SoundCloud.',
   aliases: ['p'],
-  usage: 'play <link>|<search query>',
+  usage: 'playDL <link>|<search query>',
   guildOnly: true,
   args: true,
   permissions: {
@@ -46,7 +46,7 @@ export default {
       let check;
 
       try {
-        check = await play.validate(await soundCloudUrl(args[0].trim()));
+        check = await playDL.validate(await soundCloudUrl(args[0].trim()));
       } catch (err) {
         let er = await message.channel.send({
           content: '',
@@ -153,10 +153,10 @@ export default {
               source: 'yt',
             };
             songs.push(song);
-          } else if (type === 'playlist') {
-            let playlist;
+          } else if (type === 'playDLlist') {
+            let playDLlist;
             try {
-              playlist = await getPlaylistTracks(args[0].trim());
+              playDLlist = await getplayDLlistTracks(args[0].trim());
             } catch (e) {
               console.log('Error while getting video info', e.message);
               let er = await message.channel.send({
@@ -176,7 +176,7 @@ export default {
             }
             
 
-            playlist.forEach(function (video) {
+            playDLlist.forEach(function (video) {
               song = {
                 title: video.title,
                 url: video.url,
@@ -188,13 +188,13 @@ export default {
             });
           }
         } else if (source === 'sp') {
-          if (play.is_expired()) {
-            await play.refreshToken();
+          if (playDL.is_expired()) {
+            await playDL.refreshToken();
           }
           if (type === 'track') {
             let track;
             try {
-              track = await play.spotify(args[0].trim());
+              track = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log('error while getting video info', e.message);
               let er = await message.channel.send({
@@ -224,13 +224,13 @@ export default {
               source: 'sp',
             };
             songs.push(song);
-          } else if (type === 'album' || type === 'playlist') {
-            let playlist;
+          } else if (type === 'album' || type === 'playDLlist') {
+            let playDLlist;
             try {
-              playlist = await play.spotify(args[0].trim());
+              playDLlist = await playDL.spotify(args[0].trim());
             } catch (e) {
               console.log(
-                'error while getting spotify playlist info',
+                'error while getting spotify playDLlist info',
                 e.message
               );
               let er = await message.channel.send({
@@ -248,7 +248,7 @@ export default {
               await client.sleep(5000);
               return deleteMessage(er);
             }
-            const tracks = await playlist.fetched_tracks.get('1');
+            const tracks = await playDLlist.fetched_tracks.get('1');
 
             tracks.forEach(function (track) {
               let title = `${track.name} - ${track.artists
@@ -265,7 +265,7 @@ export default {
             });
           }
         } else if (source === 'so') {
-          const so = await play.soundcloud(
+          const so = await playDL.soundcloud(
             await soundCloudUrl(args[0].trim())
           );
           if (type === 'track') {
@@ -277,7 +277,7 @@ export default {
               source: 'sc',
             };
             songs.push(song);
-          } else if (type === 'playlist') {
+          } else if (type === 'playDLlist') {
             const tracks = await so.all_tracks();
             tracks.forEach(function (track) {
               song = {
@@ -298,7 +298,7 @@ export default {
           voiceChannel: voiceChannel,
           connection: null,
           songs: songs,
-          player: null,
+          playDLer: null,
           loop: false,
           keep: false,
           timeoutID: undefined,
@@ -319,7 +319,7 @@ export default {
       } else {
         if (serverQueue?.songs.length == 0) {
           serverQueue.songs = serverQueue.songs.concat(songs);
-          play(message.guild, serverQueue.songs[0], client, message);
+          playDL(message.guild, serverQueue.songs[0], client, message);
         } else {
           serverQueue.songs = serverQueue.songs.concat(songs);
 
