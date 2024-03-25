@@ -76,7 +76,7 @@ export async function startVoiceConnection(
       play(message.guild, queueConstructor.songs[0], client, message);
     } catch (e) {
       console.log("Error while playing: ", e.message);
-      let er = await message.reply({
+      let er = await message.channel.send({
         content: '',
         embeds: [
           {
@@ -94,7 +94,7 @@ export async function startVoiceConnection(
   } catch (err) {
     console.log("Unexpected error with Voice connection handler:", err.message);
     client.queue.delete(params.guildId);
-    let er = await message.reply({
+    let er = await message.channel.send({
       content: '',
       embeds: [
         {
