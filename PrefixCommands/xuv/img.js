@@ -15,7 +15,7 @@ export default {
     * @param {Message} message
     * @param {Client} client
     */
-  execute: async (message, args, client) => {
+   async execute (message, args, client) {
    const query = args.join(' ');
    const mseg = await message.reply({
      content: '',
