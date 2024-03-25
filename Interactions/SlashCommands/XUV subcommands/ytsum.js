@@ -62,7 +62,8 @@ async function summarizeVideo(url, lang="en") {
     `Subtitles:`,
     subtitles,
     "----------------",
-    "Please ensure the summary is in English in around 200 words and encompasses all the key points covered in the video including those from the subtitles.",
+    "Please ensure the summary is in English.",
+    "Summarise the video in around 10 to 15 easy bite sized points, you can adjust it as per requirement."
   ].join("\n");
   let result;
   try {
