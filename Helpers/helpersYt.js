@@ -48,7 +48,7 @@ export async function searchVideos(query) {
       const videoInfo = videosResponse.data.items[index];
       return {
         title: item.snippet.title,
-        videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+        url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
         duration: convertDurationToSeconds(videoInfo.contentDetails.duration),
       };
     });
