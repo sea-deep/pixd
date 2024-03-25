@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import play from "play-dl";
+import { validate } from "play-dl";
+import { getVideoInfo } from '../../../Helpers/helpersYt.js';
 const genAI = new GoogleGenerativeAI(process.env.GOOGLEAI_KEY);
 export default {
   subCommand: 'xuv ytsummarise',
@@ -49,16 +50,16 @@ async function summarizeVideo(url, lang="en") {
   if (check !== "video") throw new Error("Not a valid YouTube URL");
   
   let ytInfo;
-  try {ytInfo = await play.video_basic_info(url);} catch(e) {
+  try {ytInfo = await getVideoInfo(url);} catch(e) {
     throw new Error("Failed to fetch video info");
   }
-  let subtitles = await getSubtitles(ytInfo.video_details.id, lang);
+  let subtitles = await getSubtitles(ytInfo.id, lang);
   if (!subtitles) throw new Error("Failed to fetch subtitles for this video");
   
   const prompt = [
     `Summarize the following YouTube video thoroughly. Please include all important information presented in the video.`,
-    `Title: ${ytInfo.video_details.title} by Channel: ${ytInfo.video_details.channel.name}`,
-    `Video Description: ${ytInfo.video_details.description}`,
+    `Title: ${ytInfo.title} by Channel: ${ytInfo.channelName}`,
+    `Video Description: ${ytInfo.description}`,
     `Subtitles:`,
     subtitles,
     "----------------",
@@ -76,8 +77,8 @@ async function summarizeVideo(url, lang="en") {
   const text = result.response.text();
   return {
       summary: text,
-      title: ytInfo.video_details.title,
-      thumbnail: ytInfo.video_details.thumbnails[0].url
+      title: ytInfo.title,
+      thumbnail: ytInfo.thumbnails[0].url
     };
 }
 
