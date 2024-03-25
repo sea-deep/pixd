@@ -7,7 +7,7 @@ import playDL from "play-dl";
 import { Client, Message } from "discord.js";
 import request from "request";
 import cheerio from "cheerio";
-
+import { searchVideos } from './helpersYt.js';
 /**
  * @param {Client} client
  * @param {Message} message
@@ -20,13 +20,13 @@ export async function play(guild, song, client, message) {
       () => {
         if (getVoiceConnection(guild.id) !== undefined) {
           destroy(guild, client);
-          serverQueue.timeoutID = undefined; //after timeout goes off, reset timeout value.
+          serverQueue.timeoutID = undefined; 
         } else {
           console.log("Bot was disconnected during the timeout.");
         }
       },
       2 * 60 * 1000,
-    ); //2 min idle
+    ); //2 min idli
     serverQueue.loop = false;
     return;
   }
@@ -41,16 +41,14 @@ export async function play(guild, song, client, message) {
         seek: song?.seek > 0 ? song.seek : 0,
       });
     } else if (song.source === "sp") {
-      let search = await playDL.search(song.title, {
-        limit: 1,
-      });
-      stream = await playDL.stream(search[0].url);
+      let search = await searchVideo(song.title);
+      stream = await playDL.stream(search.url);
     } else if (song.source === "sc") {
       stream = await playDL.stream(song.url);
     }
   } catch (error) {
-    console.error("An unexpected error occurred while getting the stream:", error.message);
-    let er = await message.reply({
+    console.log("An unexpected error occurred while getting the stream:", error);
+    let er = await message.channel.send({
       content: '',
       embeds: [
         {
