@@ -29,24 +29,38 @@ export async function getVideoInfo(videoUrl) {
     url: `https://www.youtube.com/watch?v=${videoId}`,
   };
 }
+export async function searchVideo(query) {
+  try {
+    const youtube = google.youtube({
+      version: 'v3',
+      auth: API_KEY,
+    });
 
-function extractVideoId(url) {
-  const match = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/
-  );
-  return match && match[1];
+    const response = await youtube.search.list({
+      part: 'snippet',
+      q: query,
+      type: 'video',
+      maxResults: 1,
+    });
+
+    if (response.data.items.length === 0) {
+      throw new Error('No videos found matching the query');
+    }
+
+    const video = response.data.items[0];
+    const videoInfo = {
+      title: video.snippet.title,
+      description: video.snippet.description,
+      channelName: video.snippet.channelTitle,
+      videoId: video.id.videoId,
+    };
+
+    return videoInfo;
+  } catch (error) {
+    console.error('Error searching video:', error.message);
+    throw error;
+  }
 }
-
-function convertDurationToSeconds(duration) {
-  if (!duration) return 0;
-  const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
-  const match = duration.match(regex);
-  const hours = match[1] ? parseInt(match[1]) : 0;
-  const minutes = match[2] ? parseInt(match[2]) : 0;
-  const seconds = match[3] ? parseInt(match[3]) : 0;
-  return hours * 3600 + minutes * 60 + seconds;
-}
-
 export async function getPlaylistTracks(playlistUrl) {
   try {
     const playlistId = extractPlaylistId(playlistUrl);
@@ -96,40 +110,25 @@ export async function getPlaylistTracks(playlistUrl) {
   }
 }
 
+function extractVideoId(url) {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/
+  );
+  return match && match[1];
+}
+
+function convertDurationToSeconds(duration) {
+  if (!duration) return 0;
+  const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+  const match = duration.match(regex);
+  const hours = match[1] ? parseInt(match[1]) : 0;
+  const minutes = match[2] ? parseInt(match[2]) : 0;
+  const seconds = match[3] ? parseInt(match[3]) : 0;
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
 function extractPlaylistId(url) {
   const match = url.match(/(?:list=)([^\s&]+)/);
   return match && match[1];
 }
 
-export async function searchVideo(query) {
-  try {
-    const youtube = google.youtube({
-      version: 'v3',
-      auth: API_KEY,
-    });
-
-    const response = await youtube.search.list({
-      part: 'snippet',
-      q: query,
-      type: 'video',
-      maxResults: 1,
-    });
-
-    if (response.data.items.length === 0) {
-      throw new Error('No videos found matching the query');
-    }
-
-    const video = response.data.items[0];
-    const videoInfo = {
-      title: video.snippet.title,
-      description: video.snippet.description,
-      channelName: video.snippet.channelTitle,
-      videoId: video.id.videoId,
-    };
-
-    return videoInfo;
-  } catch (error) {
-    console.error('Error searching video:', error.message);
-    throw error;
-  }
-}
