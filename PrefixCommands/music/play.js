@@ -2,7 +2,7 @@ import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
 import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
 import { getPlaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
-import playDL from "play-dl";
+import play from "play-dl";
 
 
 export default {
