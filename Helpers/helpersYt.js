@@ -29,30 +29,38 @@ export async function getVideoInfo(videoUrl) {
     url: `https://www.youtube.com/watch?v=${videoId}`,
   };
 }
-export async function searchVideo(query) {
+export async function searchVideos(query) {
   try {
+    const youtube = google.youtube({
+      version: 'v3',
+      auth: API_KEY,
+    });
+
     const response = await youtube.search.list({
       part: 'snippet',
       q: query,
       type: 'video',
-      maxResults: 1,
     });
 
-    if (response.data.items.length === 0) {
-      throw new Error('No videos found matching the query');
-    }
+    const videoIds = response.data.items.map(item => item.id.videoId).join(',');
 
-    const video = response.data.items[0];
-    const videoInfo = {
-      title: video.snippet.title,
-      description: video.snippet.description,
-      channelName: video.snippet.channelTitle,
-      videoId: video.id.videoId,
-      url: `https://www.youtube.com/watch?v=${video.id.videoId}`
-    };
+    const videosResponse = await youtube.videos.list({
+      part: 'contentDetails',
+      id: videoIds,
+    });
 
-    return videoInfo;
+    const videos = response.data.items.map((item, index) => {
+      const videoInfo = videosResponse.data.items[index];
+      return {
+        title: item.snippet.title,
+        videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+        duration: convertDurationToSeconds(videoInfo.contentDetails.duration),
+      };
+    });
+
+    return videos;
   } catch (error) {
+    console.error('Error searching videos:', error.message);
     throw error;
   }
 }
