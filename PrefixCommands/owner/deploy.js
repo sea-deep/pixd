@@ -18,8 +18,8 @@ export default {
   execute: async (message, args, client) => {
     if (message.author.id == "908287391217905684") {
     await fetch(process.env.DEPLOY_HOOK);
-    await client.destroy();
-    return message.reply('Deploy started!');
+    await message.reply('Deploy started!');
+    return client.destroy();
     } 
   }
 };
