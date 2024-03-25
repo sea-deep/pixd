@@ -1,6 +1,7 @@
 import { Client, Message } from "discord.js";
 import { startVoiceConnection } from "../../Utilities/voiceConnectionHandler.js";
 import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
+import { getPlaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
 import playDL from "play-dl";
 
 
@@ -24,7 +25,7 @@ export default {
       let serverQueue = client.queue.get(message.guild.id);
       const voiceChannel = message.member.voice.channel;
       if (!voiceChannel) {
-        let er = await message.reply({
+        let er = await message.channel.send({
           content: '',
           embeds: [
             {
@@ -45,9 +46,9 @@ export default {
       let check;
 
       try {
-        check = await playDL.validate(await soundCloudUrl(args[0].trim()));
+        check = await play.validate(await soundCloudUrl(args[0].trim()));
       } catch (err) {
-        let er = await message.reply({
+        let er = await message.channel.send({
           content: '',
           embeds: [
             {
@@ -64,7 +65,7 @@ export default {
       }
 
       if (!check) {
-        let er = await message.reply({
+        let er = await message.channel.send({
           content: '',
           embeds: [
             {
@@ -82,20 +83,15 @@ export default {
         const searchMsg = await message.react('<:search:1090725319884951623>');
         let search;
         try {
-          search = await playDL.search(query, {
-            limit: 1,
-            source: {
-              youtube: 'video',
-            },
-          });
+          search = await searchVideo(query);
         } catch (e) {
-          console.log('Error while searching song', e.message);
-          let er = await message.reply({
+          console.log('Error while searching song: ', e.message);
+          let er = await message.channel.send({
             content: '',
             embeds: [
               {
                 author: {
-                  name: '❌ An unexpected error occurred while searching the track.',
+                  name: '❌ An error occurred while searching the track.',
                 },
                 description: e.message,
                 color: client.color,
@@ -117,30 +113,14 @@ export default {
           return;
         }
 
-        if (search.length == 0) {
-          let er = await message.reply({
-            content: '',
-            embeds: [
-              {
-                author: {
-                  name: '❌ No track found for that search query.',
-                },
-                color: client.color,
-              },
-            ],
-          });
-          await client.sleep(5000);
-          return deleteMessage(er);
-        } else {
-          song = {
-            title: search[0].title,
-            url: search[0].url,
-            duration: search[0].durationInSec,
-            durationTime: parse(search[0].durationInSec),
+        song = {
+            title: search.title,
+            url: search.url,
+            duration: search.duration,
+            durationTime: parse(search.duration),
             source: 'yt',
           };
           songs.push(song);
-        }
       } else {
         let source = check.split('_')[0];
         let type = check.split('_')[1];
@@ -148,9 +128,9 @@ export default {
           if (type === 'video') {
             let video;
             try {
-              video = await playDL.video_basic_info(args.join(' '));
+              video = await getVideoInfo(args[0].trim());
             } catch (e) {
-              let er = await message.reply({
+              let er = await message.channel.send({
                 content: '',
                 embeds: [
                   {
@@ -166,22 +146,20 @@ export default {
               return deleteMessage(er);
             }
             song = {
-              title: video.video_details.title,
-              url: video.video_details.url,
-              duration: video.video_details.durationInSec,
-              durationTime: parse(video.video_details.durationInSec),
+              title: video.title,
+              url: video.url,
+              duration: video.duration,
+              durationTime: parse(video.duration),
               source: 'yt',
             };
             songs.push(song);
           } else if (type === 'playlist') {
             let playlist;
             try {
-              playlist = await playDL.playlist_info(args[0], {
-                incomplete: true,
-              });
+              playlist = await getPlaylistTracks(args[0].trim());
             } catch (e) {
-              console.log('error while getting video info', e.message);
-              let er = await message.reply({
+              console.log('Error while getting video info', e.message);
+              let er = await message.channel.send({
                 content: '',
                 embeds: [
                   {
@@ -196,30 +174,30 @@ export default {
               await client.sleep(5000);
               return deleteMessage(er);
             }
-            const videos = await playlist.all_videos();
+            
 
-            videos.forEach(function (video) {
+            playlist.forEach(function (video) {
               song = {
                 title: video.title,
                 url: video.url,
-                duration: video.durationInSec,
-                durationTime: parse(video.durationInSec),
+                duration: video.duration,
+                durationTime: parse(video.duration),
                 source: 'yt',
               };
               songs.push(song);
             });
           }
         } else if (source === 'sp') {
-          if (playDL.is_expired()) {
-            await playDL.refreshToken();
+          if (play.is_expired()) {
+            await play.refreshToken();
           }
           if (type === 'track') {
             let track;
             try {
-              track = await playDL.spotify(args[0].trim());
+              track = await play.spotify(args[0].trim());
             } catch (e) {
               console.log('error while getting video info', e.message);
-              let er = await message.reply({
+              let er = await message.channel.send({
                 content: '',
                 embeds: [
                   {
@@ -249,13 +227,13 @@ export default {
           } else if (type === 'album' || type === 'playlist') {
             let playlist;
             try {
-              playlist = await playDL.spotify(args[0].trim());
+              playlist = await play.spotify(args[0].trim());
             } catch (e) {
               console.log(
                 'error while getting spotify playlist info',
                 e.message
               );
-              let er = await message.reply({
+              let er = await message.channel.send({
                 content: '',
                 embeds: [
                   {
@@ -287,7 +265,7 @@ export default {
             });
           }
         } else if (source === 'so') {
-          const so = await playDL.soundcloud(
+          const so = await play.soundcloud(
             await soundCloudUrl(args[0].trim())
           );
           if (type === 'track') {
@@ -384,7 +362,7 @@ export default {
       }
     } catch (err) {
       console.error('An unexpected error occurred:', err.message);
-      let er = await message.reply({
+      let er = await message.channel.send({
         content: '',
         embeds: [
           {
