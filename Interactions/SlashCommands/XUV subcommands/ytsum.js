@@ -96,6 +96,7 @@ async function convertString(inputString) {
     .replace(/&amp;/gi, "&")
     .replace(/&#39;/g, "'")
     .replace(/&#x27;/g, "'")
+    .replace(/&quot;/g, '"')
     .replace(/&#x([0-9A-Fa-f]+);/g, (match, hexCode) =>
       String.fromCharCode(parseInt(hexCode, 16)),
     );
