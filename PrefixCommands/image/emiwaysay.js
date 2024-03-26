@@ -1,5 +1,5 @@
-import {Client, Message } from "discord.js";
-
+import {Message, AttachmentBuilder } from "discord.js";
+import sharp from 'sharp';
 export default {
   name: "emiwaysay",
   description: "",
@@ -13,9 +13,8 @@ export default {
   },
   /**
     * @param {Message} message
-    * @param {Client} client
     */
-  execute: async (message, args, client) => {
+  execute: async (message, args) => {
     const text = {
     text: {
       text: args.join(" ").trim(),
