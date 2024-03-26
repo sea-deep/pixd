@@ -25,7 +25,7 @@ export default {
       align: "center"
     }
   };
- let output = sharp({
+ let output = await sharp({
    create: {
      width: 1778,
      height: 630,
