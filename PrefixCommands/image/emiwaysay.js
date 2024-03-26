@@ -25,6 +25,7 @@ export default {
       align: "center"
     }
   };
+  const randomNumber = Math.floor(Math.random() * 3) + 1;
  let output = await sharp({
    create: {
      width: 1778,
@@ -39,7 +40,7 @@ export default {
    }
  }).composite([
    {input: text, top: 20, left: 20, blend: 'difference'},
-   {input: `./Assets/emiway${Math.floor(Math.random()*3)+1}.png`, top: 0, left: (1778-630)}
+   {input: `./Assets/emiway${randomNumber}.png`, top: 0, left: (1778-630)}
  ]).png().toBuffer();
   let file = new AttachmentBuilder(output,{ name:'bantai.png'});
    return message.channel.send({
