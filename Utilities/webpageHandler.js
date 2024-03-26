@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
 import express from 'express';
-import { handleLastFmAuth } from './lastFmHandler.js';
+import { handleLastFmAuth } from '../Helpers/helpersLastFm.js';
 try {
 const app = express();
 
