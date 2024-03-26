@@ -178,4 +178,3 @@ function getRandomLine() {
     return lyrics[randomIndex];
 }
 
-console.log(getRandomLine());
