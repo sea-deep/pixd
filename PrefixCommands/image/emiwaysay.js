@@ -41,7 +41,7 @@ export default {
    {input: text, top: 20, left: 20, blend: 'difference'},
    {input: `./Assets/emiway${Math.floor(Math.random()*3)+1}.png`, top: 0, left: (1778-630)}
  ]).png().toBuffer();
-  let file = new AttachmentBuilder(output, 'bantai.png');
+  let file = new AttachmentBuilder(output,{ name:'bantai.png'});
    return message.channel.send({
      content: await getRandomLine(),
      files: [file],
