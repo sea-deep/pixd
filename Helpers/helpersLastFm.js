@@ -19,7 +19,6 @@ export async function handleLastFmAuth(req,res) {
     }
   } catch (error) {
     console.error('Error exchanging token for access token:', error);
-    res.status(500).send('An error occurred while exchanging token for access token');
     throw error;
   }
   
