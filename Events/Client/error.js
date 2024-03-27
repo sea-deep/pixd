@@ -16,6 +16,7 @@ export default {
       const userId = '908287391217905684';
       const userMention = `<@${userId}>`;
       const errorMessage = `[${chalk.red("ERROR")}] - An error occurred: ${userMention} ${error}`;
+      console.error(error);
       errorChannel.send(errorMessage);
     }
   },
