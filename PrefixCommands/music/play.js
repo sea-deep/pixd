@@ -20,7 +20,7 @@ export default {
    * @param {Message} message
    * @param {Client} client
    */
-  execute: async (message, args, client) => {
+  async execute(message, args, client) {
     try {
       let serverQueue = client.queue.get(message.guild.id);
       const voiceChannel = message.member.voice.channel;
@@ -42,9 +42,7 @@ export default {
 
       let song = {};
       let songs = [];
-
       let check;
-
       try {
         check = await playDL.validate(await soundCloudUrl(args[0].trim()));
       } catch (err) {
