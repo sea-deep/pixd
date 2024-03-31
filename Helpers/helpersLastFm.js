@@ -7,7 +7,7 @@ export async function handleLastFmAuth(req,res) {
       method: 'auth.getSession',
       api_key: process.env.LASTFM_KEY,
       token: req.query.token,
-      api_sig: getApiSig(res.query.token, 'auth.getSession'),
+      api_sig: getApiSig('auth.getSession', req.query.token),
       format: 'json'
     });
 
