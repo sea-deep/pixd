@@ -44,6 +44,7 @@ export async function startVoiceConnection(
 
     queueConstructor.connection = connection;
     queueConstructor.player = createAudioPlayer();
+    
     connection.on(
       VoiceConnectionStatus.Disconnected,
       async (oldState, newState) => {
