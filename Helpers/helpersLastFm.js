@@ -1,4 +1,6 @@
 import { client } from "../index.js";
+const crypto = require('crypto');
+
 
 export async function handleLastFmAuth(req,res) {
   try {
@@ -6,6 +8,7 @@ export async function handleLastFmAuth(req,res) {
       method: 'auth.getSession',
       api_key: process.env.LASTFM_KEY,
       token: req.query.token,
+      api_sig: getApiSig(res.query.token, 'auth.getSession'),
       format: 'json'
     });
 
@@ -28,3 +31,23 @@ export async function handleLastFmAuth(req,res) {
   }
   
 }
+
+
+function getApiSig(method, token) {
+  const apiKey = process.env.LASTFM_KEY;
+  const apiSecret = process.env.LASTFM_SECRET;
+
+  const params = {
+    api_key: apiKey,
+    method: method,
+    token: token,
+  };
+
+  const sortedParams = Object.keys(params).sort().map(key => `${key}${params[key]}`);
+  const paramString = sortedParams.join('');
+  const paramStringWithSecret = paramString + apiSecret;
+  const apiSig = crypto.createHash('md5').update(paramStringWithSecret).digest('hex');
+
+  return apiSig;
+}
+
