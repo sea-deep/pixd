@@ -1,3 +1,5 @@
+import { client } from "../index.js";
+
 export async function handleLastFmAuth(req,res) {
   try {
     const params = new URLSearchParams({
@@ -17,9 +19,9 @@ export async function handleLastFmAuth(req,res) {
     } else {
       throw new Error('Access token not found in response');
     }
+    await client.lastFmDb.set("userid", accessToken);
   } catch (error) {
     console.error('Error exchanging token for access token:', error);
-    throw error;
   }
   
 }
