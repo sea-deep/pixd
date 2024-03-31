@@ -23,7 +23,14 @@ export async function handleLastFmAuth(req,res) {
     }
     await client.lastFmDb.connect();
     await client.lastFmDb.set(req.query.userid, accessToken);
-    console.log(req.query.userid, accessToken);
+    let user = await client.users.fetch(res.query.userid);
+    await user.send({
+      content: '',
+      embeds: [{
+        description: '**✅ Your account has been authenticated sith Last.fm successfully**',
+        color: client.color
+      }]
+    });
     await client.lastFmDb.close();
   } catch (error) {
     console.error('Error exchanging token for access token:', error);
