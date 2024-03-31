@@ -20,7 +20,7 @@ export default {
     const baseUrl = 'http://www.last.fm/api/auth/';
     const params = new URLSearchParams({
       api_key: process.env.LASTFM_KEY,
-      cb: 'https://pixd.onrender.com/lastfm/login?userid=' + message.author.id,
+      cb: `https://pixd.onrender.com/lastfm/login?userid=${message.author.id}`
     });
 
     const authUrl = `${baseUrl}?${params.toString()}`;
