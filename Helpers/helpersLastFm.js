@@ -3,17 +3,17 @@ import { createHash } from 'crypto';
 
 export async function handleLastFmAuth(req,res) {
   try {
-    const params = new URLSearchParams({
+    const options = {
       method: 'auth.getSession',
       api_key: process.env.LASTFM_KEY,
       token: req.query.token,
-      api_sig: getApiSig('auth.getSession', req.query.token),
       format: 'json'
-    });
-
+    };
+    options.api_sig = getApiSig(options);
+    
+    let params = new URLSearchParams(options);
     const response = await fetch(`http://ws.audioscrobbler.com/2.0/?${params.toString()}`);
     const data = await response.json();
-   console.log(data)
     const { session } = data;
     let accessToken;
     if (session && session.key) {
@@ -34,16 +34,7 @@ export async function handleLastFmAuth(req,res) {
 
 
 
-function getApiSig(method, token) {
-  const apiKey = process.env.LASTFM_KEY;
-  const apiSecret = process.env.LASTFM_SECRET;
-
-  const params = {
-    api_key: apiKey,
-    method: method,
-    token: token,
-  };
-
+function getApiSig(params) {
   const sortedParams = Object.keys(params).sort().map(key => `${key}${params[key]}`);
   const paramString = sortedParams.join('');
   const paramStringWithSecret = paramString + apiSecret;
