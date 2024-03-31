@@ -1,5 +1,5 @@
 import { client } from "../index.js";
-import { createHash } from 'cryto';
+import { createHash } from 'crypto';
 
 export async function handleLastFmAuth(req,res) {
   try {
