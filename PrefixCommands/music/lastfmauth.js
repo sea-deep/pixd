@@ -28,7 +28,7 @@ export default {
       await message.member.send({
         content: "",
         embeds: [{
-          description: "**Click the button below to login to your Last.fm account with PIXD.**",
+          description: "**Click the button below to authorise your Last.fm account with PIXD.**",
           color: client.color
         }],
         components: [
