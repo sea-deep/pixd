@@ -19,7 +19,8 @@ export async function handleLastFmAuth(req,res) {
     } else {
       throw new Error('Access token not found in response');
     }
-    await client.lastFmDb.set("userid", accessToken);
+    await client.lastFmDb.set(req.query.userid, accessToken);
+    console.log(req.query.userid);
   } catch (error) {
     console.error('Error exchanging token for access token:', error);
   }
