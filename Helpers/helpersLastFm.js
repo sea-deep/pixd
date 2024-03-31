@@ -52,8 +52,3 @@ function getApiSig(method, token) {
   return apiSig;
 }
 
-const method = 'auth.getSession';
-const token = 'YOUR_AUTHENTICATION_TOKEN';
-
-const apiSig = getApiSig(method, token);
-console.log(apiSig);
