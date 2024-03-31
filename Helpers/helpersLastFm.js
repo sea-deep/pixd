@@ -11,7 +11,7 @@ export async function handleLastFmAuth(req,res) {
 
     const response = await fetch(`http://ws.audioscrobbler.com/2.0/?${params.toString()}`);
     const data = await response.json();
-
+   console.log(data)
     const { session } = data;
     let accessToken;
     if (session && session.key) {
