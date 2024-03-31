@@ -11,7 +11,10 @@ const staticPath = join(dirname(fileURLToPath(import.meta.url)), '../www');
 app.use(express.static(staticPath));
 app.get('/', (req, res) => res.redirect('/home'));
 app.get('/home', (req, res) => res.sendFile(join(staticPath, 'index.html')));
-app.get('/lastfm/login', (req, res) => handleLastFmAuth(req,res));
+app.get('/lastfm/login', async (req, res) => {
+   await handleLastFmAuth(req,res);
+   await res.sendFile(join(staticPath, 'lastfm.html'));
+  });
 app.get('/download', (req, res) => res.redirect('https://rpqsk.github.io/'));
 app.get('/repo', (req, res) => res.redirect('https://github.com/susudeepa/pixd'));
 app.get('/invite', (req, res) => res.redirect('https://discord.com/api/oauth2/authorize?client_id=1026234292017299586&permissions=343634472000&scope=bot'));
