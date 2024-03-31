@@ -28,6 +28,7 @@ client.queue = new Collection();
 client.keyv = new KeyValueStore(); 
 client.sleep = sleep; 
 client.pinsDB = new MongodbKeyValue(process.env.MONGODB_URL, "pins");
+client.pinsDB = new MongodbKeyValue(process.env.MONGODB_URL, "lastfmaccs");
 client.color = 0xe08e67;
 
 // Website Handler 
