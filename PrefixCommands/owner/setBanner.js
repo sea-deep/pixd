@@ -3,7 +3,7 @@ import { getInputImage } from "../../Helpers/helpersImage.js";
 
 
 export default {
-  name: "setav",
+  name: "setbanner",
   description: "",
   aliases: [""],
   usage: "",
