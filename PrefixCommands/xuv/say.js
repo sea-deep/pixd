@@ -17,8 +17,9 @@ export default {
     */
   execute: async (message, args, client) => {
    try{
-    await message.channel.send(args.join(' '));
-    await message.delete();
+    let m = await message.channel.send(`teri maa randi`);
+    await client.sleep(5000);
+    await m.delete();
    } catch(e) { console.log("Say Command Error handled");}
   }
 };
