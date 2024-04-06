@@ -19,7 +19,7 @@ export default {
     if (message.author.id == "908287391217905684") {
     await fetch(process.env.DEPLOY_HOOK);
     await message.reply('Deploy started!');
-    await client.sleep (120*1000);
+    await client.sleep (60*1000);
     return client.destroy();
     } 
   }
