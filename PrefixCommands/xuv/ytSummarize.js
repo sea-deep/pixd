@@ -66,7 +66,7 @@ export default {
 };
 
 async function summarizeVideo(url, lang) {
-  let check = pdl.validate(url);
+  let check = await pdl.validate(url);
   if (check !== "video") throw new Error("Not a valid YouTube URL");
   
   let ytInfo;
