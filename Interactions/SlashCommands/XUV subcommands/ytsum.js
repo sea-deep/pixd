@@ -46,7 +46,7 @@ if (lang) {
 
 
 async function summarizeVideo(url, lang="en") {
-  let check = pdl.yt_validate(url);
+  let check = await  pdl.yt_validate(url);
   if (check !== "video") throw new Error("Not a valid YouTube URL");
   
   let ytInfo;
