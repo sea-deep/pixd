@@ -71,7 +71,7 @@ async function summarizeVideo(url, lang) {
   
   let ytInfo;
   try {ytInfo = await getVideoInfo(url);} catch(e) {
-    throw new Error("Failed to fetch video info");
+    throw new Error("Failed to fetch video info:\n"+ e.message);
   }
   let subtitles = await getSubtitles(ytInfo.id, lang);
   if (!subtitles) throw new Error("Failed to fetch subtitles for this video");
