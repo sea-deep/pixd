@@ -16,7 +16,7 @@ export async function getVideoInfo(videoUrl) {
 
   const videoInfo = response.data.items[0].snippet;
   const channelInfo = response.data.items[0].snippet?.channelTitle;
-  const thumbnails = snippet.thumbnails;
+  const thumbnails = response.data.items[0].snippet.thumbnails;
     const thumbnailUrl = thumbnails && thumbnails.default && thumbnails.default.url;
 
   const duration = convertDurationToSeconds(
