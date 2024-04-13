@@ -35,7 +35,8 @@
     "path": "^0.12.7",
     "relevant-urban": "^2.0.0",
     "play-dl": "^1.9.6",
-    "sharp": "^0.32.4"
+    "sharp": "^0.32.4",
+    "p-queue": "^8.0.1"
   },
   "repository": {
     "type": "git",
