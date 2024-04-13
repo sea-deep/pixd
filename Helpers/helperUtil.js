@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { Queue } from 'p-queue'; // Import the Queue class from the 'p-queue' library
+import PQueue from 'p-queue'; // Import the PQueue class from the 'p-queue' library
 
 export class MongodbKeyValue {
   constructor(databaseUrl, collectionName) {
@@ -8,7 +8,7 @@ export class MongodbKeyValue {
     this.db = null;
     this.collection = null;
     this.connect();
-    this.queue = new Queue({ concurrency: 1 }); // Set concurrency to 1 to handle one request at a time
+    this.queue = new PQueue({ concurrency: 1 }); // Set concurrency to 1 to handle one request at a time
   }
 
   async connect() {
@@ -92,6 +92,8 @@ export class MongodbKeyValue {
     }
   }
 }
+
+
 /**
  * A simple key-value store using a Map.
  */
