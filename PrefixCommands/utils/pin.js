@@ -71,7 +71,7 @@ async function createPin(message, args, client) {
   
   let pin = await client.pinsDB.get(message.guild.id + args[1].trim().toLowerCase());
   if(pin && message.author.id !== pin.owner) {
-    await client.pinsDB.close();
+    
     return message.reply({
       content: "",
       embeds: [
@@ -109,7 +109,7 @@ async function createPin(message, args, client) {
   };
 
   if (!pinContent.content && !pinContent.attachment) {
-    await client.pinsDB.close();
+    
     return message.reply({
       content: "",
       embeds: [
@@ -125,7 +125,7 @@ async function createPin(message, args, client) {
     message.guild.id + args[1].trim().toLowerCase(),
     pinContent
   );
-  await client.pinsDB.close();
+  
   return message.reply({
     content: "",
     embeds: [
@@ -155,7 +155,7 @@ async function viewPin(message, args, client) {
   const pinName = message.guild.id + (args[0].trim().toLowerCase());
   await client.pinsDB.connect();
   const pinContent = await client.pinsDB.get(pinName);
-  await client.pinsDB.close();
+  
 
   if (!pinContent) {
     return message.reply({
@@ -210,7 +210,7 @@ async function removePin(message, args, client) {
   const pinContent = await client.pinsDB.get(pinName);
 
   if (!pinContent) {
-    await client.pinsDB.close();
+    
     return message.reply({
       content: "",
       embeds: [
@@ -233,7 +233,7 @@ async function removePin(message, args, client) {
     });
    }
   await client.pinsDB.delete(pinName);
-  await client.pinsDB.close();
+  
 
   return message.reply({
     content: "",
@@ -249,7 +249,7 @@ async function removePin(message, args, client) {
 async function listPin(message, args, client) {
   await client.pinsDB.connect();
   const pins = await client.pinsDB.all();
-  await client.pinsDB.close();
+  
 
   if (!pins || pins.length === 0) {
     return message.reply({
