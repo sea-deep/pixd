@@ -74,6 +74,7 @@ export class KeyValueStore {
   }
 }
 
+
 /**
  * A key-value store using MongoDB.
  */
@@ -81,6 +82,9 @@ export class MongodbKeyValue {
   constructor(databaseUrl, collectionName) {
     this.client = new MongoClient(databaseUrl, { useUnifiedTopology: true });
     this.collectionName = collectionName;
+    this.db = null;
+    this.collection = null;
+    this.connect(); // Connect to MongoDB in the constructor
   }
 
   /**
@@ -157,6 +161,7 @@ export class MongodbKeyValue {
       throw new Error('Invalid TTL value. TTL must be a positive number or null.');
     }
   }
+
   /**
    * Get the remaining time to live (TTL) for a key in hours, minutes, and seconds.
    * @param {string} key - The key.
@@ -177,7 +182,7 @@ export class MongodbKeyValue {
 
     return null;
   }
-  
+
   /**
    * Retrieve all key-value pairs from the MongoDB collection.
    * @returns {Array<Object>} An array of objects representing key-value pairs.
@@ -189,17 +194,6 @@ export class MongodbKeyValue {
     } catch (error) {
       console.error('Failed to retrieve all entries from MongoDB:', error);
       throw error;
-    }
-  }
-
-  /**
-   * Close the MongoDB connection.
-   */
-  async close() {
-    try {
-      await this.client.close();
-    } catch (error) {
-      console.error('Failed to close MongoDB connection:', error);
     }
   }
 }
