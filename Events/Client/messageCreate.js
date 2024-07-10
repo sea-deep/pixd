@@ -10,6 +10,9 @@ export default {
    * @param {Message} message 
    */ 
   execute: async (message, client) => {
+     if(message.content.includes(":empty:") {
+    try { message.delete(); } catch(e) { console.log("sorry"); }
+}
     if (config.restricted.includes(message.author.id)) return;
     if (message.content === `<@${client.user.id}>`) {
       message.reply({
