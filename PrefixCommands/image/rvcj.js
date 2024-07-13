@@ -54,6 +54,7 @@ export default {
         text: text.toUpperCase(),
         width: 940,
         height: textHeight,
+        align: 'center',
         font: "Baloo 2 Bold",
         fontfile: "./Assets/baloo.ttf",
       },
