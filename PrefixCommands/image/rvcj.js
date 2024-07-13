@@ -30,7 +30,6 @@ export default {
     const response = await fetch(image);
     const data = await response.arrayBuffer();
 
-    // Process image with RVCJ style
     let input = await sharp(Buffer.from(data)).resize(1080).png().toBuffer();
     let md = await sharp(input).metadata();
     if (md.height > md.width) {
@@ -48,11 +47,11 @@ export default {
 
     const textLength = text.length;
     const textHeight = textLength < 11 ? 55 : textLength < 51 ? 116 : textLength < 76 ? 175 : 300;
-    const finalHeight = 48 + 182 + textHeight + md.height;
+    const finalHeight = 48 + 182 + 30 + textHeight + md.height;
 
     const textBoard = await sharp({
       text: {
-        text: text,
+        text: text.toUpperCase(),
         width: 940,
         height: textHeight,
         font: "Baloo 2 Bold",
@@ -83,7 +82,7 @@ export default {
       .composite([
         { input: "./Assets/rvcjheader.png", top: 0, left: 0 },
         { input: overlay, top: 182, left: 0 },
-        { input: input, top: 182 + textHeight, left: 0 },
+        { input: input, top: 182 + textHeight + 30, left: 0 },
         { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
       ])
       .png()
