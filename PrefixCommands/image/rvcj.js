@@ -52,7 +52,7 @@ export default {
     const textBoard = await sharp({
       text: {
         text: text.toUpperCase(),
-        width: 940, dpi: 60,
+        width: 940, dpi: 360,
       //  height: textHeight,
         align: 'center',
         font: "Baloo 2 ExtraBold",
