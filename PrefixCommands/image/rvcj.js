@@ -5,7 +5,7 @@ import { getCaptionInput } from "../../Helpers/helpersImage.js";
 export default {
   name: "rvcj",
   description: "Create RVCJ styled image",
-  aliases: ["rvcjstyle"],
+  aliases: ["cid"],
   usage: "rvcj <image: emoji, url, attachment, sticker>&<caption:text>",
   guildOnly: false,
   args: true,
@@ -55,7 +55,7 @@ export default {
         width: 940,
         height: textHeight,
         align: 'center',
-        font: "Baloo 2 Bold",
+        font: "Baloo 2 ExtraBold",
         fontfile: "./Assets/baloo.ttf",
       },
     }).png().toBuffer();
