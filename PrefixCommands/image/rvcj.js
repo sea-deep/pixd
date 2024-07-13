@@ -60,6 +60,7 @@ export default {
     }).png().toBuffer();
     let textMD = await sharp(textBoard).metadata();
     const finalHeight = 48 + 182 + 30 + textMD.height + md.height;
+  console.log(textMD.height)
 
     const overlay = await sharp({
       create: {
