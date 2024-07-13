@@ -31,7 +31,7 @@ export default {
     const data = await response.arrayBuffer();
 
     // Process image with RVCJ style
-    const input = await sharp(Buffer.from(data)).resize(1080).png().toBuffer();
+    let input = await sharp(Buffer.from(data)).resize(1080).png().toBuffer();
     let md = await sharp(input).metadata();
     if (md.height > md.width) {
       input = await sharp(input)
@@ -48,7 +48,7 @@ export default {
 
     const textLength = text.length;
     const textHeight = textLength < 11 ? 55 : textLength < 51 ? 116 : textLength < 76 ? 175 : 300;
-    const finalHeight = 48 + 182 + textHeight + 60 + md.height;
+    const finalHeight = 48 + 182 + textHeight + md.height;
 
     const textBoard = await sharp({
       text: {
