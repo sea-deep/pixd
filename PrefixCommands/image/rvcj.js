@@ -47,23 +47,24 @@ export default {
 
     const textLength = text.length;
     const textHeight = textLength < 11 ? 55 : textLength < 51 ? 250 : textLength < 76 ? 400 : 500;
-    const finalHeight = 48 + 182 + 30 + textHeight + md.height;
-
+    
     const textBoard = await sharp({
       text: {
         text: text.toUpperCase(),
-        width: 940, dpi: 360,
-      //  height: textHeight,
+        width: 940,
+        dpi: 400,
         align: 'center',
         font: "Baloo 2 ExtraBold",
         fontfile: "./Assets/baloo.ttf",
       },
     }).png().toBuffer();
+    let textMD = await sharp(textBoard).metadata();
+    const finalHeight = 48 + 182 + 30 + textMD.height + md.height;
 
     const overlay = await sharp({
       create: {
         width: 1080,
-        height: textHeight,
+        height: textMD.height,
         background: { r: 255, g: 255, b: 255, alpha: 1 },
         channels: 4,
       },
