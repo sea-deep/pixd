@@ -55,7 +55,7 @@ export default {
         text: text,
         width: 940,
         height: textHeight,
-        font: "Baloo 2",
+        font: "Baloo 2 Bold",
         fontfile: "./Assets/baloo.ttf",
       },
     }).png().toBuffer();
