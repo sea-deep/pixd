@@ -46,7 +46,7 @@ export default {
     }
 
     const textLength = text.length;
-    const textHeight = textLength < 11 ? 55 : textLength < 51 ? 116 : textLength < 76 ? 175 : 300;
+    const textHeight = textLength < 11 ? 55 : textLength < 51 ? 250 : textLength < 76 ? 400 : 500;
     const finalHeight = 48 + 182 + 30 + textHeight + md.height;
 
     const textBoard = await sharp({
