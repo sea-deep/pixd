@@ -46,7 +46,6 @@ export default {
     }
 
     const textLength = text.length;
-    const textHeight = textLength < 11 ? 55 : textLength < 51 ? 250 : textLength < 76 ? 400 : 500;
     
     const textBoard = await sharp({
       text: {
@@ -60,7 +59,7 @@ export default {
     }).png().toBuffer();
     let textMD = await sharp(textBoard).metadata();
     const finalHeight = 48 + 182 + 30 + textMD.height + md.height;
-  console.log(textMD.height)
+  
 
     const overlay = await sharp({
       create: {
@@ -85,7 +84,7 @@ export default {
       .composite([
         { input: "./Assets/rvcjheader.png", top: 0, left: 0 },
         { input: overlay, top: 182, left: 0 },
-        { input: input, top: 182 + textHeight + 30, left: 0 },
+        { input: input, top: 182 + textMD.height + 30, left: 0 },
         { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
       ])
       .png()
