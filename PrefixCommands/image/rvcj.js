@@ -30,6 +30,9 @@ export default {
         .replace(reg, "")
         .trim();
 
+      // Create a temporary duplicate of text where emojis are replaced with a placeholder character
+      const tempText = text.replace(/[\u{1F600}-\u{1F64F}]|<:[a-zA-Z0-9_]+:[0-9]+>/gu, '_');
+
       const response = await fetch(image);
       if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.statusText}`);
@@ -76,10 +79,15 @@ export default {
       let textHeight = 0;
 
       for (const line of lines) {
+        // Use tempText to match characters including emojis
         let emoteAndEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
-        let characters = line.match(emoteAndEmojiRegex);
+        let characters = tempText.match(emoteAndEmojiRegex);
         let textChars = [];
         let currentLeft = 0;
+
+        if (!characters) {
+          continue; // Skip lines with no characters (shouldn't happen unless tempText is empty)
+        }
 
         for (const character of characters) {
           if (isEmoji(character)) {
