@@ -65,23 +65,8 @@ export async function getInputImage(message, opt) {
 export async function getCaptionInput(message) {
   let image = null;
 
-  if (message.attachments.size >= 1) {
-    image = message.attachments.first().url;
-  } else if (message.stickers.size >= 1) {
-    image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
-  } else {
-    let match = message.content.match(/<:[^:]+:(\d+)>/);
-    if (match) {
-      const emojiId = match[1];
-      image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-    } else {
-      match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
-      if (match) {
-        image = match[0];
-      }
-    }
-  }
-
+  
+  // check referenced message
   if (!image && message.reference) {
     const refMsg = await message.channel.messages.fetch(message.reference.messageId);
 
@@ -100,7 +85,26 @@ export async function getCaptionInput(message) {
       }
     }
   }
+  // Check current message
+  if (message.attachments.size >= 1) {
+    image = message.attachments.first().url;
+  } else if (message.stickers.size >= 1) {
+    image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
+  } else {
+    let match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+    if (match) {
+      image = match[0];
+    } else {
+      match = message.content.match(/<:[^:]+:(\d+)>/);
+      if (match) {
+        const emojiId = match[1];
+        image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+      }
+    }
+  }
 
+
+  // If image still not found, check recent messages
   if (!image) {
     const messages = await message.channel.messages.fetch({ limit: 10, cache: false });
     messages.forEach((msg) => {
@@ -113,11 +117,18 @@ export async function getCaptionInput(message) {
           const match = msg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
           if (match) {
             image = match[0];
+          } else {
+            const emojiMatch = msg.content.match(/<:[^:]+:(\d+)>/);
+            if (emojiMatch) {
+              const emojiId = emojiMatch[1];
+              image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+            }
           }
         }
       }
     });
   }
+
   return image;
 }
 
