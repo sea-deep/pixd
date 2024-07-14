@@ -185,7 +185,7 @@ const getEmojiImage = async (emoji) => {
 };
 
 const isEmoji = (part) => {
-  const emojiRegex = emojiRegex();
+  const emojiReg = emojiRegex();
   const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
-  return emojiRegex.test(part) || customEmojiRegex.test(part);
+  return emojiReg.test(part) || customEmojiRegex.test(part);
 };
