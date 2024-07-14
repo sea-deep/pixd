@@ -1,8 +1,8 @@
 import { AttachmentBuilder, Message } from "discord.js";
 import sharp from "sharp";
 import fetch from "node-fetch";
+import emojiRegex from "emoji-regex";
 import { getCaptionInput } from "../../Helpers/helpersImage.js";
-
 
 export default {
   name: "rvcj",
@@ -62,48 +62,67 @@ export default {
         lines.push(currentLine);
     }
 
-    let textBoards = [];
+    let textLines = [];
     let textHeight = 0;
 
     for (const line of lines) {
-        let lineParts = line.split(/([\u{1F600}-\u{1F64F}]|<:[a-zA-Z0-9_]+:[0-9]+>)/u); 
-        for (const part of lineParts) {
-             let currentLeft = 0  
-             if (isEmoji(part)) { 
-               
-                let emojiBuffer = await getEmojiImage(part);
-                emojiBuffer = await sharp(emojiBuffer).resize(70).png().toBuffer();
-                textBoards.push({
-                    input: emojiBuffer,
-                    top: textHeight,
-                    left: currentLeft
-                });
-                currentLeft += 72;
-            } else if (part.trim() !== '') {
-                let textBoard = await sharp({
-                    text: {
-                        text: part.toUpperCase(),
-                        width: 960,
-                        dpi: 400,
-                        align: 'center',
-                        font: "Baloo 2 ExtraBold",
-                        fontfile: "./Assets/baloo.ttf",
-                    },
-                }).png().toBuffer();
-
-                let textBoardMeta = await sharp(textBoard).metadata();
-                let leftPosition = Math.floor((1080 - textBoardMeta.width) / 2) + currentLeft;
-
-                textBoards.push({
-                    input: textBoard,
-                    blend: 'difference',
-                    top: textHeight,
-                    left: leftPosition
-                });
-                currentLeft += textBoardMeta.width;
-            }
+      let emoteAndEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
+      let characters = line.match(emoteAndEmojiRegex);
+      let textChars = [];
+      let currentLeft = 0; 
+      
+      for (const character of characters) {
+        if (isEmoji(character)) { 
+          let emojiBuffer = await getEmojiImage(character);
+          emojiBuffer = await sharp(emojiBuffer).resize(50, 50).png().toBuffer();
+          textChars.push({
+              input: emojiBuffer,
+              top: 0,
+              left: currentLeft
+          });
+          currentLeft += 52;
+        } else {
+          let textChar = await sharp({
+              text: {
+                  text: character.toUpperCase(),
+                  dpi: 400,
+                  align: 'center',
+                  font: "Baloo 2 ExtraBold",
+                  fontfile: "./Assets/baloo.ttf",
+              },
+          }).png().toBuffer();
+          
+          let textCharMeta = await sharp(textChar).metadata();
+          textChars.push({
+              input: textChar,
+              top: 0,
+              left: currentLeft
+          });
+          currentLeft += textCharMeta.width;
         }
-        textHeight += 60;
+      }
+      
+      const textLine = await sharp({
+        create: {
+          width: currentLeft,
+          height: 60,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+          channels: 4,
+        },
+      })
+      .composite(textChars)
+      .png()
+      .toBuffer();
+      
+      let textLineMeta = await sharp(textLine).metadata();
+      let leftPos = Math.floor((1080 - textLineMeta.width) / 2);
+      textLines.push({
+        input: textLine,
+        top: textHeight,
+        left: leftPos,
+      });
+      
+      textHeight += 60;
     }
 
     const overlay = await sharp({
@@ -114,7 +133,7 @@ export default {
         channels: 4,
       },
     })
-      .composite(textBoards)
+      .composite(textLines)
       .png()
       .toBuffer();
 
@@ -147,7 +166,6 @@ export default {
   },
 };
 
-
 const getEmojiImage = async (emoji) => {
   const customEmojiRegex = /<:([a-zA-Z0-9_]+):([0-9]+)>/;
   const match = emoji.match(customEmojiRegex);
@@ -167,7 +185,7 @@ const getEmojiImage = async (emoji) => {
 };
 
 const isEmoji = (part) => {
-  const emojiRegex = /[\u{1F600}-\u{1F64F}]/u;
+  const emojiRegex = emojiRegex();
   const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
   return emojiRegex.test(part) || customEmojiRegex.test(part);
 };
