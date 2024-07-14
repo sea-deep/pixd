@@ -56,15 +56,13 @@ export default {
           .toBuffer();
         md = await sharp(input).metadata();
       }
-      let emoteAndEmojiReg = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
-      let words = text.match(/\S+|./gu).map(item => item.match(emoteAndEmojiReg) ? "_" : item).flat();
-
-      const words = text.match(emoteAndEmojiReg);
+      let emotReg= /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
+      const words = text.split(" ");
       
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
-        if ((currentLine + word).length <= 24) {
+        if ((currentLine + (emotReg.test(word) ? "_” : words)).length <= 24) {
           currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
           lines.push(currentLine);
