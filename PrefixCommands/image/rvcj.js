@@ -47,7 +47,7 @@ export default {
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
-    await words.forEach(word => {
+    words.forEach(word => {
         if ((currentLine + word).length <= 28) {
             currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
@@ -58,10 +58,10 @@ export default {
     if (currentLine) {
         lines.push(currentLine);
     }
-   console.log(lines)
+ 
     let textBoards = [];
     let textHeight = 0;
-    await lines.forEach(async (line) => {
+    await lines.forEach(async (line, i) => {
        let textBoard = await sharp({
         text: {
          text: line.toUpperCase(),
@@ -73,12 +73,11 @@ export default {
       },
     }).png().toBuffer();
       
-       textBoards.push({
+       textBoards[i] = {
         input: textBoard,
         blend: 'difference',
         top: textHeight,
-
-      });
+        };
       textHeight += 50;
     });
     
