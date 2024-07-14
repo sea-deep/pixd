@@ -30,13 +30,35 @@ export default {
         .replace(reg, "")
         .trim();
 
-      // Temporarily replace emojis with placeholders in a duplicate of 'text'
-      let tempText = text;
-      const emojiPlaceholder = '⛄'; // Example placeholder that won't conflict with regular text
-      const regexEmoji = emojiRegex();
-      tempText = tempText.replace(regexEmoji, emojiPlaceholder);
+      const response = await fetch(image);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      const data = await response.arrayBuffer();
+      const buffer = Buffer.from(data);
 
-      const words = tempText.split(' ');
+      // Check if the buffer is a valid image format
+      const inputInfo = await sharp(buffer).metadata().catch(err => {
+        throw new Error(`Invalid image format: ${err.message}`);
+      });
+
+      let input = await sharp(buffer).resize(1080).png().toBuffer();
+      let md = await sharp(input).metadata();
+      if (md.height > md.width) {
+        input = await sharp(input)
+          .resize({
+            width: 1080,
+            height: 1080,
+            fit: "contain",
+            background: { r: 255, g: 255, b: 255, alpha: 1 },
+          })
+          .png()
+          .toBuffer();
+        md = await sharp(input).metadata();
+      }
+      let emoteAndEmojiReg = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
+      const words = text.match(emoteAndEmojiReg);
+      
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
@@ -57,9 +79,6 @@ export default {
       for (const line of lines) {
         let emoteAndEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
         let characters = line.match(emoteAndEmojiRegex);
-        // Handle case where 'characters' is null (no matches found)
-        characters = characters || [];
-
         let textChars = [];
         let currentLeft = 0;
 
