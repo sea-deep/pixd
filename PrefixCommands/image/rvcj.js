@@ -26,7 +26,7 @@ export default {
       .join(" ")
       .replace(reg, "")
       .trim();
-
+   
     const response = await fetch(image);
     const data = await response.arrayBuffer();
 
@@ -44,12 +44,26 @@ export default {
         .toBuffer();
       md = await sharp(input).metadata();
     }
-
-    const textLength = text.length;
-    
-    const textBoard = await sharp({
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+    words.forEach(word => {
+        if ((currentLine + word).length <= 28) {
+            currentLine += (currentLine.length ? ' ' : '') + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    });
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+    let textBoards = [];
+    let textHeight = 0;
+    lines.forEach(async (line) => {
+     let textBoard = await sharp({
       text: {
-        text: text.toUpperCase(),
+        text: line.toUpperCase(),
         width: 940,
         dpi: 400,
         align: 'center',
@@ -57,21 +71,31 @@ export default {
         fontfile: "./Assets/baloo.ttf",
       },
     }).png().toBuffer();
-    let textMD = await sharp(textBoard).metadata();
-    const finalHeight = 48 + 145 + 30 + textMD.height + md.height;
+      
+      textBoards.push({
+        input: textBoard,
+        blend: 'difference',
+        top: textHeight,
+        gravity: 'center'
+      });
+      textHeight += 50;
+    });
+    
   
 
     const overlay = await sharp({
       create: {
         width: 1080,
-        height: textMD.height,
+        height: textHeight,
         background: { r: 255, g: 255, b: 255, alpha: 1 },
         channels: 4,
       },
     })
-      .composite([{ input: textBoard, blend: "difference" }])
+      .composite(textBoards)
       .png()
       .toBuffer();
+      
+    const finalHeight = 48 + 145 + 30 + textHeight + md.height;
 
     const finalImage = await sharp({
       create: {
@@ -84,7 +108,7 @@ export default {
       .composite([
         { input: "./Assets/rvcjheader.png", top: 0, left: 0 },
         { input: overlay, top: 145, left: 0 },
-        { input: input, top: 145 + textMD.height + 30, left: 0 },
+        { input: input, top: 145 + textHeight + 30, left: 0 },
         { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
       ])
       .png()
