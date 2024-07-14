@@ -65,8 +65,7 @@ export async function getInputImage(message, opt) {
 export async function getCaptionInput(message) {
   let image = null;
 
-  
-  // check referenced message
+  // Check referenced message
   if (message.reference) {
     const refMsg = await message.channel.messages.fetch(message.reference.messageId);
 
@@ -84,9 +83,15 @@ export async function getCaptionInput(message) {
         }
       }
     }
+
+    // Return if image is found in the referenced message
+    if (image) {
+      return image;
+    }
   }
+
   // Check current message
-  if (!image && message.attachments.size >= 1) {
+  if (message.attachments.size >= 1) {
     image = message.attachments.first().url;
   } else if (message.stickers.size >= 1) {
     image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
@@ -102,7 +107,6 @@ export async function getCaptionInput(message) {
       }
     }
   }
-
 
   // If image still not found, check recent messages
   if (!image) {
