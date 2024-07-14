@@ -72,7 +72,7 @@ export default {
       },
     }).png().toBuffer();
       
-      textBoards.push({
+      await textBoards.push({
         input: textBoard,
         blend: 'difference',
         top: textHeight,
@@ -81,7 +81,7 @@ export default {
       textHeight += 50;
     });
     
-  console.log(textBoards)
+  
 
     const overlay = await sharp({
       create: {
