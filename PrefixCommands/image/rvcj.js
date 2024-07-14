@@ -97,14 +97,13 @@ export default {
         for (const part of lineParts) {
             if (isEmoji(part)) {  // Check if the part is an emoji
                 let emojiBuffer = await getEmojiImage(part);
-                emojiBuffer = await sharp(emojiBuffer).resize(50, 50).png().toBuffer();
+                emojiBuffer = await sharp(emojiBuffer).resize(64, 64).png().toBuffer();
                 textBoards.push({
                     input: emojiBuffer,
-                    blend: 'difference',
                     top: textHeight,
                     left: currentLeft
                 });
-                currentLeft += 50;
+                currentLeft += 64;
             } else if (part.trim() !== '') { // Ensure the part is not empty
                 let textBoard = await sharp({
                     text: {
