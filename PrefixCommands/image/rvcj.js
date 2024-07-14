@@ -74,13 +74,28 @@ export default {
       for (const character of characters) {
         if (isEmoji(character)) { 
           let emojiBuffer = await getEmojiImage(character);
-          emojiBuffer = await sharp(emojiBuffer).resize(50, 50).png().toBuffer();
+          emojiBuffer = await sharp(emojiBuffer).resize(48, 48).png().toBuffer();
           textChars.push({
               input: emojiBuffer,
               top: 0,
               left: currentLeft
           });
-          currentLeft += 52;
+          currentLeft += 51;
+        } else if (character === " ") {
+          const spaceBuffer = await sharp({
+            create: {
+              width: 15,
+              height: 60,
+              channels: 4,
+              background: { r: 255, g: 255, b: 255, alpha: 0 },
+            },
+          }).png().toBuffer();
+          textChars.push({
+              input: spaceBuffer,
+              top: 0,
+              left: currentLeft
+          });
+          currentLeft += 15;
         } else {
           let textChar = await sharp({
               text: {
@@ -95,10 +110,11 @@ export default {
           let textCharMeta = await sharp(textChar).metadata();
           textChars.push({
               input: textChar,
+              blend: 'difference',
               top: 0,
               left: currentLeft
           });
-          currentLeft += textCharMeta.width;
+          currentLeft += textCharMeta.width + 3;
         }
       }
       
@@ -185,7 +201,7 @@ const getEmojiImage = async (emoji) => {
 };
 
 const isEmoji = (part) => {
-  const emojiReg = emojiRegex();
+  const regex = emojiRegex();
   const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
-  return emojiReg.test(part) || customEmojiRegex.test(part);
+  return regex.test(part) || customEmojiRegex.test(part);
 };
