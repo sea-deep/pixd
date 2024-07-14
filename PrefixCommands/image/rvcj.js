@@ -57,6 +57,8 @@ export default {
         md = await sharp(input).metadata();
       }
       let emoteAndEmojiReg = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
+      let words = text.match(/\S+|./gu).map(item => item.match(emoteAndEmojiReg) ? "_" : item).flat();
+
       const words = text.match(emoteAndEmojiReg);
       
       const lines = [];
