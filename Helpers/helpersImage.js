@@ -67,7 +67,7 @@ export async function getCaptionInput(message) {
 
   
   // check referenced message
-  if (!image && message.reference) {
+  if (message.reference) {
     const refMsg = await message.channel.messages.fetch(message.reference.messageId);
 
     if (refMsg.attachments.size >= 1) {
@@ -86,7 +86,7 @@ export async function getCaptionInput(message) {
     }
   }
   // Check current message
-  if (message.attachments.size >= 1) {
+  if (!image && message.attachments.size >= 1) {
     image = message.attachments.first().url;
   } else if (message.stickers.size >= 1) {
     image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
