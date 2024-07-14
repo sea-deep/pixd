@@ -60,19 +60,19 @@ export default {
     }
     let textBoards = [];
     let textHeight = 0;
-    lines.forEach(async (line) => {
-     let textBoard = await sharp({
-      text: {
-        text: line.toUpperCase(),
-        width: 940,
-        dpi: 400,
-        align: 'center',
-        font: "Baloo 2 ExtraBold",
-        fontfile: "./Assets/baloo.ttf",
+    await lines.forEach(async (line) => {
+       let textBoard = await sharp({
+        text: {
+         text: line.toUpperCase(),
+         width: 940,
+         dpi: 400,
+         align: 'center',
+         font: "Baloo 2 ExtraBold",
+         fontfile: "./Assets/baloo.ttf",
       },
     }).png().toBuffer();
       
-      await textBoards.push({
+       textBoards.push({
         input: textBoard,
         blend: 'difference',
         top: textHeight,
@@ -81,6 +81,7 @@ export default {
       textHeight += 50;
     });
     
+console.log(textBoards)
   
 
     const overlay = await sharp({
