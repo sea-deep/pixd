@@ -49,7 +49,7 @@ export default {
     const lines = [];
     let currentLine = '';
     words.forEach(word => {
-        if ((currentLine + word).length <= 28) {
+        if ((currentLine + word).length <= 24) {
             currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
             lines.push(currentLine);
@@ -86,7 +86,7 @@ export default {
             top: textHeight,
             left: leftPosition
         });
-        textHeight += 70;
+        textHeight += 60;
     }
 
     const overlay = await sharp({
