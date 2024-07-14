@@ -1,5 +1,6 @@
 import { AttachmentBuilder, Message } from "discord.js";
 import sharp from "sharp";
+import fetch from "node-fetch";
 import { getCaptionInput } from "../../Helpers/helpersImage.js";
 
 // Function to get emoji image buffer
@@ -96,14 +97,15 @@ export default {
         for (const part of lineParts) {
             if (isEmoji(part)) {  // Check if the part is an emoji
                 let emojiBuffer = await getEmojiImage(part);
-                emojiBuffer = await sharp(emojiBuffer).resize(45, 45).png().toBuffer();
+                emojiBuffer = await sharp(emojiBuffer).resize(50, 50).png().toBuffer();
                 textBoards.push({
                     input: emojiBuffer,
+                    blend: 'difference',
                     top: textHeight,
                     left: currentLeft
                 });
-                currentLeft += 45;
-            } else {
+                currentLeft += 50;
+            } else if (part.trim() !== '') { // Ensure the part is not empty
                 let textBoard = await sharp({
                     text: {
                         text: part.toUpperCase(),
@@ -120,6 +122,7 @@ export default {
 
                 textBoards.push({
                     input: textBoard,
+                    blend: 'difference',
                     top: textHeight,
                     left: leftPosition
                 });
