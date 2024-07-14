@@ -79,11 +79,12 @@ export default {
             input: textBoard,
             blend: 'difference',
             top: textHeight,
+            left: 50
         });
         textHeight += 50;
     }
 
-    console.log(textBoards);
+
 
     const overlay = await sharp({
       create: {
