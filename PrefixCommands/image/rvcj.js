@@ -79,7 +79,7 @@ export default {
             input: textBoard,
             blend: 'difference',
             top: textHeight,
-            left: 50
+            left: 70
         });
         textHeight += 50;
     }
