@@ -30,37 +30,13 @@ export default {
         .replace(reg, "")
         .trim();
 
-      // Create a temporary duplicate of text where emojis are replaced with a placeholder character
-      const tempText = text.replace(/[\u{1F600}-\u{1F64F}]|<:[a-zA-Z0-9_]+:[0-9]+>/gu, '_');
+      // Temporarily replace emojis with placeholders in a duplicate of 'text'
+      let tempText = text;
+      const emojiPlaceholder = '⛄'; // Example placeholder that won't conflict with regular text
+      const regexEmoji = emojiRegex();
+      tempText = tempText.replace(regexEmoji, emojiPlaceholder);
 
-      const response = await fetch(image);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
-      }
-      const data = await response.arrayBuffer();
-      const buffer = Buffer.from(data);
-
-      // Check if the buffer is a valid image format
-      const inputInfo = await sharp(buffer).metadata().catch(err => {
-        throw new Error(`Invalid image format: ${err.message}`);
-      });
-
-      let input = await sharp(buffer).resize(1080).png().toBuffer();
-      let md = await sharp(input).metadata();
-      if (md.height > md.width) {
-        input = await sharp(input)
-          .resize({
-            width: 1080,
-            height: 1080,
-            fit: "contain",
-            background: { r: 255, g: 255, b: 255, alpha: 1 },
-          })
-          .png()
-          .toBuffer();
-        md = await sharp(input).metadata();
-      }
-
-      const words = text.split(' ');
+      const words = tempText.split(' ');
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
@@ -79,15 +55,13 @@ export default {
       let textHeight = 0;
 
       for (const line of lines) {
-        // Use tempText to match characters including emojis
         let emoteAndEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
-        let characters = tempText.match(emoteAndEmojiRegex);
+        let characters = line.match(emoteAndEmojiRegex);
+        // Handle case where 'characters' is null (no matches found)
+        characters = characters || [];
+
         let textChars = [];
         let currentLeft = 0;
-
-        if (!characters) {
-          continue; // Skip lines with no characters (shouldn't happen unless tempText is empty)
-        }
 
         for (const character of characters) {
           if (isEmoji(character)) {
