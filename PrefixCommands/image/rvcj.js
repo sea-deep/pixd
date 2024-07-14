@@ -26,7 +26,7 @@ export default {
       .join(" ")
       .replace(reg, "")
       .trim();
-   
+
     const response = await fetch(image);
     const data = await response.arrayBuffer();
 
@@ -44,6 +44,7 @@ export default {
         .toBuffer();
       md = await sharp(input).metadata();
     }
+
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
@@ -58,31 +59,31 @@ export default {
     if (currentLine) {
         lines.push(currentLine);
     }
- 
+
     let textBoards = [];
     let textHeight = 0;
-    await lines.forEach(async (line, i) => {
-       let textBoard = await sharp({
-        text: {
-         text: line.toUpperCase(),
-         width: 940,
-         dpi: 400,
-         align: 'center',
-         font: "Baloo 2 ExtraBold",
-         fontfile: "./Assets/baloo.ttf",
-      },
-    }).png().toBuffer();
-      
-       textBoards[i] = {
-        input: textBoard,
-        blend: 'difference',
-        top: textHeight,
-        };
-      textHeight += 50;
-    });
-    
-console.log(textBoards)
-  
+
+    for (const line of lines) {
+        let textBoard = await sharp({
+            text: {
+                text: line.toUpperCase(),
+                width: 940,
+                dpi: 400,
+                align: 'center',
+                font: "Baloo 2 ExtraBold",
+                fontfile: "./Assets/baloo.ttf",
+            },
+        }).png().toBuffer();
+
+        textBoards.push({
+            input: textBoard,
+            blend: 'difference',
+            top: textHeight,
+        });
+        textHeight += 50;
+    }
+
+    console.log(textBoards);
 
     const overlay = await sharp({
       create: {
@@ -95,7 +96,7 @@ console.log(textBoards)
       .composite(textBoards)
       .png()
       .toBuffer();
-      
+
     const finalHeight = 48 + 145 + 30 + textHeight + md.height;
 
     const finalImage = await sharp({
