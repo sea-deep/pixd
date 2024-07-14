@@ -67,7 +67,7 @@ export default {
         let textBoard = await sharp({
             text: {
                 text: line.toUpperCase(),
-                width: 940,
+                width: 960,
                 dpi: 400,
                 align: 'center',
                 font: "Baloo 2 ExtraBold",
@@ -75,16 +75,19 @@ export default {
             },
         }).png().toBuffer();
 
+        
+        let textBoardMeta = await sharp(textBoard).metadata();
+
+        let leftPosition = Math.floor((1080 - textBoardMeta.width) / 2);
+
         textBoards.push({
             input: textBoard,
             blend: 'difference',
             top: textHeight,
-            left: 70
+            left: leftPosition
         });
-        textHeight += 50;
+        textHeight += 70;
     }
-
-
 
     const overlay = await sharp({
       create: {
