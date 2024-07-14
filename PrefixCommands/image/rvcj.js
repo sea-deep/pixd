@@ -62,7 +62,7 @@ export default {
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
-        if ((currentLine + (emotReg.test(word) ? "_” : words)).length <= 24) {
+     if ((currentLine + (emotReg.test(word) ? "_" : word)).length <= 24) {
           currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
           lines.push(currentLine);
