@@ -47,7 +47,7 @@ export default {
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
-    words.forEach(word => {
+    await words.forEach(word => {
         if ((currentLine + word).length <= 28) {
             currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
@@ -58,6 +58,7 @@ export default {
     if (currentLine) {
         lines.push(currentLine);
     }
+   console.log(lines)
     let textBoards = [];
     let textHeight = 0;
     await lines.forEach(async (line) => {
