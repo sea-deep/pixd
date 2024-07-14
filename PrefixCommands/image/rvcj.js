@@ -3,32 +3,6 @@ import sharp from "sharp";
 import fetch from "node-fetch";
 import { getCaptionInput } from "../../Helpers/helpersImage.js";
 
-// Function to get emoji image buffer
-const getEmojiImage = async (emoji) => {
-  const customEmojiRegex = /<:([a-zA-Z0-9_]+):([0-9]+)>/;
-  const match = emoji.match(customEmojiRegex);
-  
-  if (match) {
-    const emojiId = match[2];
-    const emojiUrl = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-    const response = await fetch(emojiUrl);
-    const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer);
-  } else {
-    const encodedEmoji = encodeURIComponent(emoji);
-    const emojiUrl = `https://raw.githubusercontent.com/luizbizzio/emojis/main/apple/${encodedEmoji}.png`;
-    const response = await fetch(emojiUrl);
-    const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer);
-  }
-};
-
-// Function to check if a part is an emoji (including Discord custom emojis)
-const isEmoji = (part) => {
-  const emojiRegex = /[\u{1F600}-\u{1F64F}]/u;
-  const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
-  return emojiRegex.test(part) || customEmojiRegex.test(part);
-};
 
 export default {
   name: "rvcj",
@@ -92,19 +66,20 @@ export default {
     let textHeight = 0;
 
     for (const line of lines) {
-        let lineParts = line.split(/([\u{1F600}-\u{1F64F}]|<:[a-zA-Z0-9_]+:[0-9]+>)/u);  // Split the line into parts including emojis
-        let currentLeft = 0;
+        let lineParts = line.split(/([\u{1F600}-\u{1F64F}]|<:[a-zA-Z0-9_]+:[0-9]+>)/u); 
         for (const part of lineParts) {
-            if (isEmoji(part)) {  // Check if the part is an emoji
+             let currentLeft = 0  
+             if (isEmoji(part)) { 
+               
                 let emojiBuffer = await getEmojiImage(part);
-                emojiBuffer = await sharp(emojiBuffer).resize(64, 64).png().toBuffer();
+                emojiBuffer = await sharp(emojiBuffer).resize(70).png().toBuffer();
                 textBoards.push({
                     input: emojiBuffer,
                     top: textHeight,
                     left: currentLeft
                 });
-                currentLeft += 64;
-            } else if (part.trim() !== '') { // Ensure the part is not empty
+                currentLeft += 72;
+            } else if (part.trim() !== '') {
                 let textBoard = await sharp({
                     text: {
                         text: part.toUpperCase(),
@@ -170,4 +145,29 @@ export default {
       files: [file],
     });
   },
+};
+
+
+const getEmojiImage = async (emoji) => {
+  const customEmojiRegex = /<:([a-zA-Z0-9_]+):([0-9]+)>/;
+  const match = emoji.match(customEmojiRegex);
+  if (match) {
+    const emojiId = match[2];
+    const emojiUrl = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+    const response = await fetch(emojiUrl);
+    const buffer = await response.arrayBuffer();
+    return Buffer.from(buffer);
+  } else {
+    const encodedEmoji = encodeURIComponent(emoji);
+    const emojiUrl = `https://raw.githubusercontent.com/luizbizzio/emojis/main/apple/${encodedEmoji}.png`;
+    const response = await fetch(emojiUrl);
+    const buffer = await response.arrayBuffer();
+    return Buffer.from(buffer);
+  }
+};
+
+const isEmoji = (part) => {
+  const emojiRegex = /[\u{1F600}-\u{1F64F}]/u;
+  const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
+  return emojiRegex.test(part) || customEmojiRegex.test(part);
 };
