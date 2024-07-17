@@ -48,7 +48,8 @@ if (sel[0] == 'img') {
   help.embeds[0].author.icon_url = `https://cdn.discordapp.com/emojis/${com.emoji.id}.png`;
   help.embeds[0].author.name = com.label;
   help.embeds[0].description = [
-    '* `p!lapata [image] or <mentions>` - <:slash:1220953479921799218> get Lapata.',
+    '* `p!rvcj [image]+[text]` - <:slash:1220953479921799218> Caption an image in RVCJ style!',
+   '* `p!lapata [image] or <mentions>` - <:slash:1220953479921799218> get Lapata.',
     '* `p!allustuff [image]+[text]` - <:slash:1220953479921799218> Allu Arjun funnies',
     '* `p!vosahihai [image] or <mentions>` - <:slash:1220953479921799218> Hes right you know',
     '* `p!nearyou [image] or <mention>` - <:slash:1220953479921799218> WHO ARE YOU',
