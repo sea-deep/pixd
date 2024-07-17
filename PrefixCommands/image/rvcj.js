@@ -58,7 +58,7 @@ export default {
       }
       let emotReg= /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
       const words = text.split(" ");
-      
+
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
@@ -168,6 +168,9 @@ export default {
 
       const finalHeight = 48 + 145 + 30 + textHeight + md.height;
 
+      const watermarkOpacity = Math.random() * 0.25 + 0.5; // Random opacity between 50% to 75%
+      const watermark = await sharp("./Assets/watermark.png").resize(100).toBuffer(); // Replace with your watermark image and adjust size as needed
+
       const finalImage = await sharp({
         create: {
           width: 1080,
@@ -181,6 +184,7 @@ export default {
           { input: overlay, top: 145, left: 0 },
           { input: input, top: 145 + textHeight + 30, left: 0 },
           { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
+          { input: watermark, top: Math.floor(Math.random() * (finalHeight - (275 + textHeight))), left: Math.floor(Math.random() * (1080 - 100)), blend: 'over', raw: { alpha: watermarkOpacity } }
         ])
         .png()
         .toBuffer();
