@@ -168,9 +168,8 @@ export default {
 
       const finalHeight = 48 + 145 + 30 + textHeight + md.height;
 
-      const watermarkOpacity = Math.random() * 0.25 + 0.5; // Random opacity between 50% to 75%
-      const watermark = await sharp("./Assets/watermark.png").resize(100).toBuffer(); // Replace with your watermark image and adjust size as needed
-
+      const watermarkOpacity = Math.random() * 0.25 + 0.5; 
+      const watermark = await sharp("./Assets/watermark.png").resize(150).toBuffer();
       const finalImage = await sharp({
         create: {
           width: 1080,
