@@ -7,7 +7,7 @@ import { getCaptionInput } from "../../Helpers/helpersImage.js";
 export default {
   name: "rvcj",
   description: "Create RVCJ styled image",
-  aliases: ["cid"],
+  aliases: ["cid", "caption"],
   usage: "rvcj <image: emoji, url, attachment, sticker>&<caption:text>",
   guildOnly: false,
   args: true,
