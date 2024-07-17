@@ -4,6 +4,23 @@ import { play, parse, soundCloudUrl } from "../../Helpers/helpersMusic.js";
 import { getPlaylistTracks, searchVideo, getVideoInfo } from "../../Helpers/helpersYt.js";
 import playDL from "play-dl";
 
+const handleError = async (message, errorMsg, errDetail, client) => {
+  console.error(errDetail);
+  let er = await message.channel.send({
+    content: '',
+    embeds: [
+      {
+        author: {
+          name: errorMsg,
+        },
+        description: errDetail.message,
+        color: client.color,
+      },
+    ],
+  });
+  await client.sleep(5000);
+  return deleteMessage(er);
+};
 
 export default {
   name: 'play',
@@ -22,15 +39,16 @@ export default {
    */
   async execute(message, args, client) {
     try {
-      let serverQueue = client.queue.get(message.guild.id);
+      const serverQueue = client.queue.get(message.guild.id);
       const voiceChannel = message.member.voice.channel;
+
       if (!voiceChannel) {
         let er = await message.channel.send({
           content: '',
           embeds: [
             {
               author: {
-                name: '❌ Please join a  voice channel first.',
+                name: '❌ Please join a voice channel first.',
               },
               color: client.color,
             },
@@ -43,23 +61,11 @@ export default {
       let song = {};
       let songs = [];
       let check;
+
       try {
         check = await playDL.validate(await soundCloudUrl(args[0].trim()));
       } catch (err) {
-        let er = await message.channel.send({
-          content: '',
-          embeds: [
-            {
-              author: {
-                name: '❌ An unexpected error occurred while validating your query.',
-              },
-              description: err.message,
-              color: client.color,
-            },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
+        return handleError(message, '❌ An unexpected error occurred while validating your query.', err, client);
       }
 
       if (!check) {
@@ -68,7 +74,7 @@ export default {
           embeds: [
             {
               author: {
-                name: "❌ Couldn't find a valid url or search query in your message",
+                name: "❌ Couldn't find a valid URL or search query in your message",
               },
               color: client.color,
             },
@@ -76,105 +82,45 @@ export default {
         });
         await client.sleep(5000);
         return deleteMessage(er);
-      } else if (check === 'search') {
-        let query = args.join(' ');
+      }
+
+      if (check === 'search') {
+        const query = args.join(' ');
         const searchMsg = await message.react('<:search:1090725319884951623>');
         let search;
         try {
           search = await searchVideo(query);
         } catch (e) {
-          console.log('Error while searching song: ', e.message);
-          let er = await message.channel.send({
-            content: '',
-            embeds: [
-              {
-                author: {
-                  name: '❌ An error occurred while searching the track.',
-                },
-                description: e.message,
-                color: client.color,
-              },
-            ],
-          });
-          await client.sleep(5000);
+          await handleError(message, '❌ An error occurred while searching the track.', e, client);
           try {
-            searchMsg.remove();
-          } catch (e) {
-            return;
+            await searchMsg.remove();
+          } catch (err) {
+            console.error('Error while removing reaction:', err.message);
           }
-          return deleteMessage(er);
+          return;
         }
 
         try {
           await searchMsg.remove();
         } catch (er) {
+          console.error('Error while removing reaction:', er.message);
           return;
         }
 
         song = {
-            title: search.title,
-            url: search.url,
-            duration: search.duration,
-            durationTime: parse(search.duration),
-            source: 'yt',
-          };
-          songs.push(song);
+          title: search.title,
+          url: search.url,
+          duration: search.duration,
+          durationTime: parse(search.duration),
+          source: 'yt',
+        };
+        songs.push(song);
       } else {
-        let source = check.split('_')[0];
-        let type = check.split('_')[1];
-        if (source === 'yt') {
-          if (type === 'video') {
-            let video;
-            try {
-              video = await getVideoInfo(args[0].trim());
-            } catch (e) {
-              let er = await message.channel.send({
-                content: '',
-                embeds: [
-                  {
-                    author: {
-                      name: '❌ An unexpected error occurred while getting the track info.',
-                    },
-                    description: e.message,
-                    color: client.color,
-                  },
-                ],
-              });
-              await client.sleep(5000);
-              return deleteMessage(er);
-            }
-            song = {
-              title: video.title,
-              url: video.url,
-              duration: video.duration,
-              durationTime: parse(video.duration),
-              source: 'yt',
-            };
-            songs.push(song);
-          } else if (type === 'playlist') {
-            let playlist;
-            try {
-              playlist = await getPlaylistTracks(args[0].trim());
-            } catch (e) {
-              console.log('Error while getting video info', e.message);
-              let er = await message.channel.send({
-                content: '',
-                embeds: [
-                  {
-                    author: {
-                      name: '❌ An unexpected error occurred while getting the track info.',
-                    },
-                    description: e.message,
-                    color: client.color,
-                  },
-                ],
-              });
-              await client.sleep(5000);
-              return deleteMessage(er);
-            }
-            
-
-            playlist.forEach(function (video) {
+        const [source, type] = check.split('_');
+        try {
+          if (source === 'yt') {
+            if (type === 'video') {
+              const video = await getVideoInfo(args[0].trim());
               song = {
                 title: video.title,
                 url: video.url,
@@ -183,75 +129,26 @@ export default {
                 source: 'yt',
               };
               songs.push(song);
-            });
-          }
-        } else if (source === 'sp') {
-          if (playDL.is_expired()) {
-            await playDL.refreshToken();
-          }
-          if (type === 'track') {
-            let track;
-            try {
-              track = await playDL.spotify(args[0].trim());
-            } catch (e) {
-              console.log('error while getting video info', e.message);
-              let er = await message.channel.send({
-                content: '',
-                embeds: [
-                  {
-                    author: {
-                      name: '❌ An unexpected error occurred while getting the track info.',
-                    },
-                    description: e.message,
-                    color: client.color,
-                  },
-                ],
+            } else if (type === 'playlist') {
+              const playlist = await getPlaylistTracks(args[0].trim());
+              playlist.forEach(video => {
+                song = {
+                  title: video.title,
+                  url: video.url,
+                  duration: video.duration,
+                  durationTime: parse(video.duration),
+                  source: 'yt',
+                };
+                songs.push(song);
               });
-              await client.sleep(5000);
-              return deleteMessage(er);
             }
-
-            let title = `${track.name} - ${track.artists
-              .map((a) => a.name)
-              .join(', ')}`;
-            song = {
-              title: title,
-              url: track.url,
-              duration: track.durationInSec,
-              durationTime: parse(track.durationInSec),
-              source: 'sp',
-            };
-            songs.push(song);
-          } else if (type === 'album' || type === 'playlist') {
-            let playlist;
-            try {
-              playlist = await playDL.spotify(args[0].trim());
-            } catch (e) {
-              console.log(
-                'error while getting spotify playlist info',
-                e.message
-              );
-              let er = await message.channel.send({
-                content: '',
-                embeds: [
-                  {
-                    author: {
-                      name: '❌ An unexpected error occurred while getting the track info.',
-                    },
-                    description: e.message,
-                    color: client.color,
-                  },
-                ],
-              });
-              await client.sleep(5000);
-              return deleteMessage(er);
+          } else if (source === 'sp') {
+            if (playDL.is_expired()) {
+              await playDL.refreshToken();
             }
-            const tracks = await playlist.fetched_tracks.get('1');
-
-            tracks.forEach(function (track) {
-              let title = `${track.name} - ${track.artists
-                .map((a) => a.name)
-                .join(', ')}`;
+            if (type === 'track') {
+              const track = await playDL.spotify(args[0].trim());
+              const title = `${track.name} - ${track.artists.map((a) => a.name).join(', ')}`;
               song = {
                 title: title,
                 url: track.url,
@@ -260,36 +157,51 @@ export default {
                 source: 'sp',
               };
               songs.push(song);
-            });
-          }
-        } else if (source === 'so') {
-          const so = await playDL.soundcloud(
-            await soundCloudUrl(args[0].trim())
-          );
-          if (type === 'track') {
-            song = {
-              title: so.name,
-              url: so.url,
-              duration: so.durationInSec,
-              durationTime: parse(so.durationInSec),
-              source: 'sc',
-            };
-            songs.push(song);
-          } else if (type === 'playlist') {
-            const tracks = await so.all_tracks();
-            tracks.forEach(function (track) {
+            } else if (type === 'album' || type === 'playlist') {
+              const playlist = await playDL.spotify(args[0].trim());
+              const tracks = await playlist.fetched_tracks.get('1');
+              tracks.forEach(track => {
+                const title = `${track.name} - ${track.artists.map((a) => a.name).join(', ')}`;
+                song = {
+                  title: title,
+                  url: track.url,
+                  duration: track.durationInSec,
+                  durationTime: parse(track.durationInSec),
+                  source: 'sp',
+                };
+                songs.push(song);
+              });
+            }
+          } else if (source === 'so') {
+            const so = await playDL.soundcloud(await soundCloudUrl(args[0].trim()));
+            if (type === 'track') {
               song = {
-                title: track.name,
-                url: track.url,
-                duration: track.durationInSec,
-                durationTime: parse(track.durationInSec),
+                title: so.name,
+                url: so.url,
+                duration: so.durationInSec,
+                durationTime: parse(so.durationInSec),
                 source: 'sc',
               };
               songs.push(song);
-            });
+            } else if (type === 'playlist') {
+              const tracks = await so.all_tracks();
+              tracks.forEach(track => {
+                song = {
+                  title: track.name,
+                  url: track.url,
+                  duration: track.durationInSec,
+                  durationTime: parse(track.durationInSec),
+                  source: 'sc',
+                };
+                songs.push(song);
+              });
+            }
           }
+        } catch (e) {
+          return handleError(message, '❌ An unexpected error occurred while getting the track info.', e, client);
         }
       }
+
       if (!serverQueue) {
         const queueConstructor = {
           textChannel: message.channel,
@@ -315,73 +227,43 @@ export default {
           queueConstructor
         );
       } else {
-        if (serverQueue?.songs.length == 0) {
-          serverQueue.songs = serverQueue.songs.concat(songs);
-          play(message.guild, serverQueue.songs[0], client, message);
-        } else {
-          serverQueue.songs = serverQueue.songs.concat(songs);
+        serverQueue.songs = serverQueue.songs.concat(songs);
 
-          if (songs.length == 1) {
-            return message.channel.send({
-              content: '**Added to queue**',
-              tts: false,
-              embeds: [
-                {
-                  type: 'rich',
-                  title: '',
-                  description: '',
-                  color: client.color,
-                  author: {
-                    name: `${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`,
-                    icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
-                  },
-                },
-              ],
-            });
-          } else {
-            return message.channel.send({
-              content: '**Added to queue**',
-              tts: false,
-              embeds: [
-                {
-                  type: 'rich',
-                  title: '',
-                  description: '',
-                  color: 0xe08e67,
-                  author: {
-                    name: `Added ${songs.length} songs to the queue`,
-                    icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
-                  },
-                },
-              ],
-            });
-          }
+        if (serverQueue.songs.length === 1) {
+          play(message.guild, serverQueue.songs[0], client, message);
         }
+
+        const responseMessage = songs.length === 1
+          ? `**Added to queue**\n${song.title} - ${song.durationTime.minutes}:${song.durationTime.seconds}`
+          : `**Added to queue**\nAdded ${songs.length} songs to the queue`;
+
+        await message.channel.send({
+          content: responseMessage,
+          tts: false,
+          embeds: [
+            {
+              type: 'rich',
+              title: '',
+              description: '',
+              color: songs.length === 1 ? client.color : 0xe08e67,
+              author: {
+                name: responseMessage,
+                icon_url: `https://cdn.discordapp.com/emojis/763415718271385610.gif`,
+              },
+            },
+          ],
+        });
       }
     } catch (err) {
-      console.error('An unexpected error occurred:', err.message);
-      let er = await message.channel.send({
-        content: '',
-        embeds: [
-          {
-            author: {
-              name: '❌ An unexpected error occurred.',
-            },
-            description: err.message,
-            color: client.color,
-          },
-        ],
-      });
-      await client.sleep(5000);
-      return deleteMessage(er);
+      return handleError(message, '❌ An unexpected error occurred.', err, client);
     }
   },
 };
 
 async function deleteMessage(msg) {
   try {
-    return msg.delete();
+    return await msg.delete();
   } catch (e) {
-    return;
+    console.error('Error while deleting message:', e.message);
   }
 }
