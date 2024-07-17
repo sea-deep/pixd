@@ -62,7 +62,7 @@ export default {
       const lines = [];
       let currentLine = '';
       words.forEach(word => {
-     if ((currentLine + (emotReg.test(word) ? "_" : word)).length <= 24) {
+        if ((currentLine + (emotReg.test(word) ? "_" : word)).length <= 24) {
           currentLine += (currentLine.length ? ' ' : '') + word;
         } else {
           lines.push(currentLine);
@@ -167,9 +167,9 @@ export default {
         .toBuffer();
 
       const finalHeight = 48 + 145 + 30 + textHeight + md.height;
+      const watermarkOpacity = Math.random() * 0.25 + 0.5;
+      const watermark = await sharp("./Assets/watermark.png").resize(150).ensureAlpha(watermarkOpacity).toBuffer(); 
 
-      const watermarkOpacity = Math.random() * 0.25 + 0.5; 
-      const watermark = await sharp("./Assets/watermark.png").resize(150).toBuffer();
       const finalImage = await sharp({
         create: {
           width: 1080,
@@ -183,7 +183,7 @@ export default {
           { input: overlay, top: 145, left: 0 },
           { input: input, top: 145 + textHeight + 30, left: 0 },
           { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
-          { input: watermark, top: Math.floor(Math.random() * (finalHeight - (275 + textHeight))), left: Math.floor(Math.random() * (1080 - 100)), blend: 'over', raw: { alpha: watermarkOpacity } }
+          { input: watermark, top: Math.floor(Math.random() * (finalHeight - (275 + textHeight))), left: Math.floor(Math.random() * (1080 - 100)), blend: 'over' }
         ])
         .png()
         .toBuffer();
