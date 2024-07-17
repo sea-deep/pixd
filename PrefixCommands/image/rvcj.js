@@ -182,7 +182,7 @@ export default {
           { input: overlay, top: 145, left: 0 },
           { input: input, top: 145 + textHeight + 30, left: 0 },
           { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
-          { input: "./Assets/watermark.jpg", top: Math.floor(Math.random() * (finalHeight - (275 + textHeight))), left: Math.floor(Math.random() * (1080 - 100))}
+          { input: "./Assets/watermark.png", top: Math.floor(Math.random() * (finalHeight - (275 + textHeight))), left: Math.floor(Math.random() * (1080 - 100))}
         ])
         .png()
         .toBuffer();
