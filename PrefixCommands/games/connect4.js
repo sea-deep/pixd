@@ -49,8 +49,8 @@ export default {
        }, 
        fields: [ 
          { 
-           name: '-# 1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣\n__Click the buttons to drop__', 
-           value: '`The highlighted button indicates the last move played.`', 
+           name: '', 
+           value: '-# 1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣\n__Click the buttons to drop__\n-# The highlighted button indicates the last move played.`', 
         }, 
        ],
      }, 
