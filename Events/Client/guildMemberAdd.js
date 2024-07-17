@@ -18,8 +18,7 @@ export default {
       default:
         break;
     }
-
-async function sendOkbb(member, client) {
+  async function sendOkbb(member, client) {
   // Fetch and process avtar..
   let avatarURL = member.user.displayAvatarURL({
     extension: "png",
@@ -85,37 +84,8 @@ async function sendOkbb(member, client) {
   await channel.send({
     content: `Namaste saar <@${member.user.id}> cummed in sarvar`,
     files: [file],
-  });
-}
-   async function sendPajeet(member, client) {
-      const rounded = Buffer.from(
-        '<svg><rect x="0" y="0" width="50" height="50" rx="50" ry="50"/></svg>',
-      );
-      let avatarURL = member.user.displayAvatarURL({
-        extension: "png",
-        forceStatic: true,
-      });
-      let res = await fetch(avatarURL);
-      let buffer = await res.arrayBuffer();
-      let avatar = await sharp(buffer)
-        .resize(275)
-        .composite({
-          input: rounded,
-          blend: "dest-in",
-        })
-        .toBuffer();
-      let wlcm = await sharp("./Assets/pajeet.png")
-        .composite([{ input: avatar, top: 78, left: 50 }])
-        .png()
-        .toBuffer();
-      let file = new AttachmentBuilder(wlcm, {
-        name: "aagaya_muh_uthake.png",
-      });
-      let channel = client.channels.cache.get("1065736446981451776");
-      return channel.send({
-        content: `Namaste sirs <@${member.user.id}> did poo in the loo`,
-        files: [file],
       });
     }
+
   },
 };
