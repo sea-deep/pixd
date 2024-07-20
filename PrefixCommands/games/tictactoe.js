@@ -81,7 +81,7 @@ export default {
   execute: async (message, args, client) => {
     let players = [
       message.author.id,
-      (message.mentions.users.size === 0) ? "BOT" : `<@${message.mentions.users.first().id}>`
+      (message.mentions.users.size === 0) ? "BOT" : message.mentions.users.first().id
     ];
     let gameState = [
       ["-", "-", "-"],
