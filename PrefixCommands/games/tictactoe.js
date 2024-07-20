@@ -103,7 +103,8 @@ collector.on('collect', async i => {
   cell = cell.map(Number);
   gameState[cell[0]][cell[1]] = `${(players.indexOf(i.user.id) === 0 ? 'X' : 'O')}`;
 	let newGrid = new ButtonGrid(gameState);
-	await message.edit({
+  await i.deferUpdate();
+	await response.edit({
 	  components: newGrid.components
 	});
 });
