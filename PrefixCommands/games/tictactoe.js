@@ -93,7 +93,7 @@ export default {
       content: `Turn: <@${players[0]}>`,
       embeds: [{
         title: "⚔️ TicTacToe",
-        description: `❌ <@${players[0]}> VS ⭕ ${(players[1] !== "BOT") ? "BOT" : `<@${players[1]}>`}`
+        description: `❌ <@${players[0]}> VS ⭕ ${(players[1] === "BOT") ? "BOT" : `<@${players[1]}>`}`
       }],
       components: buttonGrid.components,
     });
