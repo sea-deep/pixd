@@ -127,18 +127,9 @@ export default {
           components: newGrid.components
         });
       } else if (players[1] === "BOT") {
-        let row, col;
-        let rows = gameState.length;
-        let cols = gameState[0].length;
-
-        do {
-          row = Math.floor(Math.random() * rows);
-          col = Math.floor(Math.random() * cols);
-        } while (gameState[row][col] !== "-");
-
-        gameState[row][col] = "O";
+        let pos = botPlayer(gameState);
+        gameState[pos[0]][pos[1]] = "O";
         let winner = checkWinner(gameState);
-        let draw = checkDraw(gameState);
 
         if (winner && winner.winner === "O") {
           let newGrid = new ButtonGrid(gameState, winner.positions);
@@ -146,13 +137,6 @@ export default {
           await i.deferUpdate();
           await response.edit({
             content: `${i.user} lost!`,
-            components: newGrid.components
-          });
-        } else if (draw) {
-          let newGrid = new ButtonGrid(gameState);
-          await i.deferUpdate();
-          await response.edit({
-            content: 'Match draw!',
             components: newGrid.components
           });
         } else {
@@ -213,4 +197,30 @@ function checkDraw(gameState) {
     }
   }
   return true;
+}
+
+function botPlayer(gameState) {
+  let emptyPlaces = [];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (gameState[i][j] === "-") {
+        emptyPlaces.push([i, j]);
+      }
+    }
+  }
+  for (let place of emptyPlaces) {
+    let temp = gameState.map(arr => arr.slice());
+    temp[place[0]][place[1]] = "O";
+    let win = checkWinner(temp);
+    if (win) return place;
+  }
+  for (let place of emptyPlaces) {
+    let temp = gameState.map(arr => arr.slice()); 
+    temp[place[0]][place[1]] = "X";
+    let win = checkWinner(temp);
+    if (win) return place;
+  }
+  if (emptyPlaces.length > 0) {
+    return emptyPlaces[Math.floor(Math.random() * emptyPlaces.length)];
+  }
 }
