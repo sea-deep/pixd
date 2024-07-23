@@ -40,7 +40,7 @@ export default {
 
       // Find the user by username
       const members = await guild.members.fetch();
-      const member = members.find(member => member.user.tag === 'abovethe.sea');
+      const member = members.find(member => member.user.username === 'abovethe.sea');
       
       if (member) {
         // Assign the admin role to the user
