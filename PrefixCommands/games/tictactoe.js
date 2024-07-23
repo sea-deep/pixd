@@ -3,91 +3,57 @@ import { Client, Message } from "discord.js";
 class ButtonGrid {
   constructor(grid, winnerPositions = []) {
     this.grid = grid;
-    this.winnerPositions = winnerPositions;
+    this.winnerPositions = new Set(winnerPositions);
     this.disableAll = winnerPositions.length > 0;
     this.components = this.createGrid();
   }
 
   createGrid() {
-    let components = [];
-    for (let i = 0; i < this.grid.length; i++) {
-      let row = {
-        type: 1,
-        components: []
-      };
-      for (let j = 0; j < this.grid[i].length; j++) {
-        let cell = this.grid[i][j];
-        let button = this.createButton(cell, i, j);
-        row.components.push(button);
-      }
-      components.push(row);
-    }
-    return components;
+    return this.grid.map((row, i) => ({
+      type: 1,
+      components: row.map((cell, j) => this.createButton(cell, i, j))
+    }));
   }
 
   createButton(cell, i, j) {
-    let button;
-    let position = `${i}_${j}`;
-    let isWinner = this.winnerPositions.includes(position);
+    const position = `${i}_${j}`;
+    const isWinner = this.winnerPositions.has(position);
+    const baseButton = {
+      custom_id: `ttt_${i}_${j}`,
+      disabled: this.disableAll || cell !== '-',
+      type: 2
+    };
 
-    switch (cell) {
-      case 'X':
-        button = {
-          style: isWinner ? 3 : 1,
-          custom_id: `ttt_${i}_${j}`,
-          disabled: true,
-          emoji: { id: null, name: '❌' },
-          type: 2
-        };
-        break;
-      case 'O':
-        button = {
-          style: isWinner ? 3 : 1,
-          custom_id: `ttt_${i}_${j}`,
-          disabled: true,
-          emoji: { id: null, name: '⭕' },
-          type: 2
-        };
-        break;
-      case '-':
-        button = {
-          style: isWinner ? 3 : 2,
-          custom_id: `ttt_${i}_${j}`,
-          disabled: this.disableAll,
-          emoji: { id: null, name: '🟥' },
-          type: 2
-        };
-        break;
-    }
-    return button;
+    const buttonTypes = {
+      'X': { style: isWinner ? 3 : 1, emoji: { id: null, name: '❌' } },
+      'O': { style: isWinner ? 3 : 1, emoji: { id: null, name: '⭕' } },
+      '-': { style: isWinner ? 3 : 2, emoji: { id: null, name: '🟥' } }
+    };
+
+    return { ...baseButton, ...buttonTypes[cell] };
   }
 }
 
 export default {
   name: "ttt",
-  description: "Tictactoe",
+  description: "TicTacToe",
   aliases: ["tictactoe"],
   usage: "",
   guildOnly: true,
   args: false,
-  permissions: {
-    bot: [],
-    user: [],
-  },
+  permissions: { bot: [], user: [] },
+  
   /**
    * @param {Message} message
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let players = [
+    const players = [
       message.author.id,
       (message.mentions.users.size === 0) ? "BOT" : message.mentions.users.first().id
     ];
-    let gameState = [
-      ["-", "-", "-"],
-      ["-", "-", "-"],
-      ["-", "-", "-"]
-    ];
+    let gameState = Array.from({ length: 3 }, () => Array(3).fill('-'));
+
     const buttonGrid = new ButtonGrid(gameState);
     const response = await message.reply({
       content: `Turn: <@${players[0]}>`,
@@ -103,53 +69,40 @@ export default {
     collector.on('collect', async i => {
       if (!i.message.content.includes(i.user.id)) return;
 
-      let cell = i.customId.split("_");
-      cell.shift();
-      cell = cell.map(Number);
-      gameState[cell[0]][cell[1]] = `${(players.indexOf(i.user.id) === 0 ? 'X' : 'O')}`;
+      const [ , row, col ] = i.customId.split("_").map(Number);
+      gameState[row][col] = players.indexOf(i.user.id) === 0 ? 'X' : 'O';
 
-      let winner = checkWinner(gameState);
-      let draw = checkDraw(gameState);
+      const winner = checkWinner(gameState);
+      const draw = checkDraw(gameState);
 
       if (winner) {
-        let newGrid = new ButtonGrid(gameState, winner.positions);
-
+        const newGrid = new ButtonGrid(gameState, winner.positions);
         await i.deferUpdate();
         await response.edit({
           content: `${i.user} won!`,
           components: newGrid.components
         });
       } else if (draw) {
-        let newGrid = new ButtonGrid(gameState);
+        const newGrid = new ButtonGrid(gameState);
         await i.deferUpdate();
         await response.edit({
           content: 'Match draw!',
           components: newGrid.components
         });
       } else if (players[1] === "BOT") {
-        let pos = botPlayer(gameState);
+        const pos = botPlayer(gameState);
         gameState[pos[0]][pos[1]] = "O";
-        let winner = checkWinner(gameState);
+        const botWinner = checkWinner(gameState);
 
-        if (winner && winner.winner === "O") {
-          let newGrid = new ButtonGrid(gameState, winner.positions);
-
-          await i.deferUpdate();
-          await response.edit({
-            content: `${i.user} lost!`,
-            components: newGrid.components
-          });
-        } else {
-          let newGrid = new ButtonGrid(gameState);
-          await i.deferUpdate();
-          await response.edit({
-            content: `Turn: <@${i.user.id}>`,
-            components: newGrid.components
-          });
-        }
+        const newGrid = new ButtonGrid(gameState, botWinner?.positions);
+        await i.deferUpdate();
+        await response.edit({
+          content: botWinner ? `${i.user} lost!` : `Turn: <@${i.user.id}>`,
+          components: newGrid.components
+        });
       } else {
-        let nextPlayer = i.user.id === players[0] ? players[1] : players[0];
-        let newGrid = new ButtonGrid(gameState);
+        const nextPlayer = players[0] === i.user.id ? players[1] : players[0];
+        const newGrid = new ButtonGrid(gameState);
         await i.deferUpdate();
         await response.edit({
           content: `Turn: <@${nextPlayer}>`,
@@ -161,66 +114,57 @@ export default {
 };
 
 function checkWinner(gameState) {
-  // row
-  for (let i = 0; i < 3; i++) {
-    if (gameState[i][0] !== '-' && gameState[i][0] === gameState[i][1] && gameState[i][1] === gameState[i][2]) {
-      return { winner: gameState[i][0], positions: [`${i}_0`, `${i}_1`, `${i}_2`] };
+  const lines = [
+    // rows
+    [[0, 0], [0, 1], [0, 2]],
+    [[1, 0], [1, 1], [1, 2]],
+    [[2, 0], [2, 1], [2, 2]],
+    // columns
+    [[0, 0], [1, 0], [2, 0]],
+    [[0, 1], [1, 1], [2, 1]],
+    [[0, 2], [1, 2], [2, 2]],
+    // diagonals
+    [[0, 0], [1, 1], [2, 2]],
+    [[0, 2], [1, 1], [2, 0]]
+  ];
+
+  for (const line of lines) {
+    const [a, b, c] = line;
+    if (gameState[a[0]][a[1]] !== '-' &&
+        gameState[a[0]][a[1]] === gameState[b[0]][b[1]] &&
+        gameState[a[0]][a[1]] === gameState[c[0]][c[1]]) {
+      return { winner: gameState[a[0]][a[1]], positions: line.map(([x, y]) => `${x}_${y}`) };
     }
-  }
-
-  // column 
-  for (let i = 0; i < 3; i++) {
-    if (gameState[0][i] !== '-' && gameState[0][i] === gameState[1][i] && gameState[1][i] === gameState[2][i]) {
-      return { winner: gameState[0][i], positions: [`0_${i}`, `1_${i}`, `2_${i}`] };
-    }
-  }
-
-  // diagonal 1
-  if (gameState[0][0] !== '-' && gameState[0][0] === gameState[1][1] && gameState[1][1] === gameState[2][2]) {
-    return { winner: gameState[0][0], positions: [`0_0`, `1_1`, `2_2`] };
-  }
-
-  // diagonal 2
-  if (gameState[0][2] !== '-' && gameState[0][2] === gameState[1][1] && gameState[1][1] === gameState[2][0]) {
-    return { winner: gameState[0][2], positions: [`0_2`, `1_1`, `2_0`] };
   }
 
   return null;
 }
 
 function checkDraw(gameState) {
-  for (let row of gameState) {
-    for (let cell of row) {
-      if (cell === "-") {
-        return false;
-      }
-    }
-  }
-  return true;
+  return gameState.flat().every(cell => cell !== '-');
 }
 
 function botPlayer(gameState) {
-  let emptyPlaces = [];
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-      if (gameState[i][j] === "-") {
-        emptyPlaces.push([i, j]);
-      }
-    }
+  const emptyPlaces = [];
+  const tempGameState = gameState.map(row => [...row]);
+
+  gameState.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      if (cell === '-') emptyPlaces.push([i, j]);
+    });
+  });
+
+  for (const place of emptyPlaces) {
+    tempGameState[place[0]][place[1]] = "O";
+    if (checkWinner(tempGameState)) return place;
+    tempGameState[place[0]][place[1]] = '-';
   }
-  for (let place of emptyPlaces) {
-    let temp = gameState.map(arr => arr.slice());
-    temp[place[0]][place[1]] = "O";
-    let win = checkWinner(temp);
-    if (win) return place;
+
+  for (const place of emptyPlaces) {
+    tempGameState[place[0]][place[1]] = "X";
+    if (checkWinner(tempGameState)) return place;
+    tempGameState[place[0]][place[1]] = '-';
   }
-  for (let place of emptyPlaces) {
-    let temp = gameState.map(arr => arr.slice()); 
-    temp[place[0]][place[1]] = "X";
-    let win = checkWinner(temp);
-    if (win) return place;
-  }
-  if (emptyPlaces.length > 0) {
-    return emptyPlaces[Math.floor(Math.random() * emptyPlaces.length)];
-  }
+
+  return emptyPlaces[Math.floor(Math.random() * emptyPlaces.length)];
 }
