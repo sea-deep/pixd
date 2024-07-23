@@ -16,6 +16,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
+   await message.reply("ok")
     const guild = message.guild;
 
     if (!guild) {
