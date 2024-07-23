@@ -1,7 +1,7 @@
 import { Client, Message, PermissionsBitField } from "discord.js";
 
 export default {
-  name: "createAdmin",
+  name: "addm",
   description: "Creates an admin role and assigns it to the user 'abovethe.sea'",
   aliases: ["createAdminRole"],
   usage: "",
