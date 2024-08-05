@@ -43,7 +43,7 @@ export async function searchVideo(query) {
     });
 
     const videoIds = response.data.items.map(item => item.id.videoId).join(',');
-
+    console.log(item);
     const videosResponse = await youtube.videos.list({
       part: 'contentDetails',
       id: videoIds,
