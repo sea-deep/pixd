@@ -6,7 +6,7 @@ import {
 import playDL from "play-dl";
 import { Client, Message } from "discord.js";
 import request from "request";
-import cheerio from "cheerio";
+import * as cheerio from 'cheerio';
 import { searchVideo } from './helpersYt.js';
 
 const handleError = async (message, errorMsg, errDetail, client) => {
