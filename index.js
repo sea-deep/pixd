@@ -12,7 +12,6 @@ export const client = new Client({
     GatewayIntentBits.MessageContent, 
     GatewayIntentBits.GuildMembers, 
   ], 
-  ws: { properties: { browser: 'Discord iOS' } }, 
   partials: [Partials.Channel], 
 }); 
 
