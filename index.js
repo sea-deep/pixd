@@ -1,5 +1,5 @@
 import 'dotenv/config'; 
-//bla
+
 import { Client, GatewayIntentBits, Partials, Collection } from 'discord.js'; 
 import playDL from 'play-dl'; 
 import { KeyValueStore, MongodbKeyValue, sleep } from './Helpers/helperUtil.js'; 
