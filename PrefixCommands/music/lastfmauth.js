@@ -1,5 +1,6 @@
 import { Client, Message } from "discord.js";
 
+
 export default {
   name: "lastfm",
   description: "Login with Last.fm",
@@ -20,7 +21,7 @@ export default {
     const baseUrl = 'http://www.last.fm/api/auth/';
     const params = new URLSearchParams({
       api_key: process.env.LASTFM_KEY,
-      cb: `https://pixd.onrender.com/lastfm/login?userid=${message.author.id}`
+      cb: `https://pixd-o5r1.onrender.com/lastfm/login?userid=${message.author.id}`
     });
 
     const authUrl = `${baseUrl}?${params.toString()}`;
