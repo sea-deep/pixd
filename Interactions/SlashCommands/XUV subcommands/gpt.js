@@ -1,14 +1,8 @@
-import * as pkg from "openai";
-
-const { Configuration, OpenAIApi } = pkg;
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 export default {
   subCommand: "xuv gpt",
   async execute(interaction) {
+    return;
     const msg = interaction.options.getString("message");
     await interaction.deferReply();
 

@@ -1,10 +1,4 @@
 import { Message } from "discord.js";
-import pkg from "openai";
-const { Configuration, OpenAIApi } = pkg;
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 export default {
   name: "padhaku",
@@ -21,6 +15,7 @@ export default {
    * @param {Message} message
    */
   execute: async (message, args) => {
+    return;
     await message.channel.sendTyping();
     const query = args.join(" ");
     let systemPrompt = [

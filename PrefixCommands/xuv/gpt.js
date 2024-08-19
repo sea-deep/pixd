@@ -1,11 +1,4 @@
 import { Message, Client } from "discord.js";
-import * as pkg from "openai";
-
-const { Configuration, OpenAIApi } = pkg;
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 export default {
   name: "gpt",
@@ -23,6 +16,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
+    return;
     await message.channel.sendTyping();
     let username = message.author.username;
     let msg = message.content.split(" ").splice(1).join(" ");
