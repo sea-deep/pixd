@@ -1,5 +1,5 @@
-import {Message, AttachmentBuilder } from "discord.js";
-import sharp from 'sharp';
+import { Message, AttachmentBuilder } from "discord.js";
+import sharp from "sharp";
 export default {
   name: "emiwaysay",
   description: "",
@@ -12,45 +12,50 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    */
+   * @param {Message} message
+   */
   execute: async (message, args) => {
     const text = {
-    text: {
-      text: args.join(" ").trim(),
-      font: "gg sans",
-      fontfile: "./Assets/ggsans-ExtraBold.ttf",
-      height: 610,
-      width: 1778-630,
-      align: "center"
-    }
-  };
-  const randomNumber = Math.floor(Math.random() * 3) + 1;
- let output = await sharp({
-   create: {
-     width: 1778,
-     height: 630,
-     channels: 4,
-     background: {
-       r: 255,
-       g: 255,
-       b: 255,
-       alpha: 1
-     }
-   }
- }).composite([
-   {input: text, top: 20, left: 20, blend: 'difference'},
-   {input: `./Assets/emiway${randomNumber}.png`, top: 0, left: (1778-630)}
- ]).png().toBuffer();
-  let file = new AttachmentBuilder(output,{ name:'bantai.png'});
-   return message.channel.send({
-     content: await getRandomLine(),
-     files: [file],
-   });
-  }
+      text: {
+        text: args.join(" ").trim(),
+        font: "gg sans",
+        fontfile: "./Assets/ggsans-ExtraBold.ttf",
+        height: 610,
+        width: 1778 - 630,
+        align: "center",
+      },
+    };
+    const randomNumber = Math.floor(Math.random() * 3) + 1;
+    let output = await sharp({
+      create: {
+        width: 1778,
+        height: 630,
+        channels: 4,
+        background: {
+          r: 255,
+          g: 255,
+          b: 255,
+          alpha: 1,
+        },
+      },
+    })
+      .composite([
+        { input: text, top: 20, left: 20, blend: "difference" },
+        {
+          input: `./Assets/emiway${randomNumber}.png`,
+          top: 0,
+          left: 1778 - 630,
+        },
+      ])
+      .png()
+      .toBuffer();
+    let file = new AttachmentBuilder(output, { name: "bantai.png" });
+    return message.channel.send({
+      content: await getRandomLine(),
+      files: [file],
+    });
+  },
 };
-
-
 
 function getRandomLine() {
   const lyrics = [
@@ -173,9 +178,8 @@ function getRandomLine() {
     "Raaste se tu hat mat",
     "Aaj karega mehnat fun hoga tera kal",
     "Hoga tu safal bas aage badta chal",
-    "Chal, chal, chal"
-];
-    const randomIndex = Math.floor(Math.random() * lyrics.length);
-    return lyrics[randomIndex];
+    "Chal, chal, chal",
+  ];
+  const randomIndex = Math.floor(Math.random() * lyrics.length);
+  return lyrics[randomIndex];
 }
-

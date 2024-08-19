@@ -1,10 +1,10 @@
-import {Client, Message} from 'discord.js';
+import { Client, Message } from "discord.js";
 
 export default {
-  name: 'skip',
-  description: 'Skips the current track.',
-  aliases: ['next'],
-  usage: 'skip <number(optional)>',
+  name: "skip",
+  description: "Skips the current track.",
+  aliases: ["next"],
+  usage: "skip <number(optional)>",
   guildOnly: true,
   args: false,
   permissions: {
@@ -20,11 +20,11 @@ export default {
     let serverQueue = client.queue.get(message.guild.id);
     if (!message.member.voice.channel) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ Please join a  voice channel first.',
+              name: "❌ Please join a  voice channel first.",
             },
             color: client.color,
           },
@@ -36,11 +36,11 @@ export default {
 
     if (!serverQueue || serverQueue.songs.length === 0) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ No song to skip.',
+              name: "❌ No song to skip.",
             },
             color: client.color,
           },
@@ -52,28 +52,28 @@ export default {
 
     if (args.length === 0) {
       serverQueue.player.stop();
-      return message.react('<:skip:1090718541143097464>');
+      return message.react("<:skip:1090718541143097464>");
     }
 
     let pos = parseInt(args[0]);
     if (isNaN(pos)) {
       let query = message.content
-        .substring(message.content.indexOf(' '), message.content.length)
+        .substring(message.content.indexOf(" "), message.content.length)
         .trim();
-      if (args[0] === 'last' || args[0] === 'end') {
+      if (args[0] === "last" || args[0] === "end") {
         pos = serverQueue.songs.length - 1;
       } else {
-        const regex = new RegExp(query, 'i');
+        const regex = new RegExp(query, "i");
         pos = serverQueue.songs.findIndex((s) => regex.test(s.title));
       }
 
       if (pos < 0) {
         let er = await message.reply({
-          content: '',
+          content: "",
           embeds: [
             {
               author: {
-                name: '❌ Failed to skip the given track.',
+                name: "❌ Failed to skip the given track.",
               },
               color: client.color,
             },
@@ -84,11 +84,11 @@ export default {
       }
     } else if (pos > serverQueue.songs.length - 1 || pos < 0) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ Failed to skip the given track',
+              name: "❌ Failed to skip the given track",
             },
             color: client.color,
           },
@@ -100,10 +100,10 @@ export default {
 
     if (pos === 0) {
       serverQueue.player.stop();
-      return message.react('<:skip:1090718541143097464>');
+      return message.react("<:skip:1090718541143097464>");
     }
 
-    message.react('<:skip:1090718541143097464>');
+    message.react("<:skip:1090718541143097464>");
     serverQueue.songs.splice(pos, 1);
     serverQueue.keep = false;
   },

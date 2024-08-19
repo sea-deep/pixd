@@ -4,12 +4,12 @@ import { getCaptionInputInt } from "../../../Helpers/helpersImage.js";
 import translate from "google-translate-api-x";
 
 export default {
-  subCommand: 'img allustuff',
+  subCommand: "img allustuff",
   async execute(interaction) {
     await interaction.deferReply();
     const image = await getCaptionInputInt(interaction);
     const text = await interaction.options._hoistedOptions[0].value;
-const response = await fetch(image);
+    const response = await fetch(image);
     const data = await response.arrayBuffer();
     const res = await translate(text, { to: "te" });
     const translatedText = res.text;
@@ -51,5 +51,5 @@ const response = await fetch(image);
       content: "",
       files: [file],
     });
-  }
+  },
 };

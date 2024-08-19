@@ -26,12 +26,12 @@ export default {
     let url = await getInputImage(message);
     const res = await fetch(url);
     const buffer = await res.arrayBuffer();
-    const avatar = await sharp(buffer).resize(366, 500, {fit: "fill"}).toBuffer();
+    const avatar = await sharp(buffer)
+      .resize(366, 500, { fit: "fill" })
+      .toBuffer();
     const rapper = await sharp("./Assets/rap.jpg")
       .resize(732, 1000)
-      .composite([
-        { input: avatar, top: position.y, left: position.x },
-      ])
+      .composite([{ input: avatar, top: position.y, left: position.x }])
       .png()
       .toBuffer();
     let file = new AttachmentBuilder(rapper, { name: "nirbhaya.png" });

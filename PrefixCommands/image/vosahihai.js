@@ -39,9 +39,13 @@ export default {
       .composite([
         { input: head, top: 0, left: 200 },
         { input: hand, top: 150, left: 5 },
-      ]).png()
+      ])
+      .png()
       .toBuffer();
-    const vosahi = await sharp(sahi).resize(1080, 855, {position: "top"}).png().toBuffer();
+    const vosahi = await sharp(sahi)
+      .resize(1080, 855, { position: "top" })
+      .png()
+      .toBuffer();
 
     let file = new AttachmentBuilder(vosahi, { name: "maisahitha.png" });
     let text = [

@@ -1,6 +1,5 @@
 import { Client, Message } from "discord.js";
 
-
 export default {
   name: "lastfm",
   description: "Login with Last.fm",
@@ -18,20 +17,23 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    const baseUrl = 'http://www.last.fm/api/auth/';
+    const baseUrl = "http://www.last.fm/api/auth/";
     const params = new URLSearchParams({
       api_key: process.env.LASTFM_KEY,
-      cb: `https://pixd-o5r1.onrender.com/lastfm/login?userid=${message.author.id}`
+      cb: `https://pixd-o5r1.onrender.com/lastfm/login?userid=${message.author.id}`,
     });
 
     const authUrl = `${baseUrl}?${params.toString()}`;
     try {
       await message.member.send({
         content: "",
-        embeds: [{
-          description: "**Click the button below to authorise your Last.fm account with PIXD.**",
-          color: client.color
-        }],
+        embeds: [
+          {
+            description:
+              "**Click the button below to authorise your Last.fm account with PIXD.**",
+            color: client.color,
+          },
+        ],
         components: [
           {
             type: 1,
@@ -41,30 +43,34 @@ export default {
                 label: `LOGIN WITH LAST.FM`,
                 url: authUrl,
                 disabled: false,
-                type: 2
-              }
-            ]
-          }
-        ]
+                type: 2,
+              },
+            ],
+          },
+        ],
       });
       return message.reply({
         content: "",
-        embeds: [{
-          color: client.color,
-          description: "Just sent you a DM."
-        }]
+        embeds: [
+          {
+            color: client.color,
+            description: "Just sent you a DM.",
+          },
+        ],
       });
     } catch (e) {
       return message.reply({
         content: "",
-        embeds: [{
-          title: "An error occurred while sending you a DM",
-          description: e.message,
-          footer: {
-            text: 'Make sure you have "Direct Messages" enabled in this server',
-          }
-        }]
+        embeds: [
+          {
+            title: "An error occurred while sending you a DM",
+            description: e.message,
+            footer: {
+              text: 'Make sure you have "Direct Messages" enabled in this server',
+            },
+          },
+        ],
       });
     }
-  }
+  },
 };

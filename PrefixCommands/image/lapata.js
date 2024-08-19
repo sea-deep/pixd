@@ -55,7 +55,9 @@ export default {
     ];
 
     for (let i = 0; i < overlays.length; i++) {
-      overlays[i] = await sharp(overlays[i]).resize(s[i].w, s[i].h, { fit: "fill"}).toBuffer();
+      overlays[i] = await sharp(overlays[i])
+        .resize(s[i].w, s[i].h, { fit: "fill" })
+        .toBuffer();
     }
 
     let lapata = await sharp({

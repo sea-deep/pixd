@@ -1,10 +1,10 @@
-import {Client, Message} from 'discord.js';
+import { Client, Message } from "discord.js";
 
 export default {
-  name: 'shuffle',
-  description: 'Shuffle the running queue.',
-  aliases: [''],
-  usage: 'shuffle',
+  name: "shuffle",
+  description: "Shuffle the running queue.",
+  aliases: [""],
+  usage: "shuffle",
   guildOnly: true,
   args: false,
   permissions: {
@@ -19,11 +19,11 @@ export default {
     const serverQueue = client.queue.get(message.guild.id);
     if (!message.member.voice.channel) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ Please join a  voice channel first.',
+              name: "❌ Please join a  voice channel first.",
             },
             color: client.color,
           },
@@ -34,11 +34,11 @@ export default {
     }
     if (!serverQueue || serverQueue.songs.length == 0) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ No songs to shuffle.',
+              name: "❌ No songs to shuffle.",
             },
             color: client.color,
           },
@@ -55,7 +55,7 @@ export default {
         serverQueue.songs[i],
       ];
     }
-    message.react('<:shuffle:1090732407931543681>');
+    message.react("<:shuffle:1090732407931543681>");
   },
 };
 

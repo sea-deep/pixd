@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb';
-import PQueue from 'p-queue'; // Import the PQueue class from the 'p-queue' library
+import { MongoClient } from "mongodb";
+import PQueue from "p-queue"; // Import the PQueue class from the 'p-queue' library
 
 export class MongodbKeyValue {
   constructor(databaseUrl, collectionName) {
@@ -17,7 +17,7 @@ export class MongodbKeyValue {
       this.db = this.client.db();
       this.collection = this.db.collection(this.collectionName);
     } catch (error) {
-      console.error('Failed to connect to MongoDB:', error);
+      console.error("Failed to connect to MongoDB:", error);
       throw error;
     }
   }
@@ -57,12 +57,17 @@ export class MongodbKeyValue {
       await this.queue.add(async () => {
         await this.collection.updateOne({ key }, { $set: { ttl: null } });
       });
-    } else if (typeof newTTL === 'number' && newTTL >= 0) {
+    } else if (typeof newTTL === "number" && newTTL >= 0) {
       await this.queue.add(async () => {
-        await this.collection.updateOne({ key }, { $set: { ttl: Date.now() + newTTL * 1000 } });
+        await this.collection.updateOne(
+          { key },
+          { $set: { ttl: Date.now() + newTTL * 1000 } },
+        );
       });
     } else {
-      throw new Error('Invalid TTL value. TTL must be a positive number or null.');
+      throw new Error(
+        "Invalid TTL value. TTL must be a positive number or null.",
+      );
     }
   }
 
@@ -73,7 +78,9 @@ export class MongodbKeyValue {
       const currentTime = Date.now();
       const remainingTime = Math.max(0, entry.ttl - currentTime);
       const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      const minutes = Math.floor(
+        (remainingTime % (1000 * 60 * 60)) / (1000 * 60),
+      );
       const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
       return { hours, minutes, seconds };
@@ -85,14 +92,16 @@ export class MongodbKeyValue {
   async all() {
     try {
       const allEntries = await this.collection.find().toArray();
-      return allEntries.map(entry => ({ key: entry.key, value: entry.value }));
+      return allEntries.map((entry) => ({
+        key: entry.key,
+        value: entry.value,
+      }));
     } catch (error) {
-      console.error('Failed to retrieve all entries from MongoDB:', error);
+      console.error("Failed to retrieve all entries from MongoDB:", error);
       throw error;
     }
   }
 }
-
 
 /**
  * A simple key-value store using a Map.
@@ -157,17 +166,18 @@ export class KeyValueStore {
     if (entry) {
       if (newTTL === null) {
         entry.ttl = null;
-      } else if (typeof newTTL === 'number' && newTTL >= 0) {
+      } else if (typeof newTTL === "number" && newTTL >= 0) {
         entry.ttl = Date.now() + newTTL * 1000;
       } else {
-        throw new Error('Invalid TTL value. TTL must be a positive number or null.');
+        throw new Error(
+          "Invalid TTL value. TTL must be a positive number or null.",
+        );
       }
     } else {
-      throw new Error('Key does not exist in the store.');
+      throw new Error("Key does not exist in the store.");
     }
   }
 }
-
 
 /**
  * Sleep for a specified number of milliseconds.

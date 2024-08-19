@@ -39,7 +39,6 @@ export default {
         ],
       });
     } else {
-      
       let def = res.list[0];
       let msg = await message.reply({
         failIfNotExists: true,
@@ -94,12 +93,20 @@ export default {
           {
             type: "rich",
             title: def.word,
-            description: def.definition.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
+            description: def.definition.replaceAll(
+              /\[(.*?)\]/g,
+              (match, word) =>
+                `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`,
+            ),
             color: client.color,
             fields: [
               {
                 name: "Example:",
-                value: def.example.replaceAll(/\[(.*?)\]/g, (match, word) => `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`),
+                value: def.example.replaceAll(
+                  /\[(.*?)\]/g,
+                  (match, word) =>
+                    `[${word}](https://www.urbandictionary.com/define.php?term=${encodeURIComponent(word)})`,
+                ),
               },
             ],
             author: {
@@ -114,7 +121,7 @@ export default {
           },
         ],
       });
-    await client.keyv.set(`ud${msg.id}`, args.join(" "), 30*60*1000);
+      await client.keyv.set(`ud${msg.id}`, args.join(" "), 30 * 60 * 1000);
     }
   },
 };

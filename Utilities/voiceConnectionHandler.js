@@ -11,7 +11,7 @@ import { play, destroy } from "../Helpers/helpersMusic.js";
 const handleError = async (message, errorMsg, errDetail, client) => {
   console.error(errDetail);
   let er = await message.channel.send({
-    content: '',
+    content: "",
     embeds: [
       {
         author: {
@@ -30,7 +30,12 @@ const handleError = async (message, errorMsg, errDetail, client) => {
  * @param {Client} client
  * @param {Message} message
  */
-export async function startVoiceConnection(params, client, message, queueConstructor) {
+export async function startVoiceConnection(
+  params,
+  client,
+  message,
+  queueConstructor,
+) {
   const voiceChannel = message.member.voice.channel;
 
   try {
@@ -56,24 +61,32 @@ export async function startVoiceConnection(params, client, message, queueConstru
       newNetworking?.on("stateChange", networkStateChangeHandler);
     });
 
-    connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-      try {
-        await Promise.race([
-          entersState(connection, VoiceConnectionStatus.Signalling, 5000),
-          entersState(connection, VoiceConnectionStatus.Connecting, 5000),
-        ]);
-      } catch (error) {
-        console.log(`Forcibly destroyed the bot.`);
-        connection.destroy();
-        client.queue.delete(params.guildId);
-      }
-    });
+    connection.on(
+      VoiceConnectionStatus.Disconnected,
+      async (oldState, newState) => {
+        try {
+          await Promise.race([
+            entersState(connection, VoiceConnectionStatus.Signalling, 5000),
+            entersState(connection, VoiceConnectionStatus.Connecting, 5000),
+          ]);
+        } catch (error) {
+          console.log(`Forcibly destroyed the bot.`);
+          connection.destroy();
+          client.queue.delete(params.guildId);
+        }
+      },
+    );
 
     const userCheck = setInterval(() => {
-      if (voiceChannel.members.size === 1 && getVoiceConnection(params.guildId) !== undefined) {
+      if (
+        voiceChannel.members.size === 1 &&
+        getVoiceConnection(params.guildId) !== undefined
+      ) {
         clearInterval(userCheck);
         destroy(message.guild, client);
-        console.log(`No active users, bot has disconnected from "${message.guild.name}"`);
+        console.log(
+          `No active users, bot has disconnected from "${message.guild.name}"`,
+        );
       }
     }, 60 * 1000);
 
@@ -82,17 +95,17 @@ export async function startVoiceConnection(params, client, message, queueConstru
     } catch (e) {
       return handleError(
         message,
-        '❌ An unexpected error occurred while playing the song.',
+        "❌ An unexpected error occurred while playing the song.",
         e,
-        client
+        client,
       );
     }
   } catch (err) {
     return handleError(
       message,
-      '❌ An unexpected error occurred with the Voice connection handler.',
+      "❌ An unexpected error occurred with the Voice connection handler.",
       err,
-      client
+      client,
     );
   }
 }
@@ -101,6 +114,6 @@ async function deleteMessage(msg) {
   try {
     return await msg.delete();
   } catch (e) {
-    console.error('Error while deleting message:', e.message);
+    console.error("Error while deleting message:", e.message);
   }
 }

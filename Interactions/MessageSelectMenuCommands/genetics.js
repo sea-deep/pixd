@@ -2,8 +2,8 @@ import { MessageContextMenuCommandInteraction } from "discord.js";
 
 export default {
   data: {
-    name: 'React Genesis',
-    type: 3
+    name: "React Genesis",
+    type: 3,
   },
   /**
    * @param {MessageContextMenuCommandInteraction} interaction
@@ -19,17 +19,20 @@ export default {
       try {
         await interaction.targetMessage.react(genesis[i]);
       } catch (err) {
-             console.log("An error occurred: ", err);
- 
+        console.log("An error occurred: ", err);
+
         return interaction.editReply({
-          content: 'An error occurred while reacting to message :\n```\n' + err.message + '```',
-          ephemeral: true
+          content:
+            "An error occurred while reacting to message :\n```\n" +
+            err.message +
+            "```",
+          ephemeral: true,
         });
-       }    
+      }
     }
     await interaction.editReply({
-          content: 'Reactions Added!',
-          ephemeral: true
-        });
-  }
+      content: "Reactions Added!",
+      ephemeral: true,
+    });
+  },
 };

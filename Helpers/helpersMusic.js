@@ -6,13 +6,13 @@ import {
 import playDL from "play-dl";
 import { Client, Message } from "discord.js";
 import request from "request";
-import * as cheerio from 'cheerio';
-import { searchVideo } from './helpersYt.js';
+import * as cheerio from "cheerio";
+import { searchVideo } from "./helpersYt.js";
 
 const handleError = async (message, errorMsg, errDetail, client) => {
   console.error(errDetail);
   let er = await message.channel.send({
-    content: '',
+    content: "",
     embeds: [
       {
         author: {
@@ -39,7 +39,7 @@ export async function play(guild, song, client, message) {
       () => {
         if (getVoiceConnection(guild.id) !== undefined) {
           destroy(guild, client);
-          serverQueue.timeoutID = undefined; 
+          serverQueue.timeoutID = undefined;
         } else {
           console.log("Bot was disconnected during the timeout.");
         }
@@ -70,7 +70,7 @@ export async function play(guild, song, client, message) {
       message,
       `❌ An unexpected error occurred while getting the stream for ${song.title}.`,
       error,
-      client
+      client,
     );
   }
 
@@ -81,7 +81,9 @@ export async function play(guild, song, client, message) {
   serverQueue.player.play(resource);
 
   const errorListener = (error) => {
-    console.error(`Error: ${error.message} with resource ${error.resource.title}`);
+    console.error(
+      `Error: ${error.message} with resource ${error.resource.title}`,
+    );
   };
   serverQueue.player.on("error", errorListener);
   serverQueue.player.once(AudioPlayerStatus.Idle, () => {
@@ -174,12 +176,11 @@ async function deleteMessage(msg) {
   try {
     return await msg.delete();
   } catch (e) {
-    console.error('Error while deleting message:', e.message);
+    console.error("Error while deleting message:", e.message);
   }
 }
 
-
-//lyrics part 
+//lyrics part
 const proxify = (data, jar) => {
   return new Promise((res, rej) => {
     request(
@@ -257,10 +258,10 @@ export async function searchSong(q) {
   };
   const data = await proxify(formData, cookie);
   return JSON.parse(data);
-};
+}
 
 export async function getLyrics(url) {
- const { proxy_list, cookie } = await getConfig();
+  const { proxy_list, cookie } = await getConfig();
   const formData = {
     u: url,
     u_default: "https://www.google.com/",

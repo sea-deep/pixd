@@ -1,10 +1,10 @@
-import { getInputImageInt } from '../../../Helpers/helpersImage.js';
-import sharp from 'sharp';
+import { getInputImageInt } from "../../../Helpers/helpersImage.js";
+import sharp from "sharp";
 import GIFEncoder from "gif-encoder-2";
-import { AttachmentBuilder } from 'discord.js';
+import { AttachmentBuilder } from "discord.js";
 
 export default {
-  subCommand: 'img goodness',
+  subCommand: "img goodness",
   async execute(interaction) {
     await interaction.deferReply();
     let url = await getInputImageInt(interaction);
@@ -32,5 +32,5 @@ export default {
       content: ``,
       files: [file],
     });
-  }
+  },
 };

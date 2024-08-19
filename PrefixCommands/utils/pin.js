@@ -47,15 +47,15 @@ async function createPin(message, args, client) {
     });
   }
   let restricted = [
-     'add',
-     'create',
-     'new',
-     'edit',
-     'remove',
-     'delete',
-     'del',
-     'list'
-    ];
+    "add",
+    "create",
+    "new",
+    "edit",
+    "remove",
+    "delete",
+    "del",
+    "list",
+  ];
   if (restricted.includes(args[1].trim().toLowerCase())) {
     return message.reply({
       content: "",
@@ -67,11 +67,11 @@ async function createPin(message, args, client) {
       ],
     });
   }
-  
-  
-  let pin = await client.pinsDB.get(message.guild.id + args[1].trim().toLowerCase());
-  if(pin && message.author.id !== pin.owner) {
-    
+
+  let pin = await client.pinsDB.get(
+    message.guild.id + args[1].trim().toLowerCase(),
+  );
+  if (pin && message.author.id !== pin.owner) {
     return message.reply({
       content: "",
       embeds: [
@@ -82,34 +82,49 @@ async function createPin(message, args, client) {
       ],
     });
   }
-  
+
   const pinContentString = args.slice(2).join(" ");
 
   let pinContent = {
     attachment:
-  message.attachments.size > 0
-    ? message.attachments.first().url
-    : message.reference && (await message.fetchReference()).attachments.size > 0
-      ? (await message.fetchReference()).attachments.first().url
-      : message.reference && /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test((await message.fetchReference()).content)
-        ? (await message.fetchReference()).content.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0]
-        : /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(pinContentString)
-          ? pinContentString.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0]
-          : null,
-        content: message.reference && (await message.fetchReference()).content.trim() !== ''
-  ? /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test((await message.fetchReference()).content)
-    ? null
-    : (await message.fetchReference()).content
-  : /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(pinContentString)
-    ? null
-    : pinContentString.trim() !== ""
-      ? pinContentString.trim()
-      : null,
+      message.attachments.size > 0
+        ? message.attachments.first().url
+        : message.reference &&
+            (await message.fetchReference()).attachments.size > 0
+          ? (await message.fetchReference()).attachments.first().url
+          : message.reference &&
+              /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(
+                (await message.fetchReference()).content,
+              )
+            ? (await message.fetchReference()).content.match(
+                /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i,
+              )[0]
+            : /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(
+                  pinContentString,
+                )
+              ? pinContentString.match(
+                  /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i,
+                )[0]
+              : null,
+    content:
+      message.reference &&
+      (await message.fetchReference()).content.trim() !== ""
+        ? /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(
+            (await message.fetchReference()).content,
+          )
+          ? null
+          : (await message.fetchReference()).content
+        : /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i.test(
+              pinContentString,
+            )
+          ? null
+          : pinContentString.trim() !== ""
+            ? pinContentString.trim()
+            : null,
     owner: message.author.id,
   };
 
   if (!pinContent.content && !pinContent.attachment) {
-    
     return message.reply({
       content: "",
       embeds: [
@@ -123,9 +138,9 @@ async function createPin(message, args, client) {
 
   await client.pinsDB.set(
     message.guild.id + args[1].trim().toLowerCase(),
-    pinContent
+    pinContent,
   );
-  
+
   return message.reply({
     content: "",
     embeds: [
@@ -136,7 +151,6 @@ async function createPin(message, args, client) {
     ],
   });
 }
-
 
 async function viewPin(message, args, client) {
   if (args.length < 1) {
@@ -152,10 +166,9 @@ async function viewPin(message, args, client) {
     });
   }
 
-  const pinName = message.guild.id + (args[0].trim().toLowerCase());
-  
+  const pinName = message.guild.id + args[0].trim().toLowerCase();
+
   const pinContent = await client.pinsDB.get(pinName);
-  
 
   if (!pinContent) {
     return message.reply({
@@ -191,14 +204,14 @@ async function viewPin(message, args, client) {
   }
 }
 
-
 async function removePin(message, args, client) {
   if (args.length < 2) {
     return message.reply({
       content: "",
       embeds: [
         {
-          description: "❌ **Please provide the name of the pin you want to remove**",
+          description:
+            "❌ **Please provide the name of the pin you want to remove**",
           color: client.color,
         },
       ],
@@ -206,11 +219,10 @@ async function removePin(message, args, client) {
   }
 
   const pinName = message.guild.id + args[1].trim().toLowerCase();
-  
+
   const pinContent = await client.pinsDB.get(pinName);
 
   if (!pinContent) {
-    
     return message.reply({
       content: "",
       embeds: [
@@ -221,8 +233,8 @@ async function removePin(message, args, client) {
       ],
     });
   }
-   if(message.author.id !== pinContent.owner) {
-   return message.reply({
+  if (message.author.id !== pinContent.owner) {
+    return message.reply({
       content: "",
       embeds: [
         {
@@ -231,9 +243,8 @@ async function removePin(message, args, client) {
         },
       ],
     });
-   }
+  }
   await client.pinsDB.delete(pinName);
-  
 
   return message.reply({
     content: "",
@@ -247,9 +258,7 @@ async function removePin(message, args, client) {
 }
 
 async function listPin(message, args, client) {
-  
   const pins = await client.pinsDB.all();
-  
 
   if (!pins || pins.length === 0) {
     return message.reply({
@@ -267,10 +276,14 @@ async function listPin(message, args, client) {
 
   if (message.mentions.users.size > 0) {
     const mentionedUserId = message.mentions.users.first().id;
-    filteredPins = filteredPins.filter((pin) => pin.value.owner === mentionedUserId);
+    filteredPins = filteredPins.filter(
+      (pin) => pin.value.owner === mentionedUserId,
+    );
   }
 
-  const pinList = filteredPins.map((pin) => `\`${pin.key.replace(message.guild.id, "")}\``).join(", ");
+  const pinList = filteredPins
+    .map((pin) => `\`${pin.key.replace(message.guild.id, "")}\``)
+    .join(", ");
 
   return message.reply({
     content: "",

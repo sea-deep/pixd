@@ -1,6 +1,6 @@
 export default {
-  subCommand: 'hello world',
+  subCommand: "hello world",
   async execute(interaction) {
     return await interaction.reply("Seriously?");
-  }
+  },
 };

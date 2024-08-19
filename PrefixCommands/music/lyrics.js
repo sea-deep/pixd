@@ -28,23 +28,23 @@ export default {
     }
     if ((!serverQueue || serverQueue.songs.length == 0) && !title) {
       return message.react("<:error:1090721649621479506>");
-    } else if(!title) {
+    } else if (!title) {
       title = serverQueue.songs[0].title;
     }
-  
-   
-     let res = await searchSong(title);
-   if (res.songs.length === 0) {
-      return message.reply({ 
-       content: '',
-       embeds: [{
-         description: 'Couldn’t find any lyrics for this song.',
-         color: 0xe08e67
-       }]
-     }); 
+
+    let res = await searchSong(title);
+    if (res.songs.length === 0) {
+      return message.reply({
+        content: "",
+        embeds: [
+          {
+            description: "Couldn’t find any lyrics for this song.",
+            color: 0xe08e67,
+          },
+        ],
+      });
     }
-     title = res.songs[0].autocomplete;
- 
+    title = res.songs[0].autocomplete;
 
     await message.reply({
       content: "",

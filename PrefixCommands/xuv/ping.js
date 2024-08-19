@@ -1,5 +1,5 @@
-import { client } from '../../index.js';
-import { Message } from 'discord.js';
+import { client } from "../../index.js";
+import { Message } from "discord.js";
 export default {
   name: "ping",
   description: "A ping command",
@@ -14,7 +14,7 @@ export default {
   /**
    * @param {Message} message
    */
-  execute: async (message,args, client) => {
+  execute: async (message, args, client) => {
     let msg = await message.reply("Pong!");
 
     const startTime = client.keyv.get("uptime");
@@ -23,18 +23,20 @@ export default {
     return msg.edit({
       content: "Pong!",
       tts: false,
-      embeds: [{
-        type: "rich",
-        color: client.color,
-        description: [
-          `**Latency:** \`${msg.createdTimestamp - message.createdTimestamp}ms\``,
-          `**API Latency:** \`${Math.round(client.ws.ping)}ms\``,
-          `**Uptime:** ${uptime}`
-        ].join('\n'),
-      }]
+      embeds: [
+        {
+          type: "rich",
+          color: client.color,
+          description: [
+            `**Latency:** \`${msg.createdTimestamp - message.createdTimestamp}ms\``,
+            `**API Latency:** \`${Math.round(client.ws.ping)}ms\``,
+            `**Uptime:** ${uptime}`,
+          ].join("\n"),
+        },
+      ],
     });
-  }
-}
+  },
+};
 
 function formatUptime(uptime) {
   const seconds = Math.floor(uptime / 1000);

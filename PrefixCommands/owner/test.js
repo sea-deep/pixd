@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { createHash } from 'crypto';
+import { createHash } from "crypto";
 
 export default {
   name: "lol",
@@ -22,10 +22,10 @@ export default {
       let song = arg[0].trim();
       let artist = arg[1].trim();
       let sk = await client.lastFmDb.get(message.author.id);
-      
+
       // Array to hold multiple scrobbles
       let options = {
-        method: 'track.scrobble',
+        method: "track.scrobble",
         api_key: process.env.LASTFM_KEY,
         sk: sk,
       };
@@ -38,34 +38,35 @@ export default {
       }
 
       options.api_sig = getApiSig(options);
-      options.format = 'json';
+      options.format = "json";
 
       let params = new URLSearchParams(options);
 
-      const response = await fetch('http://ws.audioscrobbler.com/2.0/', {
-        method: 'POST',
+      const response = await fetch("http://ws.audioscrobbler.com/2.0/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: params.toString()
+        body: params.toString(),
       });
 
       const data = await response.json();
-      let attr = data.scrobbles['@attr'];
+      let attr = data.scrobbles["@attr"];
       message.reply(`Accepted: ${attr.accepted}\nIgnored: ${attr.ignored}`);
-    //  console.log(data);
-
+      //  console.log(data);
     } catch (e) {
       console.log(e);
     }
-  }
+  },
 };
 
 function getApiSig(params) {
-  const sortedParams = Object.keys(params).sort().map(key => `${key}${params[key]}`);
-  const paramString = sortedParams.join('');
+  const sortedParams = Object.keys(params)
+    .sort()
+    .map((key) => `${key}${params[key]}`);
+  const paramString = sortedParams.join("");
   const paramStringWithSecret = paramString + process.env.LASTFM_SECRET;
-  const apiSig = createHash('md5').update(paramStringWithSecret).digest('hex');
+  const apiSig = createHash("md5").update(paramStringWithSecret).digest("hex");
 
   return apiSig;
 }

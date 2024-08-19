@@ -38,9 +38,11 @@ export default {
       const buffer = Buffer.from(data);
 
       // Check if the buffer is a valid image format
-      const inputInfo = await sharp(buffer).metadata().catch(err => {
-        throw new Error(`Invalid image format: ${err.message}`);
-      });
+      const inputInfo = await sharp(buffer)
+        .metadata()
+        .catch((err) => {
+          throw new Error(`Invalid image format: ${err.message}`);
+        });
 
       let input = await sharp(buffer).resize(1080).png().toBuffer();
       let md = await sharp(input).metadata();
@@ -56,14 +58,14 @@ export default {
           .toBuffer();
         md = await sharp(input).metadata();
       }
-      let emotReg= /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
+      let emotReg = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
       const words = text.split(" ");
 
       const lines = [];
-      let currentLine = '';
-      words.forEach(word => {
+      let currentLine = "";
+      words.forEach((word) => {
         if ((currentLine + (emotReg.test(word) ? "_" : word)).length <= 24) {
-          currentLine += (currentLine.length ? ' ' : '') + word;
+          currentLine += (currentLine.length ? " " : "") + word;
         } else {
           lines.push(currentLine);
           currentLine = word;
@@ -77,21 +79,25 @@ export default {
       let textHeight = 0;
 
       for (const line of lines) {
-        let emoteAndEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
+        let emoteAndEmojiRegex =
+          /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
         let characters = line.match(emoteAndEmojiRegex);
         let textChars = [];
         let currentLeft = 0;
 
         for (const character of characters) {
           if (isEmoji(character)) {
-            let emojiBuffer = await getEmojiImage(character).catch(err => {
+            let emojiBuffer = await getEmojiImage(character).catch((err) => {
               throw new Error(`Failed to fetch emoji: ${err.message}`);
             });
-            emojiBuffer = await sharp(emojiBuffer).resize(48, 48).png().toBuffer();
+            emojiBuffer = await sharp(emojiBuffer)
+              .resize(48, 48)
+              .png()
+              .toBuffer();
             textChars.push({
               input: emojiBuffer,
               top: 0,
-              left: currentLeft
+              left: currentLeft,
             });
             currentLeft += 51;
           } else if (character === " ") {
@@ -102,11 +108,13 @@ export default {
                 channels: 4,
                 background: { r: 255, g: 255, b: 255, alpha: 0 },
               },
-            }).png().toBuffer();
+            })
+              .png()
+              .toBuffer();
             textChars.push({
               input: spaceBuffer,
               top: 0,
-              left: currentLeft
+              left: currentLeft,
             });
             currentLeft += 15;
           } else {
@@ -114,18 +122,20 @@ export default {
               text: {
                 text: character.toUpperCase(),
                 dpi: 400,
-                align: 'center',
+                align: "center",
                 font: "Baloo 2 ExtraBold",
                 fontfile: "./Assets/baloo.ttf",
               },
-            }).png().toBuffer();
+            })
+              .png()
+              .toBuffer();
 
             let textCharMeta = await sharp(textChar).metadata();
             textChars.push({
               input: textChar,
-              blend: 'difference',
+              blend: "difference",
               top: 0,
-              left: currentLeft
+              left: currentLeft,
             });
             currentLeft += textCharMeta.width + 3;
           }
@@ -167,7 +177,6 @@ export default {
         .toBuffer();
 
       const finalHeight = 48 + 145 + 30 + textHeight + md.height;
-     
 
       const finalImage = await sharp({
         create: {
@@ -182,7 +191,13 @@ export default {
           { input: overlay, top: 145, left: 0 },
           { input: input, top: 145 + textHeight + 30, left: 0 },
           { input: "./Assets/rvcjfooter.png", top: finalHeight - 48, left: 0 },
-          { input: "./Assets/watermark.png", top: Math.floor(145+textHeight+(Math.random()*(finalHeight-100))), left: Math.floor(Math.random() * (1080 - 100))}
+          {
+            input: "./Assets/watermark.png",
+            top: Math.floor(
+              145 + textHeight + Math.random() * (finalHeight - 100),
+            ),
+            left: Math.floor(Math.random() * (1080 - 100)),
+          },
         ])
         .png()
         .toBuffer();

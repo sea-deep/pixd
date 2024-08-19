@@ -1,5 +1,11 @@
 import { Message } from "discord.js";
-import { message2048, parseDesc, calculateScore, makeDesc, spawnRandom } from "../../Helpers/helpers2048.js";
+import {
+  message2048,
+  parseDesc,
+  calculateScore,
+  makeDesc,
+  spawnRandom,
+} from "../../Helpers/helpers2048.js";
 export default {
   name: "2048",
   description: "Play 2048 on Discord",
@@ -12,24 +18,24 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    */
+   * @param {Message} message
+   */
   execute: async (message) => {
-    const emoji = '<:0_:1133755630633635952>'; 
- const board = [ 
-   `${emoji}${emoji}${emoji}${emoji}`, 
-   `${emoji}${emoji}${emoji}${emoji}`, 
-   `${emoji}${emoji}${emoji}${emoji}`, 
-   `${emoji}${emoji}${emoji}${emoji}`, 
- ].join('\n'); 
-  
-   let newBoard = spawnRandom(parseDesc(board), 2); 
-   let description = makeDesc(newBoard); 
-  
-   let msg = message2048({ 
-     description: description, 
-     score: calculateScore(newBoard), 
-   }); 
-   await message.reply(msg);
-  }
+    const emoji = "<:0_:1133755630633635952>";
+    const board = [
+      `${emoji}${emoji}${emoji}${emoji}`,
+      `${emoji}${emoji}${emoji}${emoji}`,
+      `${emoji}${emoji}${emoji}${emoji}`,
+      `${emoji}${emoji}${emoji}${emoji}`,
+    ].join("\n");
+
+    let newBoard = spawnRandom(parseDesc(board), 2);
+    let description = makeDesc(newBoard);
+
+    let msg = message2048({
+      description: description,
+      score: calculateScore(newBoard),
+    });
+    await message.reply(msg);
+  },
 };

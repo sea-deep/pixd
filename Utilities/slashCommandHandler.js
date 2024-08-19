@@ -11,7 +11,9 @@ try {
   client.slashCommands.clear();
   client.subCommands.clear();
 
-  const Files = await proGlob(`${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`);
+  const Files = await proGlob(
+    `${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`,
+  );
 
   for (let i = 0; i < Files.length; i++) {
     Files[i] = pathToFileURL(Files[i]);
@@ -25,8 +27,7 @@ try {
     client.slashCommands.set(interaction.data.name, interaction);
   }
   const infoMessage = `[${chalk.blue("INFO")}] - Slash Commands Loaded!`;
-    process.stdout.write(`${infoMessage}\n`);
-
+  process.stdout.write(`${infoMessage}\n`);
 } catch (err) {
   const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
   process.stderr.write(`${errorOutput}\n`);

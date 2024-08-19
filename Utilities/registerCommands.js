@@ -9,8 +9,12 @@ const proGlob = promisify(glob);
 
 const clientId = "1026234292017299586";
 
-const SlashCommands = await proGlob(`${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`);
-const MessageSelectMenuCommands = await proGlob(`${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`);
+const SlashCommands = await proGlob(
+  `${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`,
+);
+const MessageSelectMenuCommands = await proGlob(
+  `${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`,
+);
 const Files = SlashCommands.concat(MessageSelectMenuCommands);
 
 const commandsArray = [];
@@ -18,14 +22,14 @@ for (let i = 0; i < Files.length; i++) {
   Files[i] = pathToFileURL(Files[i]);
   const interactionFile = await import(Files[i]);
   const interaction = interactionFile.default;
-  if(interaction.data) {
-  commandsArray.push(interaction.data);
+  if (interaction.data) {
+    commandsArray.push(interaction.data);
   }
 }
 // console.log(commandsArray)
 const url = `https://discord.com/api/v10/applications/${clientId}/commands`;
 const headers = {
-  "Authorization": `Bot ${process.env.TOKEN}`,
+  Authorization: `Bot ${process.env.TOKEN}`,
   "Content-Type": "application/json",
 };
 

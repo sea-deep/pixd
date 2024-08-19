@@ -1,20 +1,22 @@
-import { AttachmentBuilder } from 'discord.js';
+import { AttachmentBuilder } from "discord.js";
 
 export default {
-  subCommand: 'xuv genesis',
+  subCommand: "xuv genesis",
   async execute(interaction) {
     await interaction.deferReply();
     try {
-      const prompt = interaction.options.getString('prompt');
+      const prompt = interaction.options.getString("prompt");
       const imageBuffer = await createImage(prompt);
       const fileName = `${prompt}.jpg`;
       const attachment = new AttachmentBuilder(imageBuffer, { name: fileName });
 
       return interaction.followUp({
-        content: '',
-        embeds: [{
-          description: `>>> Genesisation Done! \nHere is your **${prompt}**`,
-        }],
+        content: "",
+        embeds: [
+          {
+            description: `>>> Genesisation Done! \nHere is your **${prompt}**`,
+          },
+        ],
         components: [
           {
             type: 1,
@@ -22,12 +24,12 @@ export default {
               {
                 type: 2,
                 style: 4,
-                label: 'DELETE',
-                custom_id: 'delete_btn',
+                label: "DELETE",
+                custom_id: "delete_btn",
                 disabled: false,
                 emoji: {
                   id: null,
-                  name: '🗑️',
+                  name: "🗑️",
                 },
               },
             ],
@@ -38,17 +40,17 @@ export default {
     } catch (e) {
       console.error(e);
       return interaction.followUp({
-        content: '',
+        content: "",
         embed: {
-        type: 'rich',
-        title: `>>> Ayyo saar genesis failed :fail:`,
-        description: `${e}` },
+          type: "rich",
+          title: `>>> Ayyo saar genesis failed :fail:`,
+          description: `${e}`,
+        },
         tts: false,
       });
     }
-  }
+  },
 };
-
 
 async function createImage(prompt) {
   const payload = {

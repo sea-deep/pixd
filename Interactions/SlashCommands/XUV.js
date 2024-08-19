@@ -12,9 +12,9 @@ export default {
             type: 3,
             name: "prompt",
             description: "The prompt to generate",
-            required: true
-          }
-        ]
+            required: true,
+          },
+        ],
       },
       {
         type: 1,
@@ -25,9 +25,9 @@ export default {
             type: 3,
             name: "message",
             description: "Your message to send 😂🙌🏽",
-            required: true
-          }
-        ]
+            required: true,
+          },
+        ],
       },
       {
         type: 1,
@@ -38,9 +38,9 @@ export default {
             type: 3,
             name: "query",
             description: "Your question:",
-            required: true
-          }
-        ]
+            required: true,
+          },
+        ],
       },
       {
         type: 1,
@@ -51,15 +51,16 @@ export default {
             type: 3,
             name: "yt-url",
             description: "A YouTube video URL",
-            required: true
+            required: true,
           },
           {
             type: 3,
             name: "lang-code",
-            description: "Language code of the subtitles language, like for Hindi, its hi. (Defaults to en)",
-          }
-        ]
-      }
-    ]
-  }
+            description:
+              "Language code of the subtitles language, like for Hindi, its hi. (Defaults to en)",
+          },
+        ],
+      },
+    ],
+  },
 };

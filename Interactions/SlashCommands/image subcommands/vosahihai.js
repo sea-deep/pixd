@@ -1,9 +1,9 @@
-import sharp from 'sharp';
-import { AttachmentBuilder } from 'discord.js';
-import { getInputImageInt } from '../../../Helpers/helpersImage.js';
+import sharp from "sharp";
+import { AttachmentBuilder } from "discord.js";
+import { getInputImageInt } from "../../../Helpers/helpersImage.js";
 
 export default {
-  subCommand: 'img vosahihai',
+  subCommand: "img vosahihai",
   async execute(interaction) {
     await interaction.deferReply();
     const url = await getInputImageInt(interaction);
@@ -29,9 +29,13 @@ export default {
       .composite([
         { input: head, top: 0, left: 200 },
         { input: hand, top: 150, left: 5 },
-      ]).png()
+      ])
+      .png()
       .toBuffer();
-    const vosahi = await sharp(sahi).resize(1080, 855, {position: "top"}).png().toBuffer();
+    const vosahi = await sharp(sahi)
+      .resize(1080, 855, { position: "top" })
+      .png()
+      .toBuffer();
 
     let file = new AttachmentBuilder(vosahi, { name: "maisahitha.png" });
     let text = [
@@ -48,5 +52,5 @@ export default {
       content: text[Math.round(Math.random() * text.length)],
       files: [file],
     });
-  }
+  },
 };

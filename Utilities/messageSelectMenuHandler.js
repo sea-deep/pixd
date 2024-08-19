@@ -10,7 +10,9 @@ const proGlob = promisify(glob);
 try {
   client.messageSelectMenus.clear();
 
-  const Files = await proGlob(`${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`);
+  const Files = await proGlob(
+    `${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`,
+  );
 
   for (let i = 0; i < Files.length; i++) {
     Files[i] = pathToFileURL(Files[i]);
@@ -18,7 +20,6 @@ try {
     const interaction = interactionFile.default;
     client.messageSelectMenus.set(interaction.data.name, interaction);
   }
-
 } catch (err) {
   const errorOutput = `[${chalk.red("MessageSelectMenuHandler")}] - ${err}`;
   process.stderr.write(`${errorOutput}\n`);

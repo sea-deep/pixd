@@ -1,8 +1,8 @@
-import { google } from 'googleapis';
+import { google } from "googleapis";
 
 const API_KEY = process.env.GOOGLE_KEY;
 const youtube = google.youtube({
-  version: 'v3',
+  version: "v3",
   auth: API_KEY,
 });
 
@@ -10,22 +10,22 @@ export async function getVideoInfo(videoUrl) {
   const videoId = extractVideoId(videoUrl);
 
   const response = await youtube.videos.list({
-    part: 'snippet,contentDetails',
+    part: "snippet,contentDetails",
     id: videoId,
   });
 
   const videoInfo = response.data.items[0]?.snippet || {};
-  const channelInfo = videoInfo?.channelTitle || '';
+  const channelInfo = videoInfo?.channelTitle || "";
   const thumbnails = videoInfo?.thumbnails || {};
-  const thumbnailUrl = thumbnails.default?.url || '';
+  const thumbnailUrl = thumbnails.default?.url || "";
 
   const duration = convertDurationToSeconds(
-    response.data.items[0]?.contentDetails?.duration || ''
+    response.data.items[0]?.contentDetails?.duration || "",
   );
 
   return {
-    title: videoInfo.title || '',
-    description: videoInfo.description || '',
+    title: videoInfo.title || "",
+    description: videoInfo.description || "",
     channelName: channelInfo,
     duration: duration,
     id: videoId,
@@ -37,16 +37,18 @@ export async function getVideoInfo(videoUrl) {
 export async function searchVideo(query) {
   try {
     const response = await youtube.search.list({
-      part: 'snippet',
+      part: "snippet",
       q: query,
-      type: 'video',
+      type: "video",
       maxResults: 1,
     });
 
-    const videoIds = response.data.items.map(item => item.id.videoId).join(',');
+    const videoIds = response.data.items
+      .map((item) => item.id.videoId)
+      .join(",");
 
     const videosResponse = await youtube.videos.list({
-      part: 'contentDetails',
+      part: "contentDetails",
       id: videoIds,
     });
 
@@ -55,13 +57,15 @@ export async function searchVideo(query) {
       return {
         title: item.snippet.title,
         url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-        duration: convertDurationToSeconds(videoInfo.contentDetails?.duration || ''),
+        duration: convertDurationToSeconds(
+          videoInfo.contentDetails?.duration || "",
+        ),
       };
     });
 
     return videos[0];
   } catch (error) {
-    console.error('Error searching videos:', error.message);
+    console.error("Error searching videos:", error.message);
     throw error;
   }
 }
@@ -74,18 +78,18 @@ export async function getPlaylistTracks(playlistUrl) {
     let nextPageToken = null;
     do {
       const response = await youtube.playlistItems.list({
-        part: 'snippet,contentDetails',
+        part: "snippet,contentDetails",
         playlistId: playlistId,
         maxResults: 50,
         pageToken: nextPageToken,
       });
 
       const videoIds = response.data.items
-        .map(item => item.contentDetails.videoId)
-        .join(',');
+        .map((item) => item.contentDetails.videoId)
+        .join(",");
 
       const videosResponse = await youtube.videos.list({
-        part: 'contentDetails',
+        part: "contentDetails",
         id: videoIds,
       });
 
@@ -94,7 +98,9 @@ export async function getPlaylistTracks(playlistUrl) {
         const trackInfo = {
           title: item.snippet.title,
           url: `https://www.youtube.com/watch?v=${item.contentDetails.videoId}`,
-          duration: convertDurationToSeconds(videoInfo.contentDetails?.duration || ''),
+          duration: convertDurationToSeconds(
+            videoInfo.contentDetails?.duration || "",
+          ),
         };
         tracks.push(trackInfo);
       });
@@ -104,14 +110,14 @@ export async function getPlaylistTracks(playlistUrl) {
 
     return tracks;
   } catch (error) {
-    console.error('Error fetching playlist tracks:', error.message);
+    console.error("Error fetching playlist tracks:", error.message);
     throw error;
   }
 }
 
 function extractVideoId(url) {
   const match = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([^?&]+)/,
   );
   return match && match[1];
 }

@@ -2,18 +2,18 @@ const options = [
   {
     type: 6,
     name: "user",
-    description: "A user."
+    description: "A user.",
   },
   {
     type: 3,
     name: "image-url",
-    description: "An image URL."
+    description: "An image URL.",
   },
   {
     type: 11,
     name: "image-file",
-    description: "Upload an image from your file system."
-  }
+    description: "Upload an image from your file system.",
+  },
 ];
 
 export default {
@@ -25,56 +25,56 @@ export default {
         type: 1,
         name: "rap",
         description: "Rapper Rapunzel Rappu Singh.",
-        options: options
+        options: options,
       },
       {
         type: 1,
         name: "goodness",
         description: "Oh my goodness graciousness.",
-        options: options
+        options: options,
       },
       {
         type: 1,
         name: "nearyou",
         description: "I am near you.",
-        options: options
+        options: options,
       },
       {
         type: 1,
         name: "vosahihai",
         description: "He's right, you know?",
-        options: options
+        options: options,
       },
       {
         type: 1,
         name: "animan",
         description: "I put the new forgis on the jeep.",
-        options:  [
+        options: [
           {
             type: 6,
             name: "user1",
             description: "A user.",
-            required: true
+            required: true,
           },
           {
             type: 6,
             name: "user2",
             description: "Next user.",
-            required: true
+            required: true,
           },
           {
             type: 6,
             name: "user3",
             description: "Other user.",
-            required: true
+            required: true,
           },
           {
             type: 6,
             name: "user4",
             description: "Another user.",
-            required: true
-          }
-        ]
+            required: true,
+          },
+        ],
       },
       {
         type: 1,
@@ -85,19 +85,19 @@ export default {
             type: 3,
             name: "caption",
             description: "The caption text for the image",
-            required: true
+            required: true,
           },
           {
             type: 3,
             name: "image-url",
-            description: "An image URL."
+            description: "An image URL.",
           },
           {
             type: 11,
             name: "image-file",
-            description: "Upload an image from your file system."
-          }
-        ]
+            description: "Upload an image from your file system.",
+          },
+        ],
       },
       {
         type: 1,
@@ -119,8 +119,8 @@ export default {
             name: "user4",
             description: "Other user.",
           },
-        ])
+        ]),
       },
-    ]
-  }
+    ],
+  },
 };

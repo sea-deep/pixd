@@ -7,9 +7,9 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export default {
-  subCommand: 'xuv padhaku',
+  subCommand: "xuv padhaku",
   async execute(interaction) {
-    const query = interaction.options.getString('message');
+    const query = interaction.options.getString("message");
     await interaction.deferReply();
 
     const systemPrompt = `You're a super smart AI robot capable of answering tough and logical questions with ease. Make responses by conducting thorough research and maintaining accuracy.`;
@@ -41,16 +41,16 @@ You:
 
     const messages = [
       {
-        role: 'system',
+        role: "system",
         content: systemPrompt,
       },
       {
-        role: 'user',
+        role: "user",
         content: `${prompt}${currentChat}`,
-      }
+      },
     ];
 
-    let response = '';
+    let response = "";
 
     let completion;
     try {
@@ -70,13 +70,18 @@ You:
     response = completion.data.choices[0].message.content.trim();
     const ans = response.trim();
     const chunks = ans.match(/[\s\S]{1,4000}/g);
-    chunks.forEach(async chunk => await interaction.followUp({
-      content: "",
-      embeds: [{
-        description: chunk,
-        color: 0xe08e67
-      }],
-      failIfNotExists: false
-    }));
-  }
+    chunks.forEach(
+      async (chunk) =>
+        await interaction.followUp({
+          content: "",
+          embeds: [
+            {
+              description: chunk,
+              color: 0xe08e67,
+            },
+          ],
+          failIfNotExists: false,
+        }),
+    );
+  },
 };

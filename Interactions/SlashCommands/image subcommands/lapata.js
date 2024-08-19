@@ -2,7 +2,7 @@ import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
 
 export default {
-  subCommand: 'img lapata',
+  subCommand: "img lapata",
   async execute(interaction) {
     await interaction.deferReply();
     let overlays = await getOverlays(interaction);
@@ -15,7 +15,9 @@ export default {
     ];
 
     for (let i = 0; i < overlays.length; i++) {
-      overlays[i] = await sharp(overlays[i]).resize(s[i].w, s[i].h, { fit: "fill"}).toBuffer();
+      overlays[i] = await sharp(overlays[i])
+        .resize(s[i].w, s[i].h, { fit: "fill" })
+        .toBuffer();
     }
 
     let lapata = await sharp({
@@ -42,27 +44,33 @@ export default {
       content: "",
       files: [file],
     });
-  }
+  },
 };
 
 async function getOverlays(interaction) {
   let overlays = [];
   const options = interaction.options._hoistedOptions;
-  
+
   if (options && options.length !== 0) {
     for (let i = 0; i < options.length; i++) {
       switch (options[i].name) {
-        case 'image-url':
-           overlays.push(options[i].value.match(/(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i)[0]);
+        case "image-url":
+          overlays.push(
+            options[i].value.match(
+              /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i,
+            )[0],
+          );
           break;
-        case 'image-file':
+        case "image-file":
           overlays.push(options[i].attachment.url);
           break;
         default:
-          overlays.push(await options[i].user.displayAvatarURL({
-            format: 'png',
-            size: 128,
-          }));
+          overlays.push(
+            await options[i].user.displayAvatarURL({
+              format: "png",
+              size: 128,
+            }),
+          );
       }
     }
     let neededDuplicates = 5 - overlays.length;
@@ -71,19 +79,21 @@ async function getOverlays(interaction) {
       overlays.push(...duplicatedElements);
       neededDuplicates = 5 - overlays.length;
     }
-  } else { 
+  } else {
     let url = await interaction.user.displayAvatarURL({
-       format: 'png',
-       size: 128,
+      format: "png",
+      size: 128,
     });
-     overlays = [url, url, url, url, url];
+    overlays = [url, url, url, url, url];
   }
-  
+
   // Convert URLs to buffers
-  overlays = await Promise.all(overlays.map(async (overlay) => {
+  overlays = await Promise.all(
+    overlays.map(async (overlay) => {
       const response = await fetch(overlay);
       return await response.arrayBuffer();
-  }));
-  
+    }),
+  );
+
   return overlays;
 }

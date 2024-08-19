@@ -1,4 +1,4 @@
-import {AttachmentBuilder, Message } from "discord.js";
+import { AttachmentBuilder, Message } from "discord.js";
 
 export default {
   name: "donate",
@@ -12,13 +12,13 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    * @param {Client} client
-    */
+   * @param {Message} message
+   * @param {Client} client
+   */
   execute: async (message, args, client) => {
     await message.reply({
-     content: "",
-     files: [new AttachmentBuilder("./Assets/donate.mp4", "donate.mp4")]
-});
-  }
+      content: "",
+      files: [new AttachmentBuilder("./Assets/donate.mp4", "donate.mp4")],
+    });
+  },
 };

@@ -12,83 +12,85 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    * @param {Client} client
-    */
+   * @param {Message} message
+   * @param {Client} client
+   */
   execute: async (message, args, client) => {
     let serverQueue = client.queue.get(message.guild.id);
-  if (!message.member.voice.channel) {
-    let er = await message.reply({
-          content: ``,
-          embeds: [
-            {
-              author: {
-                name: `❌ Please join a  voice channel first.`,
-              },
-              color: client.color,
+    if (!message.member.voice.channel) {
+      let er = await message.reply({
+        content: ``,
+        embeds: [
+          {
+            author: {
+              name: `❌ Please join a  voice channel first.`,
             },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
-  }
-  if (!serverQueue || serverQueue.songs.length == 0) {
-               let er = await message.reply({
-          content: ``,
-          embeds: [
-            {
-              author: {
-                name: `❌ No song to seek.`,
-              },
-              color: client.color,
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
+    }
+    if (!serverQueue || serverQueue.songs.length == 0) {
+      let er = await message.reply({
+        content: ``,
+        embeds: [
+          {
+            author: {
+              name: `❌ No song to seek.`,
             },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
-  }
-  if (serverQueue.songs[0].source != `yt`) {
-               let er = await message.reply({
-          content: ``,
-          embeds: [
-            {
-              author: {
-                name: `❌ Cannot seek into this track`
-              },
-              color: client.color,
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
+    }
+    if (serverQueue.songs[0].source != `yt`) {
+      let er = await message.reply({
+        content: ``,
+        embeds: [
+          {
+            author: {
+              name: `❌ Cannot seek into this track`,
             },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
-  }
-  let timeToSeek = parse(args[0]);
-  let seekTime = parse(timeToSeek);
-  let maxDuration = serverQueue.songs[0].duration;
-  let maxTime = parse(maxDuration);
-  if (timeToSeek > maxDuration || timeToSeek < 0) {
-    console.log(`Seek failed, requested ${timeToSeek}, max is ${maxDuration}`);
-         let er = await message.reply({
-          content: ``,
-          embeds: [
-            {
-              author: {
-                name: `❌ Seek failed, requested ${timeToSeek}, max is ${maxDuration}`,
-              },
-              color: client.color,
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
+    }
+    let timeToSeek = parse(args[0]);
+    let seekTime = parse(timeToSeek);
+    let maxDuration = serverQueue.songs[0].duration;
+    let maxTime = parse(maxDuration);
+    if (timeToSeek > maxDuration || timeToSeek < 0) {
+      console.log(
+        `Seek failed, requested ${timeToSeek}, max is ${maxDuration}`,
+      );
+      let er = await message.reply({
+        content: ``,
+        embeds: [
+          {
+            author: {
+              name: `❌ Seek failed, requested ${timeToSeek}, max is ${maxDuration}`,
             },
-          ],
-        });
-        await client.sleep(5000);
-        return deleteMessage(er);
-  }
-  let currentSong = serverQueue.songs[0];
-  currentSong.seek = timeToSeek;
-  currentSong.seekTime = seekTime;
-  serverQueue.songs.unshift(currentSong);
-  serverQueue.player.stop();
-  return message.react(`<:seek:1090718780545581116>`);
-  }
+            color: client.color,
+          },
+        ],
+      });
+      await client.sleep(5000);
+      return deleteMessage(er);
+    }
+    let currentSong = serverQueue.songs[0];
+    currentSong.seek = timeToSeek;
+    currentSong.seekTime = seekTime;
+    serverQueue.songs.unshift(currentSong);
+    serverQueue.player.stop();
+    return message.react(`<:seek:1090718780545581116>`);
+  },
 };
 /**
  * Given a number, parses it into the form of mm:ss
@@ -113,7 +115,6 @@ function parse(input) {
     return 0;
   }
 }
-
 
 async function deleteMessage(msg) {
   try {

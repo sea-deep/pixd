@@ -12,18 +12,18 @@ export default {
     user: [],
   },
   /**
-    * @param {Message} message
-    * @param {Client} client
-    */
+   * @param {Message} message
+   * @param {Client} client
+   */
   execute: async (message, args, client) => {
     let serverQueue = client.queue.get(message.guild.id);
-      if (!message.member.voice.channel) {
+    if (!message.member.voice.channel) {
       let er = await message.reply({
-        content: '',
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ Please join a  voice channel first.',
+              name: "❌ Please join a  voice channel first.",
             },
             color: client.color,
           },
@@ -31,14 +31,14 @@ export default {
       });
       await client.sleep(5000);
       return deleteMessage(er);
-  }
-  if (!serverQueue) {
-          let er = await message.reply({
-        content: '',
+    }
+    if (!serverQueue) {
+      let er = await message.reply({
+        content: "",
         embeds: [
           {
             author: {
-              name: '❌ No song to stop...',
+              name: "❌ No song to stop...",
             },
             color: client.color,
           },
@@ -46,11 +46,11 @@ export default {
       });
       await client.sleep(5000);
       return deleteMessage(er);
-  }
-  message.react('<:stop:1090718630628573245>');
-  serverQueue.connection.destroy();
-  client.queue.delete(message.guild.id);
-  }
+    }
+    message.react("<:stop:1090718630628573245>");
+    serverQueue.connection.destroy();
+    client.queue.delete(message.guild.id);
+  },
 };
 async function deleteMessage(msg) {
   try {
