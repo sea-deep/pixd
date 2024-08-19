@@ -103,7 +103,7 @@ export default {
             "* `p!ping` - check ping status and uptime.",
             "* `p!donate` - send me 10 rupees in UPI.",
             "",
-            "[Website](https://pixd.onrender.com/home)   •   [Invite me](https://pixd.onrender.com/invite)",
+            "[Website](https://pixd-production.up.railway.app)   •   [Invite me](https://pixd-production.up.railway.app/invite)",
           ].join("\n"),
           color: 0xe08e67,
           footer: {
