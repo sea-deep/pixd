@@ -39,7 +39,6 @@
     "path": "^0.12.7",
     "play-dl": "^1.9.6",
     "relevant-urban": "^2.0.0",
-    "request": "^2.88.2",
     "sharp": "^0.32.4"
   },
   "repository": {
