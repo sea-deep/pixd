@@ -5,8 +5,6 @@ import {
 } from "@discordjs/voice";
 import playDL from "play-dl";
 import { Client, Message } from "discord.js";
-import request from "request";
-import * as cheerio from "cheerio";
 import { searchVideo } from "./helpersYt.js";
 
 const handleError = async (message, errorMsg, errDetail, client) => {
@@ -178,110 +176,4 @@ async function deleteMessage(msg) {
   } catch (e) {
     console.error("Error while deleting message:", e.message);
   }
-}
-
-//lyrics part
-const proxify = (data, jar) => {
-  return new Promise((res, rej) => {
-    request(
-      {
-        url: "https://www.4everproxy.com/query",
-        method: "POST",
-        followAllRedirects: true,
-        headers: {
-          cookie: jar,
-          "content-type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(data).toString(),
-      },
-      (e, r, b) => (!e && r.statusCode == 200 ? res(b) : rej(e)),
-    );
-  });
-};
-
-const getConfig = async () => {
-  try {
-    const data = await new Promise((Res, Rej) => {
-      request(
-        {
-          url: "https://www.4everproxy.com/",
-          method: "GET",
-        },
-        (e, r, b) =>
-          !e && r.statusCode == 200
-            ? Res({ cookie: r.headers["set-cookie"][0].split(";")[0], body: b })
-            : Rej(e),
-      );
-    });
-    const $ = cheerio.load(data.body);
-    const serverList = [];
-    const ipLocList = [];
-    $("select[id=server_name] optgroup option").each((i, e) => {
-      const obj = {};
-      obj.location = $(e).text();
-      obj.server_name = $(e).attr("value");
-      serverList.push(obj);
-    });
-    $("select[name=selip] option").each((i, e) => {
-      const obj = {};
-      obj.ip = $(e).attr("value");
-      obj.location = $(e).text();
-      ipLocList.push(obj);
-    });
-    return {
-      cookie: data.cookie,
-      proxy_list: {
-        servers: serverList,
-        ips: ipLocList,
-      },
-    };
-  } catch (e) {
-    throw new Error(`Error while making the request!\n\n${String(e)}`);
-  }
-};
-
-const getObjectByLocation = (el, array) => {
-  return array.find((obj) =>
-    obj.location.toLowerCase().includes(el.toLowerCase()),
-  );
-};
-
-export async function searchSong(q) {
-  const { proxy_list, cookie } = await getConfig();
-  const formData = {
-    u: `https:/\/search.azlyrics.com/suggest.php?q=${encodeURIComponent(q)}`,
-    u_default: "https://www.google.com/",
-    customip: "",
-    server_name: getObjectByLocation("newyork", proxy_list.servers).server_name,
-    selip: getObjectByLocation("newyork", proxy_list.ips).ip,
-    allowCookies: "on",
-  };
-  const data = await proxify(formData, cookie);
-  return JSON.parse(data);
-}
-
-export async function getLyrics(url) {
-  const { proxy_list, cookie } = await getConfig();
-  const formData = {
-    u: url,
-    u_default: "https://www.google.com/",
-    customip: "",
-    server_name: getObjectByLocation("newyork", proxy_list.servers).server_name,
-    selip: getObjectByLocation("newyork", proxy_list.ips).ip,
-    allowCookies: "on",
-  };
-  const htmlText = await proxify(formData, cookie);
-  const indexOfComment = htmlText.indexOf(
-    "Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our licensing agreement. Sorry about that.",
-  );
-  const startIndex = htmlText.lastIndexOf("<div", indexOfComment);
-  const endIndex = htmlText.indexOf("</div>", indexOfComment) + 6;
-  const lyrics = htmlText
-    .substring(startIndex, endIndex)
-    .replace(/<!--[^>]*-->/g, "")
-    .replace(/<br>/g, "\n")
-    .replace(/<\/?div[^>]*>/g, "")
-    .replace(/<\/?i[^>]*>/g, "")
-    .trim();
-  return lyrics;
 }

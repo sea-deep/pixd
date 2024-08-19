@@ -1,5 +1,4 @@
 import { Client, Message } from "discord.js";
-import { searchSong } from "../../Helpers/helpersMusic.js";
 
 export default {
   name: "lyrics",
@@ -32,8 +31,11 @@ export default {
       title = serverQueue.songs[0].title;
     }
 
-    let res = await searchSong(title);
-    if (res.songs.length === 0) {
+    let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
+    
+    let data = await res.json();
+  //  console.log(data)
+    if (data.error) {
       return message.reply({
         content: "",
         embeds: [
@@ -44,7 +46,7 @@ export default {
         ],
       });
     }
-    title = res.songs[0].autocomplete;
+    title = data.title;
 
     await message.reply({
       content: "",
@@ -62,7 +64,7 @@ export default {
               type: 2,
               style: 3,
               label: "Click Here",
-              custom_id: "getLyrics",
+              custom_id: "getLyricss",
               disabled: false,
             },
           ],

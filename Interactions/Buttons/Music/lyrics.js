@@ -1,15 +1,14 @@
-import { getLyrics, searchSong } from "../../../Helpers/helpersMusic.js";
-
 export default {
-  name: "getLyrics",
+  name: "getLyricss",
   execute: async (interaction) => {
     await interaction.deferReply({
       ephemeral: true,
     });
     let title = interaction.message.embeds[0].title.split(" - ")[1];
 
-    const call = await searchSong(title);
-    const lyrics = await getLyrics(call.songs[0].url);
+    let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
+    let data = await res.json();
+    let lyrics = data.lyrics;
     //  console.log(lyrics)
     const chunks = lyrics.match(/[\s\S]{1,3900}/g);
 
