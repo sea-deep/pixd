@@ -5,8 +5,7 @@ import { Poru } from "poru";
 import { KeyValueStore, MongodbKeyValue, sleep } from "./Helpers/helperUtil.js";
 import config from "./Configs/config.js";
 
-const Nodes = config.nodes;
-console.log('Nodes configuration:', Nodes);
+const Nodes = config.nodes;;
 
 export const client = new Client({
   intents: [
@@ -72,9 +71,6 @@ client.login(process.env.TOKEN);
 // Setting current time to present the Uptime
 client.keyv.set("uptime", Date.now());
 
-client.on('ready', () => {
-  client.poru.init(client);
-})
 client.poru.on("nodeError", (error) => {
   console.error(error);
 })

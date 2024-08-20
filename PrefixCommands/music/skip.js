@@ -32,7 +32,6 @@ export default {
       deaf: true,
   });
    let res = await player.skip();
-   console.log(res)
   },
 };
 
