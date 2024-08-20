@@ -57,7 +57,7 @@ export default {
         player.queue.add(track);
       }
 
-      message.reply(embedder('', 'Added to queue'
+      message.reply(embedder('', 'Added to queue',
         `${res.playlistInfo.name} has been loaded with ${res.tracks.length}`
       ));
     } else {
