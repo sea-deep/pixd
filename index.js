@@ -1,8 +1,12 @@
 import "dotenv/config";
 
 import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
-import playDL from "play-dl";
+import { Poru } from "poru";
 import { KeyValueStore, MongodbKeyValue, sleep } from "./Helpers/helperUtil.js";
+import config from "./Configs/config.js";
+
+const Nodes = config.nodes;
+console.log('Nodes configuration:', Nodes);
 
 export const client = new Client({
   intents: [
@@ -15,6 +19,11 @@ export const client = new Client({
   partials: [Partials.Channel],
 });
 
+const PoruOptions = {
+  library: "discord.js",
+  defaultPlatform: "ytmsearch",
+};
+client.poru = new Poru(client, Nodes, PoruOptions);
 // Setting a Global Collection for Commands, Aliases, Buttons & Interactions and more
 client.prefixCommands = new Collection();
 client.slashCommands = new Collection();
@@ -23,7 +32,7 @@ client.buttons = new Collection();
 client.modals = new Collection();
 client.messageSelectMenus = new Collection();
 client.stringSelectMenus = new Collection();
-client.queue = new Collection();
+//client.queue = new Collection();
 client.keyv = new KeyValueStore();
 client.sleep = sleep;
 client.pinsDB = new MongodbKeyValue(process.env.MONGODB_URL, "pins");
@@ -63,24 +72,9 @@ client.login(process.env.TOKEN);
 // Setting current time to present the Uptime
 client.keyv.set("uptime", Date.now());
 
-(async () => {
-  await playDL.setToken({
-    youtube: {
-      cookie: process.env.YT_COOKIES,
-    },
-    spotify: {
-      client_id: process.env.SPOT_ID,
-      client_secret: process.env.SPOT_SECRET,
-      refresh_token: process.env.SPOT_TOKEN,
-      market: "US",
-    },
-    soundcloud: {
-      client_id: process.env.SC_CLIENT,
-    },
-    useragent: [
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
-      "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/110.0.5481.97 Safari/537.11",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0",
-    ],
-  });
-})();
+client.on('ready', () => {
+  client.poru.init(client);
+})
+client.poru.on("nodeError", (error) => {
+  console.error(error);
+})

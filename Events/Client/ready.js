@@ -11,8 +11,9 @@ export default {
     process.stdout.write(
       `[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}\n`,
     );
+    client.poru.init(client);
     let status = `p!help or /help`;
-    await client.user.setActivity({
+    client.user.setActivity({
       name: `${status}`,
       type: ActivityType.Listening,
     });

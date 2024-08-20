@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import pdl from "play-dl";
 import { getVideoInfo } from "../../../Helpers/helpersYt.js";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLEAI_KEY);
 export default {
@@ -49,8 +48,7 @@ export default {
 };
 
 async function summarizeVideo(url, lang = "en") {
-  let check = await pdl.yt_validate(url);
-  if (check !== "video") throw new Error("Not a valid YouTube URL");
+  if (!url.includes("youtube.com") || !url.includes("youtu.be")) throw new Error("Not a valid YouTube URL");
 
   let ytInfo;
   try {

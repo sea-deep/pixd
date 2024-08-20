@@ -15,7 +15,6 @@
   "author": "sea.deep",
   "license": "MIT",
   "dependencies": {
-    "@discordjs/voice": "^0.16.0",
     "@google/generative-ai": "^0.3.0",
     "@types/node": "^18.0.6",
     "axios": "^1.4.0",
@@ -30,16 +29,16 @@
     "google-img-scrap": "^1.1.1",
     "google-translate-api-x": "^10.6.7",
     "googleapis": "^134.0.0",
-    "libsodium-wrappers": "^0.7.11",
     "modern-gif": "^2.0.3",
     "mongodb": "^6.1.0",
     "node-fetch": "^3.2.6",
     "openai": "^4.56.0",
     "p-queue": "^8.0.1",
     "path": "^0.12.7",
-    "play-dl": "^1.9.6",
+    "poru": "^5.2.0",
     "relevant-urban": "^2.0.0",
-    "sharp": "^0.32.4"
+    "sharp": "^0.32.4",
+    "shoukaku": "^4.0.1"
   },
   "repository": {
     "type": "git",

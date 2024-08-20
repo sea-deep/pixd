@@ -16,40 +16,22 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let serverQueue = client.queue.get(message.guild.id);
-    if (!message.member.voice.channel) {
-      let er = await message.reply({
-        content: "",
-        embeds: [
-          {
-            author: {
-              name: "❌ Please join a  voice channel first.",
-            },
-            color: client.color,
-          },
-        ],
-      });
+    const voiceChannel = message.member.voice.channel;
+
+    if (!voiceChannel) {
+      let er = await message.channel.send(embedder('', 'Please join a voice channel..'));
       await client.sleep(5000);
       return deleteMessage(er);
     }
-    if (!serverQueue) {
-      let er = await message.reply({
-        content: "",
-        embeds: [
-          {
-            author: {
-              name: "❌ No song to stop...",
-            },
-            color: client.color,
-          },
-        ],
-      });
-      await client.sleep(5000);
-      return deleteMessage(er);
-    }
-    message.react("<:stop:1090718630628573245>");
-    serverQueue.connection.destroy();
-    client.queue.delete(message.guild.id);
+
+    const player = client.poru.createConnection({
+      guildId: message.guild.id,
+      voiceChannel: message.member.voice.channelId,
+      textChannel: message.channel.id,
+      deaf: true,
+  });
+   let res = await player.destroy();
+   return message.reply(embedder("","", "Leaving VC and clearing Queue..."));
   },
 };
 async function deleteMessage(msg) {
@@ -58,4 +40,23 @@ async function deleteMessage(msg) {
   } catch (e) {
     return;
   }
+}
+
+
+function embedder(content, title, description) {
+  const result = {
+    content: content
+  };
+
+  if (title || description) {
+    result.embeds = [
+      {
+        title: title || undefined,
+        description: description || undefined,
+        color: 0xe08e67
+      }
+    ];
+  }
+
+  return result;
 }
