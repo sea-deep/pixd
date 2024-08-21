@@ -1,4 +1,10 @@
 import { Message, Client } from "discord.js";
+import { content } from "googleapis/build/src/apis/content";
+import Groq from 'groq-sdk';
+
+const groq = new Groq({
+  apiKey: process.env['GROQ_API_KEY'], 
+});
 
 export default {
   name: "gpt",
@@ -16,12 +22,11 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    return;
+   
     await message.channel.sendTyping();
-    let username = message.author.username;
     let msg = message.content.split(" ").splice(1).join(" ");
 
-    const prompt = [
+    const system = [
       "You are a discord bot named PIXD.",
       "You are chatting in a discord server.",
       "You behave like fellow humans: friendly, grounded, with a nuanced sense of humor, and take everything lightly.",
@@ -29,22 +34,21 @@ export default {
       "You have the freedom to tease and joke about anything.",
       "You're entitled to have opinions on all matters.",
       "You can mock anything, even sensitive topics.",
-      "",
-      "Current Chat:-",
-      `${message.author.username} said: ${msg}`,
-      "PIXD said: ",
+      "Here are few inside jokes you can use and understand: ",
+      ' - thug: oiled black men',
+      ' - allu arjun: our favourite person',
+      ' - jeet: an alias to call indians or brothers.',
+      'Here are few emojis you can use at any occasion: :xbox:, :allustuff:, :pussygotmelike:, :genesis:, :4paise:',
+
     ].join("\n");
 
     let completion;
     try {
-      completion = await openai.createCompletion({
-        model: "gpt-3.5-turbo-instruct",
-        prompt: prompt,
-        max_tokens: 512,
-        temperature: 0.7,
-        top_p: 1,
-        presence_penalty: 0.25,
-        frequency_penalty: 0.1,
+      completion = await groq.chat.completions.create({
+        messages: [{ role: 'system', content: system },
+          {role:'user', content: msg}
+        ],
+        model: 'llama3-8b-8192',
       });
     } catch (e) {
       console.log("Error in gpt:", e);
@@ -61,7 +65,7 @@ export default {
         ],
       });
     }
-    let ans = completion.data.choices[0].text;
+  let ans = completion.choices[0].message.content;
 
     return message.reply({
       content: "",
