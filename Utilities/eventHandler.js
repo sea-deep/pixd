@@ -8,7 +8,7 @@ import { client } from "../index.js";
 
 try {
   const Files = await proGlob(
-    `${process.cwd().replace(/\\/g, "/")}/Events/**/*.js`,
+    `${process.cwd().replace(/\\/g, "/")}/Events/Client/**/*.js`,
   );
 
   for (let i = 0; i < Files.length; i++) {

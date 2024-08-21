@@ -1,4 +1,4 @@
-import { client } from "../../index.js";
+import { client } from "../index.js";
 import { createHash } from "crypto";
 
 function getApiSig(params) {
