@@ -74,7 +74,3 @@ client.login(process.env.TOKEN);
 
 // Setting current time to present the Uptime
 client.keyv.set("uptime", Date.now());
-
-client.poru.on("nodeError", (error) => {
-  console.error(error);
-})

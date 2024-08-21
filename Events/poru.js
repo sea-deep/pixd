@@ -117,3 +117,9 @@ client.poru.on("trackEnd", async (player, track) => {
     });
   }
 });
+
+
+
+client.poru.on("nodeError", (error) => {
+  console.error(error.message);
+})
