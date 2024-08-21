@@ -100,7 +100,7 @@ client.poru.on("trackEnd", async (player, track) => {
     });
     console.log(`Scrobbled track for ${scrobbleList.length} members!`);
   }
-  await client.sleep(300000);
+  await client.sleep(30000);
   let plr = await client.poru.players.get(vc.guild.id);
   let vc2 = await client.channels.fetch(plr.voiceChannel);
   if (vc2.members.size == 1 || (!plr.isPlaying && !plr.isPaused)) {
