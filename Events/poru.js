@@ -100,4 +100,6 @@ client.poru.on("trackEnd", async (player, track) => {
     });
     console.log(`Scrobbled track for ${scrobbleList.length} members!`);
   }
+
+
 });

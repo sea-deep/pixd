@@ -1,5 +1,4 @@
 import { Message, Client } from "discord.js";
-import { content } from "googleapis/build/src/apis/content";
 import Groq from 'groq-sdk';
 
 const groq = new Groq({
