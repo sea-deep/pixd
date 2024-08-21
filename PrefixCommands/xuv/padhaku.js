@@ -1,4 +1,9 @@
 import { Message } from "discord.js";
+import Groq from "groq-sdk";
+
+const groq = new Groq({
+  apiKey: process.env["GROQ_API_KEY"],
+});
 
 export default {
   name: "padhaku",
@@ -15,7 +20,6 @@ export default {
    * @param {Message} message
    */
   execute: async (message, args) => {
-    return;
     await message.channel.sendTyping();
     const query = args.join(" ");
     let systemPrompt = [
@@ -53,15 +57,15 @@ export default {
       {
         role: "user",
         content: [].concat(prompt, currentChat).join("\n"),
-      },
+      }
     );
 
     let response = "";
 
     let completion;
     try {
-      completion = await openai.createChatCompletion({
-        model: `gpt-3.5-turbo`,
+      completion = await groq.chat.completions.create({
+        model: "llama3-8b-8192",
         messages: messages,
         max_tokens: 2048,
         temperature: 0.1,
@@ -73,7 +77,7 @@ export default {
     } catch (e) {
       return message.reply("*An error occurred* :" + e.message);
     }
-    response = completion.data.choices[0].message.content.trim();
+    response = completion.choices[0].message.content;
     const ans = response.trim();
     const chunks = ans.match(/[\s\S]{1,4000}/g);
     chunks.forEach(
@@ -87,7 +91,7 @@ export default {
             },
           ],
           failIfNotExists: false,
-        }),
+        })
     );
   },
 };
