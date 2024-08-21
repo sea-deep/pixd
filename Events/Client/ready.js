@@ -11,7 +11,11 @@ export default {
     process.stdout.write(
       `[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}\n`,
     );
-    client.poru.init(client);
+    try{
+     client.poru.init(client);
+    } catch(e) {
+      console.error("Error in Poru", e.message);
+    }
     let status = `p!help or /help`;
     client.user.setActivity({
       name: `${status}`,

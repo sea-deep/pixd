@@ -37,7 +37,7 @@ export default {
       ' - thug: oiled black men',
       ' - allu arjun: our favourite person',
       ' - jeet: an alias to call indians or brothers.',
-      'Here are few emojis you can use at any occasion: :xbox:, :allustuff:, :pussygotmelike:, :genesis:, :4paise:',
+      'Here are few emojis you can use at any occasion: <:genesis:1070233348099813436>, :xbox:, :allustuff:, :pussygotmelike:, :4paise:',
 
     ].join("\n");
 
