@@ -30,14 +30,15 @@ export default {
     }
 
     let source = args[0].includes("soundcloud.com/")
-      ? "scsearch"
+      ? "soundcloud"
       : args[0].includes("youtube.com") || args[0].includes("youtu.be") 
-        ? "ytsearch"
+        ? "youtube"
         : "ytmsearch";
 
     const res = await client.poru.resolve({ query: args.join(' ').trim(), source: source, requester: message.member });
 
     if (res.loadType === "error") {
+      console.log(res)
         return message.reply(":x: Failed to load track.");
     } else if (res.loadType === "empty") {
         return message.reply(":x: No source found!");
