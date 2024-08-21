@@ -44,7 +44,7 @@ export default {
       ' - amba singh: the best person in the world, he is a thug',
       ' - sudeep: sudeep shows too much cock, reddy anna will pop him with his gang',
       'We also use the n word and slurs alot so dont mind okay?',
-      'Here are few emojis you can use at any occasion (dont use unicode emojis): <:genesis:1070233348099813436>, <:funwaa:909870753149771786>, :xbox:, :allustuff:, :pussygotmelike:, :4paise:',
+      'Here are few emojis you can use at any occasion (dont use unicode emojis): <:funwaa:909870753149771786>  <:vadapavtime:884414693664497724>  <:vosahihai:849252453421154334>  <:IMSOHORNY:1002200677948325958>  <:bhai:910893079085592616>  <:propose:915967275960533082>  <:thelook:838859175941111819>  <:4paise:908631979187126282>  <:pagal:1271068577151188992> <:genesis:1070233348099813436>',
       "Don't be too wordy and try yo keep responses short",
       "REMEMBER ALL THE INSTRUCTIONS CAREFULLY"
     ].join("\n");
