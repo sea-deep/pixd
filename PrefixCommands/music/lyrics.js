@@ -21,15 +21,21 @@ export default {
       title = args.join(" ");
     }
 
-    let serverQueue = client.queue.get(message.guild.id);
     if (!message.member.voice.channel && !title) {
       return message.react("<:error:1090721649621479506>");
     }
-    if ((!serverQueue || serverQueue.songs.length == 0) && !title) {
-      return message.react("<:error:1090721649621479506>");
-    } else if (!title) {
-      title = serverQueue.songs[0].title;
+ 
+    if(message.member.voice.channel) {
+      let player = client.poru.players.get(message.guild.id);
+      if(player && player.isPlaying && player.isConnected) {
+        if (!title) { 
+          title = `${player.currentTrack.info.author} ${player.currentTrack.info.title}`;
+        }
+      }
     }
+    if (!title) {
+      return message.react("<:error:1090721649621479506>");
+    } 
 
     let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
     
@@ -40,19 +46,21 @@ export default {
         content: "",
         embeds: [
           {
-            description: "Couldn’t find any lyrics for this song.",
+            title: "Couldn’t find any lyrics for this song.",
+            description: '`' + data.error + '`',
             color: 0xe08e67,
           },
         ],
       });
     }
-    title = data.title;
+    title = `${data.artist} ${data.title}`;
 
     await message.reply({
       content: "",
       embeds: [
         {
-          title: `Lyrics for - ${title}`,
+          title: `Lyrics`,
+          description: `${title}`,
           color: 0xe08e67,
         },
       ],

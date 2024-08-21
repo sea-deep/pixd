@@ -16,15 +16,27 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let serverQueue = client.queue.get(message.guild.id);
-    if (!message.member.voice.channel) {
+    const voiceChannel = message.member.voice.channel;
+
+    if (!voiceChannel) {
+      let er = await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Join a VC to use that command',
+          color: client.color
+        }]
+       });
+      await client.sleep(5000);
+      return deleteMessage(er);
+    }
+
+    const player = client.poru.players.get(message.guild.id);
+     if (!player || !player.isPlaying && !player.isPaused) {
       let er = await message.reply({
         content: "",
         embeds: [
           {
-            author: {
-              name: "❌ Please join a  voice channel first.",
-            },
+           title: 'No song to pause...',
             color: client.color,
           },
         ],
@@ -32,22 +44,8 @@ export default {
       await client.sleep(5000);
       return deleteMessage(er);
     }
-    if (!serverQueue || serverQueue.songs.length == 0) {
-      let er = await message.reply({
-        content: "",
-        embeds: [
-          {
-            author: {
-              name: "❌ No song to pause.",
-            },
-            color: client.color,
-          },
-        ],
-      });
-      await client.sleep(5000);
-      return deleteMessage(er);
-    }
-    serverQueue.player.pause();
+
+    await player.pause(true);
     return message.react("<:pause:1090718191824683038>");
   },
 };

@@ -19,19 +19,30 @@ export default {
     const voiceChannel = message.member.voice.channel;
 
     if (!voiceChannel) {
-      let er = await message.channel.send(embedder('', 'Please join a voice channel..'));
+      let er = await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Join a VC to use that command',
+          color: client.color
+        }]
+       });
       await client.sleep(5000);
       return deleteMessage(er);
     }
 
-    const player = client.poru.createConnection({
-      guildId: message.guild.id,
-      voiceChannel: message.member.voice.channelId,
-      textChannel: message.channel.id,
-      deaf: true,
-  });
-   let res = await player.destroy();
-   return message.reply(embedder("","", "Leaving VC and clearing Queue..."));
+    const player = client.poru.players.get(message.guild.id);
+    if (player && player.isPlaying && player.isConnected) {
+   await player.destroy();
+   return message.channel.send({
+    content: '',
+    embeds: [{
+      title: 'Leaving VC and clearing the queue',
+      color: client.color
+    }]
+   });
+  } else {
+    return message.channel.send(":x: No Player to stop.");
+   }
   },
 };
 async function deleteMessage(msg) {
@@ -42,21 +53,3 @@ async function deleteMessage(msg) {
   }
 }
 
-
-function embedder(content, title, description) {
-  const result = {
-    content: content
-  };
-
-  if (title || description) {
-    result.embeds = [
-      {
-        title: title || undefined,
-        description: description || undefined,
-        color: 0xe08e67
-      }
-    ];
-  }
-
-  return result;
-}

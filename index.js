@@ -65,6 +65,9 @@ import("./Utilities/messageSelectMenuHandler.js");
 // Register application commands
 import("./Utilities/registerCommands.js");
 
+//Import poru events
+import('./Events/poru.js');
+
 // Logging in to the bot..
 client.login(process.env.TOKEN);
 

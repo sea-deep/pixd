@@ -1,11 +1,4 @@
 import { Client, Message } from "discord.js";
-import { client } from "../../index.js";
-
-client.poru.on("trackStart", (player, track) => {
-  const channel = client.channels.cache.get(player.textChannel);
-  return channel.send(`Now playing \`${track.info.title}\``);
-});
-
 
 export default {
   name: "play",
@@ -24,25 +17,30 @@ export default {
    */
   async execute(message, args, client) {
     const voiceChannel = message.member.voice.channel;
-
     if (!voiceChannel) {
-      let er = await message.channel.send(embedder('', 'Please join a voice channel..'));
+      let er = await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Join a VC to use that command',
+          color: client.color
+        }]
+       });
       await client.sleep(5000);
       return deleteMessage(er);
     }
 
-    let source = args[0].includes("https://soundcloud.com/")
+    let source = args[0].includes("soundcloud.com/")
       ? "scsearch"
-      : args[0].includes("youtube.com")
+      : args[0].includes("youtube.com") || args[0].includes("youtu.be") 
         ? "ytsearch"
         : "ytmsearch";
 
     const res = await client.poru.resolve({ query: args.join(' ').trim(), source: source, requester: message.member });
 
     if (res.loadType === "error") {
-        return message.reply(embedder(":x: Failed to load track."));
+        return message.reply(":x: Failed to load track.");
     } else if (res.loadType === "empty") {
-        return message.reply(embedder(":x: No source found!"));
+        return message.reply(":x: No source found!");
     }
     const player = client.poru.createConnection({
       guildId: message.guild.id,
@@ -53,21 +51,43 @@ export default {
    // console.log(client.poru.players);
     if (res.loadType === "playlist") {
       for (const track of res.tracks) {
-        track.info.requester = message.user;
+        track.info.requester = message.member;
         player.queue.add(track);
       }
 
-      message.reply(embedder('', 'Added to queue',
-        `${res.playlistInfo.name} has been loaded with ${res.tracks.length}`
-      ));
+      await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Added to queue',
+          description: `${res.playlistInfo.name} has been loaded with ${res.tracks.length}`,
+          thumbnail: {
+            url: res.playlistInfo.artworkUrl
+          },
+          color: client.color
+        }]
+       });
     } else {
       const track = res.tracks[0];
       track.info.requester = message.user;
       player.queue.add(track);
-      message.reply(embedder(``, 'Queued Track', track.info.title));
+     // console.log(track.info);
+      await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Queued Track',
+          description: track.info.title,
+          footer: {
+            text: track.info.author
+          },
+          thumbnail: {
+            url: track.info.artworkUrl
+          },
+          color: client.color
+        }]
+       });
     }
 
-    if (!player.isPlaying && player.isConnected) player.play();
+    if (!player.isPlaying && !player.isPaused && player.isConnected) player.play();
     
   },
 };
@@ -78,22 +98,4 @@ async function deleteMessage(msg) {
   } catch (e) {
     console.error("Error while deleting message:", e.message);
   }
-}
-
-function embedder(content, title, description) {
-  const result = {
-    content: content
-  };
-
-  if (title || description) {
-    result.embeds = [
-      {
-        title: title || undefined,
-        description: description || undefined,
-        color: 0xe08e67
-      }
-    ];
-  }
-
-  return result;
 }

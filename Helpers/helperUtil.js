@@ -3,7 +3,7 @@ import PQueue from "p-queue"; // Import the PQueue class from the 'p-queue' libr
 
 export class MongodbKeyValue {
   constructor(databaseUrl, collectionName) {
-    this.client = new MongoClient(databaseUrl, { useUnifiedTopology: true });
+    this.client = new MongoClient(databaseUrl);
     this.collectionName = collectionName;
     this.db = null;
     this.collection = null;

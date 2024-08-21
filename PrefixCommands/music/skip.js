@@ -20,18 +20,37 @@ export default {
     const voiceChannel = message.member.voice.channel;
 
     if (!voiceChannel) {
-      let er = await message.channel.send(embedder('', 'Please join a voice channel..'));
+      let er = await message.channel.send({
+        content: '',
+        embeds: [{
+          title: 'Join a VC to use that command',
+          color: client.color
+        }]
+       });
       await client.sleep(5000);
       return deleteMessage(er);
     }
 
-    const player = client.poru.createConnection({
-      guildId: message.guild.id,
-      voiceChannel: message.member.voice.channelId,
-      textChannel: message.channel.id,
-      deaf: true,
-  });
-   let res = await player.skip();
+    const player = client.poru.players.get(message.guild.id);
+   if (player && player.isPlaying && player.isConnected) {
+     await message.channel.send({
+      content: '',
+      embeds: [{
+        title: 'Skipped Track',
+        description: player.currentTrack.info.title,
+        footer: {
+          text: player.currentTrack.info.author
+        },
+        thumbnail: {
+          url: player.currentTrack.info.artworkUrl
+        },
+        color: client.color
+      }]
+     });
+     return player.skip();
+   } else {
+    return message.channel.send(":x: No Track to skip.");
+   }
   },
 };
 
@@ -43,22 +62,3 @@ async function deleteMessage(msg) {
   }
 }
 
-
-
-function embedder(content, title, description) {
-  const result = {
-    content: content
-  };
-
-  if (title || description) {
-    result.embeds = [
-      {
-        title: title || undefined,
-        description: description || undefined,
-        color: 0xe08e67
-      }
-    ];
-  }
-
-  return result;
-}

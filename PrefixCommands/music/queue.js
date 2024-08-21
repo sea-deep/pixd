@@ -16,15 +16,16 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let serverQueue = client.queue.get(message.guild.id);
+    let player = client.poru.players.get(message.guild.id);
 
     const nowPlaying =
-      serverQueue && serverQueue.songs.length !== 0
-        ? serverQueue.songs[0].title
+      player && player.isPlaying && player.isConnected
+        ? `${player.currentTrack.info.author} - ${player.currentTrack.info.title}`
         : "*No song is currently being played*";
+       
     const playingNext =
-      serverQueue && serverQueue.songs.length > 1
-        ? serverQueue.songs[1].title
+      player && player.isPlaying && player.isConnected && player.queue.length > 0
+        ? `${player.queue[0].info.author} - ${player.queue[0].info.title}`
         : "*No song is in queue.*";
     let msg = `**Now playing:**\n${nowPlaying}\n**Playing Next:**\n1. ${playingNext}`;
 
@@ -39,19 +40,19 @@ export default {
           description: `${msg}`,
           color: client.color,
           footer: {
-            text: `total songs in queue: ${serverQueue && serverQueue.songs.length !== 0 ? serverQueue.songs.length - 1 : "0"}`,
+            text: `total songs in queue: ${player && player.isPlaying && player.isConnected ? player.queue.length : "0"}`,
           },
         },
       ],
     };
-    if (serverQueue && serverQueue.songs.length > 2) {
+    if (player && player.isPlaying && player.isConnected && player.queue.length > 1) {
       m.components.push({
         type: 1,
         components: [
           {
             style: 4,
             label: `See remaining queue`,
-            custom_id: `showQueue`,
+            custom_id: `showQueue_`,
             disabled: false,
             emoji: {
               id: null,
