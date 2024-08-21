@@ -100,6 +100,20 @@ client.poru.on("trackEnd", async (player, track) => {
     });
     console.log(`Scrobbled track for ${scrobbleList.length} members!`);
   }
-
-
+  await client.sleep(300000);
+  let plr = await client.poru.players.get(vc.guild.id);
+  let vc2 = await client.channels.fetch(plr.voiceChannel);
+  if (vc2.members.size == 1 || (!plr.isPlaying && plr.isPaused)) {
+    await plr.destroy();
+    return client.channels.cache.get(player.textChannel).send({
+      content: "",
+      embeds: [
+        {
+          title: "",
+          description: "Leaving VC due to inactivity",
+          color: client.color,
+        },
+      ],
+    });
+  }
 });
