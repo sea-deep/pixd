@@ -19,12 +19,12 @@ export default {
    * @param {Client} client
    */
   execute: async (interaction, client) => {
+    await interaction.reply('<:sent:1276093659820855396>');
     let title = interaction.options.getString('title');
 
     if (!interaction.member.voice.channel && !title) {
-      return interaction.reply({
+      return interaction.channel.send({
         content: "<:error:1090721649621479506>",
-        ephemeral: true,
       });
     }
 
@@ -38,9 +38,8 @@ export default {
     }
 
     if (!title) {
-      return interaction.reply({
+      return interaction.channel.send({
         content: "<:error:1090721649621479506>",
-        ephemeral: true,
       });
     }
 
@@ -48,7 +47,7 @@ export default {
     let data = await res.json();
 
     if (data.error) {
-      return interaction.reply({
+      return interaction.channel.send({
         content: "",
         embeds: [
           {
@@ -57,13 +56,12 @@ export default {
             color: 0xe08e67,
           },
         ],
-        ephemeral: true,
       });
     }
 
     title = `${data.artist} ${data.title}`;
 
-    await interaction.reply({
+    await interaction.channel.send({
       content: "",
       embeds: [
         {
@@ -86,7 +84,6 @@ export default {
           ],
         },
       ],
-      ephemeral: true,
     });
   },
 };
