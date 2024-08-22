@@ -102,8 +102,7 @@ client.poru.on("trackEnd", async (player, track) => {
   }
   await client.sleep(30000);
   let plr = await client.poru.players.get(vc.guild.id);
-  let vc2 = await client.channels.fetch(plr.voiceChannel);
-  if (vc2.members.size == 1 || (!plr.isPlaying && !plr.isPaused)) {
+  if (vc.members.size === 1 || (!player.isPlaying && !player.isPaused)) {
     await plr.destroy();
     return client.channels.cache.get(player.textChannel).send({
       content: "",
