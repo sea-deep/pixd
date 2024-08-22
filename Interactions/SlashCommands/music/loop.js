@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "loop",
-    description: "Toggle looping the server queue or track",
+    description: "0. Toggle looping the server queue or track",
     options: [
       {
         type: 3,

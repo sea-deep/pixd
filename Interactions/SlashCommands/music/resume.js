@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "resume",
-    description: "Resume the paused music",
+    description: "0. Resume the paused music",
   },
 
   /**

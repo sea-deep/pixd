@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "lyrics",
-    description: "Get Lyrics of any song",
+    description: "0. Get Lyrics of any song",
     options: [
       {
         type: 3,

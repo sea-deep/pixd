@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "skip",
-    description: "Skips the current track.",
+    description: "0. Skips the current track.",
   },
 
   /**

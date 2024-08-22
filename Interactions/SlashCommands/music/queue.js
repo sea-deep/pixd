@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "queue",
-    description: "Shows the queue.",
+    description: "0. Shows the queue.",
   },
 
   /**

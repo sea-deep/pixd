@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "stop",
-    description: "Clears the queue and leaves the VC",
+    description: "0. Clears the queue and leaves the VC",
   },
 
   /**

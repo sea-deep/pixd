@@ -3,7 +3,7 @@ import { Client, ChatInputCommandInteraction } from "discord.js";
 export default {
   data: {
     name: "seek",
-    description: "Seek to a desired timestamp",
+    description: "0. Seek to a desired timestamp",
     options: [
       {
         type: 3,
