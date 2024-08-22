@@ -1,24 +1,34 @@
-import { Client, Message } from "discord.js";
+import {
+    ChatInputCommandInteraction,
+    AttachmentBuilder,
+    Client,
+  } from "discord.js";
+  
 
 export default {
-  name: "play",
-  description: "plays from YouTube or SoundCloud.",
-  aliases: ["p"],
-  usage: "play <link>|<search query>",
-  guildOnly: true,
-  args: true,
-  permissions: {
-    bot: [],
-    user: [],
+  data: {
+    name: "play",
+    description: "0. Play music from Youtube Soundcloud,etc.",
+    options: [
+      {
+        type: 3,
+        name: "query",
+        description: "Search query or song URL",
+        required: true,
+      },
+    ],
   },
+  
   /**
-   * @param {Message} message
+   * @param {ChatInputCommandInteraction} interaction
    * @param {Client} client
    */
-  async execute(message, args, client) {
-    const voiceChannel = message.member.voice.channel;
+  async execute(interaction, client) {
+    await interaction.reply('<:sent:1276093659820855396>');
+    let query = interaction.options.getString('query');
+    const voiceChannel = interaction.member.voice.channel;
     if (!voiceChannel) {
-      let er = await message.channel.send({
+      let er = await interaction.channel.send({
         content: '',
         embeds: [{
           title: 'Join a VC to use that command',
@@ -29,23 +39,23 @@ export default {
       return deleteMessage(er);
     }
 
-    let source = args[0].includes("soundcloud.com/")
+    let source = query.includes("soundcloud.com/")
       ? "soundcloud"
-      : args[0].includes("youtube.com") || args[0].includes("youtu.be") 
+      : query.includes("youtube.com") || query.includes("youtu.be") 
         ? "youtube"
         : "ytmsearch";
 
-    const res = await client.poru.resolve({ query: args.join(' ').trim(), source: source, requester: message.member });
+    const res = await client.poru.resolve({ query: query.trim(), source: source, requester: interaction.member });
 
     if (res.loadType === "error") {
-        return message.reply(":x: Failed to load track.");
+        return interaction.channel.send(":x: Failed to load track.");
     } else if (res.loadType === "empty") {
-        return message.reply(":x: No source found!");
+        return interaction.channel.send(":x: No source found!");
     }
     const player = client.poru.createConnection({
-      guildId: message.guild.id,
-      voiceChannel: message.member.voice.channelId,
-      textChannel: message.channel.id,
+      guildId: interaction.guild.id,
+      voiceChannel: interaction.member.voice.channelId,
+      textChannel: interaction.channel.id,
       deaf: true,
     });
    // console.log(client.poru.players);
@@ -55,7 +65,7 @@ export default {
         player.queue.add(track);
       }
 
-      await message.channel.send({
+      await interaction.channel.send({
         content: '',
         embeds: [{
           title: 'Added to queue',
@@ -68,10 +78,10 @@ export default {
        });
     } else {
       const track = res.tracks[0];
-      track.info.requester = message.user;
+      track.info.requester = interaction.user;
       player.queue.add(track);
      // console.log(track.info);
-      await message.channel.send({
+      await interaction.channel.send({
         content: '',
         embeds: [{
           title: 'Queued Track',
@@ -92,10 +102,14 @@ export default {
   },
 };
 
+
+
+
 async function deleteMessage(msg) {
-  try {
-    return await msg.delete();
-  } catch (e) {
-    console.error("Error while deleting message:", e.message);
+    try {
+      return msg.delete();
+    } catch (e) {
+      return;
+    }
   }
-}
+  
