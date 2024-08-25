@@ -16,7 +16,7 @@ export default {
    */
   execute: async (message) => {
     await message.reply({
-      content: ``,
+      content: `-# p!help`,
       tts: false,
       components: [
         {

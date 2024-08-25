@@ -10,7 +10,7 @@ export default {
    */
   execute: async (interaction) => {
     return interaction.reply({
-      content: ``,
+      content: `-# /help`,
       tts: false,
       components: [
         {

@@ -1,7 +1,7 @@
 export default {
   name: "cmd",
   execute: async (interaction) => {
-    const prefix = (interaction.message.embeds[0].description.includes('/ping')) ? '/' : 'p!';
+    let prefix = 'p!';
     const sel = interaction.values;
     const help = {
       content: "",
@@ -24,6 +24,7 @@ export default {
     };
 
     if (sel[0] == "xuv") {
+      prefix = (interaction.message.content.includes('/help')) ? '/xuv ' : 'p!';
       let com = interaction.message.components[0].components[0].options[0];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
@@ -47,6 +48,7 @@ export default {
       ].join("\n");
     }
     if (sel[0] == "img") {
+      prefix = (interaction.message.content.includes('/help')) ? '/img ' : 'p!';
       let com = interaction.message.components[0].components[0].options[2];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
@@ -72,6 +74,7 @@ export default {
       ].join("\n");
     }
     if (sel[0] == "son") {
+      prefix = (interaction.message.content.includes('/help')) ? '/ ' : 'p!';
       let com = interaction.message.components[0].components[0].options[5];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
@@ -80,12 +83,9 @@ export default {
         "* `" + prefix + "pause` - pause the song.",
         "* `" + prefix + "resume` - resume the song.",
         "* `" + prefix + "stop` - stop playing and clear queue.",
-        "* `" + prefix + "skip <n or song name>` - skips the current song or remove a song from the queue.",
-        "* `" + prefix + "lyrics <song-name>` - get lyrics of a song",
-        "* `" + prefix + "skipto <n or song name>` - skip to a desired position in the queue.",
+        "* `" + prefix + "skip - skips the current song.",
+        "* `" + prefix + "lyrics <song-name>` - get lyrics of a song nowplaying/title",
         "* `" + prefix + "queue` - shows songs in the queue.",
-        "* `" + prefix + "clear` - removes all songs in the queue.",
-        "* `" + prefix + "shuffle` - shuffles the queue.",
         "* `" + prefix + "loop` - repeats the current song.",
         "* `" + prefix + "seek <mm:ss>` - seek to a desired time in the current playing song.",
       ].join("\n");
