@@ -48,7 +48,7 @@ export default {
     }
     if (sel[0] == "img") {
       prefix = (interaction.message.content.includes('/help')) ? '/img ' : 'p!';
-      let com = interaction.message.components[0].components[0].options[2];
+      let com = interaction.message.components[0].components[0].options[3];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
@@ -62,7 +62,7 @@ export default {
       ].join("\n");
     }
     if (sel[0] == "gam") {
-      let com = interaction.message.components[0].components[0].options[3];
+      let com = interaction.message.components[0].components[0].options[4];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
@@ -74,7 +74,7 @@ export default {
     }
     if (sel[0] == "son") {
       prefix = (interaction.message.content.includes('/help')) ? '/ ' : 'p!';
-      let com = interaction.message.components[0].components[0].options[5];
+      let com = interaction.message.components[0].components[0].options[2];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
