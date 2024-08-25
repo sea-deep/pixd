@@ -28,10 +28,10 @@ export default {
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
-        "* `" + prefix + "gpt <query>` - <:slash:1220953479921799218> Danky dank GPT",
-        "* `" + prefix + "padhaku <query>` - <:slash:1220953479921799218> Ask study related questions.",
-        "* `" + prefix + "genesis <prompt>` - <:slash:1220953479921799218> Genesis AI images",
-        "* `" + prefix + "ytsum <youtube URL>` - <:slash:1220953479921799218> summarise a youtube video",
+        "* `" + prefix + "gpt <query>` - Danky dank GPT",
+        "* `" + prefix + "padhaku <query>` - Ask study related questions.",
+        "* `" + prefix + "genesis <prompt>` - Genesis AI images",
+        "* `" + prefix + "ytsum <youtube URL>` - summarise a youtube video",
       ].join("\n");
     }
     if (sel[0] == "uti") {
@@ -52,13 +52,13 @@ export default {
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
-        "* `" + prefix + "rvcj [image]+[text]` - <:slash:1220953479921799218> Caption an image in RVCJ style!",
-        "* `" + prefix + "lapata [image] or <mentions>` - <:slash:1220953479921799218> get Lapata.",
-        "* `" + prefix + "allustuff [image]+[text]` - <:slash:1220953479921799218> Allu Arjun funnies",
-        "* `" + prefix + "vosahihai [image] or <mentions>` - <:slash:1220953479921799218> Hes right you know",
-        "* `" + prefix + "nearyou [image] or <mention>` - <:slash:1220953479921799218> WHO ARE YOU",
-        "* `" + prefix + "goodness [image] or <mention>` - <:slash:1220953479921799218> oh my goodness gracious",
-        "* `" + prefix + "animan <4 mentions>` - <:slash:1220953479921799218> put that new forgis on the jeep",
+        "* `" + prefix + "rvcj [image]+[text]` - Caption an image in RVCJ style!",
+        "* `" + prefix + "lapata [image] or <mentions>` - get Lapata.",
+        "* `" + prefix + "allustuff [image]+[text]` - Allu Arjun funnies",
+        "* `" + prefix + "vosahihai [image] or <mentions>` - Hes right you know",
+        "* `" + prefix + "nearyou [image] or <mention>` - WHO ARE YOU",
+        "* `" + prefix + "goodness [image] or <mention>` - oh my goodness gracious",
+        "* `" + prefix + "animan <4 mentions>` - put that new forgis on the jeep",
       ].join("\n");
     }
     if (sel[0] == "gam") {
