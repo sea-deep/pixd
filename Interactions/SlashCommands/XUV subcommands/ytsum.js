@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getVideoInfo } from "../../../Helpers/helpersYt.js";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLEAI_KEY);
 export default {
-  subCommand: "xuv ytsummarise",
+  subCommand: "xuv ytsum",
   async execute(interaction, client) {
     await interaction.deferReply();
     let url = interaction.options.getString("yt-url");
