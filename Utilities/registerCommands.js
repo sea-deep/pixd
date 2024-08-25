@@ -1,18 +1,16 @@
 import chalk from "chalk";
 import pkg from "glob";
-import { promisify } from "util";
 import { pathToFileURL } from "url";
 import fetch from "node-fetch";
 
 const { glob } = pkg;
-const proGlob = promisify(glob);
 
 const clientId = "1026234292017299586";
 
-const SlashCommands = await proGlob(
+const SlashCommands = await glob(
   `${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`,
 );
-const MessageSelectMenuCommands = await proGlob(
+const MessageSelectMenuCommands = await glob(
   `${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`,
 );
 const Files = SlashCommands.concat(MessageSelectMenuCommands);

@@ -1,17 +1,16 @@
 import chalk from "chalk";
 import pkg from "glob";
-import { promisify } from "util";
 import { pathToFileURL } from "url";
 import { client } from "../index.js";
 
 const { glob } = pkg;
-const proGlob = promisify(glob);
+
 
 try {
   client.slashCommands.clear();
   client.subCommands.clear();
 
-  const Files = await proGlob(
+  const Files = await glob(
     `${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`,
   );
 
