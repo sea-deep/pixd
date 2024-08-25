@@ -4,7 +4,6 @@ export default {
     let prefix = 'p!';
     const sel = interaction.values;
     const help = {
-      content: "",
       embeds: [
         {
           type: "rich",
