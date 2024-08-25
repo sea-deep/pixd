@@ -1,7 +1,7 @@
 export default {
   name: "cmd",
   execute: async (interaction) => {
-    const prefix = (interaction.message.embeds[0].description.includes('/ping')) ? '/' ? 'p!';
+    const prefix = (interaction.message.embeds[0].description.includes('/ping')) ? '/' : 'p!';
     const sel = interaction.values;
     const help = {
       content: "",
