@@ -88,9 +88,9 @@ export default {
           type: "rich",
           title: `Tech Saport`,
           description: [
-            "* </contact:000> - send a message to the developer.",
-            "* `p!ping` - check ping status and uptime.",
-            "* `p!donate` - send me 10 rupees in UPI.",
+            "* `/contact` - send a message to the developer.",
+            "* `/ping` - check ping status and uptime.",
+            "* `/donate` - send me 10 rupees in UPI.",
             "",
             "[Website](https://pixd-production.up.railway.app)   •   [Invite me](https://pixd-production.up.railway.app/invite)",
           ].join("\n"),
