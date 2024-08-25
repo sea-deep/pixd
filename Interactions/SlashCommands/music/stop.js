@@ -26,7 +26,7 @@ export default {
     }
 
     const player = client.poru.players.get(interaction.guild.id);
-    if (player && player.isPlaying && player.isConnected) {
+    if (player) {
       await player.destroy();
       return interaction.reply({
         content: '',

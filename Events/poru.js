@@ -53,10 +53,10 @@ client.poru.on("trackStart", async (player, track) => {
         console.error(e);
       }
     });
-    return channel.send(
-      `Scrobbling this track for ${scrobbleList.length} members!\n-# To enable scrobbling for your account use p!lastfm command...`
-    );
   }
+  return channel.send(
+    `Scrobbling this track for **${scrobbleList.length}** members!\n-# Enable scrobbling on your account: use /lastfm`
+  );
 });
 
 client.poru.on("trackEnd", async (player, track) => {
@@ -104,7 +104,7 @@ client.poru.on("trackEnd", async (player, track) => {
   let plr = await client.poru.players.get(vc.guild.id);
   if (vc.members.size === 1 || (!player.isPlaying && !player.isPaused)) {
     await plr.destroy();
-    return client.channels.cache.get(player.textChannel).send({
+    return (client.channels.cache.get(player.textChannel)).send({
       content: "",
       embeds: [
         {

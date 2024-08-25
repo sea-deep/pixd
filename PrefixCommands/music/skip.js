@@ -32,7 +32,7 @@ export default {
     }
 
     const player = client.poru.players.get(message.guild.id);
-   if (player && player.isPlaying && player.isConnected) {
+   if (player && player.currentTrack) {
      await message.channel.send({
       content: '',
       embeds: [{
@@ -47,6 +47,9 @@ export default {
         color: client.color
       }]
      });
+     if (player.isPaused) {
+      message.channel.send('**The player is paused.\nPlease resume it using the `p!resume` command to start playing tracks.**');
+    }
      return player.skip();
    } else {
     return message.channel.send(":x: No Track to skip.");

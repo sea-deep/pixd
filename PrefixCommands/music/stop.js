@@ -31,7 +31,7 @@ export default {
     }
 
     const player = client.poru.players.get(message.guild.id);
-    if (player && player.isPlaying && player.isConnected) {
+    if (player) {
    await player.destroy();
    return message.channel.send({
     content: '',

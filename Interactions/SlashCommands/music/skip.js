@@ -28,7 +28,7 @@ export default {
     }
 
     const player = client.poru.players.get(interaction.guild.id);
-    if (player && player.isPlaying && player.isConnected) {
+    if (player && player.currentTrack) {
       await interaction.channel.send({
         content: '',
         embeds: [{

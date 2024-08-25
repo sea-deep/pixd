@@ -88,7 +88,9 @@ export default {
     }
 
     if (!player.isPlaying && !player.isPaused && player.isConnected) player.play();
-    
+    if (player.isPaused) {
+      message.channel.send('**The player is paused.\nPlease resume it using the `p!resume` command to start playing tracks.**');
+    }
   },
 };
 
