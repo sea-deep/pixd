@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction } from "discord.js";
 
 export default {
   data: {
-    name: "help",
-    description: "Get some help.",
+    name: "lastfm",
+    description: "Authorise PIXD to your last.fm account!",
   },
   /**
    * @param {ChatInputCommandInteraction} interaction
