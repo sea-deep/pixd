@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction } from "discord.js";
 
 export default {
   data: {
-    name: "help",
-    description: "Get some help.",
+    name: "donate",
+    description: "Pls donate me money Im poor",
   },
   /**
    * @param {ChatInputCommandInteraction} interaction

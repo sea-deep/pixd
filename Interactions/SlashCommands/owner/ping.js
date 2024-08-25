@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction } from "discord.js";
 
 export default {
   data: {
-    name: "help",
-    description: "Get some help.",
+    name: "ping",
+    description: "Whats my ping?",
   },
   /**
    * @param {ChatInputCommandInteraction} interaction
