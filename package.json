@@ -1,5 +1,5 @@
 {
-  "name": "PixD",
+  "name": "pixd",
   "version": "1.0.0",
   "description": "A Discord bot for various functions and masti.",
   "main": "index.js",
@@ -35,7 +35,6 @@
     "node-fetch": "^3.2.6",
     "openai": "^4.56.0",
     "p-queue": "^8.0.1",
-    "path": "^0.12.7",
     "poru": "^5.2.0",
     "relevant-urban": "^2.0.0",
     "sharp": "^0.32.4",
