@@ -49,6 +49,17 @@ export default {
                   default: false,
                 },
                 {
+                  label: `Music`,
+                  value: `son`,
+                  description: `Op supar high quality music `,
+                  emoji: {
+                    id: `1084743885063991346`,
+                    name: `music`,
+                    animated: false,
+                  },
+                  default: false,
+                },
+                {
                   label: `Image Generation`,
                   value: `img`,
                   description: `Create fanny images`,
@@ -70,28 +81,6 @@ export default {
                   },
                   default: false,
                 },
-                {
-                  label: `No-Fap Streak (Not working)`,
-                  value: `fap`,
-                  description: `No-Fap Streak counter!`,
-                  emoji: {
-                    id: `1084742439694245928`,
-                    name: `nofap`,
-                    animated: false,
-                  },
-                  default: false,
-                },
-                {
-                  label: `Music`,
-                  value: `son`,
-                  description: `Op supar high quality music `,
-                  emoji: {
-                    id: `1084743885063991346`,
-                    name: `music`,
-                    animated: false,
-                  },
-                  default: false,
-                },
               ],
               min_values: 0,
               max_values: 1,
@@ -104,9 +93,9 @@ export default {
         {
           type: "rich",
           description: [
-            "* </contact:000> - send a message to the developer.",
-            "* `p!ping` - check ping status and uptime.",
-            "* `p!donate` - send me 10 rupees in UPI.",
+            "* `/contact` - send a message to the developer.",
+            "* `/ping` - check ping status and uptime.",
+            "* `/donate` - send me 10 rupees in UPI.",
             "",
             "[Website](https://pixd-production.up.railway.app)   •   [Invite me](https://pixd-production.up.railway.app/invite)",
           ].join("\n"),

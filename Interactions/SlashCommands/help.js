@@ -43,6 +43,17 @@ export default {
                   default: false,
                 },
                 {
+                  label: `Music`,
+                  value: `son`,
+                  description: `Op supar high quality music `,
+                  emoji: {
+                    id: `1084743885063991346`,
+                    name: `music`,
+                    animated: false,
+                  },
+                  default: false,
+                },
+                {
                   label: `Image Generation`,
                   value: `img`,
                   description: `Create fanny images`,
@@ -60,28 +71,6 @@ export default {
                   emoji: {
                     id: `1116349246732521472`,
                     name: `minigames`,
-                    animated: false,
-                  },
-                  default: false,
-                },
-                {
-                  label: `No-Fap Streak (Not working)`,
-                  value: `fap`,
-                  description: `No-Fap Streak counter!`,
-                  emoji: {
-                    id: `1084742439694245928`,
-                    name: `nofap`,
-                    animated: false,
-                  },
-                  default: false,
-                },
-                {
-                  label: `Music`,
-                  value: `son`,
-                  description: `Op supar high quality music `,
-                  emoji: {
-                    id: `1084743885063991346`,
-                    name: `music`,
                     animated: false,
                   },
                   default: false,
