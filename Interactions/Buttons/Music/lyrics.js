@@ -4,7 +4,7 @@ export default {
     await interaction.deferReply({
       ephemeral: true,
     });
-    let title = interaction.message.embeds[0].title.split(" - ")[1];
+    let title = interaction.message.embeds[0].description;
 
     let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
     let data = await res.json();
