@@ -53,7 +53,7 @@ export default {
         ],
       });
     }
-    title = `${data.artist} ${data.title}`;
+    title = `${data.title} ${data.artist}`;
 
     await message.reply({
       content: "",

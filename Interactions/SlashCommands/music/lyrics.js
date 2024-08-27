@@ -59,7 +59,7 @@ export default {
       });
     }
 
-    title = `${data.artist} ${data.title}`;
+    title = `${data.title} ${data.artist}`;
 
     await interaction.channel.send({
       content: "",
