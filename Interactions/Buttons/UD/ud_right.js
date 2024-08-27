@@ -1,5 +1,4 @@
 import { Client } from "discord.js";
-import urban from "relevant-urban";
 
 export default {
   name: "ud_right",
@@ -18,8 +17,7 @@ export default {
     }
 
     let term = await client.keyv.get(`ud${msg.id}`);
-    console.log(`ud${msg.id}`);
-    let res = await urban.search(term);
+    let res = await search(term);
     let def = res.list[goto];
 
     return interaction.message.edit({
@@ -104,3 +102,14 @@ export default {
     });
   },
 };
+
+
+
+const BASE_URL = 'https://api.urbandictionary.com/v0';
+
+async function search(query, page = 1) {
+  const url = `${BASE_URL}/define?page=${page}&term=${query}`;
+  const response = await fetch(url);
+  const body = await response.json();
+  return body;
+}

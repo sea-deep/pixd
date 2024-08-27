@@ -1,5 +1,4 @@
 import { Client, Message } from "discord.js";
-import urban from "relevant-urban";
 
 export default {
   name: "ud",
