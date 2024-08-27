@@ -29,7 +29,7 @@ export default {
       let player = client.poru.players.get(message.guild.id);
       if(player && player.isPlaying && player.isConnected) {
         if (!title) { 
-          title = `${player.currentTrack.info.author} ${player.currentTrack.info.title}`;
+          title = `${player.currentTrack.info.title} ${player.currentTrack.info.author}`;
         }
       }
     }

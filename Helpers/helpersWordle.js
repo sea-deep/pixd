@@ -1,4 +1,4 @@
-import emojis from "../Assets/emojis.json" with { type: "json" };
+import emojis from "../Assets/emojis.js"
 
 export function getColoredWord(answer, guess) {
   let coloredWord = [];

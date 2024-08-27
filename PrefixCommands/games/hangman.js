@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import hangman from "../../Assets/hangman.json" with { type: "json" };
+import hangman from "../../Assets/hangman.js";
 
 export default {
   name: "hangman",

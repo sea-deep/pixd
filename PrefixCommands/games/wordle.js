@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import words from "../../Assets/words.json" with { type: "json" };
+import words from "../../Assets/words.js";
 export default {
   name: "wordle",
   description: "Play wordle om discord!",

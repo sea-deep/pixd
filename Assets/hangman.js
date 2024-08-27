@@ -1,4 +1,4 @@
-{
+export default {
   "words": [
     "aaron",
     "abandoned",
