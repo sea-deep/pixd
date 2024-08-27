@@ -82,7 +82,7 @@ export default {
         "* `" + prefix + "pause` - pause the song.",
         "* `" + prefix + "resume` - resume the song.",
         "* `" + prefix + "stop` - stop playing and clear queue.",
-        "* `" + prefix + "skip - skips the current song.",
+        "* `" + prefix + "skip` - skips the current song.",
         "* `" + prefix + "lyrics <song-name>` - get lyrics of a song nowplaying/title",
         "* `" + prefix + "queue` - shows songs in the queue.",
         "* `" + prefix + "loop` - repeats the current song.",
