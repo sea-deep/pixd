@@ -17,7 +17,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    let res = await urban.search(args.join(" "));
+    let res = await search(args.join(" "));
     if (res.list.length == 0) {
       return message.reply({
         failIfNotExists: true,
@@ -125,3 +125,15 @@ export default {
     }
   },
 };
+
+
+
+const BASE_URL = 'https://api.urbandictionary.com/v0';
+
+async function search(query, page = 1) {
+    const url = `${BASE_URL}/define?page=${page}&term=${query}`;
+    const response = await fetch(url);
+    const body = await response.json();
+    return body;
+}
+

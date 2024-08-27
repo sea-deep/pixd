@@ -36,7 +36,6 @@
     "openai": "^4.56.0",
     "p-queue": "^8.0.1",
     "poru": "^5.2.0",
-    "relevant-urban": "^2.0.0",
     "sharp": "^0.32.4",
     "shoukaku": "^4.0.1"
   },
