@@ -1,15 +1,13 @@
 export default {
-  name: "getLyricss",
+  name: "genius",
   execute: async (interaction) => {
     await interaction.deferReply({
       ephemeral: true,
     });
-    let title = interaction.message.embeds[0].description;
 
-    let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
-    let data = await res.json();
-    let lyrics = data.lyrics;
-    //  console.log(lyrics)
+    let lyrics = await geniusLyrics(interaction.message.embeds[0].url);
+    
+    //sconsole.log(lyrics)
     const chunks = lyrics.match(/[\s\S]{1,3900}/g);
 
     chunks.forEach(async (chunk) => {
@@ -26,3 +24,24 @@ export default {
     });
   },
 };
+
+
+
+async function geniusLyrics(url) {
+  let x = await fetch(url);
+  let html = await x.text();
+    const divs = html.match(
+      /<div[^>]*data-lyrics-container[^>]*>([\s\S]*?)<\/div>/gi
+    );
+    if (!divs) return "";
+    let processedDivs = [];
+    divs.forEach((div) => {
+      let content = div.replace(/<div[^>]*>/i, "").replace(/<\/div>/i, "");
+      content = content.replace(/<br\s*\/?>/gi, "\n");
+      content = content.replace(/<\/?[^>]+(>|$)/g, "");
+      processedDivs.push(content);
+    });
+    return processedDivs.join("\n");
+}
+
+

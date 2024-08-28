@@ -33,15 +33,15 @@ export default {
         }
       }
     }
+ //   console.log(title)
     if (!title) {
       return message.react("<:error:1090721649621479506>");
     } 
 
-    let res = await fetch('https://api.popcat.xyz/lyrics?song='+ encodeURIComponent(title));
-    
-    let data = await res.json();
+    let res = await searchGenius(title);
+  
   //  console.log(data)
-    if (data.error) {
+    if (!res) {
       return message.reply({
         content: "",
         embeds: [
@@ -53,15 +53,16 @@ export default {
         ],
       });
     }
-    title = `${data.title} ${data.artist}`;
+ 
 
     await message.reply({
       content: "",
       embeds: [
         {
           title: `Lyrics`,
-          description: `${title}`,
+          description: `${res.title}`,
           color: 0xe08e67,
+          url: res.url
         },
       ],
       components: [
@@ -72,7 +73,7 @@ export default {
               type: 2,
               style: 3,
               label: "Click Here",
-              custom_id: "getLyricss",
+              custom_id: "genius",
               disabled: false,
             },
           ],
@@ -81,3 +82,25 @@ export default {
     });
   },
 };
+
+
+async function searchGenius(q) {
+  let url = "https://api.genius.com/search?q=" + encodeURIComponent(q);
+  let x = await fetch(url, {
+    headers: {
+      Authorization: "Bearer " + process.env.GENIUS_ACCESS_TOKEN,
+    },
+  });
+  let y = await x.json();
+  if (y.meta.status !== 200 || y.response.hits.length === 0) return null;
+  let songs = y.response.hits.filter((hit) => hit.type === "song");
+  //console.log(songs[0].result.url);
+  let out = null;
+  if (songs.length !== 0) {
+    out = {
+      url: songs[0].result.url,
+      title: songs[0].result.full_title,
+    };
+  }
+  return out;
+}
