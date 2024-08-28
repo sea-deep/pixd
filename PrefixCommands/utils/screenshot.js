@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { AttachmentBuilder, Message } from "discord.js";
 
 export default {

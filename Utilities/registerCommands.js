@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import pkg from "glob";
 import { pathToFileURL } from "url";
-import fetch from "node-fetch";
 
 const { glob } = pkg;
 

@@ -59,7 +59,13 @@ client.poru.on("trackStart", async (player, track) => {
   );
 });
 
-client.poru.on("trackEnd", async (player, track) => {
+client.poru.on('trackEnd', khatam);
+client.poru.on('queueEnd', async (player) => {
+  khatam(player, player.previousTrack);
+})
+
+async function khatam(player, track) {
+  console.log('event fired')
   const timestamp = Math.floor((Date.now() - track.info.length) / 1000);
   const vc = await client.channels.fetch(player.voiceChannel);
   let scrobbleList = [];
@@ -102,8 +108,9 @@ client.poru.on("trackEnd", async (player, track) => {
   }
   await client.sleep(30000);
   let plr = await client.poru.players.get(vc.guild.id);
-  if (vc.members.size === 1 || (!player.isPlaying && !player.isPaused)) {
-    await plr.destroy();
+ // console.log(vc.members.size , player.isPlaying, player.isPaused)
+  if (vc.members.size === 1 || !player.isPlaying) {
+    await player.destroy();
     return (client.channels.cache.get(player.textChannel)).send({
       content: "",
       embeds: [
@@ -115,7 +122,7 @@ client.poru.on("trackEnd", async (player, track) => {
       ],
     });
   }
-});
+}
 
 
 

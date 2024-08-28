@@ -1,6 +1,5 @@
 import { AttachmentBuilder, Message } from "discord.js";
 import sharp from "sharp";
-import fetch from "node-fetch";
 import emojiRegex from "emoji-regex";
 import { getCaptionInput } from "../../Helpers/helpersImage.js";
 
