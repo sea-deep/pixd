@@ -65,7 +65,7 @@ client.poru.on('queueEnd', async (player) => {
 })
 
 async function khatam(player, track) {
-  console.log('event fired')
+ // console.log('event fired')
   const timestamp = Math.floor((Date.now() - track.info.length) / 1000);
   const vc = await client.channels.fetch(player.voiceChannel);
   let scrobbleList = [];
