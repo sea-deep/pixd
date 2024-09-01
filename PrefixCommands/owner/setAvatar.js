@@ -17,7 +17,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    if (message.author.id == "908287391217905684") {
+    if (message.author.id == "1258396025354453054") {
       //  console.log(getInputImage(message))
       await client.user.setAvatar(
         await getInputImage(message, { dynamic: true }),

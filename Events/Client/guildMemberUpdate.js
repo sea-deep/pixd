@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import chalk from "chalk";
+
 
 export default {
   event: "guildMemberUpdate",

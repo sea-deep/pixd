@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import pkg from "glob";
 import { pathToFileURL } from "url";
 import { client } from "../index.js";
@@ -19,6 +18,5 @@ try {
     client.messageSelectMenus.set(interaction.data.name, interaction);
   }
 } catch (err) {
-  const errorOutput = `[${chalk.red("MessageSelectMenuHandler")}] - ${err}`;
-  process.stderr.write(`${errorOutput}\n`);
+  console.error(`[MessageSelectMenuHandler] -`, err)
 }

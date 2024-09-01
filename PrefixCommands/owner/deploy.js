@@ -16,7 +16,7 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    if (message.author.id == "908287391217905684") {
+    if (message.author.id == "1258396025354453054") {
       await fetch(process.env.DEPLOY_HOOK);
       await message.reply("Deploy started!");
       await client.sleep(60 * 1000);

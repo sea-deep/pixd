@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import pkg from "glob";
 const { glob } = pkg;
 import { pathToFileURL } from "node:url";
@@ -18,7 +17,7 @@ try {
       client.prefixCommands.set(command.name, command);
     }
   }
-  process.stdout.write(`[${chalk.blue("INFO")}] - Prefix Commands Loaded!\n`);
+  console.info(`[INFO] - Prefix Commands Loaded!\n`);
 } catch (err) {
-  console.log("[PrefixCommandHandler]", err);
+  console.error("[PrefixCommandHandler]", err);
 }

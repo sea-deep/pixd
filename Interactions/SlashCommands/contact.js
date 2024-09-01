@@ -37,7 +37,7 @@ export default {
     let channel = client.channels.cache.get(channelId);
     let query = {
       content: [
-        `**New message** <@908287391217905684>`,
+        `**New message** <@1258396025354453054>`,
         `**User:**- ${interaction.member.user.username} (${interaction.member.id})`,
         `**Server**- ${interaction.guild.name} (${interaction.guild.id})`,
         `**Message-** ${msg}`,

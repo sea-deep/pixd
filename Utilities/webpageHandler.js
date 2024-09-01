@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import fs from "fs";
+import {existsSync} from "fs";
 import express from "express";
 import { handleLastFmAuth } from "../Helpers/helpersLastFm.js";
 try {
@@ -26,7 +26,7 @@ try {
   );
   app.get("/:page", (req, res) => {
     const pagePath = join(staticPath, `${req.params.page}.html`);
-    if (fs.existsSync(pagePath)) {
+    if (existsSync(pagePath)) {
       res.sendFile(pagePath);
     } else {
       res.status(404).sendFile(join(staticPath, "404.html"));

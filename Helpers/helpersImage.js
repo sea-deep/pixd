@@ -1,3 +1,6 @@
+const regex = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
+const emoteRegex = /<:[^:]+:(\d+)>/;
+
 export async function getInputImage(message, opt) {
   let state = opt?.dynamic ? false : true;
 
@@ -11,13 +14,13 @@ export async function getInputImage(message, opt) {
     }.png`;
   }
 
-  let match = message.content.match(/<:[^:]+:(\d+)>/);
+  let match = message.content.match(emoteRegex);
   if (match) {
     let emojiId = match[1];
     return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
   }
 
-  match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+  match = message.content.match(regex);
   if (match) {
     return match[0];
   }
@@ -31,12 +34,12 @@ export async function getInputImage(message, opt) {
       return refMsg.attachments.first().url;
     }
 
-    match = refMsg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+    match = refMsg.content.match(regex);
     if (match) {
       return match[0];
     }
 
-    match = refMsg.content.match(/<:[^:]+:(\d+)>/);
+    match = refMsg.content.match(emoteRegex);
     if (match) {
       let emojiId = match[1];
       return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
@@ -74,11 +77,11 @@ export async function getCaptionInput(message) {
     if (refMsg.attachments.size >= 1) {
       image = refMsg.attachments.first().url;
     } else {
-      let match = refMsg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+      let match = refMsg.content.match(regex);
       if (match) {
         image = match[0];
       } else {
-        match = refMsg.content.match(/<:[^:]+:(\d+)>/);
+        match = refMsg.content.match(emoteRegex);
         if (match) {
           const emojiId = match[1];
           image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
@@ -98,11 +101,11 @@ export async function getCaptionInput(message) {
   } else if (message.stickers.size >= 1) {
     image = `https://cdn.discordapp.com/stickers/${message.stickers.first().id}.png`;
   } else {
-    let match = message.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+    let match = message.content.match(regex);
     if (match) {
       image = match[0];
     } else {
-      match = message.content.match(/<:[^:]+:(\d+)>/);
+      match = message.content.match(emoteRegex);
       if (match) {
         const emojiId = match[1];
         image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
@@ -124,12 +127,12 @@ export async function getCaptionInput(message) {
           image = `https://cdn.discordapp.com/stickers/${msg.stickers.first().id}.png`;
         } else {
           const match = msg.content.match(
-            /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i,
+            regex,
           );
           if (match) {
             image = match[0];
           } else {
-            const emojiMatch = msg.content.match(/<:[^:]+:(\d+)>/);
+            const emojiMatch = msg.content.match(emoteRegex);
             if (emojiMatch) {
               const emojiId = emojiMatch[1];
               image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
@@ -172,7 +175,7 @@ export async function getCaptionInputInt(interaction) {
     switch (opt[1].name) {
       case "image-url":
         return opt[1].value.match(
-          /(https?:\/\/\S+\.(?:png|mp4|jpg|gif|jpeg)(?:\?[^\s]+)?)/i,
+          regex
         )[0];
       case "image-file":
         return opt[1].attachment.url;
@@ -192,7 +195,7 @@ export async function getCaptionInputInt(interaction) {
       } else if (msg.stickers.size >= 1) {
         image = `https://cdn.discordapp.com/stickers/${msg.stickers.first().id}.png`;
       } else {
-        const match = msg.content.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i);
+        const match = msg.content.match(regex);
         if (match) {
           image = match[0];
         }

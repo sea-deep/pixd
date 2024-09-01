@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import pkg from "glob";
 const { glob } = pkg;
 import { pathToFileURL } from "node:url";
@@ -18,7 +17,7 @@ try {
       client.buttons.set(button.name, button);
     }
   }
-  process.stdout.write(`[${chalk.blue("INFO")}] - Buttons Registered!\n`);
+  console.info(`[INFO] - Buttons Registered!`);
 } catch (err) {
-  process.stdout.write(`[${chalk.red("ButtonHandler")}] - ${err}\n`);
+  console.error(`[ButtonHandler] -`, err);
 }

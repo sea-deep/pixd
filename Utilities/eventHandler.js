@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import pkg from "glob";
 const { glob } = pkg;
 import { pathToFileURL } from "node:url";
@@ -29,10 +28,10 @@ try {
         eventFunction.execute(...args, client),
       );
     } catch (error) {
-      process.stdout.write(`[${chalk.red("EventHandler")}] - ${error.stack}\n`);
+      console.error(`[EventHandler] -`, error);
     }
   }
-  process.stdout.write(`[${chalk.blue("INFO")}] - Events Loaded!\n`);
+  console.info(`[INFO] - Events Loaded!\n`);
 } catch (err) {
-  process.stdout.write(`[${chalk.red("EventHandler")}] - ${err}\n`);
+  console.error(`[EventHandler] -`, err);
 }

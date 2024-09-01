@@ -127,5 +127,5 @@ async function khatam(player, track) {
 
 
 client.poru.on("nodeError", (error) => {
-  console.error(error.message);
+  console.error("[NodeError]", error.message);
 })
