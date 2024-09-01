@@ -11,7 +11,7 @@ export default {
     const errorChannel = client.channels.cache.get(errorChannelId);
       const userId = "1258396025354453054";
       const userMention = `<@${userId}>`;
-      const errorMessage = `[${chalk.red("ERROR")}] - An error occurred: ${userMention}\n${error.message}\n${error?.stack}`;
+      const errorMessage = `[ERROR] - An error occurred: ${userMention}\n${error.message}\n${error?.stack}`;
       console.error(error);
       errorChannel.send(errorMessage);
   },
