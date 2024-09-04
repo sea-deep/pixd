@@ -17,7 +17,7 @@ export default {
    */
   execute: async (message, args, client) => {
     try {
-      let m = await message.channel.send(`teri maa randi`);
+      let m = await message.channel.send(`teri maa`);
       await client.sleep(5000);
       await m.delete();
     } catch (e) {

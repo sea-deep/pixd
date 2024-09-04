@@ -15,12 +15,5 @@ export default {
       port:443,
       secure: true,
     },
-    {
-      name: "node3",
-      host: "lava-v4.ajieblogs.eu.org",
-      password: "https://dsc.gg/ajidevserver",
-      port:443,
-      secure: true,
-    },
   ]
 };
