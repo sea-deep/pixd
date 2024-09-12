@@ -193,7 +193,7 @@ export default {
           {
             input: "./Assets/watermark.png",
             top: Math.floor(
-              145 + textHeight + Math.random() * (finalHeight - 100),
+              145 + textHeight + Math.random() * (finalHeight - 100)
             ),
             left: Math.floor(Math.random() * (1080 - 100)),
           },
