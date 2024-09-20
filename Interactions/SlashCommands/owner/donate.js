@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 
 export default {
   data: {
