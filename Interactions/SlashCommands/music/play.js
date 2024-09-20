@@ -61,7 +61,7 @@ export default {
    // console.log(client.poru.players);
     if (res.loadType === "playlist") {
       for (const track of res.tracks) {
-        track.info.requester = message.member;
+        track.info.requester = interaction.member;
         player.queue.add(track);
       }
 
@@ -99,7 +99,7 @@ export default {
 
     if (!player.isPlaying && !player.isPaused && player.isConnected) player.play();
     if (player.isPaused) {
-      message.channel.send('**The player is paused.\nPlease resume it using the `/resume` command to start playing tracks.**');
+      interaction.channel.send('**The player is paused.\nPlease resume it using the `/resume` command to start playing tracks.**');
     }
   },
 };
