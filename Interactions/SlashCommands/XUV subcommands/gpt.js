@@ -6,7 +6,7 @@ const groq = new Groq({
 
 export default {
   subCommand: "xuv gpt",
-  async execute(interaction) {
+  async execute(interaction, client) {
     const msg = interaction.options.getString("message");
     await interaction.deferReply();
 
