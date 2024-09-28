@@ -6,7 +6,7 @@ export default {
    * @param {Client} client
    */
   execute: async (interaction, client) => {
-    await interaction.deferUpdate();
+    await client.interactionDefer(nteraction);
     const regex = /`([^`]+)`/;
     const matches = interaction.message.embeds[0].footer.text.match(regex);
     const total = parseInt(matches[1].split("/")[1]) - 1;

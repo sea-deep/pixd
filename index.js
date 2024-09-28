@@ -5,7 +5,7 @@ import { Poru } from "poru";
 import { KeyValueStore, MongodbKeyValue, sleep } from "./Helpers/helperUtil.js";
 import config from "./Configs/config.js";
 
-const Nodes = config.nodes;;
+const Nodes = config.nodes;
 
 export const client = new Client({
   intents: [
@@ -67,10 +67,17 @@ import("./Utilities/messageSelectMenuHandler.js");
 import("./Utilities/registerCommands.js");
 
 //Import poru events
-import('./Events/poru.js');
+import("./Events/poru.js");
 
 // Logging in to the bot..
 client.login(process.env.TOKEN);
 
 // Setting current time to present the Uptime
 client.keyv.set("uptime", Date.now());
+client.interactionDefer = async (interaction) => {
+  try {
+    await client.interactionDefer(interaction);
+  } catch (e) {
+    console.warn("Interaction defer failed.");
+  }
+};

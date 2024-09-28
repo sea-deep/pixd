@@ -2,7 +2,7 @@ export default {
   name: "delete-btn",
 
   execute: async (interaction, client) => {
-    await interaction.deferUpdate();
+    await client.interactionDefer(nteraction);
     const perms = interaction.member.permissions.toArray();
     const requiredPerms = ["Administrator", "ManageMessages"];
     if (

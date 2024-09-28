@@ -7,7 +7,7 @@ export default {
    * @param {Client} client
    */
   async execute(interaction, client) {
-    await interaction.deferUpdate();
+    await client.interactionDefer(nteraction);
 
     const value = interaction.fields.getTextInputValue("answer").toLowerCase();
     let newWord = [...value]

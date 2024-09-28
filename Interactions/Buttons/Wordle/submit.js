@@ -19,7 +19,7 @@ export default {
         ],
       });
     }
-    await interaction.deferUpdate();
+    await client.interactionDefer(nteraction);
     const answer = client.keyv.get(interaction.message.id);
 
     const oldChances = parseInt(interaction.message.embeds[0].fields[0].value);

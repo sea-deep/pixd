@@ -8,7 +8,8 @@ export default {
   execute: async (interaction, client) => {
     if (interaction.member.id !== interaction.message.mentions.users.first().id)
       return;
-    await interaction.deferUpdate();
+   
+    await client.interactionDefer(nteraction);
     const images = await client.keyv.get(interaction.message.id);
 
     if (!images || images.length === 0) {
@@ -71,3 +72,4 @@ export default {
     }
   },
 };
+

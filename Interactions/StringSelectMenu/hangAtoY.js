@@ -6,7 +6,7 @@ export default {
    * @param {Client} client
    */
   execute: async (interaction, client) => {
-    await interaction.deferUpdate();
+    await client.interactionDefer(nteraction);
     if (interaction.message.mentions.users.first().id != interaction.member.id)
       return;
     let input = interaction.values[0].split("_")[1];
