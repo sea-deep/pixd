@@ -21,7 +21,7 @@ export default {
     try {
       const image = await getCaptionInput(message);
 
-      const reg = regex;
+      const reg = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
       const text = message.content
         .split(" ")
         .splice(1)
