@@ -76,7 +76,7 @@ client.login(process.env.TOKEN);
 client.keyv.set("uptime", Date.now());
 client.interactionDefer = async (interaction) => {
   try {
-    await client.interactionDefer(interaction);
+    await interaction.deferUpdate();
   } catch (e) {
     console.warn("Interaction defer failed.");
   }

@@ -11,7 +11,7 @@ export default {
    * @param {Client} client
    */
   execute: async (interaction, client) => {
-    await client.interactionDefer(nteraction);
+    await client.interactionDefer(interaction);
 
     let message = interaction.message;
     let content = message.content.split("\n");

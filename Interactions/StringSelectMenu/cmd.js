@@ -89,7 +89,7 @@ export default {
         "* `" + prefix + "seek <mm:ss>` - seek to a desired time in the current playing song.",
       ].join("\n");
     }
-    await client.interactionDefer(nteraction);
+    await client.interactionDefer(interaction);
     return interaction.message.edit(help);
   },
 };
