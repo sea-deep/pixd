@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { google } from "googleapis";
 
 const API_KEY = process.env.GOOGLE_KEY;

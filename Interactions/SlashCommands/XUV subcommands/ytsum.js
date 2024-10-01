@@ -48,7 +48,7 @@ export default {
 };
 
 async function summarizeVideo(url, lang = "en") {
-  if (!url.includes("youtube.com") || !url.includes("youtu.be")) throw new Error("Not a valid YouTube URL");
+  if (!url.includes("youtube.com") && !url.includes("youtu.be")) throw new Error("Not a valid YouTube URL");
 
   let ytInfo;
   try {

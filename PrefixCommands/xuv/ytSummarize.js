@@ -38,10 +38,11 @@ export default {
     let arg = match[0];
     let lang = langMatch ? langMatch[1] : "en";
     let call;
+    let msg = await message.reply("Trying to summarise video...");
     try {
       call = await summarizeVideo(arg, lang);
     } catch (e) {
-      let er = await message.reply({
+      let er = await msg.edit({
         content: "",
         embeds: [
           {
@@ -54,7 +55,7 @@ export default {
       await client.sleep(10000);
       return er.delete();
     }
-    return message.reply({
+    return msg.edit({
       content: "",
       embeds: [
         {
@@ -71,7 +72,7 @@ export default {
 };
 
 async function summarizeVideo(url, lang) {
-  if (!url.includes("youtube.com") || !url.includes("youtu.be")) throw new Error("Not a valid YouTube URL");
+  if (!url.includes("youtube.com") && !url.includes("youtu.be")) throw new Error("Not a valid YouTube URL");
 
   let ytInfo;
   try {
