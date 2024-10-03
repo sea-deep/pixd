@@ -44,6 +44,9 @@ export default {
                 players: [],
               });
               await collector.stop();
+              await interaction.message.edit({
+                components: []
+              })
               return m.reply({
                 content: "Anddd the chain ends.",
                 embeds: [
