@@ -8,7 +8,7 @@ export default {
   /**
    * @param {ChatInputCommandInteraction} interaction
    */
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     const baseUrl = "http://www.last.fm/api/auth/";
     const params = new URLSearchParams({
       api_key: process.env.LASTFM_KEY,

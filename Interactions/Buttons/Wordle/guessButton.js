@@ -1,6 +1,6 @@
 export default {
   name: "guessWordle",
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     if (interaction.message.mentions.users.first().id !== interaction.user.id) {
       return interaction.reply({
         content: "",

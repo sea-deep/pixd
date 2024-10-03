@@ -8,7 +8,7 @@ export default {
   /**
    * @param {MessageContextMenuCommandInteraction} interaction
    */
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     return interaction.reply("*This command has been discontinued...*");
     await interaction.deferReply({ ephemeral: true });
     let gene =

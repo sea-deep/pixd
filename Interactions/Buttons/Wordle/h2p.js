@@ -2,7 +2,7 @@ import emojis from "../../../Assets/emojis.js"
 
 export default {
   name: "htpWordle",
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     const desc = [
       `• After each guess, the color of the tiles will change to show how close your guess was to the word.\n`,
       `**Tile color meanings:**\n`,

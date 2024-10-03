@@ -8,7 +8,7 @@ import {
 export default {
   name: "2048down",
   deferUpdate: true,
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     await client.interactionDefer(interaction);
     const description = interaction.message.embeds[0].description;
     let newDescription = move(description, "down");

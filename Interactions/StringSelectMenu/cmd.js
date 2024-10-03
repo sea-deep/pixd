@@ -1,6 +1,6 @@
 export default {
   name: "cmd",
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     let prefix = 'p!';
     const sel = interaction.values;
     const help = {

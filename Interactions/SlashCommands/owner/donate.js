@@ -8,7 +8,7 @@ export default {
   /**
    * @param {ChatInputCommandInteraction} interaction
    */
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     await interaction.reply({
       content: "",
       files: [new AttachmentBuilder("./Assets/donate.mp4", "donate.mp4")],

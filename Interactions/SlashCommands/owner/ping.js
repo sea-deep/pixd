@@ -8,7 +8,7 @@ export default {
   /**
    * @param {ChatInputCommandInteraction} interaction
    */
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     let msg = await interaction.reply("Pong!");
 
 const startTime = client.keyv.get("uptime");

@@ -1,6 +1,6 @@
 export default {
   name: "test",
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     await client.interactionDefer(interaction);
 
     await interaction.followUp(

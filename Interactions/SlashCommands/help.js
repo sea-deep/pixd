@@ -8,7 +8,7 @@ export default {
   /**
    * @param {ChatInputCommandInteraction} interaction
    */
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     return interaction.reply({
       content: `-# /help`,
       tts: false,

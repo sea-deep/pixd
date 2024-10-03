@@ -1,6 +1,6 @@
 export default {
   name: "getLyricss",
-  execute: async (interaction) => {
+  execute: async (interaction, client) => {
     await interaction.deferReply({
       ephemeral: true,
     });
