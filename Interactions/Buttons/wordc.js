@@ -1,16 +1,13 @@
-import { describe } from "node:test";
-import { title } from "process";
-
 export default {
   name: "chain",
   execute: async (interaction, client) => {
     await client.interactionDefer(interaction);
     let game = await client.keyv.get("chain_" + interaction.channel.id);
     if (game?.players.length === 0) {
-        await interaction.followUp({
-            content: "Send a word to start the game.",
-            ephemeral:true,
-        });
+      await interaction.followUp({
+        content: "Send a word to start the game.",
+        ephemeral: true,
+      });
       const collector = interaction.channel.createMessageCollector({
         time: 150000,
       });
@@ -45,8 +42,8 @@ export default {
               });
               await collector.stop();
               await interaction.message.edit({
-                components: []
-              })
+                components: [],
+              });
               return m.reply({
                 content: "Anddd the chain ends.",
                 embeds: [
