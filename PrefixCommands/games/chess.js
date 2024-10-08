@@ -9,7 +9,7 @@ export default {
   aliases: ["ces", "ches", "chs"],
   usage: "p!chess @someone",
   guildOnly: true,
-  args: true,
+  args: false,
   permissions: { bot: [], user: [] },
 
   /**
@@ -17,24 +17,19 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    // FEW exceptions and quick returns/...
-    if (
-      message.mentions.users.size <= 1 &&
-      message.mentions.users.first().id == message.author.id &&
-      message.mentions.users.first().bot
-    ) {
-      return message.reply(
-        "**Please use the command correctly.**\nThe proper usage would be: `p!chess @someone`"
-      );
-    }
-
+    const opponent = 
+    message.mentions.users.size === 0 || 
+    message.mentions.users.first().id === message.author.id || 
+    message.mentions.users.first().bot 
+      ? client.user
+      : message.mentions.users.first();
+  
     let chess = new Chess();
 
     // console.log(chess.board());
     let img = await chess2img(chess.board());
     let file = new AttachmentBuilder(img, "board.png");
     let challenger = message.member.user;
-    let opponent = message.mentions.users.first();
     let components = await chessComponents(chess, "w");
     let urlMap = {
       b: "https://iili.io/dpouoTG.jpg",

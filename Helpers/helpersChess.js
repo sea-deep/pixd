@@ -128,3 +128,32 @@ export async function chessComponents(chess, color) {
   }
   return components;
 }
+
+export async function getBotMove(fen, difficulty) {
+  const depthMap = {
+    easy: 5,
+    medium: 10,
+    hard: 15
+  };
+
+  const depth = depthMap[difficulty] || 10;
+  const url = `https://stockfish.online/api/s/v2.php?fen=${encodeURIComponent(fen)}&depth=${depth}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.success) {
+      const bestMoveString = data.bestmove.split(" ")[1];
+      const from = bestMoveString.slice(0, 2); 
+      const to = bestMoveString.slice(2);
+
+      return { from, to };
+    } else {
+      throw new Error(`Error: ${data.data}`);
+    }
+  } catch (error) {
+    console.error("Error fetching best move:", error);
+    return null;
+  }
+}
