@@ -17,18 +17,17 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    const opponent = 
-    message.mentions.users.size === 0 || 
-    message.mentions.users.first().id === message.author.id || 
-    message.mentions.users.first().bot 
-      ? client.user
-      : message.mentions.users.first();
-  
-    let chess = new Chess();
+    const opponent =
+      message.mentions.users.size === 0 ||
+      message.mentions.users.first().id === message.author.id ||
+      message.mentions.users.first().bot
+        ? client.user
+        : message.mentions.users.first();
 
+    let chess = new Chess();
     // console.log(chess.board());
     let img = await chess2img(chess.board());
-    let file = new AttachmentBuilder(img, "board.png");
+    let file = new AttachmentBuilder(img, {name: 'board.png'});
     let challenger = message.member.user;
     let components = await chessComponents(chess, "w");
     let urlMap = {

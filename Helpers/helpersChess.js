@@ -45,7 +45,7 @@ export async function chess2img(board) {
   return cb;
 }
 
-export async function chessComponents(chess, color) {
+export async function chessComponents(chess) {
   // const board = chess.board();
   let components = [
     {

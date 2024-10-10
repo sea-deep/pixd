@@ -19,21 +19,23 @@ export default {
   execute: async (message) => {
     let overlays = [];
     if (message.mentions.users.size > 1) {
-      overlays = message.mentions.parsedUsers.map((user) =>
-        fetch(
-          user.displayAvatarURL({
-            extension: "png",
-            size: 256,
-            forceStatic: true,
-          }),
+      overlays = await Promise.all(
+        message.mentions.parsedUsers.map((user) =>
+          fetch(
+            user.displayAvatarURL({
+              extension: "png",
+              size: 256,
+              forceStatic: true,
+            })
+          )
+            .then((res) => res.arrayBuffer())
+            .catch((e) => {
+              console.log(e);
+              return null;
+            })
         )
-          .then((res) => res.arrayBuffer())
-          .catch((e) => {
-            console.log(e);
-            return null;
-          }),
       );
-
+    
       let neededDuplicates = 5 - overlays.length;
       while (neededDuplicates > 0) {
         const duplicatedElements = overlays.slice(0, neededDuplicates);
@@ -46,6 +48,7 @@ export default {
       const overlay = await res.arrayBuffer();
       overlays = [overlay, overlay, overlay, overlay, overlay];
     }
+    
     const s = [
       { w: 359, h: 437, x: 145, y: 334 },
       { w: 195, h: 289, x: 938, y: 398 },
