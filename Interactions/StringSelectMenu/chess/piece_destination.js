@@ -67,6 +67,7 @@ export default {
         : "**The game is a draw.**";
 
       await message.edit({
+        content:content.join('\n'),
         components: [],
         files: [file],
         embeds: [{ author: { name: "GAME OVER" }, description: msg }],
@@ -78,6 +79,7 @@ export default {
     }
 
     await message.edit({
+      content: content.join('\n'),
       components: components,
       files: [file],
       embeds: [
@@ -98,7 +100,7 @@ export default {
       if (botMoved.captured) {
         let turn = chess.turn();
         let index = turn === 'b' ? 1 : 2;
-        content[index] += pieceEmoji[`${moved.captured.toLowerCase()}${turn}`];
+        content[index] += pieceEmoji[`${botMoved.captured.toLowerCase()}${turn}`];
       }
       const botComponents = await chessComponents(chess, chess.turn());
       const img = await chess2img(chess.board(), chess.turn());
@@ -109,6 +111,7 @@ export default {
       }
 
       await message.edit({
+        content: content.join('\n'),
         components: botComponents,
         files: [file],
         embeds: [
