@@ -8,12 +8,12 @@ export default {
     "887265587854737479",
   ],
   nodes:[
- //   {
- //     name: "node1",
- //     host: "v4.lavalink.rocks",
- //     password: "horizxon.tech",
- //     port:443,
- //     secure: true,
- //   },
+   {
+     name: "node1",
+     host: "v4.lavalink.rocks",
+     password: "horizxon.tech",
+     port:443,
+     secure: true,
+   },
   ]
 };
