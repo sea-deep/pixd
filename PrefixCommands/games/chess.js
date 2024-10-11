@@ -37,7 +37,11 @@ export default {
     };
 
     let initMsg = await message.channel.send({
-      content: `<:chess:1292536865743704187> <@${players[0]}> ⚔️ <@${players[1]}>`,
+      content: [
+        "**Chess**",
+        `:white_circle: <@${players[0]}>< `,
+        `:black_circle: <@${players[1]}><`,
+      ].join("\n"),
       files: [file],
       components: components,
       embeds: [

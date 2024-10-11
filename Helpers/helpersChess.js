@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-const pieceEmoji = {
+export const pieceEmoji = {
   pw: { name: "pw", id: "1292698392656609331" },
   pb: { name: "pb", id: "1292698388839534623" },
   bw: { name: "bw", id: "1292698372142141460" },
@@ -51,7 +51,7 @@ if (turn === "b") {
   return cb;
 }
 
-export async function chessComponents(chess) {
+export async function chessComponents(chess, turn) {
   // const board = chess.board();
   let components = [
     {
@@ -96,7 +96,7 @@ export async function chessComponents(chess) {
   ];
 
   let pieces = await chess.moves({ verbose: true });
-  if (chess.turn() === 'b') {
+  if (turn === 'b') {
     pieces = pieces.reverse();
   }
   for (let i = 0; i < pieces.length; i++) {

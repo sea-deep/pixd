@@ -16,12 +16,6 @@ export default {
    * @param {Client} client
    */
   execute: async (message, args, client) => {
-    try {
-      let m = await message.channel.send(`teri maa`);
-      await client.sleep(5000);
-      await m.delete();
-    } catch (e) {
-      console.log("Say Command Error handled");
-    }
+    console.log(message.mentions.parsedUsers)
   },
 };

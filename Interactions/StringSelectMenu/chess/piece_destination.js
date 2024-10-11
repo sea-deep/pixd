@@ -8,6 +8,7 @@ import {
   chess2img,
   chessComponents,
   getBotMove,
+  pieceEmoji,
 } from "../../../Helpers/helpersChess.js";
 
 export default {
@@ -18,7 +19,7 @@ export default {
    */
   execute: async (interaction, client) => {
     await client.interactionDefer(interaction);
-
+    let content = interaction.message.content.split('\n');
     const message = interaction.message;
     const memberId = interaction.member.id;
 
@@ -36,8 +37,12 @@ export default {
       (piece) => piece.default
     ).label;
     const to = interaction.values[0];
-    chess.move({ from, to });
-
+    let moved = chess.move({ from, to });
+    if (moved.captured) {
+      let turn = chess.turn();
+      let index = turn === 'b' ? 1 : 2;
+      content[index] += pieceEmoji[`${moved.captured.toLowerCase()}${turn}`];
+    }
     const img = await chess2img(chess.board(), chess.turn());
     const file = new AttachmentBuilder(img, "board.png");
     const components = await chessComponents(chess, chess.turn());
@@ -71,24 +76,30 @@ export default {
     if (chess.isGameOver()) {
       return handleGameOver();
     }
-console.log(JSON.stringify(components, null, 2))
+
     await message.edit({
       components: components,
       files: [file],
       embeds: [
         {
-          author: { name: "Current turn :", icon_url: playerMap[chess.turn()].url },
+          author: {
+            name: "Current turn :",
+            icon_url: playerMap[chess.turn()].url,
+          },
           description: `<@${playerMap[chess.turn()].id}>`,
-          color: playerMap[chess.turn()].color
+          color: playerMap[chess.turn()].color,
         },
-        
       ],
     });
 
     if (message.content.includes(client.user.id)) {
       const botMove = await getBotMove(chess.fen(), "hard");
-      chess.move(botMove);
-      // console.log(botMove);
+      let botMoved = chess.move(botMove);
+      if (botMoved.captured) {
+        let turn = chess.turn();
+        let index = turn === 'b' ? 1 : 2;
+        content[index] += pieceEmoji[`${moved.captured.toLowerCase()}${turn}`];
+      }
       const botComponents = await chessComponents(chess, chess.turn());
       const img = await chess2img(chess.board(), chess.turn());
       const file = new AttachmentBuilder(img, "board.png");
@@ -102,9 +113,12 @@ console.log(JSON.stringify(components, null, 2))
         files: [file],
         embeds: [
           {
-            author: { name: "Current turn :", icon_url: playerMap[chess.turn()].url },
+            author: {
+              name: "Current turn :",
+              icon_url: playerMap[chess.turn()].url,
+            },
             description: `<@${playerMap[chess.turn()].id}>`,
-            color: playerMap[chess.turn()].color
+            color: playerMap[chess.turn()].color,
           },
         ],
       });
