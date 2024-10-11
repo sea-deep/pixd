@@ -32,7 +32,7 @@ export default {
     const to = interaction.values[0];
     chess.move({ from, to });
 
-    const img = await chess2img(chess.board());
+    const img = await chess2img(chess.board(), chess.turn());
     const file = new AttachmentBuilder(img, "board.png");
     const components = await chessComponents(chess, chess.turn());
 
@@ -80,7 +80,7 @@ export default {
       chess.move(botMove);
    // console.log(botMove);
       const botComponents = await chessComponents(chess, chess.turn());
-      const img = await chess2img(chess.board());
+      const img = await chess2img(chess.board(), chess.turn());
       const file = new AttachmentBuilder(img, "board.png");
      
   

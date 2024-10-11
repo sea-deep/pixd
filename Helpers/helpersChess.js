@@ -15,15 +15,17 @@ const pieceEmoji = {
   kb: { name: "kb", id: "1292698378144059392" },
 };
 
-export async function chess2img(board) {
+export async function chess2img(board, turn) {
   let overlays = [
     {
-      input: "./Assets/chess/board.png",
+      input: `./Assets/chess/${turn}.png`,
       top: 0,
       left: 23,
     },
   ];
-
+if (turn === "b") {
+  board = board.reverse();
+}
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       let piece = board[i][j];
@@ -38,7 +40,7 @@ export async function chess2img(board) {
     }
     
   }
-  let cb = await sharp("./Assets/chess/frame.png")
+  let cb = await sharp(`./Assets/chess/frame${turn}.png`)
     .composite(overlays)
     .png()
     .toBuffer();
@@ -91,6 +93,9 @@ export async function chessComponents(chess) {
   ];
 
   let pieces = await chess.moves({ verbose: true });
+  if (chess.turn === 'b') {
+    pieces = pieces.reverse;
+  }
   for (let i = 0; i < pieces.length; i++) {
     const piece = pieces[i];
     const value = piece.from + "_" + piece.piece + piece.color;
@@ -115,6 +120,9 @@ export async function chessComponents(chess) {
       square: arguments[2].split("_")[0],
       verbose: true,
     });
+    if (chess.turn === 'b') {
+      moves = moves.reverse;
+    }
     // console.log(moves)
     if (moves.length > 0) {
       components[1].components[0].options.shift();
