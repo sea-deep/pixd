@@ -36,6 +36,7 @@ export async function chess2img(board) {
         left: j * 50 + 23,
       });
     }
+    
   }
   let cb = await sharp("./Assets/chess/frame.png")
     .composite(overlays)
@@ -133,7 +134,7 @@ export async function getBotMove(fen, difficulty) {
   const depthMap = {
     easy: 5,
     medium: 10,
-    hard: 15
+    hard: 16
   };
 
   const depth = depthMap[difficulty] || 10;

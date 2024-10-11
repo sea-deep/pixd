@@ -76,7 +76,7 @@ export default {
     });
 
     if (message.content.includes(client.user.id)) {
-      const botMove = await getBotMove(chess.fen(), "medium");
+      const botMove = await getBotMove(chess.fen(), "hard");
       chess.move(botMove);
    // console.log(botMove);
       const botComponents = await chessComponents(chess, chess.turn());
