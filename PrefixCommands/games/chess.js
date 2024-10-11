@@ -47,6 +47,7 @@ export default {
             icon_url: urlMap["w"],
           },
           description: `<@${players[0]}>`,
+          color: 0xfffcf3
         },
       ],
     });
@@ -65,6 +66,7 @@ export default {
           {
             author: { name: "Current turn :", icon_url: urlMap['b'] },
             description: `<@${players[1]}>`,
+            color: 0xAB723B
           },
         ],
       });
