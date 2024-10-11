@@ -27,6 +27,9 @@ if (turn === "b") {
   board = board.reverse();
 }
   for (let i = 0; i < 8; i++) {
+    if (turn === "b") {
+      board[i] = board[i].reverse();
+    }
     for (let j = 0; j < 8; j++) {
       let piece = board[i][j];
       if (!board[i][j]) {
