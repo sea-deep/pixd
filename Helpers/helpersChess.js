@@ -97,7 +97,7 @@ export async function chessComponents(chess) {
 
   let pieces = await chess.moves({ verbose: true });
   if (chess.turn() === 'b') {
-    pieces = pieces.reverse;
+    pieces = pieces.reverse();
   }
   for (let i = 0; i < pieces.length; i++) {
     const piece = pieces[i];
@@ -124,7 +124,7 @@ export async function chessComponents(chess) {
       verbose: true,
     });
     if (chess.turn() === 'b') {
-      moves = moves.reverse;
+      moves = moves.reverse();
     }
     // console.log(moves)
     if (moves.length > 0) {

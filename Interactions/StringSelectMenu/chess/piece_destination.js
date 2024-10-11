@@ -71,9 +71,9 @@ export default {
     if (chess.isGameOver()) {
       return handleGameOver();
     }
-
+console.log(JSON.stringify(components, null, 2))
     await message.edit({
-      components,
+      components: components,
       files: [file],
       embeds: [
         {
