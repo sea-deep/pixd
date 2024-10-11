@@ -134,7 +134,7 @@ export async function getBotMove(fen, difficulty) {
   const depthMap = {
     easy: 5,
     medium: 10,
-    hard: 16
+    hard: 15
   };
 
   const depth = depthMap[difficulty] || 10;
