@@ -30,7 +30,7 @@ export default {
       help.embeds[0].description = [
         "* `" + prefix + "gpt <query>` - Danky dank GPT",
         "* `" + prefix + "padhaku <query>` - Ask study related questions.",
-        "* `" + prefix + "genesis <prompt>` - Genesis AI images",
+   //     "* `" + prefix + "genesis <prompt>` - Genesis AI images",
         "* `" + prefix + "ytsum <youtube URL>` - summarise a youtube video",
       ].join("\n");
     }
@@ -67,8 +67,10 @@ export default {
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
         "* `" + prefix + "wordle` - Play the game wordle",
+        "* `" + prefix + "chess <@user>` - Play chess on discord with me or someone else",
         "* `" + prefix + "c4` -  Play the game Connect 4",
         "* `" + prefix + "2048` - Play 2048",
+        "* `" + prefix + "wordchain` - Start a chain of words in the chat",
         "* `" + prefix + "hangman` - Yet another word guessing game.",
       ].join("\n");
     }

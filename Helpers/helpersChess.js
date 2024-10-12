@@ -23,7 +23,7 @@ export async function chess2img(board, turn) {
       left: 23,
     },
   ];
-if (turn === "b") {
+if (turn === "b" ) {
   board = board.reverse();
 }
   for (let i = 0; i < 8; i++) {
