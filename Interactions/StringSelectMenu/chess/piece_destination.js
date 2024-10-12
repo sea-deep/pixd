@@ -19,7 +19,7 @@ export default {
    */
   execute: async (interaction, client) => {
     await client.interactionDefer(interaction);
-    let content = interaction.message.content.split('\n');
+    let content = interaction.message.content.split("\n");
     const message = interaction.message;
     const memberId = interaction.member.id;
 
@@ -40,8 +40,9 @@ export default {
     let moved = chess.move({ from, to });
     if (moved.captured) {
       let turn = chess.turn();
-      let index = turn === 'b' ? 1 : 2;
-      content[index] += pieceEmoji[`${moved.captured.toLowerCase()}${turn}`];
+      let index = turn === "b" ? 1 : 2;
+      let e = pieceEmoji[`${botMoved.captured.toLowerCase()}${turn}`];
+      content[index] += `<:${e.name}:${e.id}>`;
     }
     const img = await chess2img(chess.board(), chess.turn());
     const file = new AttachmentBuilder(img, "board.png");
@@ -67,7 +68,7 @@ export default {
         : "**The game is a draw.**";
 
       await message.edit({
-        content:content.join('\n'),
+        content: content.join("\n"),
         components: [],
         files: [file],
         embeds: [{ author: { name: "GAME OVER" }, description: msg }],
@@ -79,7 +80,7 @@ export default {
     }
 
     await message.edit({
-      content: content.join('\n'),
+      content: content.join("\n"),
       components: components,
       files: [file],
       embeds: [
@@ -99,8 +100,9 @@ export default {
       let botMoved = chess.move(botMove);
       if (botMoved.captured) {
         let turn = chess.turn();
-        let index = turn === 'b' ? 1 : 2;
-        content[index] += pieceEmoji[`${botMoved.captured.toLowerCase()}${turn}`];
+        let index = turn === "b" ? 1 : 2;
+        let e = pieceEmoji[`${botMoved.captured.toLowerCase()}${turn}`];
+        content[index] += `<:${e.name}:${e.id}>`;
       }
       const botComponents = await chessComponents(chess, chess.turn());
       const img = await chess2img(chess.board(), chess.turn());
@@ -111,7 +113,7 @@ export default {
       }
 
       await message.edit({
-        content: content.join('\n'),
+        content: content.join("\n"),
         components: botComponents,
         files: [file],
         embeds: [
