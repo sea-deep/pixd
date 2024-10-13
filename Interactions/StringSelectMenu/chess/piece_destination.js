@@ -111,8 +111,8 @@ export default {
         content[index] += `<:${e.name}:${e.id}>`;
         content = incrementScore(
           content.join("\n"),
-          moved.color,
-          moved.captured.toLowerCase()
+          botMoved.color,
+          botMoved.captured.toLowerCase()
         );
       }
       const botComponents = await chessComponents(chess, chess.turn());
