@@ -171,20 +171,22 @@ export async function getBotMove(fen, difficulty) {
 
 export function incrementScore(content, player, capturedPiece) {
   const pieceValues = {
-    pawn: 1,
-    knight: 3,
-    bishop: 3,
-    rook: 5,
-    queen: 9,
+    p: 1,
+    n: 3,
+    b: 3,
+    r: 5,
+    q: 9,
   };
   const incrementBy = pieceValues[capturedPiece] || 0;
   const regex =
-    player === "white"
+    player === "w"
       ? /(:white_circle:.*`)(\d+)(`)/
       : /(:black_circle:.*`)(\d+)(`)/;
-  return content.replace(
-    regex,
-    (match, prefix, score, suffix) =>
-      `${prefix}${parseInt(score) + incrementBy}${suffix}`
-  ).split('\n');
+  return content
+    .replace(
+      regex,
+      (match, prefix, score, suffix) =>
+        `${prefix}${parseInt(score) + incrementBy}${suffix}`
+    )
+    .split("\n");
 }
