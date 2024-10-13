@@ -8,6 +8,7 @@ import {
   chess2img,
   chessComponents,
   getBotMove,
+  incrementScore,
   pieceEmoji,
 } from "../../../Helpers/helpersChess.js";
 
@@ -43,6 +44,11 @@ export default {
       let index = turn === "b" ? 1 : 2;
       let e = pieceEmoji[`${moved.captured.toLowerCase()}${turn}`];
       content[index] += `<:${e.name}:${e.id}>`;
+      content = incrementScore(
+        content.join("\n"),
+        moved.color,
+        moved.captured.toLowerCase()
+      );
     }
     const img = await chess2img(chess.board(), chess.turn());
     const file = new AttachmentBuilder(img, "board.png");
@@ -103,6 +109,11 @@ export default {
         let index = turn === "b" ? 1 : 2;
         let e = pieceEmoji[`${botMoved.captured.toLowerCase()}${turn}`];
         content[index] += `<:${e.name}:${e.id}>`;
+        content = incrementScore(
+          content.join("\n"),
+          moved.color,
+          moved.captured.toLowerCase()
+        );
       }
       const botComponents = await chessComponents(chess, chess.turn());
       const img = await chess2img(chess.board(), chess.turn());

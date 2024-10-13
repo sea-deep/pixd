@@ -23,9 +23,9 @@ export async function chess2img(board, turn) {
       left: 23,
     },
   ];
-if (turn === "b" ) {
-  board = board.reverse();
-}
+  if (turn === "b") {
+    board = board.reverse();
+  }
   for (let i = 0; i < 8; i++) {
     if (turn === "b") {
       board[i] = board[i].reverse();
@@ -41,7 +41,6 @@ if (turn === "b" ) {
         left: j * 50 + 23,
       });
     }
-    
   }
   let cb = await sharp(`./Assets/chess/frame${turn}.png`)
     .composite(overlays)
@@ -96,7 +95,7 @@ export async function chessComponents(chess, turn) {
   ];
 
   let pieces = await chess.moves({ verbose: true });
-  if (turn === 'b') {
+  if (turn === "b") {
     pieces = pieces.reverse();
   }
   for (let i = 0; i < pieces.length; i++) {
@@ -123,7 +122,7 @@ export async function chessComponents(chess, turn) {
       square: arguments[2].split("_")[0],
       verbose: true,
     });
-    if (chess.turn() === 'b') {
+    if (chess.turn() === "b") {
       moves = moves.reverse();
     }
     // console.log(moves)
@@ -145,7 +144,7 @@ export async function getBotMove(fen, difficulty) {
   const depthMap = {
     easy: 5,
     medium: 10,
-    hard: 15
+    hard: 15,
   };
 
   const depth = depthMap[difficulty] || 10;
@@ -157,7 +156,7 @@ export async function getBotMove(fen, difficulty) {
 
     if (data.success) {
       const bestMoveString = data.bestmove.split(" ")[1];
-      const from = bestMoveString.slice(0, 2); 
+      const from = bestMoveString.slice(0, 2);
       const to = bestMoveString.slice(2);
 
       return { from, to };
@@ -168,4 +167,24 @@ export async function getBotMove(fen, difficulty) {
     console.error("Error fetching best move:", error);
     return null;
   }
+}
+
+export function incrementScore(content, player, capturedPiece) {
+  const pieceValues = {
+    pawn: 1,
+    knight: 3,
+    bishop: 3,
+    rook: 5,
+    queen: 9,
+  };
+  const incrementBy = pieceValues[capturedPiece] || 0;
+  const regex =
+    player === "white"
+      ? /(:white_circle:.*`)(\d+)(`)/
+      : /(:black_circle:.*`)(\d+)(`)/;
+  return content.replace(
+    regex,
+    (match, prefix, score, suffix) =>
+      `${prefix}${parseInt(score) + incrementBy}${suffix}`
+  ).split('\n');
 }
