@@ -71,7 +71,7 @@ import("./Utilities/registerCommands.js");
 import("./Events/poru.js");
 
 // Logging in to the bot..
-client.login(process.env.hdjec);
+client.login(process.env.TOKEN);
 
 // Setting current time to present the Uptime
 client.keyv.set("uptime", Date.now());
