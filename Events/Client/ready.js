@@ -1,5 +1,4 @@
 import { Client, ActivityType } from "discord.js";
-import chalk from "chalk";
 
 export default {
   event: "ready",
@@ -8,9 +7,7 @@ export default {
    * @param {Client} client
    */
   execute: async (client) => {
-    process.stdout.write(
-      `[${chalk.blue("INFO")}] - Logged in as: ${chalk.greenBright(client.user.tag)}\n`,
-    );
+  console.log("[INFO] Logged in as", client.user.tag)
     try{
      client.poru.init(client);
     } catch(e) {
