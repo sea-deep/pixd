@@ -202,7 +202,7 @@ function botPlayer(gameState) {
     tempGameState[place[0]][place[1]] = "O";
     if (checkWinner(tempGameState)) return place;
     tempGameState[place[0]][place[1]] = "-";
-  }
+    }
 
   for (const place of emptyPlaces) {
     tempGameState[place[0]][place[1]] = "X";
