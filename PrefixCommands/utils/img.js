@@ -17,11 +17,12 @@ export default {
    */
   async execute(message, args, client) {
     const query = args.join(" ");
-    const mseg = await message.reply({
+   // const mseg = await
+    return message.reply({
       content: "",
       embeds: [
         {
-          description: "Searching <a:Searching:1142532717406322809>",
+          description: "UNDER CONSTRUCTION", //"Searching <a:Searching:1142532717406322809>",
           color: client.color,
         },
       ],
