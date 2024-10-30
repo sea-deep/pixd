@@ -42,7 +42,6 @@ export default {
         "* `" + prefix + "ud <word>` - get a word definition from urban dictionary",
         "* `" + prefix + "img <query>` - search images from google",
         "* `" + prefix + "lens [image]` - reverse search an image from google",
-        "* `" + prefix + "screenshot <website link>` - get screenshot from a webpage",
         "* `" + prefix + "pin <create|list|delete|edit>` - Manage pins or tags in this server.",
       ].join("\n");
     }
@@ -75,7 +74,7 @@ export default {
       ].join("\n");
     }
     if (sel[0] == "son") {
-      prefix = (interaction.message.content.includes('/help')) ? '/ ' : 'p!';
+      prefix = (interaction.message.content.includes('/help')) ? '/' : 'p!';
       let com = interaction.message.components[0].components[0].options[2];
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
