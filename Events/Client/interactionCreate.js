@@ -1,6 +1,5 @@
 import { Client, BaseInteraction } from "discord.js";
 import config from "../../Configs/config.js";
-import chalk from "chalk";
 
 export default {
   event: "interactionCreate",
