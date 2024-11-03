@@ -9,13 +9,6 @@ export default {
   ],
   nodes: [
     {
-      name: "node4",
-      host: "lavalinkv4-id.serenetia.com",
-      password: "BatuManaBisa",
-      port: 443,
-      secure: true,
-    },
-    {
       name: "node6",
       host: "lavalink.alfari.id",
       password: "catfein",

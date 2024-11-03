@@ -9,10 +9,10 @@ export default {
     client.login(process.env.TOKEN);
     const errorChannelId = "1200865021450801259";
     const errorChannel = client.channels.cache.get(errorChannelId);
-      const userId = "1258396025354453054";
-      const userMention = `<@${userId}>`;
-      const errorMessage = `[ERROR] - An error occurred: ${userMention}\n${error.message}\n${error?.stack}`;
-      console.error(error);
-      errorChannel.send(errorMessage);
+    const userId = "1258396025354453054";
+    const userMention = `<@${userId}>`;
+    const errorMessage = `[ERROR] - An error occurred: ${userMention}\n${error.message}\n${error?.stack}`;
+    console.error(error);
+    errorChannel.send(errorMessage);
   },
 };
