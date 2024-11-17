@@ -33,11 +33,9 @@ export default {
       ? "soundcloud"
       : args[0].includes("youtube.com") || args[0].includes("youtu.be") 
         ? "youtube"
-        : "ytmsearch";
-    console.log(source)
-    console.log(args)
+        : "ytsearch";
+    
     const res = await client.poru.resolve({ query: args.join(' ').trim(), source: source, requester: message.member });
-    console.log(res)
     if (res.loadType === "error") {
         return message.reply(":x: Failed to load track.");
     } else if (res.loadType === "empty") {
