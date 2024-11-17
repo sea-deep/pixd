@@ -9,11 +9,26 @@ export default {
   ],
   nodes: [
     {
-      name: "node6",
-      host: "lavalink.alfari.id",
-      password: "catfein",
+      name: "node1",
+      host: "lavalinkv4-eu.serenetia.com",
+      password: "BatuManaBisa",
       port: 443,
       secure: true,
     },
+    // {
+    //   name: "node2",
+    //   host: "lava-v4.ajieblogs.eu.org",
+    //   password: "https://dsc.gg/ajidevserver",
+    //   port: 443,
+    //   secure: true,
+    // },
+    // {
+    //   name: "node2",
+    //   host: "lavalink.alfari.id",
+    //   password: "catfein",
+    //   port: 443,
+    //   secure: true,
+    // },
+    
   ],
 };
