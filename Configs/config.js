@@ -10,10 +10,10 @@ export default {
   nodes: [
     {
       name: "node1",
-      host: "lavalink.alfari.id",
-      password: "catfein",
-      port: 443,
-      secure: true,
+      host: "lavalink.jirayu.net",
+      password: "youshallnotpass",
+      port: 13592,
+      secure: false,
     },
     // {
     //   name: "node2",
