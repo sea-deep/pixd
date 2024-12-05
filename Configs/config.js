@@ -10,9 +10,9 @@ export default {
   nodes: [
     {
       name: "node1",
-      host: "lavalink.jirayu.net",
-      password: "youshallnotpass",
-      port: 13592,
+      host: "lavahatry4.techbyte.host",
+      password: "NAIGLAVA-dash.techbyte.host",
+      port: 3000,
       secure: false,
     },
     // {
