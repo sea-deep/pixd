@@ -15,13 +15,14 @@ export default {
       port: 3000,
       secure: false,
     },
-    // {
-    //   name: "node2",
-    //   host: "lava-v4.ajieblogs.eu.org",
-    //   password: "https://dsc.gg/ajidevserver",
-    //   port: 443,
-    //   secure: true,
-    // },
+
+    {
+      name: "node2",
+      host: "45.89.99.118",
+      password: "winkle@team",
+      port: 8000,
+      secure: false,
+    },
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
