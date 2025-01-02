@@ -16,13 +16,13 @@ export default {
       secure: false,
     },
 
-    {
-      name: "node2",
-      host: "45.89.99.118",
-      password: "winkle@team",
-      port: 8000,
-      secure: false,
-    },
+    // {
+    //   name: "node2",
+    //   host: "45.89.99.118",
+    //   password: "winkle@team",
+    //   port: 8000,
+    //   secure: false,
+    // },
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
