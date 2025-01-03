@@ -34,7 +34,7 @@ export default {
 
     const embed = {
       title: msg.embeds[0].title,
-      description: `**[${image.title}](${image.originalUrl})**`,
+      description: `**[${image.title}](${image.originalUrl.replace(`\\u003d`, "=")})**`,
       image: {
         url: image.url,
         height: image.height,

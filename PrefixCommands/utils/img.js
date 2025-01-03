@@ -127,7 +127,7 @@ export default {
       embeds: [
         {
           type: "rich",
-          description: `**[${img.title}](${img.originalUrl.replace("\\003d", "=")})**`,
+          description: `**[${img.title}](${img.originalUrl.replace(`\\u003d`, "=")})**`,
           title: `🔍 ${query}`,
           color: client.color,
           image: {
