@@ -43,6 +43,7 @@ export default {
         "* `" + prefix + "img <query>` - search images from google",
         "* `" + prefix + "lens [image]` - reverse search an image from google",
         "* `" + prefix + "pin <create|list|delete|edit>` - Manage pins or tags in this server.",
+        "* `" + prefix + "piracy <query> <type> <sort>` - Search and download anything you want! Videos, audios, ebooks, etc.",   
       ].join("\n");
     }
     if (sel[0] == "img") {

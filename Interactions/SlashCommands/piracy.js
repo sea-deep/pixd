@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, Client } from "discord.js";
 
 export default {
   data: {
-    name: "download",
+    name: "piracy",
     description:
       "Search and download anything you want! Videos, audios, ebooks, etc.",
     options: [
