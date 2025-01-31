@@ -33,7 +33,7 @@ export default {
       ? "soundcloud"
       : args[0].includes("youtube.com") || args[0].includes("youtu.be") 
         ? "youtube"
-        : "ytsearch";
+        : "ytmsearch";
     
     const res = await client.poru.resolve({ query: args.join(' ').trim(), source: source, requester: message.member });
     if (res.loadType === "error") {

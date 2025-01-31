@@ -10,19 +10,11 @@ export default {
   nodes: [
     {
       name: "node1",
-      host: "lavahatry4.techbyte.host",
-      password: "NAIGLAVA-dash.techbyte.host",
-      port: 3000,
-      secure: false,
+      host: "lava-v4.ajieblogs.eu.org",
+      password: "https://dsc.gg/ajidevserver",
+      port: 443,
+      secure: true,
     },
-
-    // {
-    //   name: "node2",
-    //   host: "45.89.99.118",
-    //   password: "winkle@team",
-    //   port: 8000,
-    //   secure: false,
-    // },
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
