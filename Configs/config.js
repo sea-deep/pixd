@@ -15,13 +15,13 @@ export default {
       port: 443,
       secure: true,
     },
-    // {
-    //   name: "node2",
-    //   host: "lavalink.alfari.id",
-    //   password: "catfein",
-    //   port: 443,
-    //   secure: true,
-    // },
+    {
+      name: "node2",
+      host: "lavalink.alfari.id",
+      password: "catfein",
+      port: 443,
+      secure: true,
+    },
     
   ],
 };
