@@ -8,7 +8,7 @@ export default {
     "887265587854737479",
   ],
   nodes: [
-    {
+  /*  {
       name: "node1",
       host: "lava-v4.ajieblogs.eu.org",
       password: "https://dsc.gg/ajidevserver",
@@ -22,6 +22,6 @@ export default {
       port: 443,
       secure: true,
     },
-    
+    */
   ],
 };
