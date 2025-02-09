@@ -22,6 +22,5 @@ export default {
       port: 443,
       secure: true,
     },
-    
   ],
 };
