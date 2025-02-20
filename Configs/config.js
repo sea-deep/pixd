@@ -15,6 +15,7 @@ export default {
       port: 443,
       secure: true,
     },
+<<<<<<< HEAD
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
@@ -23,5 +24,18 @@ export default {
     //   secure: true,
     // },
     
+=======
+
+
+
+    
+    {
+      name: "node2",
+      host: "lavalink.alfari.id",
+      password: "catfein",
+      port: 443,
+      secure: true,
+    },
+>>>>>>> 7402bc4 (Auto Update)
   ],
 };
