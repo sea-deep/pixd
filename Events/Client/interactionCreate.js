@@ -1,6 +1,6 @@
 import { Client, BaseInteraction } from "discord.js";
 import config from "../../Configs/config.js";
-
+//bal
 export default {
   event: "interactionCreate",
   /**

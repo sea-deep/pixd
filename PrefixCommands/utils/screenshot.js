@@ -41,7 +41,7 @@ export default {
     const isMobile = message.content.toLowerCase().includes("-m");
 
     const response = await fetch(
-      `https://fetch-ss.onrender.com/screenshot?url=${url}&mobile=${isMobile}&password=${process.env.SS_PASS}`,
+      `https://fetch-ss.up.railway.app/screenshot?url=${url}&mobile=${isMobile}&password=${process.env.SS_PASS}`,
     );
 
     if (!response.ok) {

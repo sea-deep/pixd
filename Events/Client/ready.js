@@ -8,6 +8,8 @@ export default {
    */
   execute: async (client) => {
   console.log("[INFO] Logged in as", client.user.tag)
+ 
+  
     try{
      client.poru.init(client);
     } catch(e) {
