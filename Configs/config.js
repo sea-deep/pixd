@@ -18,7 +18,6 @@ export default {
 
 
 
-    
     {
       name: "node2",
       host: "lavalink.alfari.id",
