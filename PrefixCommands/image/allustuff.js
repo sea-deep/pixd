@@ -27,11 +27,14 @@ export default {
       .replace(reg, "")
       .trim();
 
+    let finalText = text;
+
     const response = await fetch(image);
     const data = await response.arrayBuffer();
-    const res = await translate(text, { to: "te" });
-    const translatedText = res.text;
-
+    if (!text.includes("-x")) {
+      const res = await translate(text, { to: "te" });
+       finalText = res.text.replace("-x", "");
+    }
     const img = await sharp(data).resize(1080).toBuffer();
     const md = await sharp(img).metadata();
     const height = md.height + 408;
@@ -47,15 +50,17 @@ export default {
         {
           input: {
             text: {
-              text: translatedText,
+              text: finalText,
               font: "Noto Serif Telugu",
               fontfile: "./Assets/nst.ttf",
               width: 650,
               height: 370,
+              align: "center",
+              justify: false,
             },
           },
-          top: md.height + 20,
-          left: 14,
+          top: md.height + 30,
+          left: 30,
           blend: "difference",
         },
       ])
