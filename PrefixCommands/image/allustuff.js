@@ -33,7 +33,7 @@ export default {
     const data = await response.arrayBuffer();
     if (!text.includes("-x")) {
       const res = await translate(text, { to: "te" });
-       finalText = res.text.replace("-x", "");
+       finalText = res.text;
     }
     const img = await sharp(data).resize(1080).toBuffer();
     const md = await sharp(img).metadata();
@@ -50,7 +50,7 @@ export default {
         {
           input: {
             text: {
-              text: finalText,
+              text: finalText.replaceAll("-x", ""),
               font: "Noto Serif Telugu",
               fontfile: "./Assets/nst.ttf",
               width: 650,
@@ -71,7 +71,7 @@ export default {
       name: "stuff.png",
     });
     message.reply({
-      content: "",
+      content: "-# Add '-x' in your message to disable translation!",
       files: [file],
     });
   },
