@@ -23,13 +23,15 @@ try {
         : eventFunction.emitter) || client;
     const once = eventFunction.once;
 
-    try {
-      emitter[once ? "once" : "on"](event, (...args) =>
-        eventFunction.execute(...args, client),
-      );
-    } catch (error) {
-      console.error(`[EventHandler] -`, error);
-    }
+
+    emitter[once ? "once" : "on"](event, (...args) => {
+      try {
+        eventFunction.execute(...args, client)
+      } catch (error) {
+        console.error(`[EventHandler] -`, error);
+      }
+    });
+
   }
   console.info(`[INFO] - Events Loaded!\n`);
 } catch (err) {

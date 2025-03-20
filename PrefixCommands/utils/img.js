@@ -1,5 +1,8 @@
 import { Client, Message } from "discord.js";
 import { GOOGLE_IMG_SCRAP } from "google-img-scrap";
+
+
+let retryCount = new Map();
 export default {
   name: "img",
   description: "Search image from Google.",
@@ -17,16 +20,16 @@ export default {
    */
   async execute(message, args, client) {
     const query = args.join(" ");
-   const mseg = await
-   message.reply({
-      content: "",
-      embeds: [
-        {
-          description: "Searching <a:Searching:1142532717406322809>",
-          color: client.color,
-        },
-      ],
-    });
+    const mseg = await
+      message.reply({
+        content: "",
+        embeds: [
+          {
+            description: "Searching <a:Searching:1142532717406322809>",
+            color: client.color,
+          },
+        ],
+      });
     let images;
     try {
       images = await GOOGLE_IMG_SCRAP({
@@ -45,6 +48,23 @@ export default {
           ],
         });
     } catch (e) {
+      if (await retryCount.get(mseg.id) >= 3) {
+        retryCount.delete(mseg.id);
+        return mseg.edit({
+          content: "",
+          embeds: [
+            {
+              description: `An error occurred...: ${e.message}`,
+              color: client.color,
+            },
+          ],
+        });
+      }
+
+      retryCount.has(mseg.id)
+        ? retryCount.set(mseg.id, retryCount.get(mseg.id) + 1)
+        : retryCount.set(mseg.id, 1);
+
       await mseg.edit({
         content: "",
         embeds: [
@@ -57,7 +77,7 @@ export default {
       await client.sleep(3000);
       try {
         await mseg.delete();
-      } catch (e) {}
+      } catch (e) { }
       return this.execute(message, args, client);
     }
 
