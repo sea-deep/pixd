@@ -1,4 +1,5 @@
 # PIXD Discord Bot
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/vIstDW?referralCode=TDTzm0)
 
 Welcome to PixD, the Discord bot that's here to make your server life a whole lot easier and more entertaining! What if Discord had a cool assistant who could fetch information, play music, generate images, and even entertain users with mini-games? That's PixD for you!
 
