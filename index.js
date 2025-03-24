@@ -82,3 +82,11 @@ client.interactionDefer = async (interaction) => {
     console.warn("Interaction defer failed.");
   }
 };
+
+process.on("unhandledRejection", (error) => {
+  console.error(`[ERROR] - Unhandled Promise Rejection: ${error.message}`);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error(`[ERROR] - Uncaught Exception: ${error.message}`);
+});
