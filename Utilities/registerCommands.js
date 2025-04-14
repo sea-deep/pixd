@@ -38,14 +38,11 @@ try {
   });
 
   if (response.ok) {
-    const infoMessage = `[${chalk.blue("INFO")}] - Application Commands Registered!`;
-    process.stdout.write(`${infoMessage}\n`);
+    console.log("[INFO] - Application Commands Registered!");
   } else {
     const errorMessage = await response.text();
-    const errorOutput = `[${chalk.red("CommandRegister")}] - ${errorMessage}`;
-    process.stderr.write(`${errorOutput}\n`);
+    console.error(`[CommandRegister] - ${errorMessage}`);
   }
 } catch (err) {
-  const errorOutput = `[${chalk.red("CommandRegister")}] - ${JSON.stringify(err, null, 2)}`;
-  process.stderr.write(`${errorOutput}\n`);
+  console.error(`[CommandRegister] - ${JSON.stringify(err, null, 2)}`);
 }

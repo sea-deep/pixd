@@ -1,9 +1,10 @@
 import chalk from "chalk";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import {existsSync} from "fs";
+import { existsSync } from "fs";
 import express from "express";
 import { handleLastFmAuth } from "../Helpers/helpersLastFm.js";
+
 try {
   const app = express();
 
@@ -34,8 +35,8 @@ try {
   });
   const port = process.env.PORT;
   app.listen(port, () =>
-    process.stdout.write(`[${chalk.blue("INFO")}] - Webpage is live!\n`),
+    console.log("[INFO] - Webpage is live!"),
   );
 } catch (err) {
-  process.stdout.write(`[${chalk.red("WebpageHandler")}] - ${err}\n`);
+  console.error(`[WebpageHandler] - ${err}`);
 }

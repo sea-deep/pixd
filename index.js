@@ -4,7 +4,8 @@ import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
 import { Poru } from "poru";
 import { KeyValueStore, MongodbKeyValue, sleep } from "./Helpers/helperUtil.js";
 import config from "./Configs/config.js";
-
+import mongoose from "mongoose";
+import User from "./Utilities/jeetModel.js";
 const Nodes = config.nodes;
 
 export const client = new Client({
@@ -23,6 +24,14 @@ const PoruOptions = {
   defaultPlatform: "ytmsearch",
 };
 
+mongoose.connect(process.env.MONGODB_URL)
+  .then(async () => {
+    console.log('[INFO] - Connected to mongodb')
+    await User.deleteMany({})
+  })
+  .catch((err) => console.error('mongodb connection error:', err));
+
+
 client.poru = new Poru(client, Nodes, PoruOptions);
 // Setting a Global Collection for Commands, Aliases, Buttons & Interactions and more
 client.prefixCommands = new Collection();
@@ -35,10 +44,10 @@ client.stringSelectMenus = new Collection();
 //client.queue = new Collection();
 client.keyv = new KeyValueStore();
 client.sleep = sleep;
-client.pinsDB = new MongodbKeyValue(process.env.MONGODB_URL, "pins");
-client.chess = new MongodbKeyValue(process.env.MONGODB_URL, "chess");
-client.lastFmDb = new MongodbKeyValue(process.env.MONGODB_URL, "lastfmaccs");
-client.color = 0xe08e67;
+client.pinsDB = new MongodbKeyValue();
+client.chess = new MongodbKeyValue();
+client.lastFmDb = new MongodbKeyValue();
+client.color = 0xe08e6
 
 // Website Handler
 import("./Utilities/webpageHandler.js");

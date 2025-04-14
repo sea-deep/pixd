@@ -5,7 +5,6 @@ import { client } from "../index.js";
 
 const { glob } = pkg;
 
-
 try {
   client.slashCommands.clear();
   client.subCommands.clear();
@@ -25,9 +24,7 @@ try {
 
     client.slashCommands.set(interaction.data.name, interaction);
   }
-  const infoMessage = `[${chalk.blue("INFO")}] - Slash Commands Loaded!`;
-  process.stdout.write(`${infoMessage}\n`);
+  console.log("[INFO] - Slash Commands Loaded!");
 } catch (err) {
-  const errorOutput = `[${chalk.red("SlashCommandHandler")}] - ${err}`;
-  process.stderr.write(`${errorOutput}\n`);
+  console.error(`[SlashCommandHandler] - ${err}`);
 }

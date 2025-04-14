@@ -1,107 +1,68 @@
-import { MongoClient } from "mongodb";
-import PQueue from "p-queue"; // Import the PQueue class from the 'p-queue' library
+import mongoose from "mongoose";
+import PQueue from "p-queue";
+
+const kvSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed, required: true },
+  ttl: { type: Number, default: null }, // expiration timestamp
+});
+
+const KVModel = mongoose.model("KVStore", kvSchema);
 
 export class MongodbKeyValue {
-  constructor(databaseUrl, collectionName) {
-    this.client = new MongoClient(databaseUrl);
-    this.collectionName = collectionName;
-    this.db = null;
-    this.collection = null;
-    this.connect();
-    this.queue = new PQueue({ concurrency: 1 }); // Set concurrency to 1 to handle one request at a time
-  }
-
-  async connect() {
-    try {
-      await this.client.connect();
-      this.db = this.client.db();
-      this.collection = this.db.collection(this.collectionName);
-    } catch (error) {
-      console.error("Failed to connect to MongoDB:", error);
-      throw error;
-    }
+  constructor() {
+    this.collection = KVModel;
+    this.queue = new PQueue({ concurrency: 1 });
   }
 
   async set(key, value, ttl = null) {
     const entry = { key, value, ttl: ttl ? Date.now() + ttl * 1000 : null };
-    await this.queue.add(async () => {
-      await this.collection.replaceOne({ key }, entry, { upsert: true });
-    });
+    await this.queue.add(() =>
+      this.collection.updateOne({ key }, { $set: entry }, { upsert: true })
+    );
   }
 
   async get(key) {
     const entry = await this.collection.findOne({ key });
     if (entry) {
-      if (entry.ttl === null || entry.ttl >= Date.now()) {
-        return entry.value;
-      } else {
-        await this.delete(key);
-      }
+      if (entry.ttl === null || entry.ttl >= Date.now()) return entry.value;
+      await this.delete(key);
     }
     return undefined;
   }
 
   async delete(key) {
-    await this.queue.add(async () => {
-      await this.collection.deleteOne({ key });
-    });
+    await this.queue.add(() => this.collection.deleteOne({ key }));
   }
 
   async has(key) {
     const entry = await this.collection.findOne({ key });
-    return entry && (entry.ttl === null || entry.ttl >= Date.now());
+    return !!(entry && (entry.ttl === null || entry.ttl >= Date.now()));
   }
 
   async setTTL(key, newTTL) {
-    if (newTTL === null) {
-      await this.queue.add(async () => {
-        await this.collection.updateOne({ key }, { $set: { ttl: null } });
-      });
-    } else if (typeof newTTL === "number" && newTTL >= 0) {
-      await this.queue.add(async () => {
-        await this.collection.updateOne(
-          { key },
-          { $set: { ttl: Date.now() + newTTL * 1000 } },
-        );
-      });
-    } else {
-      throw new Error(
-        "Invalid TTL value. TTL must be a positive number or null.",
-      );
-    }
+    const ttlValue = newTTL !== null ? Date.now() + newTTL * 1000 : null;
+    await this.queue.add(() => this.collection.updateOne({ key }, { $set: { ttl: ttlValue } }));
   }
 
   async getRemainingTTL(key) {
     const entry = await this.collection.findOne({ key });
-
-    if (entry && entry.ttl !== null) {
-      const currentTime = Date.now();
-      const remainingTime = Math.max(0, entry.ttl - currentTime);
-      const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-      const minutes = Math.floor(
-        (remainingTime % (1000 * 60 * 60)) / (1000 * 60),
-      );
-      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-
-      return { hours, minutes, seconds };
+    if (entry?.ttl !== null) {
+      const remaining = Math.max(0, entry.ttl - Date.now());
+      return {
+        hours: Math.floor(remaining / 3600000),
+        minutes: Math.floor((remaining % 3600000) / 60000),
+        seconds: Math.floor((remaining % 60000) / 1000),
+      };
     }
-
     return null;
   }
 
   async all() {
-    try {
-      const allEntries = await this.collection.find().toArray();
-      return allEntries.map((entry) => ({
-        key: entry.key,
-        value: entry.value,
-      }));
-    } catch (error) {
-      console.error("Failed to retrieve all entries from MongoDB:", error);
-      throw error;
-    }
+    return (await this.collection.find()).map(({ key, value }) => ({ key, value }));
   }
 }
+
 
 /**
  * A simple key-value store using a Map.

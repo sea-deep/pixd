@@ -8,15 +8,15 @@ export default {
     "887265587854737479",
   ],
   nodes: [
+
+
     {
-      name: "node1",
-      host: "lava-v4.ajieblogs.eu.org",
-      password: "https://dsc.gg/ajidevserver",
-      port: 443,
-      secure: true,
-    },
-
-
+      "name": "MYHM.Space",
+      "password": "d.gg/therepublic",
+      "host": "ll3.myhm.space",
+      "port": 443,
+      "secure": true
+    }
 
     // {
     //   name: "node2",

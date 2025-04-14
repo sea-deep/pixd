@@ -19,7 +19,7 @@ try {
       client.modals.set(modal.name, modal);
     }
   }
-  process.stdout.write(`[${chalk.blue("INFO")}] - Modals Registered!\n`);
+  console.log("[INFO] - Modals Registered!");
 } catch (err) {
-  process.stdout.write(`[${chalk.red("ModalHandler")}] - ${err}\n`);
+  console.error(`[ModalHandler] - ${err}`);
 }
