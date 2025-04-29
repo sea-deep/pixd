@@ -1,4 +1,4 @@
-import { ButtonInteraction, User } from "discord.js";
+import { ButtonInteraction} from "discord.js";
 import User from "../../../Utilities/jeetModel.js";
 export default {
     name: "pajeeta",
