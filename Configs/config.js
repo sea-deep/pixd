@@ -8,15 +8,15 @@ export default {
     "887265587854737479",
   ],
   nodes: [
-
-
     {
-      "name": "MYHM.Space",
-      "password": "d.gg/therepublic",
-      "host": "ll3.myhm.space",
+      "name": "Node1",
+      "host": "lavalinkv4-id.serenetia.com",
       "port": 443,
+      "password": "https://dsc.gg/ajidevserver",
       "secure": true
-    }
+    },
+
+  
 
     // {
     //   name: "node2",
