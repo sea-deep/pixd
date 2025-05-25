@@ -9,7 +9,7 @@ export default {
       perms.includes(requiredPerms) ||
       interaction.member.id ===
         interaction.message.mentions?.users.first().id ||
-      interaction.member.user.username === "sea.deep" ||
+      interaction.member.user.username === "am.deepak" ||
       interaction.member.id === interaction.message.interaction?.user.id
     ) {
       return interaction.message.delete();
