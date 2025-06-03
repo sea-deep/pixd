@@ -1,4 +1,5 @@
 import { Client } from "discord.js";
+import { handleMeta } from "../../../Helpers/helpersImage.js";
 
 export default {
   name: "img_left",
@@ -38,8 +39,8 @@ export default {
       title: msg.embeds[0].title,
       description: `**[${image.title}](${image.originalUrl.replace(`\\u003d`, "=")})**`,
       image: {
-        url: image.url,
-        height: image.height,
+      url: img.url.includes('lookaside') ? await handleMeta(img.url) : img.url,
+         height: image.height,
         width: image.width,
       },
       color: client.color,

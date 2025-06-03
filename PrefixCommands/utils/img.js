@@ -1,5 +1,6 @@
 import { Client, Message } from "discord.js";
 import { GOOGLE_IMG_SCRAP } from "google-img-scrap";
+import { handleMeta } from "../../Helpers/helpersImage.js";
 
 
 let retryCount = new Map();
@@ -37,7 +38,7 @@ export default {
         limit: 101,
         safeSearch: false,
       });
-      console.log(JSON.stringify(images, null, 2));
+      // console.log(JSON.stringify(images, null, 2));
       if (!images.result || images.result.length == 0)
         return mseg.edit({
           content: "",
@@ -84,7 +85,7 @@ export default {
 
     await client.keyv.set(mseg.id, images.result, 30);
     let img = images.result[0];
-    console.log(`${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}`)
+    // console.log(`${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}`)
    
     const msg = {
       failIfNotExists: false,
@@ -154,7 +155,7 @@ export default {
           title: `🔍 ${query}`,
           color: client.color,
           image: {
-            url: img.url.includes('lookaside') ? `${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}` : img.url,
+            url: img.url.includes('lookaside') ? await handleMeta(img.url) : img.url,
             height: img.height,
             width: img.width,
           },

@@ -1,6 +1,7 @@
 const regex = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
 const emoteRegex = /<:[^:]+:(\d+)>/;
-
+import axios from 'axios';
+import * as cheerio from "cheerio";
 export async function getInputImage(message, opt) {
   let state = opt?.dynamic ? false : true;
 
@@ -203,4 +204,23 @@ export async function getCaptionInputInt(interaction) {
     }
   });
   return image;
+}
+
+export function handleMeta(url) {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url)
+      .then((response) => {
+        const $ = cheerio.load(response.data);
+        const metaImage = $('meta[property="og:image"]').attr("content");
+        if (metaImage) {
+          resolve(metaImage);
+        } else {
+          reject(new Error("No og:image found"));
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
