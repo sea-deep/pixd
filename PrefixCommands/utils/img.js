@@ -37,6 +37,7 @@ export default {
         limit: 101,
         safeSearch: false,
       });
+      console.log(JSON.stringify(images, null, 2));
       if (!images.result || images.result.length == 0)
         return mseg.edit({
           content: "",
@@ -83,6 +84,8 @@ export default {
 
     await client.keyv.set(mseg.id, images.result, 30);
     let img = images.result[0];
+    console.log(`${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}`)
+   
     const msg = {
       failIfNotExists: false,
       content: ``,
@@ -151,7 +154,7 @@ export default {
           title: `🔍 ${query}`,
           color: client.color,
           image: {
-            url: img.url,
+            proxy_url: `${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}`,
             height: img.height,
             width: img.width,
           },
