@@ -39,7 +39,7 @@ export default {
       title: msg.embeds[0].title,
       description: `**[${image.title}](${image.originalUrl.replace(`\\u003d`, "=")})**`,
       image: {
-        url: img.url.includes('lookaside') ? await handleMeta(img.url) : img.url,
+        url: image.url.includes('lookaside') ? await handleMeta(image.url) : image.url,
         height: image.height,
         width: image.width,
       },
