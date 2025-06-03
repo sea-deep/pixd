@@ -26,21 +26,30 @@ try {
       "https://discord.com/api/oauth2/authorize?client_id=1026234292017299586&permissions=343634472000&scope=bot",
     ),
   );
-  app.get('/igproxy', async (req, res) => {
-    const url = decodeURIComponent(req.query.url);
-    try {
-      const response = await axios.get(url, {
-        responseType: 'arraybuffer',
-        headers: {
-          'User-Agent': 'Googlebot/2.1 (+http://www.google.com/bot.html)'
-        }
-      });
-      res.set('Content-Type', response.headers['content-type']);
-      res.send(response.data);
-    } catch (e) {
-      res.status(404).send('fail');
-    }
-  });
+ app.get('/ig-image', async (req, res) => {
+  const mediaId = req.query.id;
+  const shortcode = mediaIdToShortcode(mediaId);
+  const postUrl = `https://www.instagram.com/p/${shortcode}`;
+
+  try {
+    const html = await axios.get(postUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Googlebot)' // spoof
+      }
+    });
+    const match = html.data.match(/"og:image" content="([^"]+)"/);
+    if (!match) return res.status(404).send('no og:image');
+
+    const imageUrl = match[1];
+    const image = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+
+    res.set('Content-Type', image.headers['content-type']);
+    res.send(image.data);
+  } catch (e) {
+    res.status(500).send('fail');
+  }
+});
+
 
   app.get("/:page", (req, res) => {
     const pagePath = join(staticPath, `${req.params.page}.html`);
@@ -56,4 +65,16 @@ try {
   );
 } catch (err) {
   console.error(`[WebpageHandler] - ${err}`);
+}
+
+
+function mediaIdToShortcode(id) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  let s = '';
+  id = BigInt(id);
+  while (id > 0) {
+    s = alphabet[Number(id % 64n)] + s;
+    id = id / 64n;
+  }
+  return s;
 }

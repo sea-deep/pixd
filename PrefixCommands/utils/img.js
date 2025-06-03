@@ -154,7 +154,7 @@ export default {
           title: `🔍 ${query}`,
           color: client.color,
           image: {
-            url: `${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}`,
+            url: img.url.includes('lookaside') ? `${process.env.LINK}/igproxy?url=${encodeURIComponent(img.url)}` : img.url,
             height: img.height,
             width: img.width,
           },
