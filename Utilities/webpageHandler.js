@@ -23,7 +23,7 @@ try {
   );
   app.get("/invite", (req, res) =>
     res.redirect(
-      "https://discord.com/api/oauth2/authorize?client_id=1026234292017299586&permissions=343634472000&scope=bot",
+      "https://discord.com/oauth2/authorize?client_id=1397525517569097729&scope=bot&permissions=1003113402177"
     ),
   );
  app.get('/ig-image', async (req, res) => {
