@@ -29,7 +29,7 @@ export default {
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
         "* `" + prefix + "gpt <query>` - Danky dank GPT",
-        "* `" + prefix + "padhaku <query>` - Ask study related questions.",
+     //   "* `" + prefix + "padhaku <query>` - Ask study related questions.",
    //     "* `" + prefix + "genesis <prompt>` - Genesis AI images",
         "* `" + prefix + "ytsum <youtube URL>` - summarise a youtube video",
       ].join("\n");

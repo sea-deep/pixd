@@ -1,7 +1,7 @@
 import { Client, ActivityType } from "discord.js";
 
 export default {
-  event: "ready",
+  event: "clientReady",
   once: true,
   /**
    * @param {Client} client

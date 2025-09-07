@@ -4,7 +4,7 @@ import { pathToFileURL } from "url";
 
 const { glob } = pkg;
 
-const clientId = "1026234292017299586";
+const clientId = process.env.CLIENT_ID;
 
 const SlashCommands = await glob(
   `${process.cwd().replace(/\\/g, "/")}/Interactions/SlashCommands/**/*.js`,

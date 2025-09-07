@@ -37,7 +37,8 @@
     "openai": "^4.56.0",
     "p-queue": "^8.0.1",
     "poru": "^5.2.0",
-    "sharp": "^0.32.4"
+    "sharp": "^0.32.4",
+    "xml2js": "^0.6.2"
   },
   "repository": {
     "type": "git",
