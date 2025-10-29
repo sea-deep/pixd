@@ -1,90 +1,102 @@
-<!DOCTYPE html> 
- <html> 
- <head> 
-   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-   <meta property="og:title" content="PIXD"> 
-   <meta property="og:description" content="Proud discord bot
-Vocal for local 📣📢🗣️🔊"> 
-   <meta property="og:image" content="https://iili.io/HQm5MbI.md.png"> 
-   <meta property="og:url" content="https://pixd.up.railway.app"> 
-<link rel="stylesheet" href="style.css"/>
-</head> 
- <body> 
-   <div class="container"> 
-   <div class="header"> 
-     <div class="header-content">
-       <a href="/download">
-       <img src="https://iili.io/HZczHa2.md.jpg" alt="download_now.jpg" class="header_img"> </a>
-       <div class="menu-icon" onclick="toggleMenu()"> 
-         <span></span> 
-         <span></span> 
-         <span></span> 
-       </div> 
-     </div> 
-   </div>   
-   <div class="nav" id="nav"> 
-     <a href="/home">Home</a> 
-     <a href="/commands">Commands</a> 
-     <a href="/repo">Repository</a> 
-     <a href="/legal">Legal</a> 
-   </div> 
-   <div class="main"> 
-     <section class="chat"> 
-       <img src="https://iili.io/HQm5MbI.md.png"> 
-       <div> 
-         <p><b>PIXD</b> <span id="BOT">BOT</span> <span id="time">Today at 20:38 PM</span></p> 
-         <p id="message">hlo saar</p> 
-       </div> 
-     </section> 
-     <p class="desc">Funniest discord bot to make ever. <br />Proudly Manufactured in Bihar🇵🇰 on Oppo A17, Oppo A31, Samsung M01(Motherboard burnt), and ThinkPad-T480</p> 
-     <a href="/invite" class="invite-button">Invite PIXD</a> 
-     <div class="bot-features"> 
-       <h2>Bot Features</h2> 
-       <div class="bot-features-item"> 
-         <h3>AI llm chatbot gupta</h3> 
-         <p>Gupta ji.</p> 
-       </div> 
-       <div class="bot-features-item"> 
-         <h3>Music</h3> 
-         <p>Play music on discord vc</p> 
-       </div> 
-       <div class="bot-features-item"> 
-         <h3>Pro gaming</h3> 
-         <p>Play games like wordle and connect 4 and chess.</p> 
-       </div> 
-       <div class="bot-features-item"> 
-         <h3>Make memes</h3> 
-         <p>make funny photos like Allu stuff and RVCJ synthesis.</p> 
-       </div> 
-     </div> 
-     <div class="faq"> 
-       <h2>Frequently Asked Questions</h2> 
-       <div class="faq-item" onclick="toggleAnswer(this)"> 
-        <h3>Who created PIXD</h3> 
-        <p>@am.deepak on discord... Open for feedbacks and ideas :]</p> 
-      </div> 
-       <div class="faq-item" onclick="toggleAnswer(this)"> 
-         <h3>What is the full-form of PIXD</h3> 
-         <p>Pandit Badri Prasad Har Har Bole</p> 
-       </div> 
-       <div class="faq-item" onclick="toggleAnswer(this)"> 
-         <h3>How do I invite PIXD Bot to my server?</h3> 
-         <img src="https://media.tenor.com/NZd9oTn4WF0AAAAM/ja-puch-k-aa-ja-puch-ke-aa.gif" alt="jaa puchke kaa" class="jaa" /> 
-       </div> 
-       <div class="faq-item" onclick="toggleAnswer(this)"> 
-         <h3>How do I use PIXD Bot commands?</h3> 
-         <p>You can use PIXD Bot commands by typing the prefix followed by the command name and any arguments. The prefix is p!, For example, to play a song, you can type p!play song name.</p> 
-       </div> 
-       <div class="faq-item" onclick="toggleAnswer(this)"> 
-         <h3>Where can I get support for PIXD Bot?</h3> 
-         <p>You can get support for PIXD Bot dming am.deepak on discord or using the command <code>/contact</code> on any server the bot is in.</p> 
-       </div> 
-     </div> 
-   </div> 
-   <div class="footer"> 
-     <p>© 2025 PIXD Bot. All rights reserved.</p> 
-   </div> 
-<script src="script.js" type="text/javascript" charset="utf-8"></script>  
-   </div> 
- </body> 
- </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXD — Discord Bot</title>
+  <meta property="og:title" content="PIXD">
+  <meta property="og:description" content="Proud discord bot
+Vocal for local 📣📢🗣️🔊">
+  <meta property="og:image" content="https://iili.io/HQm5MbI.md.png">
+  <meta property="og:url" content="https://pixd.up.railway.app">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <header class="header" role="banner">
+      <div class="header-content">
+        <a href="/download" aria-label="Download PIXD">
+          <img src="https://iili.io/HZczHa2.md.jpg" alt="download_now.jpg" class="header_img wiggle-hover">
+        </a>
+        <button class="menu-icon" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false" onclick="toggleMenu(this)">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+    <div id="nav-overlay" class="nav-overlay" onclick="toggleMenu(document.querySelector('.menu-icon'))" aria-hidden="true"></div>
+
+    <nav class="nav" id="nav" role="navigation" aria-label="Primary">
+      <a href="/home" class="reveal">Home</a>
+      <a href="/commands" class="reveal" style="--reveal-delay: 60ms;">Commands</a>
+      <a href="/repo" class="reveal" style="--reveal-delay: 120ms;">Repository</a>
+      <a href="/legal" class="reveal" style="--reveal-delay: 180ms;">Legal</a>
+    </nav>
+
+    <main class="main" role="main">
+      <section class="chat reveal" style="--reveal-delay: 0ms;">
+        <img src="https://iili.io/HQm5MbI.md.png" alt="PIXD avatar">
+        <div>
+          <p><b>PIXD</b> <span id="BOT">BOT</span> <span id="time">Today at 20:38 PM</span></p>
+          <p id="message">hlo saar</p>
+        </div>
+      </section>
+
+      <p class="desc reveal" style="--reveal-delay: 80ms;">Funniest discord bot to make ever. <br />Proudly Manufactured in Bihar🇵🇰 on Oppo A17, Oppo A31, Samsung M01(Motherboard burnt), and ThinkPad-T480</p>
+
+      <a href="/invite" class="invite-button reveal" style="--reveal-delay: 140ms;">Invite PIXD</a>
+
+      <section class="bot-features">
+        <h2 class="reveal">Bot Features</h2>
+        <div class="bot-features-item card reveal" style="--reveal-delay: 0ms;">
+          <h3>AI llm chatbot gupta</h3>
+          <p>Gupta ji.</p>
+        </div>
+        <div class="bot-features-item card reveal" style="--reveal-delay: 60ms;">
+          <h3>Music</h3>
+          <p>Play music on discord vc</p>
+        </div>
+        <div class="bot-features-item card reveal" style="--reveal-delay: 120ms;">
+          <h3>Pro gaming</h3>
+          <p>Play games like wordle and connect 4 and chess.</p>
+        </div>
+        <div class="bot-features-item card reveal" style="--reveal-delay: 180ms;">
+          <h3>Make memes</h3>
+          <p>make funny photos like Allu stuff and RVCJ synthesis.</p>
+        </div>
+      </section>
+
+      <section class="faq">
+        <h2 class="reveal">Frequently Asked Questions</h2>
+        <div class="faq-item card reveal" onclick="toggleAnswer(this)" style="--reveal-delay: 0ms;">
+          <h3>Who created PIXD</h3>
+          <p>@am.deepak on discord... Open for feedbacks and ideas :]</p>
+        </div>
+        <div class="faq-item card reveal" onclick="toggleAnswer(this)" style="--reveal-delay: 60ms;">
+          <h3>What is the full-form of PIXD</h3>
+          <p>Pandit Badri Prasad Har Har Bole</p>
+        </div>
+        <div class="faq-item card reveal" onclick="toggleAnswer(this)" style="--reveal-delay: 120ms;">
+          <h3>How do I invite PIXD Bot to my server?</h3>
+          <img src="https://media.tenor.com/NZd9oTn4WF0AAAAM/ja-puch-k-aa-ja-puch-ke-aa.gif" alt="jaa puchke kaa" class="jaa" />
+        </div>
+        <div class="faq-item card reveal" onclick="toggleAnswer(this)" style="--reveal-delay: 180ms;">
+          <h3>How do I use PIXD Bot commands?</h3>
+          <p>You can use PIXD Bot commands by typing the prefix followed by the command name and any arguments. The prefix is p!, For example, to play a song, you can type p!play song name.</p>
+        </div>
+        <div class="faq-item card reveal" onclick="toggleAnswer(this)" style="--reveal-delay: 240ms;">
+          <h3>Where can I get support for PIXD Bot?</h3>
+          <p>You can get support for PIXD Bot dming am.deepak on discord or using the command <code>/contact</code> on any server the bot is in.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <p>© 2025 PIXD Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js" type="text/javascript" charset="utf-8"></script>
+  </div>
+</body>
+</html>
