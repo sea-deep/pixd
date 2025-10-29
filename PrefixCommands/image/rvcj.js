@@ -57,49 +57,55 @@ export default {
           .toBuffer();
         md = await sharp(input).metadata();
       }
-      let emotReg = /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|\S+/gu;
-      const words = text.split(" ");
-
+      // Build lines with simple width heuristic that treats emoji as wide tokens
+      const words = text.split(/\s+/).filter(Boolean);
+      const approxWidth = (s) => {
+        // Count emoji sequences (unicode/custom) as ~2 chars wide; others as 1 per char
+        const eRe = emojiRegex();
+        const cRe = /<(?:a?):[a-zA-Z0-9_]+:[0-9]+>/g;
+        return s.replace(cRe, "__").replace(eRe, "__").length;
+      };
       const lines = [];
       let currentLine = "";
-      words.forEach((word) => {
-        if ((currentLine + (emotReg.test(word) ? "_" : word)).length <= 24) {
-          currentLine += (currentLine.length ? " " : "") + word;
+      for (const word of words) {
+        const candidate = currentLine ? `${currentLine} ${word}` : word;
+        if (approxWidth(candidate) <= 24) {
+          currentLine = candidate;
         } else {
-          lines.push(currentLine);
+          if (currentLine) lines.push(currentLine);
+          // If single word is too long, still place it on its own line
           currentLine = word;
         }
-      });
-      if (currentLine) {
-        lines.push(currentLine);
       }
+      if (currentLine) lines.push(currentLine);
 
       let textLines = [];
       let textHeight = 0;
 
       for (const line of lines) {
-        let emoteAndEmojiRegex =
-          /<:[a-zA-Z0-9_]+:[0-9]+>|[\u{1F600}-\u{1F64F}]|./gu;
-        let characters = line.match(emoteAndEmojiRegex);
+        const tokens = segmentLine(line);
         let textChars = [];
         let currentLeft = 0;
 
-        for (const character of characters) {
-          if (isEmoji(character)) {
-            let emojiBuffer = await getEmojiImage(character).catch((err) => {
-              throw new Error(`Failed to fetch emoji: ${err.message}`);
-            });
-            emojiBuffer = await sharp(emojiBuffer)
-              .resize(48, 48)
-              .png()
-              .toBuffer();
-            textChars.push({
-              input: emojiBuffer,
-              top: 0,
-              left: currentLeft,
-            });
-            currentLeft += 51;
-          } else if (character === " ") {
+        for (const token of tokens) {
+          if (isEmoji(token)) {
+            let emojiBuffer = null;
+            try {
+              emojiBuffer = await getEmojiImage(token);
+            } catch (e) {
+              // Fallback: render as text if emoji image fetch fails
+            }
+            if (emojiBuffer) {
+              emojiBuffer = await sharp(emojiBuffer)
+                .resize(48, 48)
+                .png()
+                .toBuffer();
+              textChars.push({ input: emojiBuffer, top: 0, left: currentLeft });
+              currentLeft += 51;
+              continue;
+            }
+          }
+          if (token === " ") {
             const spaceBuffer = await sharp({
               create: {
                 width: 15,
@@ -110,16 +116,12 @@ export default {
             })
               .png()
               .toBuffer();
-            textChars.push({
-              input: spaceBuffer,
-              top: 0,
-              left: currentLeft,
-            });
+            textChars.push({ input: spaceBuffer, top: 0, left: currentLeft });
             currentLeft += 15;
           } else {
             let textChar = await sharp({
               text: {
-                text: character.toUpperCase(),
+                text: token.toUpperCase(),
                 dpi: 400,
                 align: "center",
                 font: "Baloo 2 ExtraBold",
@@ -136,7 +138,7 @@ export default {
               top: 0,
               left: currentLeft,
             });
-            currentLeft += textCharMeta.width + 3;
+            currentLeft += (textCharMeta.width || 0) + 3;
           }
         }
 
@@ -204,10 +206,7 @@ export default {
       const file = new AttachmentBuilder(finalImage, {
         name: "rvcj.png",
       });
-      message.reply({
-        content: "men are simple 🙂",
-        files: [file],
-      });
+      message.reply({ content: "men are simple 🙂", files: [file] });
     } catch (err) {
       console.error(err);
       message.reply(`An error occurred: ${err.message}`);
@@ -216,31 +215,64 @@ export default {
 };
 
 const getEmojiImage = async (emoji) => {
-  const customEmojiRegex = /<:([a-zA-Z0-9_]+):([0-9]+)>/;
+  // Handle Discord custom emoji, including animated
+  const customEmojiRegex = /<(a?):([a-zA-Z0-9_]+):([0-9]+)>/;
   const match = emoji.match(customEmojiRegex);
   if (match) {
-    const emojiId = match[2];
-    const emojiUrl = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
-    const response = await fetch(emojiUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch emoji: ${response.statusText}`);
+    const isAnimated = match[1] === "a";
+    const emojiId = match[3];
+    const exts = isAnimated ? ["gif", "png", "webp"] : ["png", "webp"];
+    for (const ext of exts) {
+      const url = `https://cdn.discordapp.com/emojis/${emojiId}.${ext}?size=96&quality=lossless`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const buf = await res.arrayBuffer();
+        return Buffer.from(buf);
+      }
     }
-    const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer);
-  } else {
-    const encodedEmoji = encodeURIComponent(emoji);
-    const emojiUrl = `https://raw.githubusercontent.com/luizbizzio/emojis/main/apple/${encodedEmoji}.png`;
-    const response = await fetch(emojiUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch emoji: ${response.statusText}`);
-    }
-    const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer);
+    throw new Error("Failed to fetch custom emoji from Discord CDN");
   }
+
+  // Unicode emoji: use Twemoji assets by codepoint sequence
+  const codepointSeq = [...emoji]
+    .map((c) => c.codePointAt(0).toString(16))
+    .join("-")
+    .toLowerCase();
+  const twemojiUrls = [
+    `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/${codepointSeq}.png`,
+    `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${codepointSeq}.png`,
+  ];
+  for (const url of twemojiUrls) {
+    const res = await fetch(url);
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      return Buffer.from(buf);
+    }
+  }
+  // Fallback to GitHub emoji set (may not cover all sequences)
+  const encodedEmoji = encodeURIComponent(emoji);
+  const fallback = `https://raw.githubusercontent.com/luizbizzio/emojis/main/apple/${encodedEmoji}.png`;
+  const res = await fetch(fallback);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch emoji: ${res.statusText}`);
+  }
+  const buffer = await res.arrayBuffer();
+  return Buffer.from(buffer);
 };
 
 const isEmoji = (part) => {
   const regex = emojiRegex();
-  const customEmojiRegex = /<:[a-zA-Z0-9_]+:[0-9]+>/;
-  return regex.test(part) || customEmojiRegex.test(part);
+  const customEmojiRegex = /<(?:a?):[a-zA-Z0-9_]+:[0-9]+>/;
+  return customEmojiRegex.test(part) || regex.test(part);
+};
+
+// Split a string into tokens: full emoji sequences, custom emojis, spaces, or single characters
+const segmentLine = (line) => {
+  const eRe = emojiRegex();
+  const customRe = /<(?:a?):[a-zA-Z0-9_]+:[0-9]+>/;
+  const splitter = new RegExp(
+    `${customRe.source}|${eRe.source}|\\s|.`,
+    "gu"
+  );
+  return line.match(splitter) || [];
 };
