@@ -1,4 +1,6 @@
+
 import { AttachmentBuilder, Message } from "discord.js";
+import fetch from "node-fetch";
 
 export default {
   name: "genesis",
@@ -45,8 +47,11 @@ export default {
     });
 
     try {
-      const imageBuffer = await createImage(prompt);
-      const fileName = `${prompt}.jpg`;
+      const imageUrl = await createImage(prompt);
+      const fileName = `${prompt.replace(/[^a-z0-9]/gi, "_")}.jpg`;
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error("Failed to fetch image from pollinations.ai");
+      const imageBuffer = await response.buffer();
       const attachment = new AttachmentBuilder(imageBuffer, { name: fileName });
 
       const editMessageResponse = await mes.edit({
@@ -54,6 +59,7 @@ export default {
         embeds: [
           {
             description: `>>> Genesisation Done! \nHere is your **${prompt}**`,
+            image: { url: `attachment://${fileName}` },
           },
         ],
         components: [
@@ -82,51 +88,24 @@ export default {
       console.error(e);
       return mes.edit({
         content: "",
-        embed: {
-          type: "rich",
-          title: `>>> Ayyo saar genesis failed :fail:`,
-          description: `${e}`,
-        },
+        embeds: [
+          {
+            type: "rich",
+            title: `>>> Ayyo saar genesis failed :fail:`,
+            description: `${e}`,
+          },
+        ],
         tts: false,
       });
     }
   },
 };
 
+
+// Use pollinations.ai free image generation API
 async function createImage(prompt) {
-  const payload = {
-    cfg_scale: 7,
-    clip_guidance_preset: "FAST_BLUE",
-    weight: 1,
-    sampler: "K_DPM_2_ANCESTRAL",
-    samples: 1,
-    prompt: `${prompt}, high-resolution 4k quality`,
-    steps: 100,
-  };
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.SD_TOKEN}`,
-  };
-
-  try {
-    const response = await fetch("https://api.wizmodel.com/sdapi/v1/txt2img", {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-
-    const responseData = await response.json();
-
-    if (responseData.images.length > 0) {
-      const image = responseData.images[0];
-      const data = image.replace(/^data:image\/\w+;base64,/, "");
-      return Buffer.from(data, "base64");
-    } else {
-      throw new Error("No images found in the response.");
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  // Pollinations API: https://pollinations.ai/prompt/{prompt}
+  // The API returns a direct image URL for the prompt
+  const encodedPrompt = encodeURIComponent(prompt);
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 }
