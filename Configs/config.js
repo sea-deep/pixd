@@ -9,15 +9,19 @@ export default {
   ],
   nodes: [
     {
-      "name": "Node1",
-      "host": "lavalinkv4-id.serenetia.com",
-      "port": 443,
-      "password": "https://dsc.gg/ajidevserver",
-      "secure": true
+      name: "Node1",
+      host: "lavalinkv4-id.serenetia.com",
+      port: 443,
+      password: "https://dsc.gg/ajidevserver",
+      secure: true
     },
-
-  
-
+    {
+      name: "Node4",
+      host: "lavalink_v4.muzykant.xyz",
+      port: 443,
+      password: "https://discord.gg/v6sdrD9kPh",
+      secure: true
+    },
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
