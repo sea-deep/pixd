@@ -22,6 +22,13 @@ export default {
       password: "https://discord.gg/v6sdrD9kPh",
       secure: true
     },
+    {
+      name: "Node5",
+      host: "lava-v4.ajieblogs.eu.org",
+      port: 443,
+      password: "https://dsc.gg/ajidevserver",
+      secure: true
+    },
     // {
     //   name: "node2",
     //   host: "lavalink.alfari.id",
