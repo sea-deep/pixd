@@ -361,7 +361,7 @@
   
  .bot-features-item h3 { 
  color: #cf941e; 
- font-size:20px; 
+ font-size:21px; 
  padding: var(--space-2) var(--space-3);
  } 
   
@@ -378,9 +378,9 @@
  display:flex; 
  align-items:center; 
  justify-content:center; 
- padding:20px; 
+ padding:21px; 
  border-radius: var(--radius-3); 
- width:300px; 
+ width:301px; 
  box-shadow:0 4px 8px rgba(0,0,0,0.9) 
  } 
   
