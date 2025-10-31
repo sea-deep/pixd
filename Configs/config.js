@@ -29,12 +29,6 @@ export default {
       password: "https://dsc.gg/ajidevserver",
       secure: true
     },
-    // {
-    //   name: "node2",
-    //   host: "lavalink.alfari.id",
-    //   password: "catfein",
-    //   port: 443,
-    //   secure: true,
-    // },
+    
   ],
 };
