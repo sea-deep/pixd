@@ -21,7 +21,7 @@ export default {
       let er = await message.channel.send({
         content: '',
         embeds: [{
-          title: 'Join a VC to use that command',
+          title: 'Join a VOICE CHANNEL to use that command',
           color: client.color
         }]
        });
