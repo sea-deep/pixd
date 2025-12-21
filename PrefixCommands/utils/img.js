@@ -19,7 +19,7 @@ export default {
    * @param {Message} message
    * @param {Client} client
    */
-  async execute(message, args, client) {
+  async execute(message, args, client, currentRetries = 0) {
     const query = args.join(" ");
     const mseg = await
       message.reply({
@@ -50,10 +50,7 @@ export default {
           ],
         });
     } catch (e) {
-      const currentRetries = retryCount.get(mseg.id) || 0;
-      
       if (currentRetries >= 3) {
-        retryCount.delete(mseg.id);
         return mseg.edit({
           content: "",
           embeds: [
@@ -64,8 +61,6 @@ export default {
           ],
         });
       }
-
-      retryCount.set(mseg.id, currentRetries + 1);
 
       await mseg.edit({
         content: "",
@@ -80,7 +75,7 @@ export default {
       try {
         await mseg.delete();
       } catch (e) { }
-      return this.execute(message, args, client);
+      return this.execute(message, args, client, currentRetries + 1);
     }
 
     await client.keyv.set(mseg.id, images.result, 30);
