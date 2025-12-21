@@ -50,28 +50,28 @@ export default {
           ],
         });
     } catch (e) {
-      if (await retryCount.get(mseg.id) >= 3) {
+      const currentRetries = retryCount.get(mseg.id) || 0;
+      
+      if (currentRetries >= 3) {
         retryCount.delete(mseg.id);
         return mseg.edit({
           content: "",
           embeds: [
             {
-              description: `An error occurred...: ${e.message}`,
+              description: `An error occurred after 3 retries: ${e.message}`,
               color: client.color,
             },
           ],
         });
       }
 
-      retryCount.has(mseg.id)
-        ? retryCount.set(mseg.id, retryCount.get(mseg.id) + 1)
-        : retryCount.set(mseg.id, 1);
+      retryCount.set(mseg.id, currentRetries + 1);
 
       await mseg.edit({
         content: "",
         embeds: [
           {
-            description: `An error occurred...: ${e.message}\n\nRETRYING IN 3 SECONDS`,
+            description: `An error occurred...: ${e.message}\n\nRETRYING IN 3 SECONDS (Attempt ${currentRetries + 1}/3)`,
             color: client.color,
           },
         ],
