@@ -20,7 +20,7 @@ export default {
       content: "",
       files: [new AttachmentBuilder("./Assets/donate.mp4", "donate.mp4")],
       embeds : [{
-        description: 'UPI ID :\n```\ndeepak411@fam```'
+        description: 'UPI ID :\n```\nseadeep@upi```'
       }]
     });
   },
