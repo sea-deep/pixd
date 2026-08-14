@@ -41,7 +41,6 @@ client.buttons = new Collection();
 client.modals = new Collection();
 client.messageSelectMenus = new Collection();
 client.stringSelectMenus = new Collection();
-//client.queue = new Collection();
 client.keyv = new KeyValueStore();
 client.sleep = sleep;
 client.pinsDB = new MongodbKeyValue();
