@@ -19,7 +19,9 @@
     "start": "npm run build && node dist/index.js",
     "dev": "tsx --watch index.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy": "railway up --detach --service pixd",
+    "prepare": "git config core.hooksPath .hooks || true"
   },
   "dependencies": {
     "@discordjs/voice": "^0.19.2",

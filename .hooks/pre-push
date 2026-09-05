@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Git pre-push hook: Automatically deploy to Railway when pushing to main
+# No GitHub-to-Railway connection required.
+
+remote="$1"
+url="$2"
+
+is_main=false
+while read -r local_ref local_oid remote_ref remote_oid; do
+  if [[ "$remote_ref" =~ "refs/heads/main" || "$local_ref" =~ "refs/heads/main" ]]; then
+    is_main=true
+    break
+  fi
+done
+
+if [ "$is_main" = true ]; then
+  if command -v railway >/dev/null 2>&1; then
+    echo "🚂 Main branch push detected: uploading and deploying update to Railway..."
+    railway up --detach --service pixd
+  else
+    echo "⚠️  Railway CLI not found in PATH. Skipping Railway deployment."
+  fi
+fi
+
+exit 0
