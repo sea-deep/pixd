@@ -1,17 +1,22 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import type { Server } from "node:http";
 import axios from "axios";
 import express from "express";
 import { handleLastFmAuth } from "../helpers/helpersLastFm.js";
 import { env } from "../utilities/env.js";
 import Logger from "../helpers/Logger.js";
 
-const app = express();
+export const app = express();
+let ready = () => false;
 const staticPath = join(process.cwd(), "www");
 app.disable("x-powered-by");
 app.use(express.static(staticPath));
 app.get("/", (_req, res) => res.redirect("/home"));
-app.get("/healthz", (_req, res) => res.status(200).json({ ok: true }));
+app.get("/healthz", (_req, res) => {
+  const ok = ready();
+  res.status(ok ? 200 : 503).json({ ok });
+});
 app.get("/home", (_req, res) => res.sendFile(join(staticPath, "index.html")));
 app.get("/lastfm/login", async (req, res) => {
   try {
@@ -49,7 +54,16 @@ app.get("/:page", (req, res) => {
   return existsSync(pagePath) ? res.sendFile(pagePath) : res.status(404).sendFile(join(staticPath, "404.html"));
 });
 
-app.listen(env.PORT, () => Logger.info(`Web server listening on port ${env.PORT}`));
+export function startWebServer(isReady: () => boolean): Promise<Server> {
+  ready = isReady;
+  return new Promise((resolve, reject) => {
+    const server = app.listen(env.PORT, () => {
+      Logger.info(`Web server listening on port ${env.PORT}`);
+      resolve(server);
+    });
+    server.once("error", reject);
+  });
+}
 
 function mediaIdToShortcode(id: string): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";

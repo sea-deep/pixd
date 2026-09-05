@@ -2,6 +2,7 @@ import { Client, Collection, GatewayIntentBits, Partials } from "discord.js";
 import mongoose from "mongoose";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import type { Server } from "node:http";
 import { env } from "./src/utilities/env.js";
 import Logger from "./src/helpers/Logger.js";
 import config from "./Configs/config.js";
@@ -35,11 +36,14 @@ client.mentionableSelectMenus = new Collection(); client.channelSelectMenus = ne
 client.keyv = new KeyValueStore(); client.pinsDB = new MongodbKeyValue("pins"); client.chess = new MongodbKeyValue("chess");
 client.lastFmDb = new MongodbKeyValue("lastfm"); client.music = new MusicManager(client); client.sleep = sleep; client.color = config.color;
 client.interactionDefer = async (interaction) => { if (!interaction.deferred && !interaction.replied) await interaction.deferUpdate(); };
+let webServer: Server | undefined;
+let shutdownPromise: Promise<void> | undefined;
 
 export async function start(): Promise<void> {
   await client.music.validateRuntime();
   await mongoose.connect(env.MONGODB_URL);
-  await import("./src/services/webServer.js");
+  const { startWebServer } = await import("./src/services/webServer.js");
+  webServer = await startWebServer(() => client.isReady() && mongoose.connection.readyState === 1 && client.keyv.get("commandsRegistered") === true);
   for (const handler of ["eventHandler", "prefixCommandHandler", "slashCommandHandler", "buttonHandler",
     "selectMenuHandler", "modalHandler", "autocompleteHandler", "hybridCommandHandler", "contextMenuHandler"]) {
     await import(`./src/utilities/${handler}.js`);
@@ -49,13 +53,46 @@ export async function start(): Promise<void> {
 }
 client.connect = start;
 
-async function shutdown(signal: string): Promise<void> {
-  Logger.info(`Received ${signal}; shutting down`);
-  await client.music.destroyAll(); client.destroy(); await mongoose.disconnect();
+export function shutdown(reason: string): Promise<void> {
+  if (shutdownPromise) return shutdownPromise;
+  shutdownPromise = (async () => {
+    Logger.info(`Received ${reason}; shutting down`);
+    client.keyv.set("commandsRegistered", false);
+    const results = await Promise.allSettled([
+      client.music.destroyAll(), client.destroy(), mongoose.disconnect(),
+      new Promise<void>((resolve, reject) => {
+        if (!webServer?.listening) return resolve();
+        webServer.close(error => error ? reject(error) : resolve());
+      }),
+    ]);
+    for (const result of results) if (result.status === "rejected") {
+      Logger.error("Shutdown cleanup failed", result.reason);
+      process.exitCode = 1;
+    }
+  })();
+  return shutdownPromise;
 }
-process.once("SIGINT", () => void shutdown("SIGINT"));
-process.once("SIGTERM", () => void shutdown("SIGTERM"));
-process.on("unhandledRejection", (error) => Logger.error("Unhandled rejection", error));
-process.on("uncaughtException", (error) => Logger.error("Uncaught exception", error));
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
-if (isMain) void client.connect().catch((error) => { Logger.error("PixD failed to start", error); process.exitCode = 1; });
+if (isMain) {
+  let stopping = false;
+  const stop = (reason: string) => {
+    if (stopping) return;
+    stopping = true;
+    const deadline = setTimeout(() => process.exit(1), 10_000);
+    deadline.unref();
+    void shutdown(reason).finally(() => { clearTimeout(deadline); process.exit(); });
+  };
+  process.once("SIGINT", () => stop("SIGINT"));
+  process.once("SIGTERM", () => stop("SIGTERM"));
+  process.on("unhandledRejection", error => Logger.error("Unhandled rejection", error));
+  process.on("uncaughtException", error => {
+    Logger.error("Uncaught exception", error);
+    process.exitCode = 1;
+    stop("uncaught exception");
+  });
+  void client.connect().catch(error => {
+    Logger.error("PixD failed to start", error);
+    process.exitCode = 1;
+    stop("startup failure");
+  });
+}

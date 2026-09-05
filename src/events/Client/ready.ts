@@ -12,6 +12,7 @@ export default new Event({
 
     // Register / Update application commands dynamically
     await registerCommands(client);
+    client.keyv.set("commandsRegistered", true);
 
     // Set activity
     client.user!.setActivity({

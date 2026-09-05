@@ -48,3 +48,13 @@ The source `.env` was copied without displaying secrets or changing the original
 - Corrected RVCJ's input-variable collision, user-text markup escaping, image-buffer types, embed values, obsolete attachments, and missing async acknowledgements.
 - Typed existing board algorithms and corrected Connect Four's string/cell mismatch with a simple win/block move selector. The game rules remain unchanged; the bot's move-selection heuristic is intentionally simplified.
 - Kept source assets, static pages, original credentials and original repository intact. No production bot or database was started during verification.
+# Local promotion — 2026-09-05
+
+The TypeScript draft now lives in `/home/dipak/code/pixd` on `main`, retaining the
+original PixD Git history and `origin` remote. The previous working state, including
+uncommitted source changes, is preserved in `codex/pixd-before-draft-20260905` and
+the complete `/home/dipak/code/pixd-legacy-20260905` folder. The draft's former
+template Git metadata is retained at `/home/dipak/code/pixd-draft-template-git-20260905`.
+The draft's current `.env` was retained without exposing it in Git. No remote push
+or production deployment was performed during promotion. The proposed Jeetlife
+expansion is deferred; its existing commands and database schema are unchanged.

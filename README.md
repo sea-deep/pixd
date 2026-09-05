@@ -1,4 +1,4 @@
-# PixD TypeScript Draft
+# PixD
 
 This is the template-based PixD migration. It carries PixD's commands, games, image tools, interaction components, web pages, MongoDB state, Last.fm integration, and direct music playback into the template's TypeScript layout.
 
@@ -21,11 +21,18 @@ npm run build
 npm run dev
 ```
 
-Production:
+Production (run only one instance with this token):
 
 ```sh
-npm start
+cd /home/dipak/code/pixd
+npm ci
+ENVIRONMENT=prod NODE_ENV=production npm start
 ```
+
+For Docker, set `ENVIRONMENT=prod` in `.env`, then run `docker compose up -d --build`.
+Use `docker compose logs -f bot` for logs and `docker compose down` to stop it.
+The health endpoint returns 200 only after Discord is ready, MongoDB is connected,
+and application command registration succeeds; otherwise it returns 503.
 
 ## Feature layout
 
@@ -48,7 +55,7 @@ The same library also supports the retained reverse-image command.
 
 ## Manual smoke test
 
-The original `.env` has been copied locally, is Git-ignored, and has owner-only file permissions. It points to the same account/database as the original: stop the original bot before running this draft to avoid duplicate command processing. No live bot was started as part of the automated checks.
+The local `.env` is Git-ignored and has owner-only file permissions. It points to the same account/database as the original: stop any older bot instance before starting this version to avoid duplicate command processing. Offline checks do not log into Discord or register commands.
 
 New game slash commands accept an `opponent` where applicable. Image/owner/pin commands accept `arguments` in the original prefix order, optional target users, and an `image` attachment. For example, `/pin arguments:"add example some text"` corresponds to `d!pin add example some text`. Reply-to-message inputs remain available through prefix commands; slash commands take explicit inputs instead.
 
