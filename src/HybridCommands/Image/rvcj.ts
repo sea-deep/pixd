@@ -307,14 +307,14 @@ export default new HybridCommand({
           throw new Error(`Invalid image format: ${err instanceof Error ? err.message : String(err)}`);
         });
 
-      // Normalize image to 4:3 rectangle if tall or square
+      // Normalize image to 16:9 rectangle if taller than 16:9 (including square or portrait)
       let input = await sharp(buffer).resize(1080).png().toBuffer();
       let md = await sharp(input).metadata();
-      if ((md.height ?? 0) >= (md.width ?? 1080)) {
+      if ((md.height ?? 0) > Math.round((md.width ?? 1080) * (9 / 16))) {
         input = await sharp(input)
           .resize({
             width: 1080,
-            height: 810,
+            height: 608,
             fit: "contain" as const,
             background: { r: 255, g: 255, b: 255, alpha: 1 },
           })
@@ -400,9 +400,10 @@ export default new HybridCommand({
 
         let sampleFrame = await sharp(extracted.frames[0]).resize(targetWidth).png().toBuffer();
         let sampleMeta = await sharp(sampleFrame).metadata();
-        const scaledFrameHeight = (sampleMeta.height ?? 0) >= (sampleMeta.width ?? targetWidth)
-          ? 405
-          : (sampleMeta.height ?? 405);
+        const isGifTallerThan16by9 = (sampleMeta.height ?? 0) > Math.round((sampleMeta.width ?? targetWidth) * (9 / 16));
+        const scaledFrameHeight = isGifTallerThan16by9
+          ? 304
+          : (sampleMeta.height ?? 304);
         gifCurrentY += scaledFrameHeight;
 
         let scaledBottomOverlay: Buffer | null = null;
@@ -436,11 +437,11 @@ export default new HybridCommand({
         for (const frame of extracted.frames) {
           let resizedFrame = await sharp(frame).resize(targetWidth).png().toBuffer();
           let frameMeta = await sharp(resizedFrame).metadata();
-          if ((frameMeta.height ?? 0) >= (frameMeta.width ?? targetWidth)) {
+          if ((frameMeta.height ?? 0) > Math.round((frameMeta.width ?? targetWidth) * (9 / 16))) {
             resizedFrame = await sharp(resizedFrame)
               .resize({
                 width: targetWidth,
-                height: 405,
+                height: 304,
                 fit: "contain",
                 background: { r: 255, g: 255, b: 255, alpha: 1 },
               })

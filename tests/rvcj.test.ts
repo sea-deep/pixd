@@ -78,7 +78,7 @@ describe("rvcj parseCaptions", () => {
 });
 
 describe("rvcj command rendering", () => {
-  it("renders static image with 3 captions and normalizes square image to 4:3 rectangle", async () => {
+  it("renders static image with 3 captions and normalizes square/portrait image to 16:9 rectangle", async () => {
     // 500x500 square image
     const squarePng = await sharp({
       create: { width: 500, height: 500, channels: 4, background: { r: 100, g: 150, b: 200, alpha: 1 } },
@@ -115,8 +115,8 @@ describe("rvcj command rendering", () => {
     const attachmentBuffer = payload.files[0].attachment as Buffer;
     const meta = await sharp(attachmentBuffer).metadata();
     expect(meta.width).toBe(1080);
-    // 145 header + top text + 810 (4:3 normalized height) + bottom text + question + 48 footer
-    expect(meta.height).toBeGreaterThan(1000);
+    // 145 header + top text + 608 (16:9 normalized height) + bottom text + question + 48 footer
+    expect(meta.height).toBeGreaterThan(800);
   }, 30_000);
 
   it("correctly separates multi-word captions with pipes in prefix mode even when MessageOptionResolver has positional words", async () => {
