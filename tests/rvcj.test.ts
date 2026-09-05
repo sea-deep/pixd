@@ -119,6 +119,46 @@ describe("rvcj command rendering", () => {
     expect(meta.height).toBeGreaterThan(1000);
   }, 30_000);
 
+  it("correctly separates multi-word captions with pipes in prefix mode even when MessageOptionResolver has positional words", async () => {
+    const squarePng = await sharp({
+      create: { width: 500, height: 500, channels: 4, background: { r: 100, g: 150, b: 200, alpha: 1 } },
+    }).png().toBuffer();
+
+    vi.stubGlobal("fetch", vi.fn().mockImplementation(async () => new Response(new Uint8Array(squarePng))));
+
+    const reply = vi.fn().mockResolvedValue({ id: "reply" });
+    const image = { id: "img", url: "https://example.com/test.png" };
+    const ctx = {
+      isSlash: false,
+      args: ["ye", "le", "bhai", "tera", "energy", "drink", "|", "pee", "le", "isko", "|", "those", "who", "drink"],
+      user: { id: "123", displayAvatarURL: () => "https://example.com/avatar.png" },
+      reply,
+      raw: {
+        content: "p!rvcj ye le bhai tera energy drink | pee le isko | those who drink mother pee will only comment....",
+        attachments: new Collection([[image.id, image]]),
+        mentions: { users: new Collection(), members: new Collection() },
+        stickers: new Collection(),
+      },
+      options: {
+        // Simulates MessageOptionResolver assigning positional arguments to option names
+        getString: (name: string) => {
+          if (name === "caption") return "ye";
+          if (name === "subtitle") return "le";
+          if (name === "question") return "bhai";
+          return null;
+        },
+        getUser: () => null,
+        getMember: () => null,
+        getAttachment: () => null,
+      },
+    };
+
+    await rvcj.run(ctx as any, {} as any);
+    expect(reply).toHaveBeenCalled();
+    const payload = reply.mock.calls.at(-1)?.[0];
+    expect(payload.files).toHaveLength(1);
+  }, 30_000);
+
   it("renders slash command with individual caption options", async () => {
     const landscapePng = await sharp({
       create: { width: 1080, height: 600, channels: 4, background: { r: 50, g: 100, b: 150, alpha: 1 } },

@@ -258,25 +258,15 @@ export default new HybridCommand({
       const image = await contextImage(ctx, true);
 
       // Extract captions
-      let topText = ctx.options.getString("caption") || "";
-      let bottomText = ctx.options.getString("subtitle") || "";
-      let questionText = ctx.options.getString("question") || "";
+      let topText = "";
+      let bottomText = "";
+      let questionText = "";
 
-      const urlPattern = /https?:\/\/[^\s]+/gi;
-      const rawContent = commandArgs.content
-        .split(" ")
-        .slice(1)
-        .join(" ")
-        .replace(urlPattern, "")
-        .trim();
+      if (ctx.isSlash) {
+        topText = ctx.options.getString("caption") || "";
+        bottomText = ctx.options.getString("subtitle") || "";
+        questionText = ctx.options.getString("question") || "";
 
-      if (!topText && !bottomText && !questionText) {
-        const rawArgs = ctx.options.getString("arguments") || rawContent || "";
-        const parsed = parseCaptions(rawArgs);
-        topText = parsed.topText;
-        bottomText = parsed.bottomText;
-        questionText = parsed.questionText;
-      } else {
         const rawArgs = ctx.options.getString("arguments") || "";
         if (rawArgs) {
           const parsed = parseCaptions(rawArgs);
@@ -284,6 +274,19 @@ export default new HybridCommand({
           if (!bottomText) bottomText = parsed.bottomText;
           if (!questionText) questionText = parsed.questionText;
         }
+      } else {
+        const urlPattern = /https?:\/\/[^\s]+/gi;
+        const rawContent = commandArgs.content
+          .split(" ")
+          .slice(1)
+          .join(" ")
+          .replace(urlPattern, "")
+          .trim();
+
+        const parsed = parseCaptions(rawContent);
+        topText = parsed.topText;
+        bottomText = parsed.bottomText;
+        questionText = parsed.questionText;
       }
 
       if (!topText && !bottomText && !questionText) {
