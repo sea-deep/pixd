@@ -17,7 +17,7 @@ export default new Event({
     if (!config.commands.message_commands) return;
 
     const prefix = config.commands.prefix;
-    if (!message.content.startsWith(prefix)) return;
+    if (message.content.slice(0, prefix.length).toLowerCase() !== prefix.toLowerCase()) return;
 
     // 4. Parse args and command input
     const args = message.content.slice(prefix.length).trim().split(/ +/);
