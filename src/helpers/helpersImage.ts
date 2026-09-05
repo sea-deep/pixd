@@ -1,17 +1,33 @@
 import type { Message } from "discord.js";
+import { resolveMediaUrl } from "./gifHelper.js";
 export function escapeImageText(text: string): string {
   return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
-const regex = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
-const emoteRegex = /<:[^:]+:(\d+)>/;
+const urlRegex = /https?:\/\/[^\s<>"{}|\\^`]+[^\s<>"{}|\\^`.,?!:;]/i;
+const emoteRegex = /<(a?):[^:]+:(\d+)>/;
 import axios from 'axios';
 import * as cheerio from "cheerio";
 import { isUnembeddableMedia } from "../services/ImageSearchService.js";
+
+function getEmbedMedia(message: Message): string | null {
+  for (const embed of message.embeds) {
+    if (embed.image?.url) return embed.image.url;
+    if (embed.thumbnail?.url) return embed.thumbnail.url;
+    if (embed.video?.url && /\.gif(?:\?.*)?$/i.test(embed.video.url)) return embed.video.url;
+  }
+  return null;
+}
+
 export async function getInputImage(message: Message, opt?: { dynamic?: boolean }) {
-  let state = opt?.dynamic ? false : true;
+  const forceStatic = opt?.dynamic === false;
 
   if (message.attachments.size >= 1) {
     return message.attachments.first()!.url;
+  }
+
+  const embedMedia = getEmbedMedia(message);
+  if (embedMedia) {
+    return embedMedia;
   }
 
   if (message.stickers.size >= 1) {
@@ -20,19 +36,20 @@ export async function getInputImage(message: Message, opt?: { dynamic?: boolean 
     }.png`;
   }
 
-  let match = message.content.match(emoteRegex);
-  if (match) {
-    let emojiId = match[1];
-    return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+  const emoteMatch = message.content.match(emoteRegex);
+  if (emoteMatch) {
+    const isAnimated = emoteMatch[1] === "a";
+    const emojiId = emoteMatch[2];
+    return `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
   }
 
-  match = message.content.match(regex);
+  const match = message.content.match(urlRegex);
   if (match) {
-    return match[0];
+    return resolveMediaUrl(match[0]);
   }
 
   if (message.reference) {
-    let refMsg = await message.channel.messages.fetch(
+    const refMsg = await message.channel.messages.fetch(
       message.reference.messageId!,
     );
 
@@ -40,15 +57,21 @@ export async function getInputImage(message: Message, opt?: { dynamic?: boolean 
       return refMsg.attachments.first()!.url;
     }
 
-    match = refMsg.content.match(regex);
-    if (match) {
-      return match[0];
+    const refEmbedMedia = getEmbedMedia(refMsg);
+    if (refEmbedMedia) {
+      return refEmbedMedia;
     }
 
-    match = refMsg.content.match(emoteRegex);
-    if (match) {
-      let emojiId = match[1];
-      return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+    const refEmoteMatch = refMsg.content.match(emoteRegex);
+    if (refEmoteMatch) {
+      const isAnimated = refEmoteMatch[1] === "a";
+      const emojiId = refEmoteMatch[2];
+      return `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
+    }
+
+    const refUrlMatch = refMsg.content.match(urlRegex);
+    if (refUrlMatch) {
+      return resolveMediaUrl(refUrlMatch[0]);
     }
 
     if (refMsg.stickers.size >= 1) {
@@ -60,14 +83,14 @@ export async function getInputImage(message: Message, opt?: { dynamic?: boolean 
 
   if (message.mentions.users.size >= 1) {
     return message.mentions.users.first()!.displayAvatarURL({
-      extension: "png",
-      forceStatic: state,
+      size: 512,
+      forceStatic,
     });
   }
 
   return message.author.displayAvatarURL({
-    extension: "png",
-    forceStatic: state,
+    size: 512,
+    forceStatic,
   });
 }
 
@@ -83,19 +106,26 @@ export async function getCaptionInput(message: Message) {
     if (refMsg.attachments.size >= 1) {
       image = refMsg.attachments.first()!.url;
     } else {
-      let match = refMsg.content.match(regex);
-      if (match) {
-        image = match[0];
+      const refEmbedMedia = getEmbedMedia(refMsg);
+      if (refEmbedMedia) {
+        image = refEmbedMedia;
       } else {
-        match = refMsg.content.match(emoteRegex);
+        const match = refMsg.content.match(urlRegex);
         if (match) {
-          const emojiId = match[1];
-          image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+          image = await resolveMediaUrl(match[0]);
+        } else {
+          const emoteMatch = refMsg.content.match(emoteRegex);
+          if (emoteMatch) {
+            const isAnimated = emoteMatch[1] === "a";
+            const emojiId = emoteMatch[2];
+            image = `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
+          } else if (refMsg.stickers.size >= 1) {
+            image = `https://cdn.discordapp.com/stickers/${refMsg.stickers.first()!.id}.png`;
+          }
         }
       }
     }
 
-    // Return if image is found in the referenced message
     if (image) {
       return image;
     }
@@ -104,17 +134,23 @@ export async function getCaptionInput(message: Message) {
   // Check current message
   if (message.attachments.size >= 1) {
     image = message.attachments.first()!.url;
-  } else if (message.stickers.size >= 1) {
-    image = `https://cdn.discordapp.com/stickers/${message.stickers.first()!.id}.png`;
   } else {
-    let match = message.content.match(regex);
-    if (match) {
-      image = match[0];
+    const currentEmbedMedia = getEmbedMedia(message);
+    if (currentEmbedMedia) {
+      image = currentEmbedMedia;
+    } else if (message.stickers.size >= 1) {
+      image = `https://cdn.discordapp.com/stickers/${message.stickers.first()!.id}.png`;
     } else {
-      match = message.content.match(emoteRegex);
+      const match = message.content.match(urlRegex);
       if (match) {
-        const emojiId = match[1];
-        image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+        image = await resolveMediaUrl(match[0]);
+      } else {
+        const emoteMatch = message.content.match(emoteRegex);
+        if (emoteMatch) {
+          const isAnimated = emoteMatch[1] === "a";
+          const emojiId = emoteMatch[2];
+          image = `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
+        }
       }
     }
   }
@@ -125,28 +161,31 @@ export async function getCaptionInput(message: Message) {
       limit: 10,
       cache: false,
     });
-    messages.forEach((msg) => {
-      if (!image) {
-        if (msg.attachments.size >= 1) {
-          image = msg.attachments.first()!.url;
+    for (const msg of messages.values()) {
+      if (image) break;
+      if (msg.attachments.size >= 1) {
+        image = msg.attachments.first()!.url;
+      } else {
+        const recentEmbedMedia = getEmbedMedia(msg);
+        if (recentEmbedMedia) {
+          image = recentEmbedMedia;
         } else if (msg.stickers.size >= 1) {
           image = `https://cdn.discordapp.com/stickers/${msg.stickers.first()!.id}.png`;
         } else {
-          const match = msg.content.match(
-            regex,
-          );
+          const match = msg.content.match(urlRegex);
           if (match) {
-            image = match[0];
+            image = await resolveMediaUrl(match[0]);
           } else {
-            const emojiMatch = msg.content.match(emoteRegex);
-            if (emojiMatch) {
-              const emojiId = emojiMatch[1];
-              image = `https://cdn.discordapp.com/emojis/${emojiId}.png`;
+            const emoteMatch = msg.content.match(emoteRegex);
+            if (emoteMatch) {
+              const isAnimated = emoteMatch[1] === "a";
+              const emojiId = emoteMatch[2];
+              image = `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
             }
           }
         }
       }
-    });
+    }
   }
 
   if (!image) throw new Error("Supply an image attachment, URL, emoji, or reply to an image.");

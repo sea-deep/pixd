@@ -1,46 +1,39 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { imageOptions } from "../../Interactions/SlashCommands/image.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
-import { AttachmentBuilder, Message } from "discord.js";
+import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
+import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
 
 export default new HybridCommand({
   name: "lapata",
   slashRoute: "img lapata",
   options: imageOptions("lapata"),
-  description: "Create a pk lapata image...",
+  description: "Create a pk lapata image or animated GIF...",
   aliases: [""],
-  usage: "lapata [mention]|[emote/sticker]|[reply] / p!lapata",
+  usage: "lapata [mention]|[emote/sticker]|[reply]|[url] / p!lapata",
   guildOnly: true,
   permissions: {
     bot: [],
     user: [],
   },
-  /**
-   * @param {Message} message
-   */
   execute: async (ctx, client) => {
     const input = commandInput(ctx);
     let overlays: Buffer[] = [];
     if (input.users.size > 1) {
-      const loaded = await Promise.all(
-        Array.from(input.users.values()).slice(0, 5).map((user) =>
-          fetch(
+      for (const user of Array.from(input.users.values()).slice(0, 5)) {
+        try {
+          const res = await fetch(
             user.displayAvatarURL({
-              extension: "png",
               size: 256,
-              forceStatic: true,
+              forceStatic: false,
             })
-          )
-            .then(async (res) => Buffer.from(await res.arrayBuffer()))
-            .catch((e) => {
-              console.log(e);
-              return null;
-            })
-        )
-      );
-    
-      overlays = loaded.filter((buffer): buffer is Buffer<ArrayBuffer> => buffer !== null);
+          );
+          if (res.ok) {
+            overlays.push(Buffer.from(await res.arrayBuffer()));
+          }
+        } catch {}
+      }
       if (!overlays.length) throw new Error("Could not load any target images.");
       let neededDuplicates = 5 - overlays.length;
       while (neededDuplicates > 0) {
@@ -49,12 +42,13 @@ export default new HybridCommand({
         neededDuplicates = 5 - overlays.length;
       }
     } else {
-      let url = await contextImage(ctx);
+      const url = await contextImage(ctx);
       const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to download image: ${res.statusText}`);
       const overlay = Buffer.from(await res.arrayBuffer());
       overlays = [overlay, overlay, overlay, overlay, overlay];
     }
-    
+
     const s = [
       { w: 359, h: 437, x: 145, y: 334 },
       { w: 195, h: 289, x: 938, y: 398 },
@@ -63,13 +57,78 @@ export default new HybridCommand({
       { w: 59, h: 175, x: 1805, y: 477 },
     ];
 
+    const inspected = await Promise.all(overlays.map(inspectImage));
+    const isAnimated = inspected.some((info) => info.isAnimated);
+
+    if (isAnimated) {
+      const scale = 0.5;
+      const width = Math.round(1928 * scale);
+      const height = Math.round(1322 * scale);
+      const scaledS = s.map((p) => ({
+        w: Math.round(p.w * scale),
+        h: Math.round(p.h * scale),
+        x: Math.round(p.x * scale),
+        y: Math.round(p.y * scale),
+      }));
+
+      const bgRaw = await sharp("./Assets/lapata.png")
+        .resize(width, height)
+        .raw()
+        .toBuffer();
+
+      const extractedList = await Promise.all(
+        overlays.map((b) => extractFrames(b, 24))
+      );
+      const maxFrames = Math.max(...extractedList.map((e) => e.frames.length));
+      const delay = extractedList.find((e) => e.isAnimated)?.delay ?? 100;
+
+      const resizedByPos = await Promise.all(
+        scaledS.map(async (pos, p) => {
+          const ex = extractedList[p];
+          return Promise.all(
+            ex.frames.map((f) =>
+              sharp(f).resize(pos.w, pos.h, { fit: "fill" }).raw().toBuffer()
+            )
+          );
+        })
+      );
+
+      const rawFrames: Buffer[] = [];
+      for (let f = 0; f < maxFrames; f++) {
+        const composites = scaledS.map((pos, p) => {
+          const posFrames = resizedByPos[p];
+          const frameBuf = posFrames[f % posFrames.length];
+          return {
+            input: frameBuf,
+            raw: { width: pos.w, height: pos.h, channels: 4 as const },
+            top: pos.y,
+            left: pos.x,
+            blend: "dest-over" as const,
+          };
+        });
+
+        const frameRaw = await sharp(bgRaw, {
+          raw: { width, height, channels: 4 },
+        })
+          .composite(composites)
+          .raw()
+          .toBuffer();
+        rawFrames.push(frameRaw);
+      }
+
+      const gifBuffer = await renderAnimatedGif(rawFrames, width, height, delay);
+      const file = new AttachmentBuilder(gifBuffer, { name: "lapata.gif" });
+      return ctx.reply({ content: "", files: [file] });
+    }
+
+    // Static rendering
     for (let i = 0; i < overlays.length; i++) {
       overlays[i] = await sharp(overlays[i])
         .resize(s[i].w, s[i].h, { fit: "fill" })
         .toBuffer();
     }
 
-    let lapata = await sharp({
+    const lapata = await sharp({
       create: {
         height: 1322,
         width: 1928,
@@ -88,7 +147,7 @@ export default new HybridCommand({
       .png()
       .toBuffer();
 
-    let file = new AttachmentBuilder(lapata, { name: "lapata.png" });
+    const file = new AttachmentBuilder(lapata, { name: "lapata.png" });
     return ctx.reply({
       content: "",
       files: [file],

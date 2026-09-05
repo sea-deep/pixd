@@ -1,14 +1,14 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
-import { AttachmentBuilder, Message } from "discord.js";
+import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
 import { escapeImageText } from "../../helpers/helpersImage.js";
 import emojiRegex from "emoji-regex";
-import { getCaptionInput } from "../../helpers/helpersImage.js";
+import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
 
 export default new HybridCommand({
   name: "rvcj",
-  description: "Create RVCJ styled image",
+  description: "Create RVCJ styled image or animated GIF",
   aliases: ["cid", "caption"],
   usage: "rvcj <image: emoji, url, attachment, sticker>&<caption:text>",
   guildOnly: false,
@@ -16,9 +16,6 @@ export default new HybridCommand({
     bot: [],
     user: [],
   },
-  /**
-   * @param {Message} message
-   */
   options: [
     { type: 3, name: "arguments", description: "Command text and arguments, in prefix order" },
     { type: 6, name: "user", description: "Target user" },
@@ -28,16 +25,15 @@ export default new HybridCommand({
   ],
   execute: async (ctx, client) => {
     const commandArgs = commandInput(ctx);
-    const args = commandArgs.args;
     try {
       const image = await contextImage(ctx, true);
 
-      const reg = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
+      const urlPattern = /https?:\/\/[^\s]+/gi;
       const text = commandArgs.content
         .split(" ")
-        .splice(1)
+        .slice(1)
         .join(" ")
-        .replace(reg, "")
+        .replace(urlPattern, "")
         .trim();
       if (!text) return ctx.reply("Provide a caption for the image.");
 
@@ -194,6 +190,66 @@ export default new HybridCommand({
 
       const finalHeight = 48 + 145 + 30 + textHeight + md.height;
       const watermark = await sharp("./Assets/watermark.png").metadata();
+      const imageInfo = await inspectImage(buffer);
+
+      if (imageInfo.isAnimated) {
+        const extracted = await extractFrames(buffer, 20);
+        const scale = 0.5;
+        const targetWidth = 540;
+        const scaledHeader = await sharp("./Assets/rvcjheader.png")
+          .resize(targetWidth, Math.round(145 * scale), { fit: "fill" })
+          .png()
+          .toBuffer();
+        const scaledFooter = await sharp("./Assets/rvcjfooter.png")
+          .resize(targetWidth, Math.round(48 * scale), { fit: "fill" })
+          .png()
+          .toBuffer();
+        const scaledOverlay = await sharp(overlay)
+          .resize(targetWidth, Math.round(textHeight * scale), { fit: "fill" })
+          .png()
+          .toBuffer();
+        const scaledFrameHeight = Math.round(md.height * scale);
+        const gifFinalHeight = Math.round(48 * scale) + Math.round(145 * scale) + Math.round(30 * scale) + Math.round(textHeight * scale) + scaledFrameHeight;
+
+        const rawFrames: Buffer[] = [];
+        for (const frame of extracted.frames) {
+          let resizedFrame = await sharp(frame).resize(targetWidth).png().toBuffer();
+          let frameMeta = await sharp(resizedFrame).metadata();
+          if ((frameMeta.height ?? 0) > (frameMeta.width ?? targetWidth)) {
+            resizedFrame = await sharp(resizedFrame)
+              .resize({
+                width: targetWidth,
+                height: targetWidth,
+                fit: "contain",
+                background: { r: 255, g: 255, b: 255, alpha: 1 },
+              })
+              .png()
+              .toBuffer();
+          }
+
+          const raw = await sharp({
+            create: {
+              width: targetWidth,
+              height: gifFinalHeight,
+              background: { r: 255, g: 255, b: 255, alpha: 1 },
+              channels: 4,
+            },
+          })
+            .composite([
+              { input: scaledHeader, top: 0, left: 0 },
+              { input: scaledOverlay, top: Math.round(145 * scale), left: 0 },
+              { input: resizedFrame, top: Math.round((145 + textHeight + 30) * scale), left: 0 },
+              { input: scaledFooter, top: gifFinalHeight - Math.round(48 * scale), left: 0 },
+            ])
+            .raw()
+            .toBuffer();
+          rawFrames.push(raw);
+        }
+
+        const gifBuffer = await renderAnimatedGif(rawFrames, targetWidth, gifFinalHeight, extracted.delay);
+        const file = new AttachmentBuilder(gifBuffer, { name: "rvcj.gif" });
+        return ctx.reply({ content: "men are simple 🙂", files: [file] });
+      }
 
       const finalImage = await sharp({
         create: {
@@ -211,9 +267,9 @@ export default new HybridCommand({
           {
             input: "./Assets/watermark.png",
             top: Math.floor(
-              Math.random() * Math.max(1, finalHeight - watermark.height)
+              Math.random() * Math.max(1, finalHeight - (watermark.height ?? 100))
             ),
-            left: Math.floor(Math.random() * Math.max(1, 1080 - watermark.width)),
+            left: Math.floor(Math.random() * Math.max(1, 1080 - (watermark.width ?? 100))),
           },
         ])
         .png()

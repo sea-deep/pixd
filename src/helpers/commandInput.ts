@@ -33,14 +33,16 @@ export function commandInput(ctx: CommandContext) {
   };
 }
 
+import { resolveMediaUrl } from "./gifHelper.js";
+
 export async function contextImage(ctx: CommandContext, caption = false, options?: { dynamic?: boolean }): Promise<string> {
   if (!ctx.isSlash) return caption ? getCaptionInput(ctx.raw as Message) : getInputImage(ctx.raw as Message, options);
   const input = commandInput(ctx);
   const attachment = input.attachments.first();
   if (attachment) return attachment.url;
-  const url = ctx.options.getString("image-url") ?? input.args.find(arg => /^https?:\/\//i.test(arg));
-  if (url) return new URL(url).href;
+  const rawUrl = ctx.options.getString("image-url") ?? input.args.find(arg => /^https?:\/\//i.test(arg));
+  if (rawUrl) return resolveMediaUrl(new URL(rawUrl).href);
   const user = input.users.first();
   if (caption && !user) throw new Error("Supply an image attachment, URL, or target user.");
-  return (user ?? ctx.user).displayAvatarURL({ extension: "png", forceStatic: !options?.dynamic });
+  return (user ?? ctx.user).displayAvatarURL({ size: 512, forceStatic: options?.dynamic === false });
 }
