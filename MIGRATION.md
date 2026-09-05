@@ -52,7 +52,7 @@ The source `.env` was copied without displaying secrets or changing the original
 
 The TypeScript draft now lives in `/home/dipak/code/pixd` on `main`, retaining the
 original PixD Git history and `origin` remote. The previous working state, including
-uncommitted source changes, is preserved in `codex/pixd-before-draft-20260905` and
+uncommitted source changes, is preserved in `archive/pixd-before-migration-20260905` and
 the complete `/home/dipak/code/pixd-legacy-20260905` folder. The draft's former
 template Git metadata is retained at `/home/dipak/code/pixd-draft-template-git-20260905`.
 The draft's current `.env` was retained without exposing it in Git. No remote push
