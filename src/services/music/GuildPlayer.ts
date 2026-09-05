@@ -10,6 +10,7 @@ import {
   entersState,
   joinVoiceChannel,
   type AudioPlayer,
+  type AudioResource,
   type VoiceConnection,
 } from "@discordjs/voice";
 import { type Client, type Guild, type TextBasedChannel } from "discord.js";
@@ -30,6 +31,8 @@ export default class GuildPlayer {
   readonly connection: VoiceConnection;
   current: MusicTrack | null = null;
   loopMode: LoopMode = "off";
+  volume: number = config.music.defaultVolume;
+  private currentResource: AudioResource<MusicTrack> | null = null;
   private process: ChildProcess | null = null;
   private inactivityTimer: NodeJS.Timeout | null = null;
   private destroyed = false;
@@ -129,12 +132,22 @@ export default class GuildPlayer {
     this.loopMode = mode;
   }
 
+  setVolume(volume: number): number {
+    if (!Number.isFinite(volume) || volume < 0 || volume > config.music.maxVolume) {
+      throw new Error(`Volume must be between 0 and ${config.music.maxVolume}%.`);
+    }
+    this.volume = volume;
+    this.currentResource?.volume?.setVolumeLogarithmic(volume / 100);
+    return this.volume;
+  }
+
   async destroy(): Promise<void> {
     if (this.destroyed) return;
     this.destroyed = true;
     this.clearInactivityTimer();
     this.queue.length = 0;
     this.current = null;
+    this.currentResource = null;
     this.killProcess();
     this.audioPlayer.stop(true);
     this.connection.destroy();
@@ -198,7 +211,10 @@ export default class GuildPlayer {
     const resource = createAudioResource(child.stdout as Readable, {
       inputType: StreamType.Arbitrary,
       metadata: track,
+      inlineVolume: true,
     });
+    this.currentResource = resource;
+    resource.volume?.setVolumeLogarithmic(this.volume / 100);
     if (!isSeek) {
       this.playStartedAt = Date.now();
       this.activeStartedAt = 0;
@@ -221,6 +237,7 @@ export default class GuildPlayer {
     this.recordActivePlayback();
     const playedMs = this.playedMs;
     this.current = null;
+    this.currentResource = null;
     this.playStartedAt = 0;
     this.activeStartedAt = 0;
     this.playedMs = 0;
