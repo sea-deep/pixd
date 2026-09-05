@@ -63,6 +63,62 @@ function formatTitle(imgurl, imgrefurl) {
   }
 }
 
+function isUnembeddableMedia(url, refUrl) {
+  if (!url) return true;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+    const path = u.pathname.toLowerCase();
+
+    // Direct video formats that Discord embed.image cannot render
+    if (/\\.(mp4|webm|mov|m4v|mkv|flv|avi|wmv|ts|m3u8)(\\?|$)/i.test(path)) return true;
+
+    // Video platforms and social media domains with bot-blocking or non-image endpoints
+    if (
+      host.includes('tiktok.com') ||
+      host.includes('byteoversea.com') ||
+      host.includes('ibytedtos.com') ||
+      host.includes('muscdn.com') ||
+      host.includes('tiktokcdn.com') ||
+      host.includes('fbsbx.com') ||
+      host.includes('facebook.com') ||
+      host.includes('fbcdn.net') ||
+      host.includes('instagram.com') ||
+      host.includes('cdninstagram.com') ||
+      host.includes('threads.net') ||
+      host.includes('vimeo.com') ||
+      host.includes('dailymotion.com') ||
+      host.includes('twitch.tv') ||
+      host.includes('lookaside')
+    ) {
+      return true;
+    }
+
+    // YouTube video/short URLs (except i.ytimg.com image CDN)
+    if ((host.includes('youtube.com') || host.includes('youtu.be')) && !host.includes('ytimg.com')) {
+      return true;
+    }
+
+    // Web page / document endpoints
+    if (/\\.(html?|php|aspx?|jsp)(\\?|$)/i.test(path)) return true;
+
+    // Check refUrl if imgurl lacks an image extension and comes from social media
+    if (refUrl) {
+      const refHost = new URL(refUrl).hostname.toLowerCase();
+      if (
+        (refHost.includes('tiktok.com') || refHost.includes('facebook.com') || refHost.includes('instagram.com')) &&
+        !/\\.(png|jpe?g|gif|webp|svg|avif)(\\?|$)/i.test(path)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 async function fetchGooglePage(query, safeSearch, start = 0) {
   const ua = NOKIA_USER_AGENTS[Math.floor(Math.random() * NOKIA_USER_AGENTS.length)];
   const url = 'https://www.google.com/search?q=' + encodeURIComponent(query) +
@@ -89,11 +145,13 @@ async function fetchGooglePage(query, safeSearch, start = 0) {
       const w = parseInt(u.searchParams.get('w') || '0', 10);
       const h = parseInt(u.searchParams.get('h') || '0', 10);
       const tbnid = u.searchParams.get('tbnid');
+      const thumbUrl = tbnid ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:' + tbnid : imgurl;
+      const displayUrl = isUnembeddableMedia(imgurl, imgrefurl) ? thumbUrl : imgurl;
       results.push({
         title: formatTitle(imgurl, imgrefurl),
-        url: imgurl,
+        url: displayUrl,
         originalUrl: imgrefurl || imgurl,
-        thumbnailUrl: tbnid ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:' + tbnid : imgurl,
+        thumbnailUrl: thumbUrl,
         width: Math.max(0, w),
         height: Math.max(0, h),
         source: 'Google Images',
@@ -149,6 +207,62 @@ function scrape(query: string, limit: number, safeSearch: boolean, timeout: numb
   });
 }
 
+export function isUnembeddableMedia(url?: string, refUrl?: string): boolean {
+  if (!url) return true;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+    const path = u.pathname.toLowerCase();
+
+    // Direct video formats that Discord embed.image cannot render
+    if (/\.(mp4|webm|mov|m4v|mkv|flv|avi|wmv|ts|m3u8)(\?|$)/i.test(path)) return true;
+
+    // Video platforms and social media domains with bot-blocking or non-image endpoints
+    if (
+      host.includes("tiktok.com") ||
+      host.includes("byteoversea.com") ||
+      host.includes("ibytedtos.com") ||
+      host.includes("muscdn.com") ||
+      host.includes("tiktokcdn.com") ||
+      host.includes("fbsbx.com") ||
+      host.includes("facebook.com") ||
+      host.includes("fbcdn.net") ||
+      host.includes("instagram.com") ||
+      host.includes("cdninstagram.com") ||
+      host.includes("threads.net") ||
+      host.includes("vimeo.com") ||
+      host.includes("dailymotion.com") ||
+      host.includes("twitch.tv") ||
+      host.includes("lookaside")
+    ) {
+      return true;
+    }
+
+    // YouTube video/short URLs (except i.ytimg.com image CDN)
+    if ((host.includes("youtube.com") || host.includes("youtu.be")) && !host.includes("ytimg.com")) {
+      return true;
+    }
+
+    // Web page / document endpoints
+    if (/\.(html?|php|aspx?|jsp)(\?|$)/i.test(path)) return true;
+
+    // Check refUrl if imgurl lacks an image extension and comes from social media
+    if (refUrl) {
+      const refHost = new URL(refUrl).hostname.toLowerCase();
+      if (
+        (refHost.includes("tiktok.com") || refHost.includes("facebook.com") || refHost.includes("instagram.com")) &&
+        !/\.(png|jpe?g|gif|webp|svg|avif)(\?|$)/i.test(path)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 export function normalizeImages(response: unknown, limit: number): ImageSearchResult[] {
   const items = (response as { result?: unknown[] } | null)?.result;
   if (!Array.isArray(items)) throw new Error("Invalid image search response.");
@@ -159,11 +273,13 @@ export function normalizeImages(response: unknown, limit: number): ImageSearchRe
       const image = new URL(String(item.url));
       const page = new URL(String(item.originalUrl || item.url));
       if (!/^https?:$/.test(image.protocol) || !/^https?:$/.test(page.protocol)) continue;
-      results.set(image.href, {
+      const thumbUrl = item.thumbnailUrl ? String(item.thumbnailUrl) : image.href;
+      const displayUrl = isUnembeddableMedia(image.href, page.href) ? thumbUrl : image.href;
+      results.set(displayUrl, {
         title: String(item.title || page.hostname).slice(0, 250),
-        url: image.href,
+        url: displayUrl,
         originalUrl: page.href,
-        thumbnailUrl: String(item.thumbnailUrl || image.href),
+        thumbnailUrl: thumbUrl,
         source: "Google Images",
         width: Math.max(0, Number(item.width) || 0),
         height: Math.max(0, Number(item.height) || 0),

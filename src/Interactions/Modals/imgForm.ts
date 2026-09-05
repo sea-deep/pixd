@@ -1,6 +1,6 @@
 import Component from "../../structures/Component.js";
 import { Client } from "discord.js";
-import { handleMeta } from "../../helpers/helpersImage.js";
+import { resolveEmbedImageUrl } from "../../helpers/helpersImage.js";
 
 export default new Component({
   customId: "imgInputForm",
@@ -12,12 +12,12 @@ export default new Component({
     await client.interactionDefer(interaction);
     const regex = /`([^`]+)`/;
     const matches = interaction.message.embeds[0].footer.text.match(regex);
-    const total = parseInt(matches[1].split("/")[1]) - 1;
+    const total = parseInt(matches[1].split("/")[1], 10);
     const images = await client.keyv.get(interaction.message.id);
     const val = interaction.fields.getTextInputValue("input");
-    const valueee = Number(val);
+    const pageNumber = parseInt(val, 10);
 
-    if (isNaN(valueee) || valueee >= total || valueee < 0) {
+    if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > total || !images || !images[pageNumber - 1]) {
       return interaction.followUp({
         content: "",
         ephemeral: true,
@@ -30,8 +30,8 @@ export default new Component({
       });
     }
 
-    const current = parseInt(matches[1].split("/")[0]) - 1;
-    const next = valueee - 1;
+    const current = parseInt(matches[1].split("/")[0], 10) - 1;
+    const next = pageNumber - 1;
     const image = images[next];
     const msg = interaction.message;
 
@@ -39,7 +39,7 @@ export default new Component({
       title: msg.embeds[0].title,
       description: `**[${image.title}](${image.originalUrl.replace(`\\u003d`, "=")})**`,
       image: {
-        url: image.url.includes('lookaside') ? await handleMeta(image.url) : image.url,
+        url: resolveEmbedImageUrl(image),
         height: image.height,
         width: image.width,
       },

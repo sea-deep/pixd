@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
 import { searchImages } from "../../services/ImageSearchService.js";
+import { resolveEmbedImageUrl } from "../../helpers/helpersImage.js";
 
 export default new HybridCommand({
   name: "img",
@@ -47,7 +48,7 @@ export default new HybridCommand({
           description: `**[${image.title}](${image.originalUrl})**`,
           title: `🔍 ${query}`,
           color: client.color,
-          image: { url: image.url, height: image.height, width: image.width },
+          image: { url: resolveEmbedImageUrl(image), height: image.height, width: image.width },
           author: { name: `Image Search · ${image.source}` },
           footer: { text: `viewing page- \`1/${images.length}\`` },
         }],

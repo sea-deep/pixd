@@ -6,6 +6,7 @@ const regex = /https?:\/\/.*\.(?:png|jpg|jpeg|gif)/i;
 const emoteRegex = /<:[^:]+:(\d+)>/;
 import axios from 'axios';
 import * as cheerio from "cheerio";
+import { isUnembeddableMedia } from "../services/ImageSearchService.js";
 export async function getInputImage(message: Message, opt?: { dynamic?: boolean }) {
   let state = opt?.dynamic ? false : true;
 
@@ -152,21 +153,30 @@ export async function getCaptionInput(message: Message) {
   return image;
 }
 
-export function handleMeta(url: string): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    axios
-      .get(url)
-      .then((response) => {
-        const $ = cheerio.load(response.data);
-        const metaImage = $('meta[property="og:image"]').attr("content");
-        if (metaImage) {
-          resolve(metaImage);
-        } else {
-          reject(new Error("No og:image found"));
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+export function resolveEmbedImageUrl(image: { url: string; thumbnailUrl?: string; originalUrl?: string }): string {
+  if (!image) return "";
+  if (isUnembeddableMedia(image.url, image.originalUrl) && image.thumbnailUrl) {
+    return image.thumbnailUrl;
+  }
+  return image.url || image.thumbnailUrl || "";
+}
+
+export async function handleMeta(url: string, fallback?: string): Promise<string> {
+  try {
+    const response = await axios.get(url, {
+      timeout: 3000,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+    const $ = cheerio.load(response.data);
+    const metaImage = $('meta[property="og:image"]').attr("content");
+    if (metaImage && /^https?:\/\//.test(metaImage)) {
+      return metaImage;
+    }
+  } catch {
+    // Fail safely without throwing unhandled exceptions
+  }
+  return fallback || url;
 }

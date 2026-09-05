@@ -1,6 +1,6 @@
 import Component from "../../../structures/Component.js";
 import { Client } from "discord.js";
-import { handleMeta } from "../../../helpers/helpersImage.js";
+import { resolveEmbedImageUrl } from "../../../helpers/helpersImage.js";
 import { isComponentOwner } from "../../../helpers/componentOwnership.js";
 
 export default new Component({
@@ -41,8 +41,8 @@ export default new Component({
       title: msg.embeds[0].title,
       description: `**[${image.title}](${image.originalUrl.replace(`\\u003d`, "=")})**`,
       image: {
-      url: image.url.includes('lookaside') ? await handleMeta(image.url) : image.url,
-         height: image.height,
+        url: resolveEmbedImageUrl(image),
+        height: image.height,
         width: image.width,
       },
       color: client.color,
