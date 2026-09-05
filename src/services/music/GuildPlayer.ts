@@ -16,6 +16,7 @@ import { type Client, type Guild, type TextBasedChannel } from "discord.js";
 import { youtubeDl } from "youtube-dl-exec";
 import config from "../../../Configs/config.js";
 import { env } from "../../utilities/env.js";
+import { getCookiesPath } from "../../helpers/cookieHelper.js";
 import Logger from "../../helpers/Logger.js";
 import type { LoopMode, MusicTrack } from "./types.js";
 import LastFmService from "../lastfm/LastFmService.js";
@@ -162,6 +163,7 @@ export default class GuildPlayer {
     this.clearInactivityTimer();
     this.killProcess();
 
+    const cookiesPath = getCookiesPath();
     const args = [
       track.url,
       "--format", "bestaudio/best",
@@ -170,8 +172,9 @@ export default class GuildPlayer {
       "--no-progress",
       "--no-warnings",
       "--quiet",
+      "--extractor-args", "youtube:player_client=ios,android,mweb;player_skip=webpage",
     ];
-    if (env.YT_DLP_COOKIES_PATH) args.push("--cookies", env.YT_DLP_COOKIES_PATH);
+    if (cookiesPath) args.push("--cookies", cookiesPath);
     if (this.startAtMs > 0) {
       args.push("--download-sections", `*${this.startAtMs / 1000}-inf`, "--force-keyframes-at-cuts");
     }

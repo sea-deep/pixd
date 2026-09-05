@@ -1,6 +1,6 @@
 import { youtubeDl } from "youtube-dl-exec";
 import config from "../../../Configs/config.js";
-import { env } from "../../utilities/env.js";
+import { getCookiesPath } from "../../helpers/cookieHelper.js";
 import type { MusicTrack, ResolveResult } from "./types.js";
 
 type YtDlpEntry = {
@@ -34,14 +34,20 @@ export default class YtDlpResolver {
     }
 
     const target = isUrl ? query : `ytsearch1:${query}`;
-    const payload = await youtubeDl(target, {
+    const cookiesPath = getCookiesPath();
+    const options: Record<string, unknown> = {
       dumpSingleJson: true,
       skipDownload: true,
       noWarnings: true,
+      extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
       playlistEnd: config.music.maxPlaylistSize,
       socketTimeout: 20,
-      ...(env.YT_DLP_COOKIES_PATH ? { cookies: env.YT_DLP_COOKIES_PATH } : {}),
-    }) as unknown as YtDlpEntry;
+      ...(cookiesPath ? { cookies: cookiesPath } : {}),
+    };
+    const payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
+      target,
+      options,
+    ) as YtDlpEntry;
 
     const entries = payload.entries?.length ? payload.entries : [payload];
     const tracks = entries

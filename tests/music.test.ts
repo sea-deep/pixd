@@ -41,6 +41,7 @@ describe("YtDlpResolver", () => {
 
     expect(capturedTarget).toBe("ytsearch1:shadow gagan likhari");
     expect(capturedOptions?.noCheckCertificates).toBeUndefined();
+    expect(capturedOptions?.extractorArgs).toBe("youtube:player_client=ios,android,mweb;player_skip=webpage");
     expect(result.tracks).toHaveLength(1);
     expect(result.tracks[0].title).toBe("Shadow");
     expect(result.tracks[0].author).toBe("Gagan Likhari");

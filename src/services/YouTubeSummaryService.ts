@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { youtubeDl } from "youtube-dl-exec";
 import { env } from "../utilities/env.js";
+import { getCookiesPath } from "../helpers/cookieHelper.js";
 
 interface VideoMetadata { id: string; title: string; description: string; channel: string; thumbnail: string }
 interface SummaryResult { summary: string; title: string; thumbnail: string }
@@ -28,7 +29,18 @@ export async function summarizeYouTubeVideo(url: string, language = "en"): Promi
 }
 
 async function getMetadata(url: string, id: string): Promise<VideoMetadata> {
-  const data = await youtubeDl(url, { dumpSingleJson: true, skipDownload: true, noWarnings: true }) as unknown as {
+  const cookiesPath = getCookiesPath();
+  const options: Record<string, unknown> = {
+    dumpSingleJson: true,
+    skipDownload: true,
+    noWarnings: true,
+    extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
+    ...(cookiesPath ? { cookies: cookiesPath } : {}),
+  };
+  const data = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
+    url,
+    options,
+  ) as {
     title?: string; description?: string; uploader?: string; channel?: string; thumbnail?: string;
   };
   return {
