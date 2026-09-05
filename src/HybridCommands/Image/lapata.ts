@@ -1,9 +1,9 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { imageOptions } from "../../Interactions/SlashCommands/image.js";
-import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
 import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { resolveMultiImageTargets } from "../../helpers/targetImageResolver.js";
 
 export default new HybridCommand({
   name: "lapata",
@@ -11,43 +11,14 @@ export default new HybridCommand({
   options: imageOptions("lapata"),
   description: "Create a pk lapata image or animated GIF...",
   aliases: [""],
-  usage: "lapata [mention]|[emote/sticker]|[reply]|[url] / p!lapata",
+  usage: "lapata [@users / emojis / attachments / links / 0 args]",
   guildOnly: true,
   permissions: {
     bot: [],
     user: [],
   },
   execute: async (ctx, client) => {
-    const input = commandInput(ctx);
-    let overlays: Buffer[] = [];
-    if (input.users.size > 1) {
-      for (const user of Array.from(input.users.values()).slice(0, 5)) {
-        try {
-          const res = await fetch(
-            user.displayAvatarURL({
-              size: 256,
-              forceStatic: false,
-            })
-          );
-          if (res.ok) {
-            overlays.push(Buffer.from(await res.arrayBuffer()));
-          }
-        } catch {}
-      }
-      if (!overlays.length) throw new Error("Could not load any target images.");
-      let neededDuplicates = 5 - overlays.length;
-      while (neededDuplicates > 0) {
-        const duplicatedElements = overlays.slice(0, neededDuplicates);
-        overlays.push(...duplicatedElements);
-        neededDuplicates = 5 - overlays.length;
-      }
-    } else {
-      const url = await contextImage(ctx);
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to download image: ${res.statusText}`);
-      const overlay = Buffer.from(await res.arrayBuffer());
-      overlays = [overlay, overlay, overlay, overlay, overlay];
-    }
+    const overlays = await resolveMultiImageTargets(ctx, 5, { duplicateIfSingle: true });
 
     const s = [
       { w: 359, h: 437, x: 145, y: 334 },

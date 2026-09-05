@@ -1,5 +1,7 @@
 import type { Message } from "discord.js";
 import { resolveMediaUrl } from "./gifHelper.js";
+import { getTwemojiUrl } from "./targetImageResolver.js";
+import emojiRegex from "emoji-regex";
 export function escapeImageText(text: string): string {
   return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
@@ -43,6 +45,11 @@ export async function getInputImage(message: Message, opt?: { dynamic?: boolean 
     return `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
   }
 
+  const uMatch = message.content.match(emojiRegex());
+  if (uMatch) {
+    return getTwemojiUrl(uMatch[0]);
+  }
+
   const match = message.content.match(urlRegex);
   if (match) {
     return resolveMediaUrl(match[0]);
@@ -67,6 +74,11 @@ export async function getInputImage(message: Message, opt?: { dynamic?: boolean 
       const isAnimated = refEmoteMatch[1] === "a";
       const emojiId = refEmoteMatch[2];
       return `https://cdn.discordapp.com/emojis/${emojiId}.${isAnimated ? "gif" : "png"}`;
+    }
+
+    const refUMatch = refMsg.content.match(emojiRegex());
+    if (refUMatch) {
+      return getTwemojiUrl(refUMatch[0]);
     }
 
     const refUrlMatch = refMsg.content.match(urlRegex);

@@ -1,14 +1,14 @@
 import HybridCommand from "../../structures/HybridCommand.js";
-import { commandInput } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
 import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { resolveMultiImageTargets } from "../../helpers/targetImageResolver.js";
 
 export default new HybridCommand({
   name: "alliswell",
   description: "Create 3 idiots poster or animated GIF",
   aliases: ["idiots", "rastogi", "farhan", "3idiots", "rancho"],
-  usage: "alliswell @user1 @user2 @user3",
+  usage: "alliswell [@users / emojis / attachments / links]",
   guildOnly: true,
   permissions: {
     bot: [],
@@ -20,25 +20,11 @@ export default new HybridCommand({
     { type: 6, name: "user2", description: "Second target" },
     { type: 6, name: "user3", description: "Third target" },
     { type: 11, name: "image", description: "Input image or attachment" },
+    { type: 11, name: "image2", description: "Second image or attachment" },
+    { type: 11, name: "image3", description: "Third image or attachment" },
   ],
   execute: async (ctx, client) => {
-    const input = commandInput(ctx);
-    const ids = input.content.match(/<@!?(\d+)>/g);
-    if (!ids || ids.length < 3) {
-      return ctx.reply("Please mention 3 peoples 🤓");
-    }
-    const idArray = ids.slice(0, 3).map((id) => id.replace(/\D/g, ""));
-    const avatars: Buffer[] = [];
-    for (let i = 0; i < idArray.length; i++) {
-      const user = await client.users.fetch(idArray[i]);
-      const url = user.displayAvatarURL({
-        size: 256,
-        forceStatic: false,
-      });
-      const res = await fetch(url);
-      const buffer = Buffer.from(await res.arrayBuffer());
-      avatars.push(buffer);
-    }
+    const avatars = await resolveMultiImageTargets(ctx, 3);
     for (let i = avatars.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [avatars[i], avatars[j]] = [avatars[j], avatars[i]];

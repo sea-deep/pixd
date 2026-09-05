@@ -1,9 +1,9 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { imageOptions } from "../../Interactions/SlashCommands/image.js";
-import { commandInput } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
 import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { resolveMultiImageTargets } from "../../helpers/targetImageResolver.js";
 
 export default new HybridCommand({
   name: "animan",
@@ -11,30 +11,14 @@ export default new HybridCommand({
   options: imageOptions("animan"),
   description: "we put the new forgis on the zip",
   aliases: ["anime"],
-  usage: "animan @user1 @user2 @user3 @user4",
+  usage: "animan [@users / emojis / attachments / links]",
   guildOnly: true,
   permissions: {
     bot: [],
     user: [],
   },
   execute: async (ctx, client) => {
-    const input = commandInput(ctx);
-    const ids = input.content.match(/<@!?(\d+)>/g);
-    if (!ids || ids.length < 4) {
-      return ctx.reply("Please mention 4 peoples 🤓");
-    }
-    const idArray = ids.slice(0, 4).map((id) => id.replace(/\D/g, ""));
-    const avatars: Buffer[] = [];
-    for (let i = 0; i < idArray.length; i++) {
-      const user = await client.users.fetch(idArray[i]);
-      const url = user.displayAvatarURL({
-        size: 256,
-        forceStatic: false,
-      });
-      const res = await fetch(url);
-      const buffer = Buffer.from(await res.arrayBuffer());
-      avatars.push(buffer);
-    }
+    const avatars = await resolveMultiImageTargets(ctx, 4);
 
     const lyrics = [
       "I put the new Forgis on the Jeep",
