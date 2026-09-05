@@ -2,10 +2,8 @@ import HybridCommand from "../../structures/HybridCommand.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp, { type OverlayOptions } from "sharp";
-import { escapeImageText } from "../../helpers/helpersImage.js";
-import emojiRegex from "emoji-regex";
 import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
-import { getTwemojiUrl, fetchImageBuffer } from "../../helpers/targetImageResolver.js";
+import { renderTextWithEmojis } from "../../helpers/textEmojiRenderer.js";
 
 export function parseCaptions(rawText: string): { topText: string; bottomText: string; questionText: string } {
   let cleaned = rawText.trim();
@@ -30,213 +28,9 @@ export function parseCaptions(rawText: string): { topText: string; bottomText: s
   };
 }
 
-interface Token {
-  text: string;
-  isEmoji: boolean;
-}
-
-function tokenizeLine(line: string): Token[] {
-  const eRe = emojiRegex();
-  const customRe = /<(?:a?):[a-zA-Z0-9_]+:[0-9]+>/g;
-  const matches: { index: number; text: string; isEmoji: boolean }[] = [];
-  let m: RegExpExecArray | null;
-
-  while ((m = customRe.exec(line)) !== null) {
-    matches.push({ index: m.index, text: m[0], isEmoji: true });
-  }
-  while ((m = eRe.exec(line)) !== null) {
-    matches.push({ index: m.index, text: m[0], isEmoji: true });
-  }
-  matches.sort((a, b) => a.index - b.index);
-
-  const tokens: Token[] = [];
-  let lastIndex = 0;
-  for (const match of matches) {
-    if (match.index < lastIndex) continue;
-    if (match.index > lastIndex) {
-      tokens.push({ text: line.slice(lastIndex, match.index), isEmoji: false });
-    }
-    tokens.push({ text: match.text, isEmoji: true });
-    lastIndex = match.index + match.text.length;
-  }
-  if (lastIndex < line.length) {
-    tokens.push({ text: line.slice(lastIndex), isEmoji: false });
-  }
-  return tokens;
-}
-
-function wrapTextToLines(text: string, maxChars = 28): string[] {
-  const paragraphs = text.split(/\r?\n/);
-  const result: string[] = [];
-  const approxWidth = (s: string) => {
-    const eRe = emojiRegex();
-    const cRe = /<(?:a?):[a-zA-Z0-9_]+:[0-9]+>/g;
-    return s.replace(cRe, "__").replace(eRe, "__").length;
-  };
-
-  for (const para of paragraphs) {
-    const words = para.split(/\s+/).filter(Boolean);
-    let currentLine = "";
-    for (const word of words) {
-      const candidate = currentLine ? `${currentLine} ${word}` : word;
-      if (approxWidth(candidate) <= maxChars) {
-        currentLine = candidate;
-      } else {
-        if (currentLine) result.push(currentLine);
-        currentLine = word;
-      }
-    }
-    if (currentLine) result.push(currentLine);
-  }
-  return result;
-}
-
-async function getEmojiBuffer(token: string): Promise<Buffer | null> {
-  const customEmojiRegex = /<(?:a?):[a-zA-Z0-9_]+:([0-9]+)>/;
-  const match = token.match(customEmojiRegex);
-  if (match) {
-    const isAnimated = token.startsWith("<a:");
-    const emojiId = match[1];
-    const exts = isAnimated ? ["gif", "png", "webp"] : ["png", "webp"];
-    for (const ext of exts) {
-      const url = `https://cdn.discordapp.com/emojis/${emojiId}.${ext}?size=96&quality=lossless`;
-      const buf = await fetchImageBuffer(url);
-      if (buf) return buf;
-    }
-    return null;
-  }
-
-  const twemojiUrl = getTwemojiUrl(token);
-  const buf = await fetchImageBuffer(twemojiUrl);
-  if (buf) return buf;
-  return null;
-}
-
-interface RenderTextSectionOptions {
-  targetWidth?: number;
-  textColor?: string;
-  bgColor?: string;
-  lineHeight?: number;
-  maxCharsPerLine?: number;
-  isQuestion?: boolean;
-}
-
-async function renderTextSection(
-  text: string,
-  options: RenderTextSectionOptions = {}
-): Promise<{ buffer: Buffer; height: number } | null> {
-  const {
-    targetWidth = 1080,
-    textColor = "#000000",
-    bgColor = "#ffffff",
-    lineHeight = 60,
-    maxCharsPerLine = 28,
-    isQuestion = false,
-  } = options;
-
-  const lines = wrapTextToLines(text, maxCharsPerLine);
-  if (lines.length === 0) return null;
-
-  const overlays: OverlayOptions[] = [];
-  const sectionHeight = lines.length * lineHeight + (isQuestion ? 8 : 0);
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const tokens = tokenizeLine(line);
-    const hasEmojis = tokens.some((t) => t.isEmoji);
-
-    if (!hasEmojis) {
-      const textBuf = await sharp({
-        text: {
-          text: `<span foreground="${textColor}">${escapeImageText(line.toUpperCase())}</span>`,
-          font: "Baloo 2 ExtraBold",
-          fontfile: "./Assets/baloo.ttf",
-          dpi: 400,
-          rgba: true,
-        },
-      })
-        .resize({ width: targetWidth - 60, height: lineHeight - 10, fit: "inside", withoutEnlargement: true })
-        .png()
-        .toBuffer();
-
-      const meta = await sharp(textBuf).metadata();
-      const left = Math.max(0, Math.floor((targetWidth - (meta.width ?? 0)) / 2));
-      const top = i * lineHeight + Math.floor((lineHeight - (meta.height ?? 0)) / 2) + (isQuestion ? 4 : 0);
-      overlays.push({ input: textBuf, left, top });
-    } else {
-      const lineComposites: OverlayOptions[] = [];
-      let currentLeft = 0;
-      for (const t of tokens) {
-        if (t.isEmoji) {
-          const raw = await getEmojiBuffer(t.text);
-          if (raw) {
-            const emojiBuf = await sharp(raw).resize(48, 48).png().toBuffer();
-            lineComposites.push({ input: emojiBuf, left: currentLeft, top: Math.floor((lineHeight - 48) / 2) });
-            currentLeft += 48 + 4;
-            continue;
-          }
-        }
-        const textBuf = await sharp({
-          text: {
-            text: `<span foreground="${textColor}">${escapeImageText(t.text.toUpperCase())}</span>`,
-            font: "Baloo 2 ExtraBold",
-            fontfile: "./Assets/baloo.ttf",
-            dpi: 400,
-            rgba: true,
-          },
-        })
-          .resize({ height: lineHeight - 10, fit: "inside", withoutEnlargement: true })
-          .png()
-          .toBuffer();
-        const meta = await sharp(textBuf).metadata();
-        lineComposites.push({ input: textBuf, left: currentLeft, top: Math.floor((lineHeight - (meta.height ?? 0)) / 2) });
-        currentLeft += (meta.width ?? 0) + 4;
-      }
-
-      let lineImg = await sharp({
-        create: {
-          width: Math.max(1, currentLeft),
-          height: lineHeight,
-          channels: 4,
-          background: { r: 0, g: 0, b: 0, alpha: 0 },
-        },
-      })
-        .composite(lineComposites)
-        .png()
-        .toBuffer();
-
-      if (currentLeft > targetWidth - 60) {
-        lineImg = await sharp(lineImg)
-          .resize({ width: targetWidth - 60, fit: "inside", withoutEnlargement: true })
-          .png()
-          .toBuffer();
-      }
-      const lineMeta = await sharp(lineImg).metadata();
-      const left = Math.max(0, Math.floor((targetWidth - (lineMeta.width ?? 0)) / 2));
-      const top = i * lineHeight + (isQuestion ? 4 : 0);
-      overlays.push({ input: lineImg, left, top });
-    }
-  }
-
-  const bg = bgColor === "#000000" ? { r: 0, g: 0, b: 0, alpha: 1 } : { r: 255, g: 255, b: 255, alpha: 1 };
-  const buffer = await sharp({
-    create: {
-      width: targetWidth,
-      height: sectionHeight,
-      channels: 4,
-      background: bg,
-    },
-  })
-    .composite(overlays)
-    .png()
-    .toBuffer();
-
-  return { buffer, height: sectionHeight };
-}
-
 export default new HybridCommand({
   name: "rvcj",
-  description: "Create RVCJ styled meme image or animated GIF with up to 3 captions",
+  description: "Create RVCJ styled meme image or animated GIF with up to 3 captions and transparent custom emoji support",
   aliases: ["cid", "caption"],
   usage: "rvcj <image> & <top caption> | <subtitle> | <question>",
   guildOnly: false,
@@ -323,38 +117,56 @@ export default new HybridCommand({
         md = await sharp(input).metadata();
       }
 
-      // Render text sections
+      // Render text sections with transparent custom and unicode emojis
       let topSection: { buffer: Buffer; height: number } | null = null;
       if (topText) {
-        topSection = await renderTextSection(topText, {
-          targetWidth: 1080,
+        topSection = await renderTextWithEmojis(topText, {
+          font: "Baloo 2 ExtraBold",
+          fontfile: "./Assets/baloo.ttf",
+          maxWidth: 1080,
           textColor: "#000000",
           bgColor: "#ffffff",
           lineHeight: 60,
-          maxCharsPerLine: 28,
+          emojiSize: 48,
+          spaceWidth: 14,
+          maxUnitsPerLine: 28,
+          align: "center",
+          uppercase: true,
         });
       }
 
       let bottomSection: { buffer: Buffer; height: number } | null = null;
       if (bottomText) {
-        bottomSection = await renderTextSection(bottomText, {
-          targetWidth: 1080,
+        bottomSection = await renderTextWithEmojis(bottomText, {
+          font: "Baloo 2 ExtraBold",
+          fontfile: "./Assets/baloo.ttf",
+          maxWidth: 1080,
           textColor: "#000000",
           bgColor: "#ffffff",
           lineHeight: 60,
-          maxCharsPerLine: 28,
+          emojiSize: 48,
+          spaceWidth: 14,
+          maxUnitsPerLine: 28,
+          align: "center",
+          uppercase: true,
         });
       }
 
       let questionSection: { buffer: Buffer; height: number } | null = null;
       if (questionText) {
-        questionSection = await renderTextSection(questionText, {
-          targetWidth: 1080,
+        questionSection = await renderTextWithEmojis(questionText, {
+          font: "Baloo 2 ExtraBold",
+          fontfile: "./Assets/baloo.ttf",
+          maxWidth: 1080,
           textColor: "#FFE600",
           bgColor: "#000000",
           lineHeight: 64,
-          maxCharsPerLine: 32,
-          isQuestion: true,
+          emojiSize: 48,
+          spaceWidth: 14,
+          maxUnitsPerLine: 32,
+          align: "center",
+          uppercase: true,
+          bannerPadding: 8,
         });
       }
 
@@ -507,7 +319,7 @@ export default new HybridCommand({
       }
 
       const imageTop = currentY;
-      const imageHeight = md.height ?? 810;
+      const imageHeight = md.height ?? 608;
       composites.push({ input, top: imageTop, left: 0 });
       currentY += imageHeight;
 

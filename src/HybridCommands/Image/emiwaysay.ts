@@ -1,11 +1,12 @@
 import HybridCommand from "../../structures/HybridCommand.js";
-import { commandInput, contextImage } from "../../helpers/commandInput.js";
-import { Message, AttachmentBuilder } from "discord.js";
-import sharp from "sharp";
-import { escapeImageText } from "../../helpers/helpersImage.js";
+import { commandInput } from "../../helpers/commandInput.js";
+import { AttachmentBuilder } from "discord.js";
+import sharp, { type OverlayOptions } from "sharp";
+import { renderTextWithEmojis } from "../../helpers/textEmojiRenderer.js";
+
 export default new HybridCommand({
   name: "emiwaysay",
-  description: "Run emiwaysay.",
+  description: "Run emiwaysay with transparent custom emoji support.",
   aliases: ["emiway", "es"],
   usage: "emiwaysay [caption text]",
   guildOnly: true,
@@ -13,9 +14,6 @@ export default new HybridCommand({
     bot: [],
     user: [],
   },
-  /**
-   * @param {Message} message
-   */
   options: [
     { type: 3, name: "arguments", description: "Command text and arguments, in prefix order" },
     { type: 6, name: "user", description: "Target user" },
@@ -26,18 +24,41 @@ export default new HybridCommand({
   execute: async (ctx, client) => {
     const input = commandInput(ctx);
     const args = input.args;
-    const text = {
-      text: {
-        text: escapeImageText(args.join(" ").trim() || "..."),
-        font: "gg sans",
-        fontfile: "./Assets/ggsans-ExtraBold.ttf",
-        height: 610,
-        width: 1778 - 630,
-        align: "center" as const,
-      },
-    };
+    const captionText = args.join(" ").trim() || "...";
+
+    // Speech bubble area: width 1148 (1778 - 630), height 610
+    const textOverlay = await renderTextWithEmojis(captionText, {
+      font: "gg sans",
+      fontfile: "./Assets/ggsans-ExtraBold.ttf",
+      textColor: "#000000",
+      bgColor: "transparent",
+      maxWidth: 1148 - 40,
+      maxHeight: 610 - 40,
+      lineHeight: 70,
+      emojiSize: 56,
+      spaceWidth: 16,
+      maxUnitsPerLine: 24,
+      align: "center",
+    });
+
     const randomNumber = Math.floor(Math.random() * 3) + 1;
-    let output = await sharp({
+    const composites: OverlayOptions[] = [
+      {
+        input: `./Assets/emiway${randomNumber}.png`,
+        top: 0,
+        left: 1778 - 630,
+      },
+    ];
+
+    if (textOverlay) {
+      composites.push({
+        input: textOverlay.buffer,
+        top: 20 + Math.max(0, Math.floor(((610 - 40) - textOverlay.height) / 2)),
+        left: 20 + Math.max(0, Math.floor(((1148 - 40) - textOverlay.width) / 2)),
+      });
+    }
+
+    const output = await sharp({
       create: {
         width: 1778,
         height: 630,
@@ -50,17 +71,11 @@ export default new HybridCommand({
         },
       },
     })
-      .composite([
-        { input: text, top: 20, left: 20, blend: "difference" },
-        {
-          input: `./Assets/emiway${randomNumber}.png`,
-          top: 0,
-          left: 1778 - 630,
-        },
-      ])
+      .composite(composites)
       .png()
       .toBuffer();
-    let file = new AttachmentBuilder(output, { name: "bantai.png" });
+
+    const file = new AttachmentBuilder(output, { name: "bantai.png" });
     return ctx.reply({
       content: await getRandomLine(),
       files: [file],
