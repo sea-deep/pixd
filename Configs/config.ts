@@ -10,7 +10,7 @@ const config = {
     message_commands: true,
     application_commands: { chat_input: true, user_context: true, message_context: true },
   },
-  users: { ownerId: "1258396025354453054", developers: [] as string[] },
+  users: { ownerId: "1354690754165084271", developers: [] as string[] },
   restricted: ["720286639691399218", "1104345879588126811", "887265587854737479"] as string[],
   messages: {
     HELP_DESCRIPTION: "Welcome to PixD. Select a category to explore commands.",

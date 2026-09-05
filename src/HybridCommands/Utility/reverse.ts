@@ -1,8 +1,7 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { Client, Message } from "discord.js";
-import { GOOGLE_IMG_INVERSE_ENGINE_URL } from "google-img-scrap";
-import { getCaptionInput } from "../../helpers/helpersImage.js";
+import { GOOGLE_IMG_INVERSE_ENGINE_URL } from "../../services/ImageSearchService.js";
 export default new HybridCommand({
   name: "reverse",
   description: "Search image from Google.",

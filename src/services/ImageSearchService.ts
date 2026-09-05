@@ -1,25 +1,140 @@
 import { Worker } from "node:worker_threads";
-import { createRequire } from "node:module";
+import { env } from "../utilities/env.js";
 
 export interface ImageSearchResult {
-  title: string; url: string; originalUrl: string; thumbnailUrl: string;
-  width: number; height: number; source: string;
+  title: string;
+  url: string;
+  originalUrl: string;
+  thumbnailUrl: string;
+  width: number;
+  height: number;
+  source: string;
 }
-export interface ImageSearchOptions { limit?: number; safeSearch?: boolean; timeoutMs?: number }
-const library = createRequire(import.meta.url).resolve("google-img-scrap");
+
+export interface ImageSearchOptions {
+  limit?: number;
+  safeSearch?: boolean;
+  timeoutMs?: number;
+}
+
+export interface ReverseSearchResult {
+  search: string;
+  result: ImageSearchResult[];
+}
+
 let active = 0;
 
-/** Isolate the legacy scraper so even a hung request/parser can be terminated. */
+const WORKER_SCRIPT = `
+const { parentPort, workerData } = require('node:worker_threads');
+
+const NOKIA_USER_AGENTS = [
+  'Nokia6230/2.0 (05.50) Profile/MIDP-2.0 Configuration/CLDC-1.1',
+  'Nokia7610/2.0 (5.0509.0) SymbianOS/7.0s Series60/2.1 Profile/MIDP-2.0 Configuration/CLDC-1.0',
+  'Nokia6280/2.0 (03.60) Profile/MIDP-2.0 Configuration/CLDC-1.1',
+];
+
+function formatTitle(imgurl, imgrefurl) {
+  if (imgrefurl) {
+    try {
+      const pageUrl = new URL(imgrefurl);
+      const segments = pageUrl.pathname.split('/').filter(Boolean);
+      let candidate = segments.pop() || '';
+      if (/^\\d+$/.test(candidate) && segments.length > 0) {
+        candidate = segments.pop() || candidate;
+      }
+      candidate = candidate
+        .replace(/\\.(html?|php|aspx?|jsp)$/i, '')
+        .replace(/[-_]+/g, ' ')
+        .replace(/\\s+/g, ' ')
+        .trim();
+      if (candidate.length > 2) {
+        candidate = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+        return candidate + ' · ' + pageUrl.hostname.replace(/^www\\./, '');
+      }
+      return pageUrl.hostname.replace(/^www\\./, '');
+    } catch { }
+  }
+  try {
+    const u = new URL(imgurl);
+    const filename = u.pathname.split('/').pop()?.replace(/\\.[^.]+$/, '') || 'Google Image';
+    return decodeURIComponent(filename).replace(/[-_]+/g, ' ').slice(0, 100);
+  } catch {
+    return 'Google Image';
+  }
+}
+
+async function fetchGooglePage(query, safeSearch, start = 0) {
+  const ua = NOKIA_USER_AGENTS[Math.floor(Math.random() * NOKIA_USER_AGENTS.length)];
+  const url = 'https://www.google.com/search?q=' + encodeURIComponent(query) +
+    '&tbm=isch' + (safeSearch ? '&safe=active' : '') + (start > 0 ? '&start=' + start : '');
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': ua,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+    },
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error('Google returned HTTP ' + res.status);
+  const html = await res.text();
+  const matches = [...html.matchAll(/href=\\"(\\/imgres\\?[^\\"]+)\\"/g)].map(m => m[1]);
+  const results = [];
+  for (const raw of matches) {
+    const clean = raw.replace(/&amp;/g, '&');
+    try {
+      const u = new URL('https://www.google.com' + clean);
+      const imgurl = u.searchParams.get('imgurl');
+      const imgrefurl = u.searchParams.get('imgrefurl');
+      if (!imgurl || !/^https?:/.test(imgurl)) continue;
+      const w = parseInt(u.searchParams.get('w') || '0', 10);
+      const h = parseInt(u.searchParams.get('h') || '0', 10);
+      const tbnid = u.searchParams.get('tbnid');
+      results.push({
+        title: formatTitle(imgurl, imgrefurl),
+        url: imgurl,
+        originalUrl: imgrefurl || imgurl,
+        thumbnailUrl: tbnid ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:' + tbnid : imgurl,
+        width: Math.max(0, w),
+        height: Math.max(0, h),
+        source: 'Google Images',
+      });
+    } catch { }
+  }
+  return results;
+}
+
+async function scrapeGoogle({ search, limit = 250, safeSearch = true }) {
+  const pagesNeeded = Math.min(Math.ceil(limit / 20), 4);
+  const pagePromises = [];
+  for (let i = 0; i < pagesNeeded; i++) {
+    pagePromises.push(fetchGooglePage(search, safeSearch, i * 20));
+  }
+  const pages = await Promise.all(pagePromises);
+  const dedupe = new Map();
+  for (const page of pages) {
+    for (const item of page) {
+      if (!dedupe.has(item.url)) {
+        dedupe.set(item.url, item);
+        if (dedupe.size >= limit) break;
+      }
+    }
+  }
+  return { result: [...dedupe.values()] };
+}
+
+scrapeGoogle(workerData.options)
+  .then(value => parentPort.postMessage({ value }))
+  .catch(() => parentPort.postMessage({ failed: true }));
+`;
+
+/** Isolate the Google scraper worker so even a hung request/parser can be terminated. */
 function scrape(query: string, limit: number, safeSearch: boolean, timeout: number): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(`
-      const { parentPort, workerData } = require('node:worker_threads');
-      const { GOOGLE_IMG_SCRAP } = require(workerData.library);
-      GOOGLE_IMG_SCRAP(workerData.options).then(
-        value => parentPort.postMessage({ value }),
-        () => parentPort.postMessage({ failed: true })
-      );
-    `, { eval: true, execArgv: [], workerData: { library, options: { search: query, limit, safeSearch } } });
+    const worker = new Worker(WORKER_SCRIPT, {
+      eval: true,
+      execArgv: [],
+      workerData: { options: { search: query, limit, safeSearch } },
+    });
     const finish = (error?: Error, value?: unknown) => {
       clearTimeout(timer);
       worker.removeAllListeners();
@@ -27,7 +142,7 @@ function scrape(query: string, limit: number, safeSearch: boolean, timeout: numb
       if (error) reject(error); else resolve(value);
     };
     const timer = setTimeout(() => finish(new Error("Image search timed out.")), timeout);
-    worker.once("message", message => message.failed
+    worker.once("message", (message) => message.failed
       ? finish(new Error("Image provider unavailable.")) : finish(undefined, message.value));
     worker.once("error", () => finish(new Error("Image provider unavailable.")));
     worker.once("exit", () => finish(new Error("Image search stopped unexpectedly.")));
@@ -45,9 +160,13 @@ export function normalizeImages(response: unknown, limit: number): ImageSearchRe
       const page = new URL(String(item.originalUrl || item.url));
       if (!/^https?:$/.test(image.protocol) || !/^https?:$/.test(page.protocol)) continue;
       results.set(image.href, {
-        title: String(item.title || page.hostname).slice(0, 250), url: image.href,
-        originalUrl: page.href, thumbnailUrl: image.href, source: "Google Images",
-        width: Math.max(0, Number(item.width) || 0), height: Math.max(0, Number(item.height) || 0),
+        title: String(item.title || page.hostname).slice(0, 250),
+        url: image.href,
+        originalUrl: page.href,
+        thumbnailUrl: String(item.thumbnailUrl || image.href),
+        source: "Google Images",
+        width: Math.max(0, Number(item.width) || 0),
+        height: Math.max(0, Number(item.height) || 0),
       });
       if (results.size >= limit) break;
     } catch { /* Ignore malformed individual records. */ }
@@ -74,3 +193,63 @@ export async function searchImages(query: string, options: ImageSearchOptions = 
     return [];
   } finally { active--; }
 }
+
+export async function reverseImageSearch(imageUrl: string, options: { limit?: number } = {}): Promise<ReverseSearchResult> {
+  const limit = options.limit ?? 5;
+  let query = "";
+
+  if (env.GOOGLEAI_KEY) {
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey: env.GOOGLEAI_KEY });
+      const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(5000) });
+      if (imgRes.ok) {
+        const buf = Buffer.from(await imgRes.arrayBuffer());
+        const mimeType = imgRes.headers.get("content-type")?.split(";")[0] || "image/jpeg";
+        const res = await ai.models.generateContent({
+          model: env.GOOGLEAI_MODEL || "gemini-2.5-flash",
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { inlineData: { mimeType, data: buf.toString("base64") } },
+                { text: "Identify the main subject in this image in 1 to 4 keywords suitable for a Google search query. Reply with ONLY the search keywords." },
+              ],
+            },
+          ],
+        });
+        const detected = res.text?.trim();
+        if (detected && detected.length < 100) {
+          query = detected;
+        }
+      }
+    } catch {
+      // Fall through to query inference
+    }
+  }
+
+  if (!query) {
+    try {
+      const u = new URL(imageUrl);
+      const filename = u.pathname.split("/").pop()?.replace(/\.[^.]+$/, "");
+      if (filename) {
+        const candidate = decodeURIComponent(filename).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+        if (candidate.length >= 3 && !/^\d+$/.test(candidate)) {
+          query = candidate;
+        }
+      }
+    } catch { }
+  }
+
+  if (!query) {
+    throw new Error("Could not determine search query for image.");
+  }
+
+  const results = await searchImages(query, { limit });
+  return {
+    search: query,
+    result: results,
+  };
+}
+
+export { reverseImageSearch as GOOGLE_IMG_INVERSE_ENGINE_URL };
