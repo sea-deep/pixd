@@ -50,6 +50,10 @@ export default class YtDlpResolver {
       .filter((track): track is MusicTrack => track !== null);
 
     if (tracks.length === 0) {
+      if (entries.length > 0 && entries[0].duration && entries[0].duration * 1000 > config.music.maxTrackDurationMs) {
+        const hours = Math.round(config.music.maxTrackDurationMs / (60 * 60 * 1000));
+        throw new Error(`Track exceeds the maximum duration limit of ${hours} hours.`);
+      }
       throw new Error("No playable tracks were found.");
     }
 
@@ -65,7 +69,7 @@ export default class YtDlpResolver {
     if (!url || !title) return null;
 
     const durationMs = Math.max(0, Math.round((entry.duration ?? 0) * 1000));
-    if (durationMs > config.music.maxTrackDurationMs) return null;
+    if (config.music.maxTrackDurationMs > 0 && durationMs > config.music.maxTrackDurationMs) return null;
 
     return {
       id: entry.id ?? url,

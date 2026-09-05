@@ -24,6 +24,6 @@ const config = {
     INTERACTION_ERROR: "❌ An error occurred while executing this interaction.",
   },
   errorChannelId: "",
-  music: { maxQueueSize: 100, maxPlaylistSize: 50, maxTrackDurationMs: 4 * 60 * 60 * 1000, inactivityMs: 30_000 },
+  music: { maxQueueSize: 100, maxPlaylistSize: 50, maxTrackDurationMs: 24 * 60 * 60 * 1000, inactivityMs: 30_000 },
 } as const;
 export default config;
