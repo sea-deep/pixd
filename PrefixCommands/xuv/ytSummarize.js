@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Client, Message } from "discord.js";
 import { getVideoInfo } from "../../Helpers/helpersYt.js";
-import fetch from "node-fetch";
 import { parseStringPromise } from "xml2js";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLEAI_KEY);

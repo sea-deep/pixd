@@ -80,7 +80,7 @@ export default {
       help.embeds[0].author.icon_url = `https:\/\/cdn.discordapp.com/emojis/${com.emoji.id}.png`;
       help.embeds[0].author.name = com.label;
       help.embeds[0].description = [
-        "* `" + prefix + "play <search or url>` - play any song or playlist from YouTube, Spotify and SoundCloud.",
+        "* `" + prefix + "play <search or url>` - play audio from YouTube or supported SoundCloud URLs.",
         "* `" + prefix + "pause` - pause the song.",
         "* `" + prefix + "resume` - resume the song.",
         "* `" + prefix + "stop` - stop playing and clear queue.",

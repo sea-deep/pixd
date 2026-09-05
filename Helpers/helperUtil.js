@@ -10,20 +10,34 @@ const kvSchema = new mongoose.Schema({
 const KVModel = mongoose.model("KVStore", kvSchema);
 
 export class MongodbKeyValue {
-  constructor() {
+  constructor(namespace = "default") {
     this.collection = KVModel;
     this.queue = new PQueue({ concurrency: 1 });
+    this.namespace = namespace;
+  }
+
+  qualifiedKey(key) {
+    return `${this.namespace}:${key}`;
+  }
+
+  async findEntry(key) {
+    const qualified = await this.collection.findOne({ key: this.qualifiedKey(key) });
+    if (qualified) return qualified;
+
+    // Transitional fallback for records written before stores were namespaced.
+    return this.collection.findOne({ key });
   }
 
   async set(key, value, ttl = null) {
-    const entry = { key, value, ttl: ttl ? Date.now() + ttl * 1000 : null };
+    const qualifiedKey = this.qualifiedKey(key);
+    const entry = { key: qualifiedKey, value, ttl: ttl ? Date.now() + ttl * 1000 : null };
     await this.queue.add(() =>
-      this.collection.updateOne({ key }, { $set: entry }, { upsert: true })
+      this.collection.updateOne({ key: qualifiedKey }, { $set: entry }, { upsert: true })
     );
   }
 
   async get(key) {
-    const entry = await this.collection.findOne({ key });
+    const entry = await this.findEntry(key);
     if (entry) {
       if (entry.ttl === null || entry.ttl >= Date.now()) return entry.value;
       await this.delete(key);
@@ -32,21 +46,24 @@ export class MongodbKeyValue {
   }
 
   async delete(key) {
-    await this.queue.add(() => this.collection.deleteOne({ key }));
+    await this.queue.add(() => this.collection.deleteMany({ key: { $in: [this.qualifiedKey(key), key] } }));
   }
 
   async has(key) {
-    const entry = await this.collection.findOne({ key });
+    const entry = await this.findEntry(key);
     return !!(entry && (entry.ttl === null || entry.ttl >= Date.now()));
   }
 
   async setTTL(key, newTTL) {
     const ttlValue = newTTL !== null ? Date.now() + newTTL * 1000 : null;
-    await this.queue.add(() => this.collection.updateOne({ key }, { $set: { ttl: ttlValue } }));
+    await this.queue.add(() => this.collection.updateOne(
+      { key: { $in: [this.qualifiedKey(key), key] } },
+      { $set: { ttl: ttlValue } },
+    ));
   }
 
   async getRemainingTTL(key) {
-    const entry = await this.collection.findOne({ key });
+    const entry = await this.findEntry(key);
     if (entry?.ttl !== null) {
       const remaining = Math.max(0, entry.ttl - Date.now());
       return {
@@ -59,7 +76,9 @@ export class MongodbKeyValue {
   }
 
   async all() {
-    return (await this.collection.find()).map(({ key, value }) => ({ key, value }));
+    const prefix = `${this.namespace}:`;
+    return (await this.collection.find({ key: { $regex: `^${prefix}` } }))
+      .map(({ key, value }) => ({ key: key.slice(prefix.length), value }));
   }
 }
 

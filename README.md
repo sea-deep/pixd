@@ -2,7 +2,7 @@
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/vIstDW?referralCode=TDTzm0)
 
-PixD is a fast, playful Discord bot that fetches info, plays music (Lavalink/Poru), generates images, and entertains with mini‑games. If you want an all‑in‑one assistant for your server, this is it.
+PixD is a fast, playful Discord bot that fetches info, plays music through yt-dlp and Discord Voice, generates images, and entertains with mini-games.
 
 ## Table of contents
 
@@ -33,14 +33,14 @@ PixD is packed with a variety of commands and features to keep your server livel
 - `p!piracy <query> <type> <sort>`: Search and download various media types
 
 ### Music
-- `p!play <search or url>`: Play any song or playlist from YouTube, Spotify, and SoundCloud
+- `p!play <search or url>`: Play songs or playlists from YouTube and supported SoundCloud URLs
 - `p!pause`: Pause the song (bathroom break, anyone?)
 - `p!resume`: Resume the song after that break
 - `p!stop`: Stop playing and clear the queue
 - `p!skip`: Skip the current song (we won't judge your music taste)
-- `p!lyrics <song-name>`: Get lyrics so you can sing along
+- `p!lyrics`: Get lyrics for the current track
 - `p!queue`: Show songs in the queue
-- `p!loop`: Repeat the current song (for when you just can't get enough)
+- `p!loop <off|track|queue>`: Configure repeat behavior
 - `p!seek <mm:ss>`: Jump to a specific part of the song
 
 ### Image Generation
@@ -67,28 +67,17 @@ PixD is packed with a variety of commands and features to keep your server livel
 
 ## Configuration
 
-PixD is highly configurable through the `config.js` file in the `Configs` directory. Here's a peek at what it looks like:
+PixD is configured through `Configs/config.ts` and validated environment variables:
 
-```javascript
-let prefix = process.env.ENVIRONMENT === "prod" ? "p!" : "d!";
-
-export default {
-  prefix: prefix,
-  restricted: [
-    "720286639691399218",
-    "1104345879588126811",
-    "887265587854737479",
-  ],
-  nodes: [
-    {
-      name: "node1",
-      host: "lava-v4.ajieblogs.eu.org",
-      password: "https://dsc.gg/ajidevserver",
-      port: 443,
-      secure: true,
-    },
-    // Additional nodes can be added here
-  ],
+```typescript
+const config = {
+  prefix: env.ENVIRONMENT === "prod" ? "p!" : "d!",
+  music: {
+    maxQueueSize: 100,
+    maxPlaylistSize: 50,
+    maxTrackDurationMs: 4 * 60 * 60 * 1000,
+    inactivityMs: 30_000,
+  },
 };
 ```
 
@@ -98,8 +87,9 @@ export default {
 
 Before jumping in, make sure you have:
 
-- Node.js LTS (v18+ recommended)
+- Node.js 24+
 - npm (bundled with Node)
+- Python 3 and FFmpeg for direct music playback
 - Discord bot token and application client ID
 - MongoDB connection (for persistence)
 - Optional: API keys for advanced features (see `.env.example`)
@@ -137,10 +127,12 @@ Before jumping in, make sure you have:
    NODE_NO_WARNINGS="1"
    NODE_VERSION="lts"
    PORT="3000"
+   PUBLIC_BASE_URL="https://your-public-host.example"
    RAPID_KEY="rapid api key"
    SS_PASS="xxx"
    TOKEN="bot token"
-    CLIENT_ID="discord application client id"
+   CLIENT_ID="discord application client id"
+   YT_DLP_COOKIES_PATH=""
    ```
 
 5. Start the bot:
@@ -149,8 +141,9 @@ Before jumping in, make sure you have:
    ```
 
 Notes:
-- `ENVIRONMENT` controls the prefix via `Configs/config.js`: `dev` -> `d!`, `prod` -> `p!`.
-- Slash commands are registered at startup by `Utilities/registerCommands.js` when `TOKEN` and `CLIENT_ID` are set.
+- `ENVIRONMENT` controls the prefix via `Configs/config.ts`: `dev` -> `d!`, `prod` -> `p!`.
+- Slash commands are registered after Discord reports the client ready.
+- `YT_DLP_COOKIES_PATH` is optional and should point to a secret-mounted Netscape-format cookie file when YouTube requires authentication. Never commit it.
 
 ## Usage
 
@@ -160,19 +153,25 @@ With PixD up and running, you can start issuing commands using the configured pr
 
 ```
 pixd/
-├─ index.js                  # App entrypoint and bootstrapping
-├─ Configs/                  # Bot config (prefix, Lavalink nodes)
+├─ index.ts                  # Typed app entrypoint and bootstrapping
+├─ Configs/                  # Typed bot and music limits
+├─ HybridCommands/           # Shared prefix/slash commands
+├─ src/                      # Typed structures and application services
 ├─ Utilities/                # Handlers, models, command registration
 ├─ Interactions/             # Slash commands, buttons, modals, menus
 ├─ PrefixCommands/           # Prefix-based commands by category
-├─ Events/                   # Poru/Lavalink and client events
+├─ Events/                   # Discord client events
 ├─ Helpers/                  # Shared helpers for games/images/etc.
 └─ www/                      # Static web pages
 ```
 
 ## Development scripts
 
-- Start the bot: `npm start`
+- Development watch mode: `npm run dev`
+- Type check: `npm run typecheck`
+- Build: `npm run build`
+- Test: `npm test`
+- Production start: `npm start`
 - Format (optional): `npx prettier --write .`
 
 ## Contributing
@@ -188,7 +187,8 @@ Quick checklist:
 ## Troubleshooting
 
 - Slash commands not appearing: ensure `CLIENT_ID` and `TOKEN` are set; global command updates can take up to an hour. For faster iteration, use guild commands or re-run after edits.
-- Lavalink connection issues: update `Configs/config.js` `nodes` to a reliable server (or your own) and match `host/port/password/secure`.
+- Music extraction issues: update dependencies so the bundled yt-dlp binary is current, verify `python`, `ffmpeg`, and the configured cookie file, then retry the URL directly with yt-dlp.
+- Spotify links: direct Spotify music playback is intentionally unsupported; search for the artist and track name instead.
 - Prefix mismatch: set `ENVIRONMENT=dev` for `d!` or `ENVIRONMENT=prod` for `p!`.
 
 ## License

@@ -38,7 +38,7 @@ export default {
       return;
     }
 
-    if (command?.guildOnly && message.channel.type === "dm") {
+    if (command?.guildOnly && !message.guild) {
       return message.reply({
         content: "",
         embeds: [
@@ -67,7 +67,7 @@ export default {
     }
 
     try {
-      command.execute(message, args, client);
+      await command.execute(message, args, client);
     } catch (err) {
        console.error(`[MessageCreate- ${commandName}]: `, err);
       message.reply({

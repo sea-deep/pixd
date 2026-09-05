@@ -1,3 +1,6 @@
 node_modules
 playground
 .env
+dist
+shipready_results
+cookies.txt

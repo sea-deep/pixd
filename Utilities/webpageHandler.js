@@ -1,21 +1,27 @@
 import chalk from "chalk";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { join } from "path";
 import { existsSync } from "fs";
 import express from "express";
 import { handleLastFmAuth } from "../Helpers/helpersLastFm.js";
 import axios from "axios";
+import { env } from "../src/utilities/env.js";
 
 try {
   const app = express();
 
-  const staticPath = join(dirname(fileURLToPath(import.meta.url)), "../www");
+  const staticPath = join(process.cwd(), "www");
   app.use(express.static(staticPath));
   app.get("/", (req, res) => res.redirect("/home"));
+  app.get("/healthz", (req, res) => res.status(200).json({ ok: true }));
   app.get("/home", (req, res) => res.sendFile(join(staticPath, "index.html")));
   app.get("/lastfm/login", async (req, res) => {
-    await handleLastFmAuth(req, res);
-    res.sendFile(join(staticPath, "lastfm.html"));
+    try {
+      await handleLastFmAuth(req);
+      res.sendFile(join(staticPath, "lastfm.html"));
+    } catch (error) {
+      console.error("Last.fm callback failed:", error);
+      res.status(400).send("Last.fm authentication failed or expired.");
+    }
   });
   app.get("/download", (req, res) => res.redirect("https://rpqsk.github.io/"));
   app.get("/repo", (req, res) =>
@@ -59,7 +65,7 @@ try {
       res.status(404).sendFile(join(staticPath, "404.html"));
     }
   });
-  const port = process.env.PORT;
+  const port = env.PORT;
   app.listen(port, () =>
     console.log("[INFO] - Webpage is live!"),
   );

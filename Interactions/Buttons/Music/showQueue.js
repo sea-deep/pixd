@@ -4,15 +4,16 @@ export default {
     await interaction.deferReply({
       ephemeral: true,
     });
-    let player = client.poru.players.get(interaction.guild.id);
-    let remaining = player.queue.slice(1);
+    let player = client.music.get(interaction.guild.id);
+    if (!player) return interaction.editReply({ content: "The queue has ended." });
+    let remaining = player.queue;
     let chunks = [];
 
     for (let i = 0; i < remaining.length; i += 20) {
       let chunk = remaining.slice(i, i + 20);
       let song = "";
       chunk.forEach(
-        (item, index) => (song += `${i + index + 2}. ${item.info.author} - ${item.info.title}\n`),
+        (item, index) => (song += `${i + index + 1}. ${item.author} - ${item.title}\n`),
       );
       chunks.push(song);
     }

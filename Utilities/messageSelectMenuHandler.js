@@ -1,15 +1,14 @@
 import pkg from "glob";
 import { pathToFileURL } from "url";
 import { client } from "../index.js";
+import { loaderPattern } from "./loaderPattern.js";
 
 const { glob } = pkg;
 
 try {
   client.messageSelectMenus.clear();
 
-  const Files = await glob(
-    `${process.cwd().replace(/\\/g, "/")}/Interactions/MessageSelectMenuCommands/**/*.js`,
-  );
+  const Files = (await glob(loaderPattern("Interactions/MessageSelectMenuCommands"))).sort();
 
   for (let i = 0; i < Files.length; i++) {
     Files[i] = pathToFileURL(Files[i]);

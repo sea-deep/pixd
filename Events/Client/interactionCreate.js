@@ -1,6 +1,17 @@
 import { Client, BaseInteraction } from "discord.js";
 import config from "../../Configs/config.js";
-//bal
+
+const interactionError = (interaction, description) => {
+  const payload = {
+    content: "",
+    ephemeral: true,
+    embeds: [{ description, color: interaction.client.color }],
+  };
+  return interaction.replied || interaction.deferred
+    ? interaction.followUp(payload)
+    : interaction.reply(payload);
+};
+
 export default {
   event: "interactionCreate",
   /**
@@ -8,25 +19,16 @@ export default {
    * @param {BaseInteraction} interaction
    */
   execute: async (interaction, client) => {
-    if (config.restricted.includes(interaction.member.id)) return;
+    if (config.restricted.includes(interaction.user.id)) return;
     if (interaction.isButton()) {
       const button = client.buttons.get(interaction.customId);
       if (!button) return;
 
       try {
-        return button.execute(interaction, client);
+        return await button.execute(interaction, client);
       } catch (err) {
         console.log("Error in button:", interaction.customId, err);
-        return interaction.followUp({
-          content: "",
-          ephemeral: true,
-          embeds: [
-            {
-              description: "*There was an error while executing that button.*",
-              color: client.color,
-            },
-          ],
-        });
+        return interactionError(interaction, "*There was an error while executing that button.*");
       }
     }
 
@@ -37,9 +39,10 @@ export default {
         const subCommand = client.subCommands.get(
           `${interaction.commandName} ${subCommandName}`,
         );
+        if (!subCommand) return;
 
         try {
-          return subCommand.execute(interaction, client);
+          return await subCommand.execute(interaction, client);
         } catch (err) {
           console.log(
             "Error in subcommand:",
@@ -47,44 +50,27 @@ export default {
             interaction.subCommandName,
             err,
           );
-          return interaction.followUp({
-            content: "",
-            ephemeral: true,
-            embeds: [
-              {
-                description:
-                  "*There was an error while executing that command.*",
-                color: client.color,
-              },
-            ],
-          });
+          return interactionError(interaction, "*There was an error while executing that command.*");
         }
       }
 
       const command = client.slashCommands.get(interaction.commandName);
+      if (!command) return;
 
       try {
-        return command.execute(interaction, client);
+        return await command.execute(interaction, client);
       } catch (err) {
         console.log("Error in slash command:", interaction.commandName, err);
-        return interaction.followUp({
-          content: "",
-          ephemeral: true,
-          embeds: [
-            {
-              description: "*There was an error while executing that command.*",
-              color: client.color,
-            },
-          ],
-        });
+        return interactionError(interaction, "*There was an error while executing that command.*");
       }
     }
 
     if (interaction.isMessageContextMenuCommand()) {
       const command = client.messageSelectMenus.get(interaction.commandName);
+      if (!command) return;
 
       try {
-        return command.execute(interaction, client);
+        return await command.execute(interaction, client);
       } catch (err) {
         console.log(
           "Error in Msg Context Menu:",
@@ -92,16 +78,7 @@ export default {
           interaction,
           err,
         );
-        await interaction.followUp({
-          content: "",
-          ephemeral: true,
-          embeds: [
-            {
-              description: "*There was an error while executing that command.*",
-              color: client.color,
-            },
-          ],
-        });
+        return interactionError(interaction, "*There was an error while executing that command.*");
       }
     }
 
@@ -112,16 +89,7 @@ export default {
         return await modal.execute(interaction, client);
       } catch (err) {
         console.log("Error in Modal:", interaction.customId, err);
-        await interaction.followUp({
-          content: "",
-          ephemeral: true,
-          embeds: [
-            {
-              description: "*There was an error while executing that modal.*",
-              color: client.color,
-            },
-          ],
-        });
+        return interactionError(interaction, "*There was an error while executing that modal.*");
       }
     }
 
@@ -132,17 +100,7 @@ export default {
         return await menu.execute(interaction, client);
       } catch (err) {
         console.log("Error in Select Menu:", interaction.customId, err);
-        await interaction.followUp({
-          content: "",
-          ephemeral: true,
-          embeds: [
-            {
-              description:
-                "*There was an error while executing that select menu.*",
-              color: client.color,
-            },
-          ],
-        });
+        return interactionError(interaction, "*There was an error while executing that select menu.*");
       }
     }
   },

@@ -1,9 +1,5 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env["GROQ_API_KEY"],
-});
-
 export default {
   subCommand: "xuv gpt",
   async execute(interaction, client) {
@@ -44,6 +40,8 @@ export default {
     ].join("\n");
     let completion;
     try {
+      if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
       completion = await groq.chat.completions.create({
         messages: [
           { role: "system", content: system },
@@ -53,7 +51,7 @@ export default {
       });
     } catch (e) {
       console.log("Error in gpt:", e);
-      return message.reply({
+      return interaction.editReply({
         content: "",
         failIfNotExists: false,
         embeds: [

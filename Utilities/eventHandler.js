@@ -2,11 +2,10 @@ import pkg from "glob";
 const { glob } = pkg;
 import { pathToFileURL } from "node:url";
 import { client } from "../index.js";
+import { loaderPattern } from "./loaderPattern.js";
 
 try {
-  const Files = await glob(
-    `${process.cwd().replace(/\\/g, "/")}/Events/Client/**/*.js`,
-  );
+  const Files = (await glob(loaderPattern("Events/Client"))).sort();
 
   for (let i = 0; i < Files.length; i++) {
     Files[i] = pathToFileURL(Files[i]);
@@ -24,9 +23,9 @@ try {
     const once = eventFunction.once;
 
 
-    emitter[once ? "once" : "on"](event, (...args) => {
+    emitter[once ? "once" : "on"](event, async (...args) => {
       try {
-        eventFunction.execute(...args, client)
+        await eventFunction.execute(...args, client)
       } catch (error) {
         console.error(`[EventHandler] -`, error);
       }

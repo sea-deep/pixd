@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 
 export default {
-  name: "hangAtoY",
+  name: "HangZ",
   /**
    * @param {Client} client
    */

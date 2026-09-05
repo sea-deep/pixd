@@ -140,6 +140,6 @@ export default {
       });
     }
 
-    await client.chess.set(message.id, chess.pgn(), 3600000);
+    await client.chess.set(message.id, chess.pgn(), 60 * 60);
   },
 };

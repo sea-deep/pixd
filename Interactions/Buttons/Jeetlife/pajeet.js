@@ -1,7 +1,7 @@
 import { ButtonInteraction } from "discord.js";
 import User from "../../../Utilities/jeetModel.js";
 export default {
-    name: "pajeeta",
+    name: "pajeet",
     /**
      * 
      * @param {ButtonInteraction} interaction 

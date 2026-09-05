@@ -19,12 +19,14 @@ Thanks for your interest in contributing! This document explains how to set up y
 
 ## Project overview
 
-PixD is a Node.js Discord bot built with `discord.js` v14, `poru` for music/Lavalink, and MongoDB via Mongoose. Key folders:
+PixD is a TypeScript/Node.js Discord bot built with `discord.js` v14, `@discordjs/voice`, yt-dlp, and MongoDB via Mongoose. Key folders:
 
-- `index.js` – app entrypoint and bootstrapping
-- `Configs/` – bot configuration (prefix, Lavalink nodes)
+- `index.ts` – typed app entrypoint and bootstrapping
+- `Configs/` – bot configuration and resource limits
+- `HybridCommands/` – commands shared by prefix and slash routing
+- `src/` – typed structures and application services
 - `Utilities/` – handlers (events, commands registration, models)
-- `Events/` – Poru/Lavalink related events
+- `Events/` – Discord client events
 - `Interactions/` – Slash commands, buttons, modals, select menus
 - `PrefixCommands/` – Prefix-based commands grouped by category
 - `Helpers/` – Shared helpers (games, images, Last.fm, etc.)
@@ -33,7 +35,7 @@ PixD is a Node.js Discord bot built with `discord.js` v14, `poru` for music/Lava
 ## Development setup
 
 1. Fork the repo and clone your fork
-2. Use a recent Node.js LTS (v18+ recommended)
+2. Use Node.js 24 or newer, Python 3, and FFmpeg
 3. Install dependencies
    ```sh
    npm install
@@ -52,15 +54,18 @@ PixD is a Node.js Discord bot built with `discord.js` v14, `poru` for music/Lava
    ```sh
    npm start
    ```
-   On startup, commands are auto-registered via `Utilities/registerCommands.js` if `TOKEN` and `CLIENT_ID` are set.
+   On startup, commands are registered after the Discord client is ready.
 
-### Lavalink (music) notes
-- Configuration lives in `Configs/config.js` under `nodes`.
-- The repo includes example public nodes for convenience. For reliability, prefer running your own Lavalink v4 instance and update `host`, `port`, `password`, and `secure` accordingly.
+### Music notes
+- Music commands are hybrid commands under `HybridCommands/music/`.
+- `MusicManager` owns one direct Discord Voice player per guild.
+- yt-dlp resolves and streams media; FFmpeg performs audio conversion.
+- Spotify music is intentionally unsupported. Do not add DRM workarounds.
 
 ## Where to put your code
 
-- Prefix commands: add files under `PrefixCommands/<category>/<command>.js`
+- Hybrid prefix/slash commands: add typed files under `HybridCommands/<category>/<command>.ts`
+- Prefix-only commands: add files under `PrefixCommands/<category>/`
 - Slash commands: add interaction files under `Interactions/SlashCommands/**`
 - Buttons/Modals/Select menus: corresponding folders under `Interactions/`
 - Event listeners: `Events/` and `Client/`
@@ -70,7 +75,7 @@ Try to follow existing patterns in similar files for data shapes and handler con
 
 ## Coding style
 
-- This project uses ES Modules (`type: module`).
+- This project uses TypeScript, strict checking for migrated code, and ES Modules.
 - Format with Prettier (devDependency).
   - Optional: run `npx prettier --write .` before committing.
 - Keep functions small and focused. Prefer early returns and clear error messages.
@@ -98,7 +103,7 @@ Before you open a PR:
 
 ## Testing and manual QA
 
-There’s no formal test suite yet. Please include:
+Run `npm test`, `npm run typecheck`, and `npm run build`. Please also include:
 
 - Steps to reproduce the bug or verify the feature
 - Expected result vs actual behavior

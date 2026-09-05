@@ -1,4 +1,6 @@
 import { Client, ActivityType } from "discord.js";
+import config from "../../Configs/config.js";
+import registerCommands from "../../Utilities/registerCommands.js";
 
 export default {
   event: "clientReady",
@@ -10,12 +12,8 @@ export default {
   console.log("[INFO] Logged in as", client.user.tag)
  
   
-    try{
-     client.poru.init(client);
-    } catch(e) {
-      console.error("Error in Poru", e.message);
-    }
-    let status = `p!help or /help`;
+    await registerCommands(client);
+    let status = `${config.prefix}help or /help`;
     client.user.setActivity({
       name: `${status}`,
       type: ActivityType.Listening,

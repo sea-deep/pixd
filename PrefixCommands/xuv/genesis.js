@@ -1,6 +1,4 @@
-
 import { AttachmentBuilder, Message } from "discord.js";
-import fetch from "node-fetch";
 
 export default {
   name: "genesis",
@@ -34,7 +32,7 @@ export default {
               type: 2,
               style: 4,
               label: "STOP",
-              custom_id: "delete_btn",
+              custom_id: "delete-btn",
               disabled: false,
               emoji: {
                 id: null,
@@ -70,7 +68,7 @@ export default {
                 type: 2,
                 style: 4,
                 label: "DELETE",
-                custom_id: "delete_btn",
+                custom_id: "delete-btn",
                 disabled: false,
                 emoji: {
                   id: null,
@@ -107,5 +105,5 @@ async function createImage(prompt) {
   // Pollinations API: https://pollinations.ai/prompt/{prompt}
   // The API returns a direct image URL for the prompt
   const encodedPrompt = encodeURIComponent(prompt);
-  return `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}`; //example: https://image.pollinations.ai/prompt/An%20astronaut%20riding%20a%20horse%20in%20a%20futuristic%20cityscape
 }

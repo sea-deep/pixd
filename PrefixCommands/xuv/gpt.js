@@ -1,11 +1,6 @@
 import { Message, Client } from "discord.js";
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env["GROQ_API_KEY"],
-});
-
-
 const convoMemory = new Map();
 
 export default {
@@ -53,6 +48,8 @@ export default {
 
     let completion;
     try {
+      if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
       completion = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages,

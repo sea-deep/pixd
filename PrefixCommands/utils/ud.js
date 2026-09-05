@@ -120,7 +120,7 @@ export default {
           },
         ],
       });
-      await client.keyv.set(`ud${msg.id}`, args.join(" "), 30 * 60 * 1000);
+      await client.keyv.set(`ud${msg.id}`, args.join(" "), 30 * 60);
     }
   },
 };
@@ -135,4 +135,3 @@ async function search(query, page = 1) {
     const body = await response.json();
     return body;
 }
-

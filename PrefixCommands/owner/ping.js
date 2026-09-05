@@ -1,4 +1,3 @@
-import { client } from "../../index.js";
 import { Message } from "discord.js";
 export default {
   name: "ping",

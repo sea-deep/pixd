@@ -25,7 +25,7 @@ export default {
                 type: 2,
                 style: 4,
                 label: "DELETE",
-                custom_id: "delete_btn",
+                custom_id: "delete-btn",
                 disabled: false,
                 emoji: {
                   id: null,
