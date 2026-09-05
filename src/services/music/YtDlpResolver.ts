@@ -1,5 +1,6 @@
 import { youtubeDl } from "youtube-dl-exec";
 import config from "../../../Configs/config.js";
+import { env } from "../../utilities/env.js";
 import type { MusicTrack, ResolveResult } from "./types.js";
 
 type YtDlpEntry = {
@@ -37,9 +38,9 @@ export default class YtDlpResolver {
       dumpSingleJson: true,
       skipDownload: true,
       noWarnings: true,
-      noCheckCertificates: false,
       playlistEnd: config.music.maxPlaylistSize,
       socketTimeout: 20,
+      ...(env.YT_DLP_COOKIES_PATH ? { cookies: env.YT_DLP_COOKIES_PATH } : {}),
     }) as unknown as YtDlpEntry;
 
     const entries = payload.entries?.length ? payload.entries : [payload];
