@@ -1,0 +1,6 @@
+This migration incorporates code from:
+
+- PixD (https://github.com/sea-deep/pixd): the original MIT copyright and
+  permission notice is preserved in LICENSE.pixd-original.
+- discord-bot-template (https://github.com/sea-deep/discord-bot-template):
+  the template's GNU GPL version 3 license text is retained in LICENSE.
