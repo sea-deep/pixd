@@ -40,7 +40,7 @@ export default new HybridCommand({
             { style: 2, custom_id: "img_right", emoji: { name: "▶️" }, type: 2 },
             { style: 1, custom_id: "img_random", emoji: { name: "🔀" }, type: 2 },
             { style: 1, custom_id: "img_input", emoji: { name: "🔢" }, type: 2 },
-            { style: 4, custom_id: "delete-btn", emoji: { name: "🗑" }, type: 2 },
+            { style: 4, custom_id: `delete-btn:${ctx.user.id}`, emoji: { name: "🗑" }, type: 2 },
           ],
         }],
         embeds: [{

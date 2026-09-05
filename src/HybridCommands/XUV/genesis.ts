@@ -25,7 +25,7 @@ export default new HybridCommand({
       const filename = `${prompt.replace(/[^a-z0-9]+/gi, "_").slice(0, 80) || "genesis"}.jpg`;
       return ctx.reply({
         embeds: [{ description: `>>> Genesisation done!\nHere is your **${prompt.slice(0, 300)}**`, image: { url: `attachment://${filename}` } }],
-        components: [{ type: 1, components: [{ type: 2, style: 4, label: "DELETE", custom_id: "delete-btn", emoji: { name: "🗑️" } }] }],
+        components: [{ type: 1, components: [{ type: 2, style: 4, label: "DELETE", custom_id: `delete-btn:${ctx.user.id}`, emoji: { name: "🗑️" } }] }],
         files: [new AttachmentBuilder(image, { name: filename })],
       });
     } catch (error) {

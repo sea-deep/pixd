@@ -107,7 +107,7 @@ export default new HybridCommand({
             },
             {
               style: 4,
-              custom_id: "delete-btn",
+              custom_id: `delete-btn:${ctx.user.id}`,
               disabled: false,
               emoji: {
 
