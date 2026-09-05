@@ -1,0 +1,54 @@
+import SlashCommand from "../../structures/SlashCommand.js";
+export default new SlashCommand({
+  data: {
+    name: "xuv",
+    description: "AI commands from the future",
+    options: [
+      {
+        type: 1,
+        name: "genesis",
+        description: "Generate an AI image",
+        options: [
+          {
+            type: 3,
+            name: "prompt",
+            description: "The prompt to generate",
+            required: true,
+          },
+        ],
+      },
+      {
+        type: 1,
+        name: "gpt",
+        description: "Danky dank GPT funny jokes",
+        options: [
+          {
+            type: 3,
+            name: "message",
+            description: "Your message to send 😂🙌🏽",
+            required: true,
+          },
+        ],
+      },
+      {
+        type: 1,
+        name: "ytsummarise",
+        description: "Summarize YouTube videos with ease.",
+        options: [
+          {
+            type: 3,
+            name: "yt-url",
+            description: "A YouTube video URL",
+            required: true,
+          },
+          {
+            type: 3,
+            name: "lang-code",
+            description:
+              "Language code of the subtitles language, like for Hindi, its hi. (Defaults to en)",
+          },
+        ],
+      },
+    ],
+  },
+});

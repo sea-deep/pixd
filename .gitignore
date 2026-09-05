@@ -1,3 +1,9 @@
 node_modules
-playground
+# DO NOT REMOVE THESE FOR SECURITY
 .env
+database.yml
+terminal.log
+
+# Build Output
+dist
+cookies.txt

@@ -1,50 +1,65 @@
 {
   "name": "pixd",
   "version": "1.0.0",
-  "description": "A Discord bot for various functions and masti.",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
+  "description": "A typed, template-based rewrite of the PixD Discord bot",
+  "homepage": "https://github.com/sea-deep/pixd#readme",
+  "bugs": {
+    "url": "https://github.com/sea-deep/pixd/issues"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sea-deep/pixd.git"
+  },
+  "author": "sea-deep",
+  "license": "GPL-3.0",
   "type": "module",
-  "keywords": [
-    "discord",
-    "bot",
-    "discord.js"
-  ],
-  "author": "sea.deep",
-  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "npm run build && node dist/index.js",
+    "dev": "tsx --watch index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
-    "@google-cloud/vision": "^4.3.2",
-    "@google/generative-ai": "^0.3.0",
-    "axios": "^1.9.0",
+    "@discordjs/voice": "^0.19.2",
+    "@google-cloud/vision": "^6.0.0",
+    "@google/genai": "^2.21.0",
+    "axios": "^1.20.0",
     "chalk": "^5.3.0",
     "cheerio": "^1.0.0",
     "chess.js": "^1.0.0-beta.8",
-    "discord-api-types": "^0.37.50",
-    "discord.js": "^14.11.0",
-    "dotenv": "^16.4.5",
+    "colors": "^1.4.0",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2",
     "emoji-regex": "^10.3.0",
-    "express": "^4.21.0",
-    "glob": "^9.0.1",
-    "google-img-scrap": "^1.1.1",
+    "express": "^5.2.1",
+    "glob": "^13.0.6",
+    "google-img-scrap": "1.1.4",
     "google-translate-api-x": "^10.6.7",
-    "googleapis": "^134.0.0",
+    "googleapis": "^178.0.0",
     "groq-sdk": "^0.5.0",
     "modern-gif": "^2.0.3",
     "mongodb": "^6.1.0",
     "mongoose": "^8.13.1",
     "openai": "^4.56.0",
     "p-queue": "^8.0.1",
-    "poru": "^5.2.0",
-    "sharp": "^0.32.4",
-    "xml2js": "^0.6.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sea-deep/pixd"
+    "sharp": "^0.35.4",
+    "xml2js": "^0.6.2",
+    "youtube-dl-exec": "^3.1.14",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "@types/express": "^5.0.3",
+    "@types/node": "^26.2.0",
+    "@types/xml2js": "^0.4.14",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "allowScripts": {
+    "youtube-dl-exec@3.1.14": true,
+    "esbuild@0.28.2": true,
+    "protobufjs@7.6.6": true
   }
 }
