@@ -23,32 +23,69 @@ export interface ExtractedFrames {
 }
 
 /**
- * Resolves Tenor, Klipy, Giphy, Discord embeds or general webpage URLs into direct image / GIF URLs.
+ * Recursively unwraps any nested target media URL found in query parameters
+ * (e.g. `?url=https://...`, `?src=https://...`, `?img=https://...`).
+ * Completely domain-agnostic; handles any converter, proxy, or redirector.
+ */
+export function unwrapNestedMediaUrl(rawUrl: string): string {
+  if (!rawUrl || typeof rawUrl !== "string") return rawUrl;
+  let currentUrl = rawUrl.trim();
+
+  for (let depth = 0; depth < 5; depth++) {
+    try {
+      const parsed = new URL(currentUrl);
+      let foundNested: string | null = null;
+      const candidateKeys = ["url", "src", "img", "image", "media", "file", "target", "link"];
+      for (const key of candidateKeys) {
+        const val = parsed.searchParams.get(key);
+        if (val && /^https?:\/\//i.test(val)) {
+          foundNested = val;
+          break;
+        }
+      }
+
+      if (!foundNested) {
+        for (const val of parsed.searchParams.values()) {
+          if (/^https?:\/\//i.test(val)) {
+            foundNested = val;
+            break;
+          }
+        }
+      }
+
+      if (foundNested && foundNested !== currentUrl) {
+        currentUrl = foundNested;
+      } else {
+        break;
+      }
+    } catch {
+      break;
+    }
+  }
+
+  return currentUrl;
+}
+
+const DIRECT_MEDIA_EXT_REGEX = /\.(?:png|jpe?g|gif|webp|avif|mp4|webm|mov|mkv|bmp|tiff?)(?:\?.*)?$/i;
+
+/**
+ * Resolves Tenor, Giphy, Discord embeds, proxies, or general webpage URLs into direct image / video URLs.
+ * Uses domain-agnostic query-param unwrapping, HTTP Content-Type inspection, and OpenGraph / Twitter metadata parsing.
  */
 export async function resolveMediaUrl(rawUrl: string): Promise<string> {
   if (!rawUrl || typeof rawUrl !== "string") return rawUrl;
-  const url = rawUrl.trim();
+  const unwrapped = unwrapNestedMediaUrl(rawUrl);
 
-  // Handle proxy converters like gifconvert.vxtwitter.com
-  if (url.includes("gifconvert.vxtwitter.com") || url.includes("convert.avif") || url.includes("convert.gif")) {
-    try {
-      const parsed = new URL(url);
-      const innerUrl = parsed.searchParams.get("url");
-      if (innerUrl && /^https?:\/\//i.test(innerUrl)) {
-        return innerUrl;
-      }
-    } catch {}
+  // If already a direct media URL by extension
+  if (DIRECT_MEDIA_EXT_REGEX.test(unwrapped)) {
+    return unwrapped;
   }
 
-  // If already a direct media URL (handles query params on Discord CDN / imgur / twimg etc.)
-  if (/^https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp|avif|mp4)(?:\?.*)?$/i.test(url)) {
-    return url;
-  }
-
-  // Handle common web GIF providers and open-graph pages
   try {
-    const response = await axios.get(url, {
+    const response = await axios.get(unwrapped, {
       timeout: 5000,
+      maxRedirects: 5,
+      responseType: "stream",
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -56,23 +93,73 @@ export async function resolveMediaUrl(rawUrl: string): Promise<string> {
       },
     });
 
-    if (typeof response.data === "string") {
-      const $ = cheerio.load(response.data);
-      const meta =
-        $('meta[property="og:image"]').attr("content") ||
-        $('meta[name="twitter:image"]').attr("content") ||
-        $('meta[name="twitter:image:src"]').attr("content") ||
-        $('meta[property="og:video"]').attr("content");
+    const rawContentType = response.headers["content-type"];
+    const contentType = typeof rawContentType === "string" ? rawContentType.toLowerCase() : "";
+    const finalUrl = response.request?.res?.responseUrl || unwrapped;
 
-      if (meta && /^https?:\/\//i.test(meta)) {
-        return meta;
+    // If HTTP headers indicate direct media (image or video), return the URL
+    if (contentType.startsWith("image/") || contentType.startsWith("video/")) {
+      response.data.destroy();
+      return unwrapNestedMediaUrl(finalUrl);
+    }
+
+    // Otherwise, read HTML head to extract OpenGraph / Twitter / HTML refresh tags
+    const chunks: Buffer[] = [];
+    let bytesRead = 0;
+    for await (const chunk of response.data) {
+      chunks.push(chunk);
+      bytesRead += chunk.length;
+      if (bytesRead >= 65536) break;
+    }
+    response.data.destroy();
+
+    const html = Buffer.concat(chunks).toString("utf-8");
+    const $ = cheerio.load(html);
+
+    // Check for client-side HTML meta refresh
+    const metaRefresh = $('meta[http-equiv="refresh"]').attr("content");
+    if (metaRefresh) {
+      const match = metaRefresh.match(/url=(https?:\/\/[^\s;'"]+)/i);
+      if (match && match[1] && match[1] !== unwrapped) {
+        return resolveMediaUrl(match[1]);
       }
     }
-  } catch {
-    // Fail silently to the original URL if web scrape fails
-  }
 
-  return url;
+    // Extract OpenGraph / Twitter media in priority order
+    const meta =
+      $('meta[property="og:video"]').attr("content") ||
+      $('meta[property="og:video:url"]').attr("content") ||
+      $('meta[property="og:video:secure_url"]').attr("content") ||
+      $('meta[name="twitter:player:stream"]').attr("content") ||
+      $('meta[property="og:image"]').attr("content") ||
+      $('meta[property="og:image:url"]').attr("content") ||
+      $('meta[property="og:image:secure_url"]').attr("content") ||
+      $('meta[name="twitter:image"]').attr("content") ||
+      $('meta[name="twitter:image:src"]').attr("content");
+
+    if (meta && /^https?:\/\//i.test(meta)) {
+      return unwrapNestedMediaUrl(meta);
+    }
+
+    return unwrapNestedMediaUrl(finalUrl);
+  } catch {
+    // Fail silently to the unwrapped URL if web request fails
+    return unwrapped;
+  }
+}
+
+/**
+ * Downloads media from a URL and guarantees it is in a Sharp-supported format.
+ */
+export async function fetchImageBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const raw = Buffer.from(await res.arrayBuffer());
+    return await ensureSupportedImageBuffer(raw);
+  } catch {
+    return null;
+  }
 }
 
 /**

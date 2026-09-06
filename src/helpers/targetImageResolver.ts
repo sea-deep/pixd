@@ -150,11 +150,8 @@ export async function resolveMultiImageTargets(
         }
         // Embeds
         for (const embed of refMsg.embeds) {
-          if (embed.image?.url) candidates.push({ type: "url", url: embed.image.url });
-          else if (embed.thumbnail?.url) candidates.push({ type: "url", url: embed.thumbnail.url });
-          else if (embed.video?.url && /\.gif(?:\?.*)?$/i.test(embed.video.url)) {
-            candidates.push({ type: "url", url: embed.video.url });
-          }
+          const mediaUrl = embed.image?.url || embed.video?.url || embed.thumbnail?.url;
+          if (mediaUrl) candidates.push({ type: "url", url: mediaUrl });
         }
         // Stickers
         for (const sticker of refMsg.stickers.values()) {

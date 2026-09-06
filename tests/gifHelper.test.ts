@@ -5,6 +5,7 @@ import {
   inspectImage,
   renderAnimatedGif,
   resolveMediaUrl,
+  unwrapNestedMediaUrl,
 } from "../src/helpers/gifHelper.js";
 
 describe("gifHelper", () => {
@@ -170,9 +171,33 @@ describe("gifHelper", () => {
     expect(meta.delay).toEqual([120, 120, 120]);
   });
 
-  it("unpacks proxy URLs like gifconvert.vxtwitter.com", async () => {
+  it("generically unwraps nested media URLs from query parameters without domain hardcoding", () => {
+    // Single level with standard keys
+    expect(unwrapNestedMediaUrl("https://example-proxy.org/convert.avif?url=https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4"))
+      .toBe("https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4");
+    expect(unwrapNestedMediaUrl("https://images.weserv.nl/?url=https://i.imgur.com/cat.gif"))
+      .toBe("https://i.imgur.com/cat.gif");
+    expect(unwrapNestedMediaUrl("https://proxy.example.com/resize?src=https://cdn.example.org/photo.jpg"))
+      .toBe("https://cdn.example.org/photo.jpg");
+    expect(unwrapNestedMediaUrl("https://media-gateway.io/process?media=https://cdn.discordapp.com/emojis/123.gif"))
+      .toBe("https://cdn.discordapp.com/emojis/123.gif");
+    expect(unwrapNestedMediaUrl("https://viewer.service.net/render?target=https://somedomain.com/video.mp4"))
+      .toBe("https://somedomain.com/video.mp4");
+
+    // Multi-level nested unwrapping
+    const nested = "https://outer-service.com/proxy?url=" + encodeURIComponent("https://inner-service.com/convert?src=https://target.com/final.gif");
+    expect(unwrapNestedMediaUrl(nested)).toBe("https://target.com/final.gif");
+
+    // URLs with non-media query params remain unchanged
+    expect(unwrapNestedMediaUrl("https://example.com/path?foo=bar&baz=123")).toBe("https://example.com/path?foo=bar&baz=123");
+  });
+
+  it("resolves direct media and proxy URLs via resolveMediaUrl", async () => {
     const proxyUrl = "https://gifconvert.vxtwitter.com/convert.avif?url=https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4";
     const resolved = await resolveMediaUrl(proxyUrl);
     expect(resolved).toBe("https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4");
+
+    const directMp4 = "https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4";
+    expect(await resolveMediaUrl(directMp4)).toBe(directMp4);
   });
 });

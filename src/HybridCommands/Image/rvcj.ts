@@ -2,7 +2,7 @@ import HybridCommand from "../../structures/HybridCommand.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp, { type OverlayOptions } from "sharp";
-import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { ensureSupportedImageBuffer, extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
 import { renderTextWithEmojis } from "../../helpers/textEmojiRenderer.js";
 
 export function parseCaptions(rawText: string): { topText: string; bottomText: string; questionText: string } {
@@ -92,29 +92,12 @@ export default new HybridCommand({
         throw new Error(`Failed to fetch image: ${response.statusText}`);
       }
       const data = await response.arrayBuffer();
-      const buffer = Buffer.from(data);
+      let buffer: Buffer = Buffer.from(data);
 
-      // Check if the buffer is a valid image format
-      await sharp(buffer)
-        .metadata()
-        .catch((err) => {
-          throw new Error(`Invalid image format: ${err instanceof Error ? err.message : String(err)}`);
-        });
-
-      // Normalize image to 16:9 rectangle if taller than 16:9 (including square or portrait)
-      let input = await sharp(buffer).resize(1080).png().toBuffer();
-      let md = await sharp(input).metadata();
-      if ((md.height ?? 0) > Math.round((md.width ?? 1080) * (9 / 16))) {
-        input = await sharp(input)
-          .resize({
-            width: 1080,
-            height: 608,
-            fit: "contain" as const,
-            background: { r: 255, g: 255, b: 255, alpha: 1 },
-          })
-          .png()
-          .toBuffer();
-        md = await sharp(input).metadata();
+      try {
+        buffer = await ensureSupportedImageBuffer(buffer);
+      } catch (err) {
+        throw new Error(`Invalid image format: ${err instanceof Error ? err.message : String(err)}`);
       }
 
       // Render text sections with transparent custom and unicode emojis
@@ -306,6 +289,22 @@ export default new HybridCommand({
       }
 
       // Static Image composite stack
+      // Normalize image to 16:9 rectangle if taller than 16:9 (including square or portrait)
+      let input = await sharp(buffer).resize(1080).png().toBuffer();
+      let md = await sharp(input).metadata();
+      if ((md.height ?? 0) > Math.round((md.width ?? 1080) * (9 / 16))) {
+        input = await sharp(input)
+          .resize({
+            width: 1080,
+            height: 608,
+            fit: "contain" as const,
+            background: { r: 255, g: 255, b: 255, alpha: 1 },
+          })
+          .png()
+          .toBuffer();
+        md = await sharp(input).metadata();
+      }
+
       let currentY = 145;
       const composites: OverlayOptions[] = [
         { input: "./Assets/rvcjheader.png", top: 0, left: 0 },

@@ -3,7 +3,7 @@ import { imageOptions } from "../../Interactions/SlashCommands/image.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
-import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { ensureSupportedImageBuffer, extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
 
 export default new HybridCommand({
   name: "vosahihai",
@@ -22,7 +22,8 @@ export default new HybridCommand({
     const url = await contextImage(ctx);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch image: ${res.statusText}`);
-    const buffer = Buffer.from(await res.arrayBuffer());
+    let buffer: Buffer = Buffer.from(await res.arrayBuffer());
+    buffer = await ensureSupportedImageBuffer(buffer);
 
     const imageInfo = await inspectImage(buffer);
     const text = [

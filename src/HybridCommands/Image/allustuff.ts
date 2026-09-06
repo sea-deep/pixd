@@ -3,7 +3,7 @@ import { imageOptions } from "../../Interactions/SlashCommands/image.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp, { type OverlayOptions } from "sharp";
-import { extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
+import { ensureSupportedImageBuffer, extractFrames, inspectImage, renderAnimatedGif } from "../../helpers/gifHelper.js";
 import { translate } from "google-translate-api-x";
 import { renderTextWithEmojis, protectCustomEmojis } from "../../helpers/textEmojiRenderer.js";
 
@@ -41,7 +41,8 @@ export default new HybridCommand({
 
     const response = await fetch(image);
     if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-    const data = Buffer.from(await response.arrayBuffer());
+    let data: Buffer = Buffer.from(await response.arrayBuffer());
+    data = await ensureSupportedImageBuffer(data);
 
     const imageInfo = await inspectImage(data);
 
