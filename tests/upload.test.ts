@@ -92,9 +92,35 @@ describe("Cloud Upload Service", () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain("Session expired or invalid");
     });
+
+    it("burns session token after initiation to prevent reuse", async () => {
+      const origKey = process.env.B2_KEY_ID;
+      process.env.B2_KEY_ID = "mock_key";
+      process.env.B2_APPLICATION_KEY = "mock_app_key";
+      process.env.B2_BUCKET_NAME = "mock-bucket";
+      process.env.B2_ENDPOINT = "https://s3.us-east-005.backblazeb2.com";
+
+      const session = await StorageService.createSession("u1", "u1tag", "c1", "g1");
+      expect(session.success).toBe(true);
+
+      vi.spyOn(UploadModel, "create").mockResolvedValue({} as any);
+
+      const initResult = await StorageService.initiateUpload(session.token!, "file.txt", 100, "text/plain");
+      expect(initResult.success).toBe(true);
+
+      // Token should now be burned from memory
+      expect(StorageService.getSession(session.token!)).toBeNull();
+
+      // Second attempt with same token must fail
+      const reuseResult = await StorageService.initiateUpload(session.token!, "file2.txt", 100, "text/plain");
+      expect(reuseResult.success).toBe(false);
+      expect(reuseResult.error).toContain("Session expired or invalid");
+
+      process.env.B2_KEY_ID = origKey;
+    });
   });
 
-  describe("Hybrid Command Structure", () => {
+  describe("Hybrid Command Structure & DM Delivery", () => {
     it("has valid upload command definition and settings", () => {
       expect(uploadCommand.name).toBe("upload");
       expect(uploadCommand.category).toBe("Utility");
@@ -103,6 +129,37 @@ describe("Cloud Upload Service", () => {
       expect(uploadCommand.aliases).toContain("b2");
       expect(uploadCommand.aliases).toContain("cloud");
       expect(uploadCommand.description).toContain("1GB");
+    });
+
+    it("sends private upload link via DM for prefix commands", async () => {
+      const origKey = process.env.B2_KEY_ID;
+      process.env.B2_KEY_ID = "mock_key";
+      process.env.B2_APPLICATION_KEY = "mock_app_key";
+      process.env.B2_BUCKET_NAME = "mock-bucket";
+      process.env.B2_ENDPOINT = "https://s3.us-east-005.backblazeb2.com";
+
+      const dmSend = vi.fn().mockResolvedValue({});
+      const channelReply = vi.fn().mockResolvedValue({ delete: vi.fn().mockResolvedValue({}) });
+
+      const fakeUser = { id: "12345", tag: "tester#0001", send: dmSend };
+      const fakeContext = {
+        channel: { id: "chan1" },
+        user: fakeUser,
+        isInteraction: false,
+        raw: { deletable: false },
+        reply: channelReply,
+      };
+
+      await uploadCommand.run(fakeContext as any, { color: 0x5865f2 } as any);
+
+      expect(dmSend).toHaveBeenCalledOnce();
+      const dmPayload = dmSend.mock.calls[0][0];
+      expect(dmPayload.embeds[0].data.title).toContain("PIXD Cloud Upload Portal");
+
+      expect(channelReply).toHaveBeenCalledOnce();
+      expect(channelReply.mock.calls[0][0].content).toContain("Check your DMs");
+
+      process.env.B2_KEY_ID = origKey;
     });
   });
 
