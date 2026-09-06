@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Server } from "node:http";
 import axios from "axios";
 import express from "express";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { handleLastFmAuth } from "../helpers/helpersLastFm.js";
 import { env } from "../utilities/env.js";
 import Logger from "../helpers/Logger.js";
@@ -12,12 +13,94 @@ import UploadModel from "../models/uploadModel.js";
 export const app = express();
 let ready = () => false;
 const staticPath = join(process.cwd(), "www");
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 app.disable("x-powered-by");
+
+// Security Headers Middleware
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
+
+// Lightweight Rate Limiter for Storage APIs (max 60 req/min per IP)
+const uploadRateLimits = new Map<string, { count: number; resetAt: number }>();
+function checkUploadRateLimit(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const ip = String(req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown");
+  const now = Date.now();
+  const entry = uploadRateLimits.get(ip);
+  if (!entry || now > entry.resetAt) {
+    uploadRateLimits.set(ip, { count: 1, resetAt: now + 60_000 });
+    return next();
+  }
+  if (entry.count >= 60) {
+    return res.status(429).json({ success: false, error: "Too many upload requests. Please try again later." });
+  }
+  entry.count++;
+  return next();
+}
+
+// Fallback direct streaming route (bypass express.json to stream raw bytes directly to S3/B2)
+app.put("/api/upload/stream/:fileId", checkUploadRateLimit, async (req, res) => {
+  req.setTimeout(30 * 60 * 1000);
+  const fileId = String(req.params.fileId);
+  if (!/^[a-f0-9]{12}$/i.test(fileId)) {
+    return res.status(400).json({ success: false, error: "Invalid fileId provided." });
+  }
+
+  const upload = await UploadModel.findOne({ fileId, status: "pending" });
+  if (!upload) {
+    return res.status(404).json({ success: false, error: "Upload session not found or already processed." });
+  }
+
+  const contentLengthHeader = req.headers["content-length"];
+  const contentLength = contentLengthHeader ? Number(contentLengthHeader) : upload.fileSize;
+  if (!Number.isFinite(contentLength) || contentLength <= 0 || contentLength > StorageService.MAX_FILE_SIZE_BYTES) {
+    return res.status(400).json({ success: false, error: "Invalid file size payload." });
+  }
+
+  try {
+    const s3 = StorageService.getS3Client();
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: StorageService.getBucketName(),
+        Key: upload.s3Key,
+        Body: req,
+        ContentLength: contentLength,
+        ContentType: upload.mimeType || "application/octet-stream",
+      })
+    );
+
+    const { client } = await import("../../index.js");
+    const completeRes = await StorageService.completeUpload(fileId, client);
+    return res.status(completeRes.success ? 200 : 400).json(completeRes);
+  } catch (err: any) {
+    Logger.error(`Stream upload failed for fileId ${fileId}:`, err);
+    return res.status(500).json({ success: false, error: err?.message || "Stream upload failed." });
+  }
+});
+
 app.use(express.json());
 app.use(express.static(staticPath));
 
 // Web Upload Portal & File Landing Pages
-app.get("/upload", (_req, res) => res.sendFile(join(staticPath, "upload.html")));
+app.get("/upload", (req, res) => {
+  const token = typeof req.query.token === "string" ? req.query.token.trim() : "";
+  if (!token || !UUID_REGEX.test(token)) {
+    return res.status(403).sendFile(join(staticPath, "upload-invalid.html"));
+  }
+
+  const session = StorageService.getSession(token);
+  if (!session) {
+    return res.status(403).sendFile(join(staticPath, "upload-invalid.html"));
+  }
+
+  return res.sendFile(join(staticPath, "upload.html"));
+});
+
 app.get("/file/:fileId", (req, res) => {
   const fileId = String(req.params.fileId);
   if (!/^[a-f0-9]{12}$/i.test(fileId)) return res.status(404).sendFile(join(staticPath, "404.html"));
@@ -25,17 +108,45 @@ app.get("/file/:fileId", (req, res) => {
 });
 
 // Storage API Endpoints
-app.post("/api/upload/presign", async (req, res) => {
+app.get("/api/upload/session-info", checkUploadRateLimit, (req, res) => {
+  const token = typeof req.query.token === "string" ? req.query.token.trim() : "";
+  if (!token || !UUID_REGEX.test(token)) {
+    return res.status(400).json({ success: false, error: "Invalid or malformed session token." });
+  }
+
+  const session = StorageService.getSession(token);
+  if (!session) {
+    return res.status(404).json({ success: false, error: "Upload session not found or expired." });
+  }
+
+  return res.json({
+    success: true,
+    userTag: session.userTag,
+    channelName: session.channelName || "this channel",
+    guildName: session.guildName || "",
+    expiresAt: session.expiresAt,
+  });
+});
+
+app.post("/api/upload/presign", checkUploadRateLimit, async (req, res) => {
   const { token, fileName, fileSize, mimeType } = req.body || {};
-  if (!token || !fileName || typeof fileSize !== "number") {
-    return res.status(400).json({ success: false, error: "Missing required upload parameters." });
+  if (
+    typeof token !== "string" ||
+    !UUID_REGEX.test(token.trim()) ||
+    typeof fileName !== "string" ||
+    fileName.trim().length === 0 ||
+    typeof fileSize !== "number" ||
+    !Number.isFinite(fileSize) ||
+    fileSize <= 0
+  ) {
+    return res.status(400).json({ success: false, error: "Missing or invalid upload parameters." });
   }
 
   const result = await StorageService.initiateUpload(
-    String(token),
+    token.trim(),
     String(fileName),
     fileSize,
-    String(mimeType || "application/octet-stream")
+    typeof mimeType === "string" ? mimeType.slice(0, 100) : "application/octet-stream"
   );
 
   return res.status(result.success ? 200 : 400).json(result);
@@ -144,6 +255,8 @@ export function startWebServer(isReady: () => boolean): Promise<Server> {
   ready = isReady;
   return new Promise((resolve, reject) => {
     const server = app.listen(env.PORT, async () => {
+      server.requestTimeout = 30 * 60 * 1000;
+      server.headersTimeout = 35 * 60 * 1000;
       Logger.info(`Web server listening on port ${env.PORT}`);
       try {
         const { client } = await import("../../index.js");
@@ -151,6 +264,7 @@ export function startWebServer(isReady: () => boolean): Promise<Server> {
       } catch (err) {
         Logger.error("Failed to start storage cleanup worker", err);
       }
+      void StorageService.configureBucketCors();
       resolve(server);
     });
     server.once("error", reject);

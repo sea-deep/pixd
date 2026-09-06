@@ -4,9 +4,11 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
   HeadObjectCommand,
+  PutBucketCorsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomBytes, randomUUID } from "node:crypto";
+import { basename } from "node:path";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -32,7 +34,9 @@ export interface UploadSession {
   userId: string;
   userTag: string;
   channelId: string;
+  channelName?: string;
   guildId: string | null;
+  guildName?: string;
   createdAt: number;
   expiresAt: number;
 }
@@ -91,6 +95,38 @@ export class StorageService {
     return this.s3ClientInstance;
   }
 
+  public static getBucketName(): string {
+    return this.B2_BUCKET_NAME!;
+  }
+
+  /**
+   * Configures CORS on the Backblaze B2 bucket to permit direct browser PUT, GET, HEAD uploads.
+   */
+  public static async configureBucketCors(): Promise<void> {
+    if (!this.isConfigured()) return;
+    try {
+      const s3 = this.getS3Client();
+      await s3.send(
+        new PutBucketCorsCommand({
+          Bucket: this.B2_BUCKET_NAME!,
+          CORSConfiguration: {
+            CORSRules: [
+              {
+                AllowedHeaders: ["*"],
+                AllowedMethods: ["PUT", "GET", "HEAD"],
+                AllowedOrigins: ["*"],
+                MaxAgeSeconds: 3600,
+              },
+            ],
+          },
+        })
+      );
+      Logger.info("Backblaze B2 bucket CORS configured successfully.");
+    } catch (err: any) {
+      Logger.warn("Could not set B2 bucket CORS automatically (key may lack PutBucketCors perm):", err?.message);
+    }
+  }
+
   /**
    * Calculates current total bytes stored by active unexpired files.
    */
@@ -109,7 +145,9 @@ export class StorageService {
     userId: string,
     userTag: string,
     channelId: string,
-    guildId: string | null
+    guildId: string | null,
+    channelName?: string,
+    guildName?: string
   ): Promise<{ success: boolean; token?: string; url?: string; error?: string }> {
     if (!this.isConfigured()) {
       return {
@@ -152,7 +190,9 @@ export class StorageService {
       userId,
       userTag,
       channelId,
+      channelName,
       guildId,
+      guildName,
       createdAt: now,
       expiresAt: now + this.SESSION_TOKEN_TTL_MS,
     };
@@ -225,8 +265,12 @@ export class StorageService {
     const expiresAt = new Date(Date.now() + this.DEFAULT_EXPIRY_HOURS * 3600 * 1000);
 
     const fileId = randomBytes(6).toString("hex");
+    const rawBase = basename(fileName).replace(/[\r\n\0]/g, "").trim();
     const sanitizedName =
-      fileName.replace(/[^\w.-]/g, "_").slice(0, 100) || "upload.bin";
+      rawBase
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .replace(/\.{2,}/g, ".")
+        .slice(0, 100) || "upload.bin";
     const s3Key = `uploads/${fileId}/${sanitizedName}`;
 
     try {
@@ -234,7 +278,6 @@ export class StorageService {
       const putCommand = new PutObjectCommand({
         Bucket: this.B2_BUCKET_NAME!,
         Key: s3Key,
-        ContentType: mimeType || "application/octet-stream",
       });
 
       // 30-minute presigned PUT URL allowing sufficient upload time
@@ -478,19 +521,40 @@ export class StorageService {
     });
     if (!upload) return null;
 
+    // Strict whitelist of safe media types that can be displayed inline in browser
+    const SAFE_INLINE_MIME_TYPES = new Set([
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+      "image/avif",
+      "video/mp4",
+      "video/webm",
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/ogg",
+      "audio/wav",
+      "text/plain",
+    ]);
+
+    const isSafeInline = SAFE_INLINE_MIME_TYPES.has(upload.mimeType.toLowerCase());
+    const responseContentType = isSafeInline ? upload.mimeType : "application/octet-stream";
+    const disposition = isSafeInline ? "inline" : "attachment";
+
     try {
       const s3 = this.getS3Client();
       const getCommand = new GetObjectCommand({
         Bucket: this.B2_BUCKET_NAME!,
         Key: upload.s3Key,
-        ResponseContentType: upload.mimeType,
-        ResponseContentDisposition: `inline; filename="${encodeURIComponent(
+        ResponseContentType: responseContentType,
+        ResponseContentDisposition: `${disposition}; filename="${encodeURIComponent(
           upload.fileName
         )}"`,
       });
 
       const url = await getSignedUrl(s3, getCommand, { expiresIn: 3600 });
-      return { url, mimeType: upload.mimeType };
+      return { url, mimeType: responseContentType };
     } catch (err: any) {
       Logger.error(`Error generating view URL for ${fileId}:`, err);
       return null;

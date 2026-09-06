@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXD • Security Error</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .error-container {
+      max-width: 580px;
+      margin: 60px auto;
+      padding: 36px 30px;
+      background: #222226;
+      border: 1px solid #4d2424;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      text-align: center;
+    }
+    .error-icon {
+      font-size: 54px;
+      margin-bottom: 16px;
+    }
+    .error-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ff6b6b;
+      margin-bottom: 12px;
+    }
+    .error-desc {
+      color: #a0a0a8;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .info-card {
+      background: #18181c;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: left;
+      font-size: 13px;
+      color: #cfcfe2;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .btn-home {
+      display: inline-block;
+      background: #5865EF;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .btn-home:hover {
+      background: #4752c4;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-icon">🔒</div>
+    <div class="error-title">Invalid or Expired Upload Session</div>
+    <div class="error-desc">
+      This upload link is missing, malformed, or has already expired.
+    </div>
+    <div class="info-card">
+      <strong>🛡️ Session Security:</strong><br>
+      • Upload links are one-time use and valid for only 15 minutes.<br>
+      • To upload a file, run <code>/upload</code> or <code>p!upload</code> in your Discord server to generate a secure private link.<br>
+      • Tokens cannot be guessed or reused once consumed.
+    </div>
+    <a href="/home" class="btn-home">Return to Home</a>
+  </div>
+</body>
+</html>

@@ -163,12 +163,64 @@ describe("Cloud Upload Service", () => {
     });
   });
 
-  describe("Web routes for uploads", () => {
-    it("serves upload portal page", async () => {
-      const res = await fetch(`${baseUrl}/upload`);
+  describe("Web routes and security validation", () => {
+    it("rejects /upload without token or with malformed token", async () => {
+      // Missing token
+      const noTokenRes = await fetch(`${baseUrl}/upload`);
+      expect(noTokenRes.status).toBe(403);
+      const noTokenText = await noTokenRes.text();
+      expect(noTokenText).toContain("Invalid or Expired Upload Session");
+
+      // Malformed token like user reported (849c1874-)
+      const malformedRes = await fetch(`${baseUrl}/upload?token=849c1874-`);
+      expect(malformedRes.status).toBe(403);
+      const malformedText = await malformedRes.text();
+      expect(malformedText).toContain("Invalid or Expired Upload Session");
+
+      // Valid UUID format but non-existent session
+      const notFoundRes = await fetch(`${baseUrl}/upload?token=00000000-0000-0000-0000-000000000000`);
+      expect(notFoundRes.status).toBe(403);
+    });
+
+    it("serves upload portal page with valid active session token", async () => {
+      const origKey = process.env.B2_KEY_ID;
+      process.env.B2_KEY_ID = "mock_key";
+      process.env.B2_APPLICATION_KEY = "mock_app_key";
+      process.env.B2_BUCKET_NAME = "mock-bucket";
+      process.env.B2_ENDPOINT = "https://s3.us-east-005.backblazeb2.com";
+
+      const session = await StorageService.createSession(
+        "user123",
+        "user#0001",
+        "chan123",
+        "guild123",
+        "#general",
+        "Test Server"
+      );
+      expect(session.success).toBe(true);
+
+      const res = await fetch(`${baseUrl}/upload?token=${session.token}`);
       expect(res.status).toBe(200);
       const text = await res.text();
       expect(text).toContain("PIXD Direct Cloud Transfer");
+
+      // Test session-info endpoint
+      const infoRes = await fetch(`${baseUrl}/api/upload/session-info?token=${session.token}`);
+      expect(infoRes.status).toBe(200);
+      const infoData = await infoRes.json();
+      expect(infoData.success).toBe(true);
+      expect(infoData.channelName).toBe("#general");
+      expect(infoData.guildName).toBe("Test Server");
+
+      // Rejects malformed token on session-info API
+      const badInfoRes = await fetch(`${baseUrl}/api/upload/session-info?token=849c1874-`);
+      expect(badInfoRes.status).toBe(400);
+
+      // Verify security headers
+      expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+      expect(res.headers.get("x-frame-options")).toBe("DENY");
+
+      process.env.B2_KEY_ID = origKey;
     });
 
     it("validates fileId on landing page", async () => {

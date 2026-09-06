@@ -55,6 +55,23 @@
       background: #444;
       cursor: not-allowed;
     }
+    .btn-remove {
+      background: #382025;
+      color: #ff6b6b;
+      border: 1px solid #5a282f;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-remove:hover {
+      background: #50272f;
+      color: #ff8e8e;
+      border-color: #793740;
+    }
     .progress-box {
       display: none;
       margin: 20px 0;
@@ -103,10 +120,20 @@
     <h1 style="font-size: 26px; color: #fff;">📦 PIXD Direct Cloud Transfer</h1>
     <p style="color: #a0a0a8; margin-top: 6px;">Bypass Discord's 20 MB cap — upload files directly up to 1 GiB</p>
     <div class="badge">⏱️ Auto-expires in 6 hours • Zero server lag</div>
+    <div>
+      <div id="dest-badge" class="badge" style="display: none; background: #25252e; border: 1px solid #3e3e48; color: #cfcfe2; margin-top: 8px;">
+        📍 Destination: <span id="dest-info" style="color: #7983f5; font-weight: 600;"></span>
+      </div>
+    </div>
 
-    <div id="session-error" style="display: none; color: #ff5555; margin-top: 25px;"></div>
+    <div id="session-loader" style="padding: 40px 20px; color: #888;">
+      <div style="font-size: 38px; margin-bottom: 12px;">🔐</div>
+      <p style="font-size: 15px; color: #cfcfe2; font-weight: 500;">Validating secure session token...</p>
+    </div>
 
-    <div id="upload-flow">
+    <div id="session-error" style="display: none; color: #ff6b6b; margin-top: 25px; line-height: 1.6; padding: 20px; background: #2f1c1c; border: 1px solid #5a2626; border-radius: 8px;"></div>
+
+    <div id="upload-flow" style="display: none;">
       <div class="drop-zone" id="drop-zone">
         <div class="drop-icon">📤</div>
         <p style="font-size: 17px; font-weight: 600; color: #fff;">Drag & drop your file here</p>
@@ -115,8 +142,15 @@
       </div>
 
       <div class="file-details" id="file-details">
-        <div><strong>Selected:</strong> <span id="file-name" style="color: #fff;"></span></div>
-        <div style="margin-top: 4px;"><strong>Size:</strong> <span id="file-size" style="color: #a0a0a8;"></span></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <div style="text-align: left; overflow: hidden; flex: 1;">
+            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <strong>Selected:</strong> <span id="file-name" style="color: #fff;"></span>
+            </div>
+            <div style="margin-top: 4px;"><strong>Size:</strong> <span id="file-size" style="color: #a0a0a8;"></span></div>
+          </div>
+          <button type="button" id="remove-file-btn" class="btn-remove" title="Remove selected file">🗑️ Remove</button>
+        </div>
       </div>
 
       <div class="progress-box" id="progress-box">
@@ -150,23 +184,37 @@
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
+    const destBadge = document.getElementById('dest-badge');
+    const destInfo = document.getElementById('dest-info');
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const uploadBtn = document.getElementById('upload-btn');
     const fileDetails = document.getElementById('file-details');
     const fileNameEl = document.getElementById('file-name');
     const fileSizeEl = document.getElementById('file-size');
+    const removeFileBtn = document.getElementById('remove-file-btn');
     const progressBox = document.getElementById('progress-box');
     const progressFill = document.getElementById('progress-fill');
     const progressPercent = document.getElementById('progress-percent');
     const uploadStats = document.getElementById('upload-stats');
     const statusMsg = document.getElementById('status-msg');
+    const sessionLoader = document.getElementById('session-loader');
     const sessionError = document.getElementById('session-error');
     const uploadFlow = document.getElementById('upload-flow');
     const shareCard = document.getElementById('share-card');
     const shareLinkInput = document.getElementById('share-link-input');
     const copyShareBtn = document.getElementById('copy-share-btn');
     const viewFileBtn = document.getElementById('view-file-btn');
+
+    let selectedFile = null;
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
     copyShareBtn.addEventListener('click', () => {
       const copyText = shareLinkInput.value;
@@ -187,20 +235,43 @@
       });
     });
 
-    let selectedFile = null;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-    function formatBytes(bytes) {
-      if (bytes === 0) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    function showSessionError(msg) {
+      if (sessionLoader) sessionLoader.style.display = 'none';
+      if (uploadFlow) uploadFlow.style.display = 'none';
+      if (sessionError) {
+        sessionError.style.display = 'block';
+        sessionError.innerHTML = `🔒 <strong>${msg}</strong><br><br>` +
+          `Upload links require a valid, active token generated via <code>/upload</code> or <code>p!upload</code> in Discord.<br><br>` +
+          `<a href="/home" class="btn-upload" style="display: inline-block; text-decoration: none; padding: 8px 18px; font-size: 13px;">Return to Home</a>`;
+      }
     }
 
-    if (!token) {
-      uploadFlow.style.display = 'none';
-      sessionError.style.display = 'block';
-      sessionError.innerHTML = '❌ <strong>Missing upload session token.</strong><br>Please type <code>/upload</code> or <code>p!upload</code> in your Discord server to generate a secure upload link.';
+    if (!token || !UUID_REGEX.test(token.trim())) {
+      showSessionError('Invalid, malformed, or missing session token.');
+    } else {
+      // Validate session and retrieve destination info
+      fetch(`/api/upload/session-info?token=${encodeURIComponent(token.trim())}`)
+        .then(res => res.json())
+        .then(data => {
+          if (sessionLoader) sessionLoader.style.display = 'none';
+          if (data && data.success) {
+            let destText = data.channelName;
+            if (data.guildName && data.guildName !== 'Direct Messages') {
+              destText += ` in ${data.guildName}`;
+            }
+            destInfo.textContent = destText;
+            destBadge.style.display = 'inline-block';
+            uploadFlow.style.display = 'block';
+          } else {
+            showSessionError(data?.error || 'Upload session expired or invalid.');
+          }
+        })
+        .catch(() => {
+          if (sessionLoader) sessionLoader.style.display = 'none';
+          showSessionError('Unable to verify upload session with server.');
+        });
     }
 
     dropZone.addEventListener('click', () => fileInput.click());
@@ -228,38 +299,26 @@
       statusMsg.textContent = '';
     }
 
-    uploadBtn.addEventListener('click', async () => {
-      if (!selectedFile || !token) return;
-
+    removeFileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedFile = null;
+      fileInput.value = '';
+      fileDetails.style.display = 'none';
       uploadBtn.disabled = true;
-      dropZone.style.pointerEvents = 'none';
-      progressBox.style.display = 'block';
-      statusMsg.textContent = 'Requesting secure cloud upload URL...';
-      statusMsg.style.color = '#5865EF';
+      statusMsg.textContent = '';
+      progressBox.style.display = 'none';
+      progressFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+      uploadStats.textContent = '';
+      dropZone.style.display = 'block';
+      dropZone.style.pointerEvents = 'auto';
+    });
 
-      try {
-        // Step 1: Request presigned PUT URL
-        const presignRes = await fetch('/api/upload/presign', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            token,
-            fileName: selectedFile.name,
-            fileSize: selectedFile.size,
-            mimeType: selectedFile.type || 'application/octet-stream',
-            expiryHours: 6
-          })
-        });
+    function uploadViaProxy(fileId, file) {
+      return new Promise((resolve, reject) => {
+        statusMsg.textContent = 'Direct route restricted; streaming via PIXD proxy...';
+        statusMsg.style.color = '#e5a50a';
 
-        const presignData = await presignRes.json();
-        if (!presignRes.ok || !presignData.success) {
-          throw new Error(presignData.error || 'Failed to prepare upload session.');
-        }
-
-        const { uploadUrl, fileId } = presignData;
-        statusMsg.textContent = 'Uploading directly to Backblaze B2...';
-
-        // Step 2: Direct browser-to-B2 HTTP PUT with progress
         const xhr = new XMLHttpRequest();
         let startTime = Date.now();
 
@@ -275,47 +334,141 @@
           }
         };
 
-        xhr.onload = async () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            statusMsg.textContent = 'Verifying storage and announcing in Discord...';
-            statusMsg.style.color = '#3ba55d';
-
-            // Step 3: Complete upload
-            const completeRes = await fetch('/api/upload/complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ fileId })
-            });
-
-            const completeData = await completeRes.json();
-            if (completeRes.ok && completeData.success) {
-              const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
-              shareLinkInput.value = shareUrl;
-              viewFileBtn.href = '/file/' + fileId;
-              shareCard.style.display = 'block';
-              statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
-              dropZone.style.display = 'none';
-              uploadBtn.style.display = 'none';
+        xhr.onload = () => {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+              resolve(data);
             } else {
-              throw new Error(completeData.error || 'Failed to finalize upload.');
+              reject(new Error(data.error || `Server streaming upload failed (HTTP ${xhr.status})`));
             }
-          } else {
-            throw new Error('Cloud storage upload failed with HTTP ' + xhr.status);
+          } catch {
+            reject(new Error(`Server streaming upload failed (HTTP ${xhr.status})`));
           }
         };
 
         xhr.onerror = () => {
-          throw new Error('Network error occurred during file upload.');
+          reject(new Error('Network error during streaming upload.'));
         };
 
-        xhr.open('PUT', uploadUrl, true);
-        xhr.setRequestHeader('Content-Type', selectedFile.type || 'application/octet-stream');
-        xhr.send(selectedFile);
+        xhr.open('PUT', `/api/upload/stream/${encodeURIComponent(fileId)}`, true);
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.send(file);
+      });
+    }
+
+    function showUploadSuccess(fileId, shareUrl) {
+      shareLinkInput.value = shareUrl;
+      viewFileBtn.href = '/file/' + fileId;
+      shareCard.style.display = 'block';
+      statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
+      statusMsg.style.color = '#3ba55d';
+      dropZone.style.display = 'none';
+      fileDetails.style.display = 'none';
+      uploadBtn.style.display = 'none';
+    }
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!selectedFile || !token) return;
+
+      uploadBtn.disabled = true;
+      removeFileBtn.style.display = 'none';
+      dropZone.style.pointerEvents = 'none';
+      progressBox.style.display = 'block';
+      statusMsg.textContent = 'Requesting secure cloud upload URL...';
+      statusMsg.style.color = '#5865EF';
+
+      try {
+        // Step 1: Request presigned PUT URL
+        const presignRes = await fetch('/api/upload/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token,
+            fileName: selectedFile.name,
+            fileSize: selectedFile.size,
+            mimeType: selectedFile.type || 'application/octet-stream',
+          })
+        });
+
+        const presignData = await presignRes.json();
+        if (!presignRes.ok || !presignData.success) {
+          throw new Error(presignData.error || 'Failed to prepare upload session.');
+        }
+
+        const { uploadUrl, fileId } = presignData;
+        statusMsg.textContent = 'Uploading directly to Backblaze B2...';
+
+        // Step 2: Attempt direct browser-to-B2 HTTP PUT
+        let directSuccess = false;
+        try {
+          await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            let startTime = Date.now();
+
+            xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                progressFill.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
+
+                const elapsedSec = (Date.now() - startTime) / 1000;
+                const speed = elapsedSec > 0 ? event.loaded / elapsedSec : 0;
+                uploadStats.textContent = `${formatBytes(event.loaded)} / ${formatBytes(event.total)} • ${formatBytes(speed)}/s`;
+              }
+            };
+
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve();
+              } else {
+                reject(new Error(`Direct B2 upload failed with HTTP ${xhr.status}`));
+              }
+            };
+
+            xhr.onerror = () => {
+              reject(new Error('Direct B2 network/CORS error'));
+            };
+
+            xhr.open('PUT', uploadUrl, true);
+            xhr.setRequestHeader('Content-Type', selectedFile.type || 'application/octet-stream');
+            xhr.send(selectedFile);
+          });
+          directSuccess = true;
+        } catch (directErr) {
+          console.warn('Direct upload failed or blocked by CORS, falling back to streaming proxy...', directErr);
+        }
+
+        if (directSuccess) {
+          statusMsg.textContent = 'Verifying storage and announcing in Discord...';
+          statusMsg.style.color = '#3ba55d';
+
+          // Step 3: Complete direct upload
+          const completeRes = await fetch('/api/upload/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId })
+          });
+
+          const completeData = await completeRes.json();
+          if (completeRes.ok && completeData.success) {
+            const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
+            showUploadSuccess(fileId, shareUrl);
+          } else {
+            throw new Error(completeData.error || 'Failed to finalize upload.');
+          }
+        } else {
+          // Streaming proxy fallback
+          const completeData = await uploadViaProxy(fileId, selectedFile);
+          const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
+          showUploadSuccess(fileId, shareUrl);
+        }
 
       } catch (err) {
         statusMsg.textContent = '❌ ' + err.message;
         statusMsg.style.color = '#ff5555';
         uploadBtn.disabled = false;
+        removeFileBtn.style.display = 'inline-block';
         dropZone.style.pointerEvents = 'auto';
       }
     });

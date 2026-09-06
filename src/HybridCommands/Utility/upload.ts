@@ -29,11 +29,16 @@ export default new HybridCommand({
       });
     }
 
+    const channelName = "name" in ctx.channel && ctx.channel.name ? `#${ctx.channel.name}` : "this channel";
+    const guildName = ctx.guild?.name ?? "Direct Messages";
+
     const session = await StorageService.createSession(
       ctx.user.id,
       ctx.user.tag,
       ctx.channel.id,
-      ctx.guild?.id ?? null
+      ctx.guild?.id ?? null,
+      channelName,
+      guildName
     );
 
     if (!session.success || !session.url) {
@@ -41,11 +46,6 @@ export default new HybridCommand({
         content: session.error || "❌ **Failed to initialize upload session.**",
         ephemeral: true,
       });
-    }
-
-    // If invoked via message prefix, try to delete author's command message safely
-    if (!ctx.isInteraction && "deletable" in ctx.raw && ctx.raw.deletable) {
-      void ctx.raw.delete().catch(() => {});
     }
 
     const embed = new EmbedBuilder()
