@@ -1,6 +1,6 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { Client, Message } from "discord.js";
-import words from "../../Assets/words.js";
+import words from "../../data/words.js";
 export default new HybridCommand({
   name: "wordle",
   description: "Play wordle om discord!",

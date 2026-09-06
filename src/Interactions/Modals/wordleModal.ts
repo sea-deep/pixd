@@ -1,6 +1,6 @@
 import Component from "../../structures/Component.js";
 import { Client } from "discord.js";
-import words from "../../Assets/words.js";
+import words from "../../data/words.js";
 export default new Component({
   customId: "guessedWordle",
   type: "modal",

@@ -1,7 +1,8 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
-import User from "../../Utilities/jeetModel.js";
-import emote from "../../Configs/emote.js";
+import User from "../../models/jeetModel.js";
+import emote from "../../../Configs/emote.js";
+
 
 export default new HybridCommand({
   name: "balance",

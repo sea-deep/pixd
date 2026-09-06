@@ -1,5 +1,5 @@
 import Component from "../../../structures/Component.js";
-import emojis from "../../../Assets/emojis.js"
+import emojis from "../../../data/emojis.js";
 
 export default new Component({
   customId: "htpWordle",

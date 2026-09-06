@@ -1,6 +1,6 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { Client, Message } from "discord.js";
-import hangman from "../../Assets/hangman.js";
+import hangman from "../../data/hangman.js";
 
 export default new HybridCommand({
   name: "hangman",

@@ -1,6 +1,6 @@
 import Component from "../../../structures/Component.js";
 import { ButtonInteraction} from "discord.js";
-import User from "../../../Utilities/jeetModel.js";
+import User from "../../../models/jeetModel.js";
 import { isComponentOwner } from "../../../helpers/componentOwnership.js";
 export default new Component({
   customId: "pajeeta",

@@ -1,4 +1,4 @@
-import emojis from "../Assets/emojis.js"
+import emojis from "../data/emojis.js";
 
 export function getColoredWord(answer: string, guess: string) {
   let coloredWord = [];
