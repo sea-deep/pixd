@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { spawn } from "child_process";
 
 export interface ImageMetadataInfo {
   isAnimated: boolean;
@@ -10,6 +11,7 @@ export interface ImageMetadataInfo {
   width: number;
   height: number;
   delay: number[];
+  normalizedBuffer?: Buffer;
 }
 
 export interface ExtractedFrames {
@@ -27,8 +29,19 @@ export async function resolveMediaUrl(rawUrl: string): Promise<string> {
   if (!rawUrl || typeof rawUrl !== "string") return rawUrl;
   const url = rawUrl.trim();
 
-  // If already a direct media URL (handles query params on Discord CDN / imgur etc.)
-  if (/^https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp)(?:\?.*)?$/i.test(url)) {
+  // Handle proxy converters like gifconvert.vxtwitter.com
+  if (url.includes("gifconvert.vxtwitter.com") || url.includes("convert.avif") || url.includes("convert.gif")) {
+    try {
+      const parsed = new URL(url);
+      const innerUrl = parsed.searchParams.get("url");
+      if (innerUrl && /^https?:\/\//i.test(innerUrl)) {
+        return innerUrl;
+      }
+    } catch {}
+  }
+
+  // If already a direct media URL (handles query params on Discord CDN / imgur / twimg etc.)
+  if (/^https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp|avif|mp4)(?:\?.*)?$/i.test(url)) {
     return url;
   }
 
@@ -63,10 +76,54 @@ export async function resolveMediaUrl(rawUrl: string): Promise<string> {
 }
 
 /**
+ * Ensures an image buffer is supported by Sharp.
+ * If the buffer is an animated AVIF or video (e.g. MP4) that Sharp cannot decode,
+ * transcodes it into a standard animated GIF buffer using ffmpeg.
+ */
+export async function ensureSupportedImageBuffer(buffer: Buffer): Promise<Buffer> {
+  try {
+    await sharp(buffer, { animated: true }).metadata();
+    return buffer;
+  } catch (err: any) {
+    if (
+      err?.message?.includes("unsupported image format") ||
+      err?.message?.includes("Input buffer contains unsupported image format")
+    ) {
+      try {
+        return await new Promise<Buffer>((resolve, reject) => {
+          const p = spawn("ffmpeg", [
+            "-i", "pipe:0",
+            "-vf", "fps=20,scale=min(540\\,iw):-1:flags=fast_bilinear",
+            "-f", "gif",
+            "pipe:1",
+          ]);
+          const chunks: Buffer[] = [];
+          p.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
+          p.on("error", reject);
+          p.on("close", (code) => {
+            if (code === 0 && chunks.length) {
+              resolve(Buffer.concat(chunks));
+            } else {
+              reject(new Error(`ffmpeg exited with code ${code}`));
+            }
+          });
+          p.stdin.write(buffer);
+          p.stdin.end();
+        });
+      } catch {
+        throw err;
+      }
+    }
+    throw err;
+  }
+}
+
+/**
  * Inspects an image buffer with sharp to detect format, animated state, dimensions, and frame delays.
  */
 export async function inspectImage(buffer: Buffer): Promise<ImageMetadataInfo> {
-  const meta = await sharp(buffer, { animated: true }).metadata();
+  const supportedBuffer = await ensureSupportedImageBuffer(buffer);
+  const meta = await sharp(supportedBuffer, { animated: true }).metadata();
   const pages = meta.pages && meta.pages > 1 ? meta.pages : 1;
   const pageHeight = meta.pageHeight ?? meta.height ?? 0;
   const width = meta.width ?? 0;
@@ -82,6 +139,7 @@ export async function inspectImage(buffer: Buffer): Promise<ImageMetadataInfo> {
     width,
     height,
     delay,
+    normalizedBuffer: supportedBuffer,
   };
 }
 
@@ -92,9 +150,10 @@ export async function inspectImage(buffer: Buffer): Promise<ImageMetadataInfo> {
  */
 export async function extractFrames(buffer: Buffer, maxFrames = 30): Promise<ExtractedFrames> {
   const info = await inspectImage(buffer);
+  const targetBuffer = info.normalizedBuffer ?? buffer;
   if (!info.isAnimated) {
     return {
-      frames: [buffer],
+      frames: [targetBuffer],
       delay: [100],
       width: info.width,
       height: info.height,
@@ -120,7 +179,7 @@ export async function extractFrames(buffer: Buffer, maxFrames = 30): Promise<Ext
   }
 
   const frames = await Promise.all(
-    sampleIndices.map((page) => sharp(buffer, { page }).png().toBuffer())
+    sampleIndices.map((page) => sharp(targetBuffer, { page }).png().toBuffer())
   );
 
   return {

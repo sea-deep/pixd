@@ -1,6 +1,6 @@
 import type { Message, User, Attachment } from "discord.js";
 import type CommandContext from "./CommandContext.js";
-import { resolveMediaUrl } from "./gifHelper.js";
+import { resolveMediaUrl, ensureSupportedImageBuffer } from "./gifHelper.js";
 import emojiRegex from "emoji-regex";
 import sharp from "sharp";
 import { commandInput } from "./commandInput.js";
@@ -24,7 +24,8 @@ export async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
-    return Buffer.from(await res.arrayBuffer());
+    const raw = Buffer.from(await res.arrayBuffer());
+    return await ensureSupportedImageBuffer(raw);
   } catch {
     return null;
   }

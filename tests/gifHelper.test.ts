@@ -169,4 +169,10 @@ describe("gifHelper", () => {
     // Sharp should not fill trailing frames with 0; all frames should have delay 120
     expect(meta.delay).toEqual([120, 120, 120]);
   });
+
+  it("unpacks proxy URLs like gifconvert.vxtwitter.com", async () => {
+    const proxyUrl = "https://gifconvert.vxtwitter.com/convert.avif?url=https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4";
+    const resolved = await resolveMediaUrl(proxyUrl);
+    expect(resolved).toBe("https://video.twimg.com/tweet_video/HRbOYeZXoAI1ee4.mp4");
+  });
 });
