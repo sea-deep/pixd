@@ -126,10 +126,13 @@
       <span class="material-symbols-rounded" style="font-size: 15px; vertical-align: -2px; margin-right: 4px;">schedule</span>
       Auto-expires in 6 hours • Zero server lag
     </div>
-    <div>
       <div id="dest-badge" class="badge" style="display: none; background: #25252e; border: 1px solid #3e3e48; color: #cfcfe2; margin-top: 8px;">
         <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px; color: #7983f5;">place</span>
         Destination: <span id="dest-info" style="color: #7983f5; font-weight: 600;"></span>
+      </div>
+      <div id="quota-badge" class="badge" style="display: none; background: #25252e; border: 1px solid #3e3e48; color: #cfcfe2; margin-top: 8px;">
+        <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px; color: #3ba55d;">pie_chart</span>
+        Quota: <span id="quota-info" style="color: #3ba55d; font-weight: 600;"></span>
       </div>
     </div>
 
@@ -225,8 +228,11 @@
     const copyShareBtn = document.getElementById('copy-share-btn');
     const viewFileBtn = document.getElementById('view-file-btn');
     const viewChannelBtn = document.getElementById('view-channel-btn');
+    const quotaBadge = document.getElementById('quota-badge');
+    const quotaInfo = document.getElementById('quota-info');
 
     let selectedFile = null;
+    let userRemainingBytes = Infinity;
 
     function formatBytes(bytes) {
       if (bytes === 0) return '0 B';
@@ -253,7 +259,7 @@
         setTimeout(() => {
           copyShareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">content_copy</span> Copy Link';
           copyShareBtn.style.background = '#5865EF';
-        }, 2500);
+        }, 2000);
       });
     });
 
@@ -285,6 +291,16 @@
             }
             destInfo.textContent = destText;
             destBadge.style.display = 'inline-block';
+
+            if (data.userLimitBytes !== undefined) {
+              userRemainingBytes = data.userRemainingBytes ?? Infinity;
+              const used = formatBytes(data.userUsedBytes || 0);
+              const limit = formatBytes(data.userLimitBytes);
+              const remaining = formatBytes(data.userRemainingBytes || 0);
+              quotaInfo.textContent = `${used} / ${limit} (${remaining} remaining)`;
+              quotaBadge.style.display = 'inline-block';
+            }
+
             uploadFlow.style.display = 'block';
           } else {
             showSessionError(data?.error || 'Upload session expired or invalid.');
@@ -309,6 +325,10 @@
     });
 
     function handleFile(file) {
+      if (file.size <= 0) {
+        alert('Selected file is empty.');
+        return;
+      }
       if (file.size > 1024 * 1024 * 1024) {
         alert('File size exceeds the 1 GiB limit.');
         return;
@@ -317,8 +337,15 @@
       fileNameEl.textContent = file.name;
       fileSizeEl.textContent = formatBytes(file.size);
       fileDetails.style.display = 'block';
-      uploadBtn.disabled = false;
-      statusMsg.textContent = '';
+
+      if (file.size > userRemainingBytes) {
+        statusMsg.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: -3px; color: #ff5555; margin-right: 4px;">error</span> Selected file (' + formatBytes(file.size) + ') exceeds your available storage quota (' + formatBytes(userRemainingBytes) + '). Free up space with <code>p!rm</code> or choose a smaller file.';
+        statusMsg.style.color = '#ff5555';
+        uploadBtn.disabled = true;
+      } else {
+        statusMsg.textContent = '';
+        uploadBtn.disabled = false;
+      }
     }
 
     removeFileBtn.addEventListener('click', (e) => {

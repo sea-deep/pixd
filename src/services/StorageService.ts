@@ -42,9 +42,15 @@ export interface UploadSession {
 }
 
 export class StorageService {
-  public static MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024; // 1 GiB
-  public static GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES = 8 * 1024 * 1024 * 1024; // 8 GiB
-  public static MAX_ACTIVE_FILES_PER_USER = 1;
+  public static get MAX_FILE_SIZE_BYTES(): number {
+    return env.MAX_FILE_SIZE_BYTES;
+  }
+  public static get USER_STORAGE_LIMIT_BYTES(): number {
+    return env.USER_STORAGE_LIMIT_BYTES;
+  }
+  public static get GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES(): number {
+    return env.GLOBAL_STORAGE_LIMIT_BYTES;
+  }
   public static DEFAULT_EXPIRY_HOURS = 6;
   public static MAX_EXPIRY_HOURS = 24;
   public static SESSION_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 mins
@@ -128,11 +134,50 @@ export class StorageService {
   }
 
   /**
-   * Calculates current total bytes stored by active unexpired files.
+   * Calculates current total bytes stored across the system (active + recent pending).
    */
   public static async getActiveStorageBytes(): Promise<number> {
     const result = await UploadModel.aggregate([
-      { $match: { status: "active", expiresAt: { $gt: new Date() } } },
+      {
+        $match: {
+          $or: [
+            { status: "active", expiresAt: { $gt: new Date() } },
+            {
+              status: "pending",
+              createdAt: { $gt: new Date(Date.now() - 30 * 60 * 1000) },
+            },
+          ],
+        },
+      },
+      { $group: { _id: null, totalBytes: { $sum: "$fileSize" } } },
+    ]);
+    return result[0]?.totalBytes || 0;
+  }
+
+  /**
+   * Calculates current active (and recent pending) storage bytes consumed by a user.
+   */
+  public static async getUserActiveStorageBytes(
+    userId: string,
+    excludeFileId?: string
+  ): Promise<number> {
+    const match: any = {
+      userId,
+      $or: [
+        { status: "active", expiresAt: { $gt: new Date() } },
+        {
+          status: "pending",
+          createdAt: { $gt: new Date(Date.now() - 30 * 60 * 1000) },
+        },
+      ],
+    };
+
+    if (excludeFileId) {
+      match.fileId = { $ne: excludeFileId };
+    }
+
+    const result = await UploadModel.aggregate([
+      { $match: match },
       { $group: { _id: null, totalBytes: { $sum: "$fileSize" } } },
     ]);
     return result[0]?.totalBytes || 0;
@@ -148,7 +193,14 @@ export class StorageService {
     guildId: string | null,
     channelName?: string,
     guildName?: string
-  ): Promise<{ success: boolean; token?: string; url?: string; error?: string }> {
+  ): Promise<{
+    success: boolean;
+    token?: string;
+    url?: string;
+    userUsedBytes?: number;
+    userRemainingBytes?: number;
+    error?: string;
+  }> {
     if (!this.isConfigured()) {
       return {
         success: false,
@@ -156,17 +208,16 @@ export class StorageService {
       };
     }
 
-    // Check user active files limit
-    const userActiveCount = await UploadModel.countDocuments({
-      userId,
-      status: "active",
-      expiresAt: { $gt: new Date() },
-    });
-
-    if (userActiveCount >= this.MAX_ACTIVE_FILES_PER_USER) {
+    // Check user active storage limit (size-based cap, e.g. 1 GiB)
+    const userUsedBytes = await this.getUserActiveStorageBytes(userId);
+    if (userUsedBytes >= this.USER_STORAGE_LIMIT_BYTES) {
       return {
         success: false,
-        error: `⏳ You already have an active upload. Please wait for your previous file to expire or run \`p!removeupload\` to clear it!`,
+        error: `⏳ You have reached your active cloud storage limit (${formatBytes(
+          userUsedBytes
+        )} / ${formatBytes(
+          this.USER_STORAGE_LIMIT_BYTES
+        )}). Please wait for your previous files to expire or run \`p!rm\` to free up space!`,
       };
     }
 
@@ -177,7 +228,9 @@ export class StorageService {
         success: false,
         error: `⚠️ Free tier storage capacity is currently full (${formatBytes(
           activeBytes
-        )} / 8 GB). Please wait for active files to expire.`,
+        )} / ${formatBytes(
+          this.GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES
+        )}). Please wait for active files to expire.`,
       };
     }
 
@@ -206,6 +259,8 @@ export class StorageService {
       success: true,
       token,
       url: `${env.PUBLIC_BASE_URL}/upload?token=${token}`,
+      userUsedBytes,
+      userRemainingBytes: Math.max(0, this.USER_STORAGE_LIMIT_BYTES - userUsedBytes),
     };
   }
 
@@ -251,11 +306,24 @@ export class StorageService {
       };
     }
 
+    const userUsedBytes = await this.getUserActiveStorageBytes(session.userId);
+    if (userUsedBytes + fileSize > this.USER_STORAGE_LIMIT_BYTES) {
+      const remainingBytes = Math.max(0, this.USER_STORAGE_LIMIT_BYTES - userUsedBytes);
+      return {
+        success: false,
+        error: `⚠️ This file (${formatBytes(fileSize)}) exceeds your remaining storage quota (${formatBytes(
+          remainingBytes
+        )} remaining of ${formatBytes(this.USER_STORAGE_LIMIT_BYTES)}). Free up space with \`p!rm\`!`,
+      };
+    }
+
     const activeBytes = await this.getActiveStorageBytes();
     if (activeBytes + fileSize > this.GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES) {
       return {
         success: false,
-        error: `Storage capacity reached. Adding this file would exceed the 8 GB free storage limit.`,
+        error: `Storage capacity reached. Adding this file would exceed the free storage limit (${formatBytes(
+          this.GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES
+        )}).`,
       };
     }
 
@@ -343,7 +411,39 @@ export class StorageService {
         })
       );
 
-      upload.fileSize = head.ContentLength || upload.fileSize;
+      const verifiedLength = head.ContentLength || upload.fileSize;
+      if (verifiedLength > this.MAX_FILE_SIZE_BYTES) {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: this.B2_BUCKET_NAME!,
+            Key: upload.s3Key,
+          })
+        );
+        upload.status = "expired";
+        await upload.save();
+        return {
+          success: false,
+          error: `File exceeds maximum allowed size (${formatBytes(this.MAX_FILE_SIZE_BYTES)}).`,
+        };
+      }
+
+      const userOtherBytes = await this.getUserActiveStorageBytes(upload.userId, upload.fileId);
+      if (userOtherBytes + verifiedLength > this.USER_STORAGE_LIMIT_BYTES) {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: this.B2_BUCKET_NAME!,
+            Key: upload.s3Key,
+          })
+        );
+        upload.status = "expired";
+        await upload.save();
+        return {
+          success: false,
+          error: `Upload rejected: file size exceeds your available storage quota.`,
+        };
+      }
+
+      upload.fileSize = verifiedLength;
       upload.status = "active";
       await upload.save();
 
@@ -643,6 +743,27 @@ export class StorageService {
             Logger.error(`Failed to delete expired file ${upload.fileId}:`, deleteErr);
           }
         }
+
+        // Purge abandoned pending uploads older than 30 minutes
+        const abandonedUploads = await UploadModel.find({
+          status: "pending",
+          createdAt: { $lte: new Date(now.getTime() - 30 * 60 * 1000) },
+        }).limit(20);
+
+        for (const abandoned of abandonedUploads) {
+          try {
+            if (s3 && abandoned.s3Key && this.B2_BUCKET_NAME) {
+              await s3.send(
+                new DeleteObjectCommand({
+                  Bucket: this.B2_BUCKET_NAME,
+                  Key: abandoned.s3Key,
+                })
+              );
+            }
+          } catch {}
+          abandoned.status = "expired";
+          await abandoned.save();
+        }
       } catch (err: any) {
         Logger.error("Storage cleanup sweep failed:", err);
       }
@@ -669,7 +790,7 @@ export class StorageService {
     userId: string,
     fileIdOrName?: string | null,
     client?: Client
-  ): Promise<{ deletedCount: number; files: string[] }> {
+  ): Promise<{ deletedCount: number; freedBytes: number; files: string[] }> {
     // 1. Purge any in-memory pending sessions for this user
     for (const [token, session] of this.activeSessions.entries()) {
       if (session.userId === userId) {
@@ -692,10 +813,11 @@ export class StorageService {
 
     const uploads = await UploadModel.find(query);
     if (uploads.length === 0) {
-      return { deletedCount: 0, files: [] };
+      return { deletedCount: 0, freedBytes: 0, files: [] };
     }
 
     const deletedFiles: string[] = [];
+    let freedBytes = 0;
     let s3: S3Client | null = null;
     if (this.isConfigured()) {
       try {
@@ -721,6 +843,7 @@ export class StorageService {
       upload.status = "expired";
       upload.expiresAt = new Date();
       await upload.save();
+      freedBytes += upload.fileSize || 0;
       deletedFiles.push(upload.fileName);
 
       // Update Discord announcement message if available
@@ -741,7 +864,7 @@ export class StorageService {
       }
     }
 
-    return { deletedCount: deletedFiles.length, files: deletedFiles };
+    return { deletedCount: deletedFiles.length, freedBytes, files: deletedFiles };
   }
 }
 

@@ -138,6 +138,7 @@ describe("Cloud Upload Service", () => {
       expect(removeUploadCommand.category).toBe("Utility");
       expect(removeUploadCommand.defer).toBe(true);
       expect(removeUploadCommand.ephemeral).toBe(true);
+      expect(removeUploadCommand.aliases).toContain("rm");
       expect(removeUploadCommand.aliases).toContain("remove");
       expect(removeUploadCommand.aliases).toContain("removeup");
       expect(removeUploadCommand.aliases).toContain("delupload");
@@ -149,6 +150,7 @@ describe("Cloud Upload Service", () => {
         {
           fileId: "file1",
           fileName: "file1.png",
+          fileSize: 1024,
           s3Key: "uploads/file1.png",
           status: "active",
           expiresAt: new Date(),
@@ -158,9 +160,38 @@ describe("Cloud Upload Service", () => {
 
       const result = await StorageService.removeUserUploads("u123");
       expect(result.deletedCount).toBe(1);
+      expect(result.freedBytes).toBe(1024);
       expect(result.files).toEqual(["file1.png"]);
 
       mockFind.mockRestore();
+    });
+
+    it("enforces 1 GiB size-based quota per user", async () => {
+      const mockAggregate = vi.spyOn(UploadModel, "aggregate");
+
+      // Full quota (1 GiB)
+      mockAggregate.mockResolvedValue([{ totalBytes: 1024 * 1024 * 1024 }] as any);
+      const sessionResult = await StorageService.createSession("full-user", "tag", "c1", "g1");
+      expect(sessionResult.success).toBe(false);
+      expect(sessionResult.error).toContain("active cloud storage limit");
+
+      // Partial quota (800 MB used)
+      mockAggregate.mockResolvedValue([{ totalBytes: 800 * 1024 * 1024 }] as any);
+      const allowedSession = await StorageService.createSession("ok-user", "tag", "c1", "g1");
+      expect(allowedSession.success).toBe(true);
+      expect(allowedSession.userUsedBytes).toBe(800 * 1024 * 1024);
+
+      // Attempting to initiate 300 MB file when only ~224 MB remaining
+      const initResult = await StorageService.initiateUpload(
+        allowedSession.token!,
+        "big.bin",
+        300 * 1024 * 1024,
+        "application/octet-stream"
+      );
+      expect(initResult.success).toBe(false);
+      expect(initResult.error).toContain("exceeds your remaining storage quota");
+
+      mockAggregate.mockResolvedValue([{ totalBytes: 0 }] as any);
     });
 
     it("sends private upload link via DM for prefix commands", async () => {

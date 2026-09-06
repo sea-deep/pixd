@@ -19,6 +19,9 @@ const schema = z.object({
   B2_BUCKET_NAME: optionalSecret,
   B2_ENDPOINT: optionalSecret,
   B2_REGION: optionalSecret,
+  MAX_FILE_SIZE_BYTES: z.coerce.number().int().positive().default(1024 * 1024 * 1024),
+  USER_STORAGE_LIMIT_BYTES: z.coerce.number().int().positive().default(1024 * 1024 * 1024),
+  GLOBAL_STORAGE_LIMIT_BYTES: z.coerce.number().int().positive().default(8 * 1024 * 1024 * 1024),
 });
 
 const result = schema.safeParse(process.env);

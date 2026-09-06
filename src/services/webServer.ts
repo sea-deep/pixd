@@ -7,7 +7,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { handleLastFmAuth } from "../helpers/helpersLastFm.js";
 import { env } from "../utilities/env.js";
 import Logger from "../helpers/Logger.js";
-import StorageService from "./StorageService.js";
+import StorageService, { formatBytes } from "./StorageService.js";
 import UploadModel from "../models/uploadModel.js";
 
 export const app = express();
@@ -62,6 +62,15 @@ app.put("/api/upload/stream/:fileId", checkUploadRateLimit, async (req, res) => 
     return res.status(400).json({ success: false, error: "Invalid file size payload." });
   }
 
+  const userOtherBytes = await StorageService.getUserActiveStorageBytes(upload.userId, upload.fileId);
+  if (userOtherBytes + contentLength > StorageService.USER_STORAGE_LIMIT_BYTES) {
+    const remaining = Math.max(0, StorageService.USER_STORAGE_LIMIT_BYTES - userOtherBytes);
+    return res.status(400).json({
+      success: false,
+      error: `File size exceeds your remaining storage quota (${formatBytes(remaining)} remaining of ${formatBytes(StorageService.USER_STORAGE_LIMIT_BYTES)}). Free up space with \`p!rm\`!`,
+    });
+  }
+
   try {
     const s3 = StorageService.getS3Client();
     await s3.send(
@@ -108,7 +117,7 @@ app.get("/file/:fileId", (req, res) => {
 });
 
 // Storage API Endpoints
-app.get("/api/upload/session-info", checkUploadRateLimit, (req, res) => {
+app.get("/api/upload/session-info", checkUploadRateLimit, async (req, res) => {
   const token = typeof req.query.token === "string" ? req.query.token.trim() : "";
   if (!token || !UUID_REGEX.test(token)) {
     return res.status(400).json({ success: false, error: "Invalid or malformed session token." });
@@ -119,12 +128,18 @@ app.get("/api/upload/session-info", checkUploadRateLimit, (req, res) => {
     return res.status(404).json({ success: false, error: "Upload session not found or expired." });
   }
 
+  const userUsedBytes = await StorageService.getUserActiveStorageBytes(session.userId);
+  const userRemainingBytes = Math.max(0, StorageService.USER_STORAGE_LIMIT_BYTES - userUsedBytes);
+
   return res.json({
     success: true,
     userTag: session.userTag,
     channelName: session.channelName || "this channel",
     guildName: session.guildName || "",
     expiresAt: session.expiresAt,
+    userUsedBytes,
+    userLimitBytes: StorageService.USER_STORAGE_LIMIT_BYTES,
+    userRemainingBytes,
   });
 });
 
