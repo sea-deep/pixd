@@ -14,6 +14,11 @@ const schema = z.object({
   PUBLIC_BASE_URL: z.string().url().default("https://pixd.up.railway.app"),
   GOOGLEAI_KEY: optionalSecret,
   GOOGLEAI_MODEL: z.string().trim().min(1).default("gemini-2.5-flash"),
+  B2_KEY_ID: optionalSecret,
+  B2_APPLICATION_KEY: optionalSecret,
+  B2_BUCKET_NAME: optionalSecret,
+  B2_ENDPOINT: optionalSecret,
+  B2_REGION: optionalSecret,
 });
 
 const result = schema.safeParse(process.env);

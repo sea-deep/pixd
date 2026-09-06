@@ -6,12 +6,98 @@ import express from "express";
 import { handleLastFmAuth } from "../helpers/helpersLastFm.js";
 import { env } from "../utilities/env.js";
 import Logger from "../helpers/Logger.js";
+import StorageService from "./StorageService.js";
+import UploadModel from "../models/uploadModel.js";
 
 export const app = express();
 let ready = () => false;
 const staticPath = join(process.cwd(), "www");
 app.disable("x-powered-by");
+app.use(express.json());
 app.use(express.static(staticPath));
+
+// Web Upload Portal & File Landing Pages
+app.get("/upload", (_req, res) => res.sendFile(join(staticPath, "upload.html")));
+app.get("/file/:fileId", (req, res) => {
+  const fileId = String(req.params.fileId);
+  if (!/^[a-f0-9]{12}$/i.test(fileId)) return res.status(404).sendFile(join(staticPath, "404.html"));
+  return res.sendFile(join(staticPath, "file.html"));
+});
+
+// Storage API Endpoints
+app.post("/api/upload/presign", async (req, res) => {
+  const { token, fileName, fileSize, mimeType } = req.body || {};
+  if (!token || !fileName || typeof fileSize !== "number") {
+    return res.status(400).json({ success: false, error: "Missing required upload parameters." });
+  }
+
+  const result = await StorageService.initiateUpload(
+    String(token),
+    String(fileName),
+    fileSize,
+    String(mimeType || "application/octet-stream")
+  );
+
+  return res.status(result.success ? 200 : 400).json(result);
+});
+
+app.post("/api/upload/complete", async (req, res) => {
+  const { fileId } = req.body || {};
+  if (!fileId || !/^[a-f0-9]{12}$/i.test(String(fileId))) {
+    return res.status(400).json({ success: false, error: "Invalid fileId provided." });
+  }
+
+  const { client } = await import("../../index.js");
+  const result = await StorageService.completeUpload(String(fileId), client);
+  return res.status(result.success ? 200 : 400).json(result);
+});
+
+app.get("/api/file/:fileId/info", async (req, res) => {
+  const fileId = String(req.params.fileId);
+  if (!/^[a-f0-9]{12}$/i.test(fileId)) {
+    return res.status(400).json({ error: "Invalid file ID format." });
+  }
+
+  const upload = await UploadModel.findOne({ fileId });
+  if (!upload) {
+    return res.status(404).json({ error: "File not found or expired." });
+  }
+
+  const isExpired = upload.status === "expired" || upload.expiresAt <= new Date();
+
+  return res.json({
+    fileId: upload.fileId,
+    fileName: upload.fileName,
+    fileSize: upload.fileSize,
+    mimeType: upload.mimeType,
+    userTag: upload.userTag,
+    createdAt: upload.createdAt,
+    expiresAt: upload.expiresAt,
+    isExpired,
+    downloadCount: upload.downloadCount,
+  });
+});
+
+app.get("/api/file/:fileId/download", async (req, res) => {
+  const fileId = String(req.params.fileId);
+  if (!/^[a-f0-9]{12}$/i.test(fileId)) return res.status(404).send("File not found");
+
+  const result = await StorageService.getDownloadUrl(fileId);
+  if (!result) return res.status(404).send("File not found or has expired.");
+
+  return res.redirect(result.url);
+});
+
+app.get("/api/file/:fileId/view", async (req, res) => {
+  const fileId = String(req.params.fileId);
+  if (!/^[a-f0-9]{12}$/i.test(fileId)) return res.status(404).send("File not found");
+
+  const result = await StorageService.getViewUrl(fileId);
+  if (!result) return res.status(404).send("File not found or has expired.");
+
+  return res.redirect(result.url);
+});
+
 app.get("/", (_req, res) => res.redirect("/home"));
 app.get("/healthz", (_req, res) => {
   const ok = ready();
@@ -57,8 +143,14 @@ app.get("/:page", (req, res) => {
 export function startWebServer(isReady: () => boolean): Promise<Server> {
   ready = isReady;
   return new Promise((resolve, reject) => {
-    const server = app.listen(env.PORT, () => {
+    const server = app.listen(env.PORT, async () => {
       Logger.info(`Web server listening on port ${env.PORT}`);
+      try {
+        const { client } = await import("../../index.js");
+        StorageService.startCleanupWorker(client);
+      } catch (err) {
+        Logger.error("Failed to start storage cleanup worker", err);
+      }
       resolve(server);
     });
     server.once("error", reject);

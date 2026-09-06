@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXD • Download File</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .file-container {
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #222226;
+      border: 1px solid #36363d;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      text-align: center;
+    }
+    .file-icon {
+      font-size: 56px;
+      margin-bottom: 12px;
+    }
+    .file-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-word;
+      margin-bottom: 8px;
+    }
+    .file-info-grid {
+      background: #18181c;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 20px 0;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .info-label {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-value {
+      color: #e0e0e0;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .btn-download {
+      display: inline-block;
+      background: #5865EF;
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 36px;
+      font-size: 17px;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 10px;
+    }
+    .btn-download:hover {
+      background: #4752c4;
+      transform: translateY(-1px);
+    }
+    .preview-box {
+      margin: 20px 0;
+      max-height: 350px;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #111;
+      display: none;
+    }
+    .preview-box img, .preview-box video {
+      max-width: 100%;
+      max-height: 350px;
+      display: block;
+      margin: 0 auto;
+    }
+    .preview-box audio {
+      width: 100%;
+      padding: 10px;
+    }
+    .expired-banner {
+      display: none;
+      background: #3d1c1c;
+      border: 1px solid #732a2a;
+      color: #ff8888;
+      padding: 18px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+    .countdown {
+      color: #f1c40f;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="file-container">
+    <div id="loading" style="padding: 40px; color: #888;">Loading file metadata...</div>
+
+    <div id="file-view" style="display: none;">
+      <div class="file-icon" id="file-icon">📁</div>
+      <div class="file-title" id="file-title"></div>
+
+      <div class="preview-box" id="preview-box"></div>
+
+      <div class="file-info-grid">
+        <div>
+          <div class="info-label">File Size</div>
+          <div class="info-value" id="file-size">-</div>
+        </div>
+        <div>
+          <div class="info-label">Uploaded By</div>
+          <div class="info-value" id="file-uploader">-</div>
+        </div>
+        <div>
+          <div class="info-label">Uploaded</div>
+          <div class="info-value" id="file-uploaded">-</div>
+        </div>
+        <div>
+          <div class="info-label">Expires In</div>
+          <div class="info-value countdown" id="file-expires">-</div>
+        </div>
+      </div>
+
+      <div class="expired-banner" id="expired-banner">
+        ⚠️ This file has expired and was automatically deleted from cloud storage.
+      </div>
+
+      <a href="#" class="btn-download" id="download-btn">📥 Download File</a>
+    </div>
+
+    <div id="error-box" style="display: none; color: #ff5555; padding: 30px;"></div>
+  </div>
+
+  <script>
+    const pathParts = window.location.pathname.split('/');
+    const fileId = pathParts[pathParts.length - 1];
+
+    const loadingEl = document.getElementById('loading');
+    const fileViewEl = document.getElementById('file-view');
+    const errorBoxEl = document.getElementById('error-box');
+    const fileTitleEl = document.getElementById('file-title');
+    const fileSizeEl = document.getElementById('file-size');
+    const fileUploaderEl = document.getElementById('file-uploader');
+    const fileUploadedEl = document.getElementById('file-uploaded');
+    const fileExpiresEl = document.getElementById('file-expires');
+    const fileIconEl = document.getElementById('file-icon');
+    const previewBoxEl = document.getElementById('preview-box');
+    const downloadBtn = document.getElementById('download-btn');
+    const expiredBannerEl = document.getElementById('expired-banner');
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    async function loadFileInfo() {
+      if (!fileId) {
+        showError('Invalid file ID requested.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/file/' + fileId + '/info');
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'File not found or expired.');
+        }
+
+        const data = await res.json();
+        renderFile(data);
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    function renderFile(file) {
+      loadingEl.style.display = 'none';
+      fileViewEl.style.display = 'block';
+
+      fileTitleEl.textContent = file.fileName;
+      fileSizeEl.textContent = formatBytes(file.fileSize);
+      fileUploaderEl.textContent = file.userTag || 'Discord User';
+      fileUploadedEl.textContent = new Date(file.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+
+      downloadBtn.href = '/api/file/' + file.fileId + '/download';
+
+      const mime = file.mimeType || '';
+      if (/^image\//i.test(mime)) {
+        fileIconEl.textContent = '🖼️';
+        previewBoxEl.style.display = 'block';
+        previewBoxEl.innerHTML = '<img src="/api/file/' + file.fileId + '/view" alt="Preview">';
+      } else if (/^video\//i.test(mime)) {
+        fileIconEl.textContent = '🎬';
+        previewBoxEl.style.display = 'block';
+        previewBoxEl.innerHTML = '<video controls src="/api/file/' + file.fileId + '/view"></video>';
+      } else if (/^audio\//i.test(mime)) {
+        fileIconEl.textContent = '🎵';
+        previewBoxEl.style.display = 'block';
+        previewBoxEl.innerHTML = '<audio controls src="/api/file/' + file.fileId + '/view"></audio>';
+      } else if (/zip|rar|tar|7z|gz/i.test(file.fileName)) {
+        fileIconEl.textContent = '📦';
+      } else if (/pdf/i.test(mime) || /pdf$/i.test(file.fileName)) {
+        fileIconEl.textContent = '📄';
+      }
+
+      // Live countdown
+      const expiresTime = new Date(file.expiresAt).getTime();
+      function updateCountdown() {
+        const now = Date.now();
+        const diff = expiresTime - now;
+        if (diff <= 0) {
+          fileExpiresEl.textContent = 'Expired';
+          fileExpiresEl.style.color = '#ff5555';
+          downloadBtn.style.display = 'none';
+          expiredBannerEl.style.display = 'block';
+          return;
+        }
+
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        fileExpiresEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    function showError(msg) {
+      loadingEl.style.display = 'none';
+      errorBoxEl.style.display = 'block';
+      errorBoxEl.innerHTML = '❌ <strong>Error:</strong> ' + msg;
+    }
+
+    loadFileInfo();
+  </script>
+</body>
+</html>

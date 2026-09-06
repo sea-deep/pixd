@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXD • Cloud Upload Portal</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .upload-container {
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #222226;
+      border: 1px solid #36363d;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      text-align: center;
+    }
+    .drop-zone {
+      border: 2px dashed #5865EF;
+      border-radius: 10px;
+      padding: 50px 20px;
+      margin: 24px 0;
+      background: #1a1a1e;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      background: #25252b;
+      border-color: #7983f5;
+      transform: scale(1.01);
+    }
+    .drop-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .file-input {
+      display: none;
+    }
+    .btn-upload {
+      background: #5865EF;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-upload:hover {
+      background: #4752c4;
+    }
+    .btn-upload:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+    .progress-box {
+      display: none;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .progress-bar-bg {
+      background: #333;
+      border-radius: 6px;
+      height: 14px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      background: #5865EF;
+      height: 100%;
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+    .status-msg {
+      margin-top: 15px;
+      font-weight: 500;
+      min-height: 24px;
+    }
+    .file-details {
+      display: none;
+      background: #18181c;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 15px 0;
+      text-align: left;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #36363d;
+      margin-top: 8px;
+      color: #a0a0a8;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h1 style="font-size: 26px; color: #fff;">📦 PIXD Direct Cloud Transfer</h1>
+    <p style="color: #a0a0a8; margin-top: 6px;">Bypass Discord's 20 MB cap — upload files directly up to 1 GiB</p>
+    <div class="badge">⏱️ Auto-expires in 6 hours • Zero server lag</div>
+
+    <div id="session-error" style="display: none; color: #ff5555; margin-top: 25px;"></div>
+
+    <div id="upload-flow">
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-icon">📤</div>
+        <p style="font-size: 17px; font-weight: 600; color: #fff;">Drag & drop your file here</p>
+        <p style="font-size: 13px; color: #888; margin-top: 4px;">or click to browse from device</p>
+        <input type="file" id="file-input" class="file-input">
+      </div>
+
+      <div class="file-details" id="file-details">
+        <div><strong>Selected:</strong> <span id="file-name" style="color: #fff;"></span></div>
+        <div style="margin-top: 4px;"><strong>Size:</strong> <span id="file-size" style="color: #a0a0a8;"></span></div>
+      </div>
+
+      <div class="progress-box" id="progress-box">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #bbb;">
+          <span id="progress-percent">0%</span>
+          <span id="upload-stats">0 MB / 0 MB • 0 MB/s</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <button class="btn-upload" id="upload-btn" disabled>Start Upload</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileDetails = document.getElementById('file-details');
+    const fileNameEl = document.getElementById('file-name');
+    const fileSizeEl = document.getElementById('file-size');
+    const progressBox = document.getElementById('progress-box');
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercent = document.getElementById('progress-percent');
+    const uploadStats = document.getElementById('upload-stats');
+    const statusMsg = document.getElementById('status-msg');
+    const sessionError = document.getElementById('session-error');
+    const uploadFlow = document.getElementById('upload-flow');
+
+    let selectedFile = null;
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    if (!token) {
+      uploadFlow.style.display = 'none';
+      sessionError.style.display = 'block';
+      sessionError.innerHTML = '❌ <strong>Missing upload session token.</strong><br>Please type <code>/upload</code> or <code>p!upload</code> in your Discord server to generate a secure upload link.';
+    }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      if (file.size > 1024 * 1024 * 1024) {
+        alert('File size exceeds the 1 GiB limit.');
+        return;
+      }
+      selectedFile = file;
+      fileNameEl.textContent = file.name;
+      fileSizeEl.textContent = formatBytes(file.size);
+      fileDetails.style.display = 'block';
+      uploadBtn.disabled = false;
+      statusMsg.textContent = '';
+    }
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!selectedFile || !token) return;
+
+      uploadBtn.disabled = true;
+      dropZone.style.pointerEvents = 'none';
+      progressBox.style.display = 'block';
+      statusMsg.textContent = 'Requesting secure cloud upload URL...';
+      statusMsg.style.color = '#5865EF';
+
+      try {
+        // Step 1: Request presigned PUT URL
+        const presignRes = await fetch('/api/upload/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token,
+            fileName: selectedFile.name,
+            fileSize: selectedFile.size,
+            mimeType: selectedFile.type || 'application/octet-stream',
+            expiryHours: 6
+          })
+        });
+
+        const presignData = await presignRes.json();
+        if (!presignRes.ok || !presignData.success) {
+          throw new Error(presignData.error || 'Failed to prepare upload session.');
+        }
+
+        const { uploadUrl, fileId } = presignData;
+        statusMsg.textContent = 'Uploading directly to Backblaze B2...';
+
+        // Step 2: Direct browser-to-B2 HTTP PUT with progress
+        const xhr = new XMLHttpRequest();
+        let startTime = Date.now();
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            progressFill.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+
+            const elapsedSec = (Date.now() - startTime) / 1000;
+            const speed = elapsedSec > 0 ? event.loaded / elapsedSec : 0;
+            uploadStats.textContent = `${formatBytes(event.loaded)} / ${formatBytes(event.total)} • ${formatBytes(speed)}/s`;
+          }
+        };
+
+        xhr.onload = async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            statusMsg.textContent = 'Verifying storage and announcing in Discord...';
+            statusMsg.style.color = '#3ba55d';
+
+            // Step 3: Complete upload
+            const completeRes = await fetch('/api/upload/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fileId })
+            });
+
+            const completeData = await completeRes.json();
+            if (completeRes.ok && completeData.success) {
+              statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong><br>Your file has been announced in your Discord channel.<br><br><a href="/file/' + fileId + '" style="color: #5865EF; text-decoration: underline;">View Download Page</a>';
+              dropZone.style.display = 'none';
+              uploadBtn.style.display = 'none';
+            } else {
+              throw new Error(completeData.error || 'Failed to finalize upload.');
+            }
+          } else {
+            throw new Error('Cloud storage upload failed with HTTP ' + xhr.status);
+          }
+        };
+
+        xhr.onerror = () => {
+          throw new Error('Network error occurred during file upload.');
+        };
+
+        xhr.open('PUT', uploadUrl, true);
+        xhr.setRequestHeader('Content-Type', selectedFile.type || 'application/octet-stream');
+        xhr.send(selectedFile);
+
+      } catch (err) {
+        statusMsg.textContent = '❌ ' + err.message;
+        statusMsg.style.color = '#ff5555';
+        uploadBtn.disabled = false;
+        dropZone.style.pointerEvents = 'auto';
+      }
+    });
+  </script>
+</body>
+</html>

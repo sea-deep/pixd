@@ -24,6 +24,8 @@
     "prepare": "git config core.hooksPath .hooks || true"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1127.0",
+    "@aws-sdk/s3-request-presigner": "^3.1127.0",
     "@discordjs/voice": "^0.19.2",
     "@google-cloud/vision": "^6.0.0",
     "@google/genai": "^2.21.0",
