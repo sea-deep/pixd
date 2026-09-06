@@ -11,7 +11,7 @@ export default new HybridCommand({
   name: "upload",
   description: "Bypass Discord's 20MB limit: upload files up to 1GB to the cloud.",
   category: "Utility",
-  aliases: ["b2", "cloud"],
+  aliases: ["up", "b2", "cloud"],
   defer: true,
   ephemeral: true,
   execute: async (ctx, client) => {

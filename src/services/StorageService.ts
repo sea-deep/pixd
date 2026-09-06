@@ -44,7 +44,7 @@ export interface UploadSession {
 export class StorageService {
   public static MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024; // 1 GiB
   public static GLOBAL_ACTIVE_STORAGE_LIMIT_BYTES = 8 * 1024 * 1024 * 1024; // 8 GiB
-  public static MAX_ACTIVE_FILES_PER_USER = 2;
+  public static MAX_ACTIVE_FILES_PER_USER = 1;
   public static DEFAULT_EXPIRY_HOURS = 6;
   public static MAX_EXPIRY_HOURS = 24;
   public static SESSION_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 mins
@@ -166,9 +166,7 @@ export class StorageService {
     if (userActiveCount >= this.MAX_ACTIVE_FILES_PER_USER) {
       return {
         success: false,
-        error: `⏳ You already have **${userActiveCount}** active upload${
-          userActiveCount === 1 ? "" : "s"
-        }. Please wait for your previous files to expire before uploading more!`,
+        error: `⏳ You already have an active upload. Please wait for your previous file to expire or run \`p!removeupload\` to clear it!`,
       };
     }
 
@@ -661,6 +659,89 @@ export class StorageService {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
+  }
+
+  /**
+   * Removes active upload(s) for a specific user to free up their upload slot.
+   * Purges file(s) from Backblaze B2, marks DB records as expired, and cleans pending sessions.
+   */
+  public static async removeUserUploads(
+    userId: string,
+    fileIdOrName?: string | null,
+    client?: Client
+  ): Promise<{ deletedCount: number; files: string[] }> {
+    // 1. Purge any in-memory pending sessions for this user
+    for (const [token, session] of this.activeSessions.entries()) {
+      if (session.userId === userId) {
+        this.activeSessions.delete(token);
+      }
+    }
+
+    // 2. Build query for active/pending uploads
+    const query: any = { userId };
+    if (fileIdOrName && fileIdOrName.trim().length > 0) {
+      let trimmed = fileIdOrName.trim();
+      const match = trimmed.match(/\/file\/([a-f0-9]{12})/i);
+      if (match) {
+        trimmed = match[1];
+      }
+      query.$or = [{ fileId: trimmed }, { fileName: trimmed }];
+    } else {
+      query.status = { $in: ["active", "pending"] };
+    }
+
+    const uploads = await UploadModel.find(query);
+    if (uploads.length === 0) {
+      return { deletedCount: 0, files: [] };
+    }
+
+    const deletedFiles: string[] = [];
+    let s3: S3Client | null = null;
+    if (this.isConfigured()) {
+      try {
+        s3 = this.getS3Client();
+      } catch {}
+    }
+
+    for (const upload of uploads) {
+      // Delete from B2 if s3Key exists
+      if (s3 && upload.s3Key && this.B2_BUCKET_NAME) {
+        try {
+          await s3.send(
+            new DeleteObjectCommand({
+              Bucket: this.B2_BUCKET_NAME,
+              Key: upload.s3Key,
+            })
+          );
+        } catch (err: any) {
+          Logger.warn(`Could not delete object ${upload.s3Key} from B2:`, err?.message);
+        }
+      }
+
+      upload.status = "expired";
+      upload.expiresAt = new Date();
+      await upload.save();
+      deletedFiles.push(upload.fileName);
+
+      // Update Discord announcement message if available
+      if (client && upload.discordMessageId && upload.channelId) {
+        try {
+          const channel = (await client.channels.fetch(upload.channelId)) as TextBasedChannel | null;
+          if (channel && "messages" in channel) {
+            const message = await channel.messages.fetch(upload.discordMessageId);
+            if (message) {
+              await message.edit({
+                content: `🗑️ **This file (\`${upload.fileName}\`) was removed by the uploader.**`,
+                components: [],
+                embeds: [],
+              }).catch(() => {});
+            }
+          }
+        } catch {}
+      }
+    }
+
+    return { deletedCount: deletedFiles.length, files: deletedFiles };
   }
 }
 

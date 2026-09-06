@@ -2,6 +2,7 @@ import { describe, expect, it, beforeAll, afterAll, vi } from "vitest";
 import type { Server } from "node:http";
 import { formatBytes, StorageService } from "../src/services/StorageService.js";
 import uploadCommand from "../src/HybridCommands/Utility/upload.js";
+import removeUploadCommand from "../src/HybridCommands/Utility/removeupload.js";
 import { app } from "../src/services/webServer.js";
 import UploadModel from "../src/models/uploadModel.js";
 
@@ -126,9 +127,40 @@ describe("Cloud Upload Service", () => {
       expect(uploadCommand.category).toBe("Utility");
       expect(uploadCommand.defer).toBe(true);
       expect(uploadCommand.ephemeral).toBe(true);
+      expect(uploadCommand.aliases).toContain("up");
       expect(uploadCommand.aliases).toContain("b2");
       expect(uploadCommand.aliases).toContain("cloud");
       expect(uploadCommand.description).toContain("1GB");
+    });
+
+    it("has valid removeupload command definition and aliases", () => {
+      expect(removeUploadCommand.name).toBe("removeupload");
+      expect(removeUploadCommand.category).toBe("Utility");
+      expect(removeUploadCommand.defer).toBe(true);
+      expect(removeUploadCommand.ephemeral).toBe(true);
+      expect(removeUploadCommand.aliases).toContain("remove");
+      expect(removeUploadCommand.aliases).toContain("removeup");
+      expect(removeUploadCommand.aliases).toContain("delupload");
+      expect(removeUploadCommand.aliases).toContain("clearupload");
+    });
+
+    it("removes active user uploads and frees quota", async () => {
+      const mockFind = vi.spyOn(UploadModel, "find").mockResolvedValue([
+        {
+          fileId: "file1",
+          fileName: "file1.png",
+          s3Key: "uploads/file1.png",
+          status: "active",
+          expiresAt: new Date(),
+          save: vi.fn().mockResolvedValue({}),
+        },
+      ] as any);
+
+      const result = await StorageService.removeUserUploads("u123");
+      expect(result.deletedCount).toBe(1);
+      expect(result.files).toEqual(["file1.png"]);
+
+      mockFind.mockRestore();
     });
 
     it("sends private upload link via DM for prefix commands", async () => {
