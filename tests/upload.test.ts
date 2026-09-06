@@ -154,7 +154,7 @@ describe("Cloud Upload Service", () => {
 
       expect(dmSend).toHaveBeenCalledOnce();
       const dmPayload = dmSend.mock.calls[0][0];
-      expect(dmPayload.embeds[0].data.title).toContain("PIXD Cloud Upload Portal");
+      expect(dmPayload.embeds[0].data.title).toContain("PIXD Upload");
 
       expect(channelReply).toHaveBeenCalledOnce();
       expect(channelReply.mock.calls[0][0].content).toContain("Check your DMs");

@@ -49,15 +49,9 @@ export default new HybridCommand({
     }
 
     const embed = new EmbedBuilder()
-      .setTitle("☁️ PIXD Cloud Upload Portal")
+      .setTitle("☁️ PIXD Upload")
       .setColor((client as any).color || 0x5865f2)
-      .setDescription(
-        `Click the button below to upload your file directly to cloud storage.\n\n` +
-          `🔒 **Session Security:** One-time link valid for **15 minutes**\n` +
-          `⏳ **File Retention:** Auto-expires in **6 hours**\n` +
-          `📦 **File Delivery:** Automatically posted to this channel once completed\n` +
-          `⚡ **Capacity:** Supports files up to **1 GiB**`
-      );
+      .setDescription("Click the button below to upload your file (up to 1 GB).");
 
     const button = new ButtonBuilder()
       .setLabel("Open Upload Portal")
