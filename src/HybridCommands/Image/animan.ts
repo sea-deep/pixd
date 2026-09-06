@@ -59,7 +59,10 @@ export default new HybridCommand({
     if (isAnimated) {
       const extractedList = await Promise.all(avatars.map((a) => extractFrames(a, 20)));
       const maxFrames = Math.max(...extractedList.map((e) => e.frames.length));
-      const delay = extractedList.find((e) => e.isAnimated)?.delay ?? 100;
+      const delay =
+        extractedList.find((e) => e.isAnimated && e.frames.length === maxFrames)?.delay ??
+        extractedList.find((e) => e.isAnimated)?.delay ??
+        100;
 
       const resizedByAvatar = await Promise.all(
         dims.map(async (d, i) => {

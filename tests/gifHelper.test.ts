@@ -106,4 +106,67 @@ describe("gifHelper", () => {
     expect(meta.width).toBe(40);
     expect(meta.pageHeight).toBe(40);
   });
+
+  it("preserves total duration when downsampling animation frames", async () => {
+    // Create a 60-frame GIF with 40ms per frame (total 2400ms)
+    const rawFrames: Buffer[] = [];
+    for (let i = 0; i < 60; i++) {
+      const f = await sharp({
+        create: {
+          width: 30,
+          height: 30,
+          channels: 4,
+          background: { r: (i * 4) % 255, g: 100, b: 200, alpha: 1 },
+        },
+      })
+        .raw()
+        .toBuffer();
+      rawFrames.push(f);
+    }
+
+    const origGif = await sharp(Buffer.concat(rawFrames), {
+      raw: { width: 30, height: 30 * 60, channels: 4, pageHeight: 30 },
+    })
+      .gif({ delay: new Array(60).fill(40), loop: 0 })
+      .toBuffer();
+
+    // Downsample to 20 frames
+    const extracted = await extractFrames(origGif, 20);
+    expect(extracted.isAnimated).toBe(true);
+    expect(extracted.frames).toHaveLength(20);
+
+    const extractedDuration = extracted.delay.reduce((a, b) => a + b, 0);
+    expect(extractedDuration).toBe(2400);
+
+    // Render output GIF and inspect metadata
+    const renderedGif = await renderAnimatedGif(
+      await Promise.all(extracted.frames.map((f) => sharp(f).raw().toBuffer())),
+      30,
+      30,
+      extracted.delay
+    );
+    const meta = await sharp(renderedGif, { animated: true }).metadata();
+    expect(meta.pages).toBe(20);
+    const outputDuration = (meta.delay || []).reduce((a, b) => a + b, 0);
+    expect(outputDuration).toBe(2400);
+  });
+
+  it("pads delay array in renderAnimatedGif if fewer delays than frames are provided", async () => {
+    const f1 = await sharp({
+      create: { width: 20, height: 20, channels: 4, background: { r: 255, g: 0, b: 0, alpha: 1 } },
+    }).raw().toBuffer();
+    const f2 = await sharp({
+      create: { width: 20, height: 20, channels: 4, background: { r: 0, g: 255, b: 0, alpha: 1 } },
+    }).raw().toBuffer();
+    const f3 = await sharp({
+      create: { width: 20, height: 20, channels: 4, background: { r: 0, g: 0, b: 255, alpha: 1 } },
+    }).raw().toBuffer();
+
+    // 3 frames but only 1 delay in array [120]
+    const gif = await renderAnimatedGif([f1, f2, f3], 20, 20, [120]);
+    const meta = await sharp(gif, { animated: true }).metadata();
+    expect(meta.pages).toBe(3);
+    // Sharp should not fill trailing frames with 0; all frames should have delay 120
+    expect(meta.delay).toEqual([120, 120, 120]);
+  });
 });

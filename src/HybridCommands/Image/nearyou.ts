@@ -43,7 +43,7 @@ export default new HybridCommand({
       rawFrames.push(frameRaw);
     }
 
-    const gifBuffer = await renderAnimatedGif(rawFrames, 360, 360, 150);
+    const gifBuffer = await renderAnimatedGif(rawFrames, 360, 360, 170);
     const file = new AttachmentBuilder(gifBuffer, { name: "nearyou.gif" });
 
     await ctx.reply({

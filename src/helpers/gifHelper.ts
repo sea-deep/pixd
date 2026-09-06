@@ -104,15 +104,20 @@ export async function extractFrames(buffer: Buffer, maxFrames = 30): Promise<Ext
 
   const frameCount = Math.min(info.pages, maxFrames);
   const sampleIndices: number[] = [];
-  for (let i = 0; i < frameCount; i++) {
-    const idx = Math.floor((i * info.pages) / frameCount);
-    sampleIndices.push(idx);
-  }
+  const delays: number[] = [];
 
-  const delays: number[] = sampleIndices.map((idx) => {
-    const d = info.delay[idx] ?? info.delay[0] ?? 100;
-    return d > 10 ? d : 100; // normalize very fast or 0 delay to 100ms
-  });
+  for (let i = 0; i < frameCount; i++) {
+    const kStart = Math.floor((i * info.pages) / frameCount);
+    const kEnd = Math.floor(((i + 1) * info.pages) / frameCount) - 1;
+    sampleIndices.push(kStart);
+
+    let intervalDuration = 0;
+    for (let k = kStart; k <= kEnd; k++) {
+      const d = info.delay[k] ?? info.delay[0] ?? 100;
+      intervalDuration += d > 10 ? d : 100;
+    }
+    delays.push(intervalDuration);
+  }
 
   const frames = await Promise.all(
     sampleIndices.map((page) => sharp(buffer, { page }).png().toBuffer())
@@ -141,9 +146,21 @@ export async function renderAnimatedGif(
   }
 
   const combined = Buffer.concat(rawFrames);
-  const delays = Array.isArray(delay)
-    ? delay
-    : new Array(rawFrames.length).fill(delay);
+  let delays: number[];
+  if (Array.isArray(delay)) {
+    if (delay.length === rawFrames.length) {
+      delays = delay;
+    } else if (delay.length > 0) {
+      delays = [];
+      for (let i = 0; i < rawFrames.length; i++) {
+        delays.push(delay[i % delay.length]);
+      }
+    } else {
+      delays = new Array(rawFrames.length).fill(100);
+    }
+  } else {
+    delays = new Array(rawFrames.length).fill(delay);
+  }
 
   return sharp(combined, {
     raw: {

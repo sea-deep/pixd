@@ -51,7 +51,10 @@ export default new HybridCommand({
         overlays.map((b) => extractFrames(b, 24))
       );
       const maxFrames = Math.max(...extractedList.map((e) => e.frames.length));
-      const delay = extractedList.find((e) => e.isAnimated)?.delay ?? 100;
+      const delay =
+        extractedList.find((e) => e.isAnimated && e.frames.length === maxFrames)?.delay ??
+        extractedList.find((e) => e.isAnimated)?.delay ??
+        100;
 
       const resizedByPos = await Promise.all(
         scaledS.map(async (pos, p) => {
