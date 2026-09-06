@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from "discord.js";
+import { ApplicationCommandOptionType, type RepliableInteraction } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
 import YtDlpResolver from "../../services/music/YtDlpResolver.js";
 import { replyWithError, requireVoiceChannel } from "../../services/music/commandHelpers.js";
@@ -22,8 +22,17 @@ export default new HybridCommand({
     const voiceChannelId = requireVoiceChannel(context);
     const result = await resolver.resolve(query, context.user.id);
     const player = await client.music.connect(context.guild!, voiceChannelId, context.channel!.id);
+    const wasPlaying = Boolean(player.current);
     player.enqueue(result.tracks);
     await player.ensurePlaying();
+
+    if (!wasPlaying && result.tracks.length === 1) {
+      if (context.isInteraction) {
+        await (context.raw as RepliableInteraction).deleteReply().catch(() => undefined);
+      }
+      return;
+    }
+
     return context.reply({
       embeds: [{
         title: result.playlistName ? "Playlist queued" : "Track queued",

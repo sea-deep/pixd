@@ -47,6 +47,80 @@ describe("YtDlpResolver", () => {
     expect(result.tracks[0].author).toBe("Gagan Likhari");
   });
 
+  it("does not treat ytsearch collection wrappers as playlists and leaves playlistName undefined", async () => {
+    mockYoutubeDl.mockResolvedValue({
+      _type: "playlist",
+      id: "ytsearch1:skethcers driprreprot",
+      title: "skethcers driprreprot",
+      entries: [
+        {
+          id: "sk123",
+          title: "DripReport - Skechers (Official Music Video)",
+          uploader: "DripReport",
+          duration: 140,
+          webpage_url: "https://www.youtube.com/watch?v=sk123",
+          thumbnail: "https://i.ytimg.com/vi/sk123/default.jpg",
+        },
+      ],
+    });
+
+    const resolver = new YtDlpResolver();
+    const result = await resolver.resolve("skethcers driprreprot", "user456");
+
+    expect(result.playlistName).toBeUndefined();
+    expect(result.tracks).toHaveLength(1);
+    expect(result.tracks[0].title).toBe("DripReport - Skechers (Official Music Video)");
+    expect(result.tracks[0].author).toBe("DripReport");
+  });
+
+  it("correctly identifies multi-track playlist URLs and sets playlistName", async () => {
+    mockYoutubeDl.mockResolvedValue({
+      _type: "playlist",
+      playlist_title: "Top Hits",
+      entries: [
+        {
+          id: "t1",
+          title: "Song 1",
+          uploader: "Artist 1",
+          duration: 200,
+          webpage_url: "https://www.youtube.com/watch?v=t1",
+        },
+        {
+          id: "t2",
+          title: "Song 2",
+          uploader: "Artist 2",
+          duration: 180,
+          webpage_url: "https://www.youtube.com/watch?v=t2",
+        },
+      ],
+    });
+
+    const resolver = new YtDlpResolver();
+    const result = await resolver.resolve("https://www.youtube.com/playlist?list=PL123", "user456");
+
+    expect(result.playlistName).toBe("Top Hits");
+    expect(result.tracks).toHaveLength(2);
+    expect(result.tracks[0].title).toBe("Song 1");
+    expect(result.tracks[1].title).toBe("Song 2");
+  });
+
+  it("treats single-track URLs as single tracks without playlistName", async () => {
+    mockYoutubeDl.mockResolvedValue({
+      id: "solo1",
+      title: "Solo Track",
+      uploader: "Solo Artist",
+      duration: 150,
+      webpage_url: "https://www.youtube.com/watch?v=solo1",
+    });
+
+    const resolver = new YtDlpResolver();
+    const result = await resolver.resolve("https://www.youtube.com/watch?v=solo1", "user456");
+
+    expect(result.playlistName).toBeUndefined();
+    expect(result.tracks).toHaveLength(1);
+    expect(result.tracks[0].title).toBe("Solo Track");
+  });
+
   it("allows tracks up to 24 hours such as 12-hour videos", async () => {
     mockYoutubeDl.mockResolvedValue({
       id: "12hours",

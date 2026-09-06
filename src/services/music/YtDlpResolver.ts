@@ -4,6 +4,7 @@ import { getCookiesPath } from "../../helpers/cookieHelper.js";
 import type { MusicTrack, ResolveResult } from "./types.js";
 
 type YtDlpEntry = {
+  _type?: string;
   id?: string;
   url?: string;
   webpage_url?: string;
@@ -63,9 +64,17 @@ export default class YtDlpResolver {
       throw new Error("No playable tracks were found.");
     }
 
+    const isPlaylist = isUrl && (
+      Boolean(payload.playlist_title) ||
+      (Array.isArray(payload.entries) && payload.entries.length > 1) ||
+      (payload._type === "playlist" && tracks.length > 1)
+    );
+
     return {
       tracks,
-      playlistName: payload.entries ? payload.title ?? payload.playlist_title : undefined,
+      playlistName: isPlaylist
+        ? (payload.playlist_title ?? payload.title ?? "Playlist")
+        : undefined,
     };
   }
 
