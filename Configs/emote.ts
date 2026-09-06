@@ -34,4 +34,11 @@ export default {
     trophy: "🏆",
     gender_male: "♂️",
     gender_female: "♀️",
+
+    // Utility & Games
+    searching: "<a:Searching:1546240805281202176>",
+    emptyDisk: "<:emptyDisk:1546240808095711363>",
+    yellowDisk: "<:yellowDisk:1546240812818505808>",
+    redDisk: "<:redDisk:1546240816895492136>",
+    greenDisk: "<:greenDisk:1546240821173424160>",
 };

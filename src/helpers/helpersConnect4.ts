@@ -1,8 +1,9 @@
 import type { ButtonInteraction } from "discord.js";
-const emptyDisk = "<:emptyDisk:1102228471448604823>";
-const yellowDisk = "<:yellowDisk:1102228894209294371>";
-const redDisk = "<:redDisk:1102229231527809025>";
-const winDisk = "<:greenDisk:1117189780082528356>";
+import emote from "../../Configs/emote.js";
+const emptyDisk = emote.emptyDisk;
+const yellowDisk = emote.yellowDisk;
+const redDisk = emote.redDisk;
+const winDisk = emote.greenDisk;
 const redCircle = "🔴";
 const yellowCircle = "🟡";
 

@@ -2,6 +2,7 @@ import HybridCommand from "../../structures/HybridCommand.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { Client, Message } from "discord.js";
 import { GOOGLE_IMG_INVERSE_ENGINE_URL } from "../../services/ImageSearchService.js";
+import emote from "../../../Configs/emote.js";
 export default new HybridCommand({
   name: "reverse",
   description: "Search image from Google.",
@@ -30,7 +31,7 @@ export default new HybridCommand({
       content: "",
       embeds: [
         {
-          description: "Searching <a:Searching:1142532717406322809>",
+          description: `Searching ${emote.searching}`,
           color: client.color,
         },
       ],

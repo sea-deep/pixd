@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
 import { searchImages } from "../../services/ImageSearchService.js";
 import { resolveEmbedImageUrl } from "../../helpers/helpersImage.js";
+import emote from "../../../Configs/emote.js";
 
 export default new HybridCommand({
   name: "img",
@@ -19,7 +20,7 @@ export default new HybridCommand({
   execute: async (ctx, client) => {
     const query = ctx.options.getString("query", true)!;
     const status = await ctx.reply({
-      embeds: [{ description: "Searching <a:Searching:1142532717406322809>", color: client.color }],
+      embeds: [{ description: `Searching ${emote.searching}`, color: client.color }],
     });
 
     try {

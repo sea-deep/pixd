@@ -1,9 +1,10 @@
 import Component from "../../../structures/Component.js";
+import emote from "../../../../Configs/emote.js";
 import { Client } from "discord.js";
 
-const emptyDisk = "<:emptyDisk:1102228471448604823>";
-const yellowDisk = "<:yellowDisk:1102228894209294371>";
-const redDisk = "<:redDisk:1102229231527809025>";
+const emptyDisk = emote.emptyDisk;
+const yellowDisk = emote.yellowDisk;
+const redDisk = emote.redDisk;
 const redCircle = "🔴";
 
 export default new Component({

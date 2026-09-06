@@ -1,5 +1,6 @@
 import HybridCommand from "../../structures/HybridCommand.js";
 import { Message } from "discord.js";
+import emote from "../../../Configs/emote.js";
 
 export default new HybridCommand({
   name: "connect4",
@@ -17,7 +18,7 @@ export default new HybridCommand({
   options: [{ type: 6, name: "opponent", description: "Play against another user" }],
   execute: async (ctx, client) => {
     const opponent = ctx.options.getUser("opponent");
-    const emptyDisk = "<:emptyDisk:1102228471448604823>";
+    const emptyDisk = emote.emptyDisk;
     const redCircle = "🔴";
     const yellowCircle = "🟡";
     let desc = [
