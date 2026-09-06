@@ -95,9 +95,22 @@
       margin: 20px 0;
       font-weight: 600;
     }
-    .countdown {
-      color: #f1c40f;
-      font-weight: bold;
+    .btn-share {
+      display: inline-block;
+      background: #36363d;
+      color: #fff;
+      border: 1px solid #4a4a55;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-share:hover {
+      background: #464650;
+      border-color: #6a6a78;
     }
   </style>
 </head>
@@ -134,7 +147,10 @@
         ⚠️ This file has expired and was automatically deleted from cloud storage.
       </div>
 
-      <a href="#" class="btn-download" id="download-btn">📥 Download File</a>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+        <a href="#" class="btn-download" id="download-btn">📥 Download File</a>
+        <button type="button" class="btn-share" id="share-btn">📋 Copy Link</button>
+      </div>
     </div>
 
     <div id="error-box" style="display: none; color: #ff5555; padding: 30px;"></div>
@@ -238,11 +254,24 @@
       setInterval(updateCountdown, 1000);
     }
 
-    function showError(msg) {
-      loadingEl.style.display = 'none';
-      errorBoxEl.style.display = 'block';
-      errorBoxEl.innerHTML = '❌ <strong>Error:</strong> ' + msg;
-    }
+    const shareBtn = document.getElementById('share-btn');
+    shareBtn.addEventListener('click', () => {
+      const url = window.location.href;
+      if (!navigator.clipboard) {
+        window.prompt('Copy file link:', url);
+        return;
+      }
+      navigator.clipboard.writeText(url).then(() => {
+        shareBtn.textContent = '✅ Copied!';
+        shareBtn.style.background = '#3ba55d';
+        shareBtn.style.borderColor = '#3ba55d';
+        setTimeout(() => {
+          shareBtn.textContent = '📋 Copy Link';
+          shareBtn.style.background = '#36363d';
+          shareBtn.style.borderColor = '#4a4a55';
+        }, 2500);
+      });
+    });
 
     loadFileInfo();
   </script>

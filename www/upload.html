@@ -131,6 +131,18 @@
 
       <button class="btn-upload" id="upload-btn" disabled>Start Upload</button>
       <div class="status-msg" id="status-msg"></div>
+
+      <div id="share-card" style="display: none; margin-top: 25px; text-align: left; background: #18181c; border: 1px solid #36363d; border-radius: 10px; padding: 20px;">
+        <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;">🔗 Direct Shareable Link</div>
+        <p style="font-size: 13px; color: #a0a0a8; margin-bottom: 12px;">Send this link anywhere you want. Anyone with this link can view or download your file directly.</p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="share-link-input" readonly style="flex: 1; background: #111114; border: 1px solid #444; border-radius: 6px; padding: 10px 14px; color: #fff; font-size: 14px; font-family: monospace;">
+          <button type="button" id="copy-share-btn" style="background: #5865EF; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;">📋 Copy Link</button>
+        </div>
+        <div style="margin-top: 16px;">
+          <a href="#" id="view-file-btn" class="btn-upload" style="display: inline-block; text-decoration: none; padding: 10px 20px; font-size: 14px;">Open File Page ↗</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -151,6 +163,29 @@
     const statusMsg = document.getElementById('status-msg');
     const sessionError = document.getElementById('session-error');
     const uploadFlow = document.getElementById('upload-flow');
+    const shareCard = document.getElementById('share-card');
+    const shareLinkInput = document.getElementById('share-link-input');
+    const copyShareBtn = document.getElementById('copy-share-btn');
+    const viewFileBtn = document.getElementById('view-file-btn');
+
+    copyShareBtn.addEventListener('click', () => {
+      const copyText = shareLinkInput.value;
+      if (!navigator.clipboard) {
+        shareLinkInput.select();
+        document.execCommand('copy');
+        copyShareBtn.textContent = '✅ Copied!';
+        setTimeout(() => { copyShareBtn.textContent = '📋 Copy Link'; }, 2000);
+        return;
+      }
+      navigator.clipboard.writeText(copyText).then(() => {
+        copyShareBtn.textContent = '✅ Copied!';
+        copyShareBtn.style.background = '#3ba55d';
+        setTimeout(() => {
+          copyShareBtn.textContent = '📋 Copy Link';
+          copyShareBtn.style.background = '#5865EF';
+        }, 2500);
+      });
+    });
 
     let selectedFile = null;
 
@@ -254,7 +289,11 @@
 
             const completeData = await completeRes.json();
             if (completeRes.ok && completeData.success) {
-              statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong><br>Your file has been announced in your Discord channel.<br><br><a href="/file/' + fileId + '" style="color: #5865EF; text-decoration: underline;">View Download Page</a>';
+              const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
+              shareLinkInput.value = shareUrl;
+              viewFileBtn.href = '/file/' + fileId;
+              shareCard.style.display = 'block';
+              statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
               dropZone.style.display = 'none';
               uploadBtn.style.display = 'none';
             } else {

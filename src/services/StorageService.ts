@@ -49,12 +49,28 @@ export class StorageService {
   private static activeSessions = new Map<string, UploadSession>();
   private static cleanupInterval: NodeJS.Timeout | null = null;
 
+  private static get B2_KEY_ID(): string | undefined {
+    return env.B2_KEY_ID || process.env.B2_KEY_ID;
+  }
+  private static get B2_APPLICATION_KEY(): string | undefined {
+    return env.B2_APPLICATION_KEY || process.env.B2_APPLICATION_KEY;
+  }
+  private static get B2_BUCKET_NAME(): string | undefined {
+    return env.B2_BUCKET_NAME || process.env.B2_BUCKET_NAME;
+  }
+  private static get B2_ENDPOINT(): string | undefined {
+    return env.B2_ENDPOINT || process.env.B2_ENDPOINT;
+  }
+  private static get B2_REGION(): string | undefined {
+    return env.B2_REGION || process.env.B2_REGION || "us-east-005";
+  }
+
   public static isConfigured(): boolean {
     return Boolean(
-      env.B2_KEY_ID &&
-        env.B2_APPLICATION_KEY &&
-        env.B2_BUCKET_NAME &&
-        env.B2_ENDPOINT
+      this.B2_KEY_ID &&
+        this.B2_APPLICATION_KEY &&
+        this.B2_BUCKET_NAME &&
+        this.B2_ENDPOINT
     );
   }
 
@@ -64,11 +80,11 @@ export class StorageService {
         throw new Error("Backblaze B2 storage is not configured in environment.");
       }
       this.s3ClientInstance = new S3Client({
-        endpoint: env.B2_ENDPOINT!,
-        region: env.B2_REGION || "us-east-005",
+        endpoint: this.B2_ENDPOINT!,
+        region: this.B2_REGION,
         credentials: {
-          accessKeyId: env.B2_KEY_ID!,
-          secretAccessKey: env.B2_APPLICATION_KEY!,
+          accessKeyId: this.B2_KEY_ID!,
+          secretAccessKey: this.B2_APPLICATION_KEY!,
         },
       });
     }
@@ -216,7 +232,7 @@ export class StorageService {
     try {
       const s3 = this.getS3Client();
       const putCommand = new PutObjectCommand({
-        Bucket: env.B2_BUCKET_NAME!,
+        Bucket: this.B2_BUCKET_NAME!,
         Key: s3Key,
         ContentType: mimeType || "application/octet-stream",
       });
@@ -264,7 +280,7 @@ export class StorageService {
   public static async completeUpload(
     fileId: string,
     client: Client
-  ): Promise<{ success: boolean; upload?: IUpload; error?: string }> {
+  ): Promise<{ success: boolean; upload?: IUpload; shareUrl?: string; error?: string }> {
     const upload = await UploadModel.findOne({ fileId, status: "pending" });
     if (!upload) {
       return { success: false, error: "Upload record not found or already completed." };
@@ -275,7 +291,7 @@ export class StorageService {
       // Verify object exists in B2 and get verified content length
       const head = await s3.send(
         new HeadObjectCommand({
-          Bucket: env.B2_BUCKET_NAME!,
+          Bucket: this.B2_BUCKET_NAME!,
           Key: upload.s3Key,
         })
       );
@@ -285,15 +301,60 @@ export class StorageService {
       await upload.save();
 
       // Send Discord announcement message
-      await this.postDiscordAnnouncement(upload, client);
+      if (client) {
+        await this.postDiscordAnnouncement(upload, client);
+        await this.sendUploaderDm(upload, client);
+      }
 
-      return { success: true, upload };
+      const shareUrl = `${env.PUBLIC_BASE_URL}/file/${upload.fileId}`;
+      return { success: true, upload, shareUrl };
     } catch (err: any) {
       Logger.error(`Error completing upload ${fileId}:`, err);
       return {
         success: false,
         error: "Could not verify uploaded file in cloud storage.",
       };
+    }
+  }
+
+  /**
+   * Directly messages the uploader with the shareable link to their uploaded file.
+   */
+  private static async sendUploaderDm(
+    upload: IUpload,
+    client: Client
+  ): Promise<void> {
+    try {
+      const uploader = await client.users.fetch(upload.userId).catch(() => null);
+      if (!uploader) return;
+
+      const shareUrl = `${env.PUBLIC_BASE_URL}/file/${upload.fileId}`;
+      const expireTs = Math.floor(upload.expiresAt.getTime() / 1000);
+
+      const embed = new EmbedBuilder()
+        .setTitle("☁️ File Uploaded Successfully")
+        .setColor((client as any).color || 0x5865f2)
+        .setDescription(
+          `Your file **${upload.fileName}** (\`${formatBytes(upload.fileSize)}\`) is ready!\n\n` +
+            `🔗 **Shareable Link:**\n${shareUrl}\n\n` +
+            `⏳ **Expires:** <t:${expireTs}:R> (<t:${expireTs}:f>)\n\n` +
+            `You can copy and share this link anywhere you want.`
+        );
+
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel("Open File Page")
+          .setEmoji("🔗")
+          .setStyle(ButtonStyle.Link)
+          .setURL(shareUrl)
+      );
+
+      await uploader.send({
+        embeds: [embed],
+        components: [row],
+      }).catch(() => {});
+    } catch (err: any) {
+      Logger.warn(`Could not deliver upload DM to user ${upload.userId}:`, err?.message);
     }
   }
 
@@ -386,7 +447,7 @@ export class StorageService {
     try {
       const s3 = this.getS3Client();
       const getCommand = new GetObjectCommand({
-        Bucket: env.B2_BUCKET_NAME!,
+        Bucket: this.B2_BUCKET_NAME!,
         Key: upload.s3Key,
         ResponseContentDisposition: `attachment; filename="${encodeURIComponent(
           upload.fileName
@@ -420,7 +481,7 @@ export class StorageService {
     try {
       const s3 = this.getS3Client();
       const getCommand = new GetObjectCommand({
-        Bucket: env.B2_BUCKET_NAME!,
+        Bucket: this.B2_BUCKET_NAME!,
         Key: upload.s3Key,
         ResponseContentType: upload.mimeType,
         ResponseContentDisposition: `inline; filename="${encodeURIComponent(
@@ -459,7 +520,7 @@ export class StorageService {
             Logger.info(`Purging expired file from B2: ${upload.fileName} (${upload.fileId})`);
             await s3.send(
               new DeleteObjectCommand({
-                Bucket: env.B2_BUCKET_NAME!,
+                Bucket: this.B2_BUCKET_NAME!,
                 Key: upload.s3Key,
               })
             );
