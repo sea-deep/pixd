@@ -30,7 +30,7 @@ export function parseCaptions(rawText: string): { topText: string; bottomText: s
 
 export default new HybridCommand({
   name: "rvcj",
-  description: "Create RVCJ styled meme image or animated GIF with up to 3 captions and transparent custom emoji support",
+  description: "Create RVCJ meme image or animated GIF with up to 3 captions & custom emojis",
   aliases: ["cid", "caption"],
   usage: "rvcj <image> & <top caption> | <subtitle> | <question>",
   guildOnly: false,
