@@ -160,7 +160,11 @@ export default new HybridCommand({
       const imageInfo = await inspectImage(buffer);
 
       if (imageInfo.isAnimated) {
-        const extracted = await extractFrames(buffer, 20);
+        const totalDuration = imageInfo.delay.reduce((a, b) => a + b, 0);
+        const durationSec = totalDuration > 0 ? totalDuration / 1000 : 2;
+        const targetFrames = Math.round(durationSec * 15);
+        const maxFrames = Math.min(imageInfo.pages, Math.max(30, Math.min(60, targetFrames)));
+        const extracted = await extractFrames(buffer, maxFrames);
         const scale = 0.5;
         const targetWidth = 540;
 
@@ -228,60 +232,54 @@ export default new HybridCommand({
         const gifFooterTop = gifCurrentY;
         const gifFinalHeight = gifFooterTop + Math.round(48 * scale);
 
-        const rawFrames: Buffer[] = [];
-        for (const frame of extracted.frames) {
-          let resizedFrame = await sharp(frame).resize(targetWidth).png().toBuffer();
-          let frameMeta = await sharp(resizedFrame).metadata();
-          if ((frameMeta.height ?? 0) > Math.round((frameMeta.width ?? targetWidth) * (9 / 16))) {
-            resizedFrame = await sharp(resizedFrame)
-              .resize({
-                width: targetWidth,
-                height: 304,
-                fit: "contain",
-                background: { r: 255, g: 255, b: 255, alpha: 1 },
-              })
-              .png()
+        const resizeOptions = isGifTallerThan16by9
+          ? { width: targetWidth, height: 304, fit: "contain" as const, background: { r: 255, g: 255, b: 255, alpha: 1 } }
+          : { width: targetWidth, height: scaledFrameHeight, fit: "fill" as const };
+
+        const rawFrames: Buffer[] = await Promise.all(
+          extracted.frames.map(async (frame) => {
+            const resizedFrame = await sharp(frame)
+              .resize(resizeOptions)
               .toBuffer();
-          }
 
-          const frameComposites: OverlayOptions[] = [
-            { input: scaledHeader, top: 0, left: 0 },
-          ];
-          if (scaledTopOverlay) {
-            frameComposites.push({ input: scaledTopOverlay, top: Math.round(145 * scale), left: 0 });
-          }
-          frameComposites.push({ input: resizedFrame, top: gifImageTop, left: 0 });
-          frameComposites.push({
-            input: scaledWatermark,
-            top: gifImageTop + scaledFrameHeight - Math.round(wmHeight * scale) - 8,
-            left: targetWidth - Math.round(wmWidth * scale) - 8,
-          });
-          if (scaledBottomOverlay) {
+            const frameComposites: OverlayOptions[] = [
+              { input: scaledHeader, top: 0, left: 0 },
+            ];
+            if (scaledTopOverlay) {
+              frameComposites.push({ input: scaledTopOverlay, top: Math.round(145 * scale), left: 0 });
+            }
+            frameComposites.push({ input: resizedFrame, top: gifImageTop, left: 0 });
             frameComposites.push({
-              input: scaledBottomOverlay,
-              top: gifImageTop + scaledFrameHeight + Math.round(15 * scale),
-              left: 0,
+              input: scaledWatermark,
+              top: gifImageTop + scaledFrameHeight - Math.round(wmHeight * scale) - 8,
+              left: targetWidth - Math.round(wmWidth * scale) - 8,
             });
-          }
-          if (scaledQuestionOverlay) {
-            const qTop = gifImageTop + scaledFrameHeight + (bottomSection ? scaledBottomHeight + Math.round(30 * scale) : Math.round(15 * scale));
-            frameComposites.push({ input: scaledQuestionOverlay, top: qTop, left: 0 });
-          }
-          frameComposites.push({ input: scaledFooter, top: gifFooterTop, left: 0 });
+            if (scaledBottomOverlay) {
+              frameComposites.push({
+                input: scaledBottomOverlay,
+                top: gifImageTop + scaledFrameHeight + Math.round(15 * scale),
+                left: 0,
+              });
+            }
+            if (scaledQuestionOverlay) {
+              const qTop = gifImageTop + scaledFrameHeight + (bottomSection ? scaledBottomHeight + Math.round(30 * scale) : Math.round(15 * scale));
+              frameComposites.push({ input: scaledQuestionOverlay, top: qTop, left: 0 });
+            }
+            frameComposites.push({ input: scaledFooter, top: gifFooterTop, left: 0 });
 
-          const raw = await sharp({
-            create: {
-              width: targetWidth,
-              height: gifFinalHeight,
-              background: { r: 255, g: 255, b: 255, alpha: 1 },
-              channels: 4,
-            },
+            return await sharp({
+              create: {
+                width: targetWidth,
+                height: gifFinalHeight,
+                background: { r: 255, g: 255, b: 255, alpha: 1 },
+                channels: 4,
+              },
+            })
+              .composite(frameComposites)
+              .raw()
+              .toBuffer();
           })
-            .composite(frameComposites)
-            .raw()
-            .toBuffer();
-          rawFrames.push(raw);
-        }
+        );
 
         const gifBuffer = await renderAnimatedGif(rawFrames, targetWidth, gifFinalHeight, extracted.delay);
         const file = new AttachmentBuilder(gifBuffer, { name: "rvcj.gif" });

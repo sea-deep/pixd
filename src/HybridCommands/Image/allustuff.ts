@@ -62,7 +62,11 @@ export default new HybridCommand({
     });
 
     if (imageInfo.isAnimated) {
-      const extracted = await extractFrames(data, 20);
+      const totalDuration = imageInfo.delay.reduce((a, b) => a + b, 0);
+      const durationSec = totalDuration > 0 ? totalDuration / 1000 : 2;
+      const targetFrames = Math.round(durationSec * 15);
+      const maxFrames = Math.min(imageInfo.pages, Math.max(30, Math.min(60, targetFrames)));
+      const extracted = await extractFrames(data, maxFrames);
       const targetWidth = 540;
       const scale = targetWidth / 1080;
       const bannerHeight = Math.round(408 * scale); // ~204
@@ -89,37 +93,37 @@ export default new HybridCommand({
       const frameHeight = firstMeta.height ?? 300;
       const totalHeight = frameHeight + bannerHeight;
 
-      const rawFrames: Buffer[] = [];
-      for (const frame of extracted.frames) {
-        const resizedFrame = await sharp(frame)
-          .resize(targetWidth, frameHeight, { fit: "fill" })
-          .toBuffer();
+      const rawFrames: Buffer[] = await Promise.all(
+        extracted.frames.map(async (frame) => {
+          const resizedFrame = await sharp(frame)
+            .resize(targetWidth, frameHeight, { fit: "fill" })
+            .toBuffer();
 
-        const composites: OverlayOptions[] = [
-          { input: alluBanner, gravity: "south" },
-        ];
+          const composites: OverlayOptions[] = [
+            { input: alluBanner, gravity: "south" },
+          ];
 
-        if (scaledOverlayBuf) {
-          const bannerTop = frameHeight;
-          const leftOffset = Math.round(30 * scale) + Math.max(0, Math.floor((Math.round(650 * scale) - scaledOverlayWidth) / 2));
-          const topOffset = bannerTop + Math.round(15 * scale) + Math.max(0, Math.floor((Math.round(370 * scale) - scaledOverlayHeight) / 2));
-          composites.push({
-            input: scaledOverlayBuf,
-            top: topOffset,
-            left: leftOffset,
-          });
-        }
+          if (scaledOverlayBuf) {
+            const bannerTop = frameHeight;
+            const leftOffset = Math.round(30 * scale) + Math.max(0, Math.floor((Math.round(650 * scale) - scaledOverlayWidth) / 2));
+            const topOffset = bannerTop + Math.round(15 * scale) + Math.max(0, Math.floor((Math.round(370 * scale) - scaledOverlayHeight) / 2));
+            composites.push({
+              input: scaledOverlayBuf,
+              top: topOffset,
+              left: leftOffset,
+            });
+          }
 
-        const raw = await sharp(resizedFrame)
-          .extend({
-            bottom: bannerHeight,
-            background: { r: 0, g: 0, b: 0, alpha: 1 },
-          })
-          .composite(composites)
-          .raw()
-          .toBuffer();
-        rawFrames.push(raw);
-      }
+          return sharp(resizedFrame)
+            .extend({
+              bottom: bannerHeight,
+              background: { r: 0, g: 0, b: 0, alpha: 1 },
+            })
+            .composite(composites)
+            .raw()
+            .toBuffer();
+        })
+      );
 
       const gifBuffer = await renderAnimatedGif(rawFrames, targetWidth, totalHeight, extracted.delay);
       const file = new AttachmentBuilder(gifBuffer, { name: "stuff.gif" });

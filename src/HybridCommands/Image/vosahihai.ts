@@ -39,7 +39,11 @@ export default new HybridCommand({
     const caption = text[Math.floor(Math.random() * text.length)];
 
     if (imageInfo.isAnimated) {
-      const extracted = await extractFrames(buffer, 24);
+      const totalDuration = imageInfo.delay.reduce((a, b) => a + b, 0);
+      const durationSec = totalDuration > 0 ? totalDuration / 1000 : 2;
+      const targetFrames = Math.round(durationSec * 15);
+      const maxFrames = Math.min(imageInfo.pages, Math.max(30, Math.min(60, targetFrames)));
+      const extracted = await extractFrames(buffer, maxFrames);
       const scale = 0.5;
       const finalWidth = 540;
       const finalHeight = 428;
@@ -51,30 +55,30 @@ export default new HybridCommand({
         .png()
         .toBuffer();
 
-      const rawFrames: Buffer[] = [];
-      for (const frame of extracted.frames) {
-        const head = await sharp(frame)
-          .resize(Math.round(720 * scale), Math.round(800 * scale), handOptions)
-          .rotate(-15, handOptions)
-          .toBuffer();
+      const rawFrames: Buffer[] = await Promise.all(
+        extracted.frames.map(async (frame) => {
+          const head = await sharp(frame)
+            .resize(Math.round(720 * scale), Math.round(800 * scale), handOptions)
+            .rotate(-15, handOptions)
+            .toBuffer();
 
-        const sahi = await sharp({
-          create: {
-            width: canvasDim,
-            height: canvasDim,
-            channels: 4,
-            background: { r: 0, g: 0, b: 0, alpha: 0 },
-          },
+          return sharp({
+            create: {
+              width: canvasDim,
+              height: canvasDim,
+              channels: 4,
+              background: { r: 0, g: 0, b: 0, alpha: 0 },
+            },
+          })
+            .composite([
+              { input: head, top: 0, left: Math.round(200 * scale) },
+              { input: hand, top: Math.round(150 * scale), left: Math.round(5 * scale) },
+            ])
+            .resize(finalWidth, finalHeight, { position: "top" })
+            .raw()
+            .toBuffer();
         })
-          .composite([
-            { input: head, top: 0, left: Math.round(200 * scale) },
-            { input: hand, top: Math.round(150 * scale), left: Math.round(5 * scale) },
-          ])
-          .resize(finalWidth, finalHeight, { position: "top" })
-          .raw()
-          .toBuffer();
-        rawFrames.push(sahi);
-      }
+      );
 
       const gifBuffer = await renderAnimatedGif(rawFrames, finalWidth, finalHeight, extracted.delay);
       const file = new AttachmentBuilder(gifBuffer, { name: "maisahitha.gif" });
