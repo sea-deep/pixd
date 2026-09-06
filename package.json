@@ -41,7 +41,7 @@
     "googleapis": "^178.0.0",
     "groq-sdk": "^0.5.0",
     "mongodb": "^6.1.0",
-    "mongoose": "^8.13.1",
+    "mongoose": "^9.9.4",
     "openai": "^4.56.0",
     "opusscript": "^0.0.8",
     "p-queue": "^8.0.1",
