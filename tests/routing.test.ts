@@ -19,7 +19,7 @@ describe("template routing", () => {
     expect(client.slashCommandsArray.length).toBeGreaterThanOrEqual(19);
     expect(client.buttons.size).toBe(31);
     expect(client.modals.size).toBe(2);
-    expect(client.stringSelectMenus.size).toBe(5);
+    expect(client.stringSelectMenus.size).toBe(6);
     expect(client.messageContextMenus.size).toBe(2);
   });
 });

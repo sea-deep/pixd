@@ -32,6 +32,19 @@ export default new Component({
       return interaction.update(view);
     }
 
+    if (action === "gender") {
+      const gender = params[1] === "Female" ? "Female" : "Male";
+      const player = await JeetlifeService.ensurePlayer(interaction.user.id, interaction.user);
+      player.gender = gender;
+      await player.save();
+      await interaction.reply({
+        content: `✅ Gender set to **${gender}**!`,
+        ephemeral: true,
+      });
+      const view = JeetlifeViews.renderDashboard(player, interaction.user, client.color);
+      return interaction.message.edit(view);
+    }
+
     if (action === "jobs") {
       const player = await JeetlifeService.ensurePlayer(interaction.user.id, interaction.user);
       const view = JeetlifeViews.renderJobList(player, interaction.user, client.color);

@@ -28,6 +28,9 @@ export default new HybridCommand({
           type: 1,
           components: [
             { type: 2, style: 1, custom_id: "jeet:jobs", label: "Majdoori (Work)", emoji: { name: "🔨" } },
+            { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
+            { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
+            { type: 2, style: 3, custom_id: "jeet:daily", label: "Daily", emoji: { name: "📅" } },
             { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
           ],
         },

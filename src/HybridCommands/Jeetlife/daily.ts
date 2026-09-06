@@ -12,6 +12,17 @@ export default new HybridCommand({
     if (!res.success) {
       return ctx.reply({
         content: `**Aapne aaj ki daily attendance pehle hi claim kar li hai!**\n-# Kal dubara aana ya majdoori (\`/majdoori\`) karke kamao!`,
+        components: [
+          {
+            type: 1,
+            components: [
+              { type: 2, style: 1, custom_id: "jeet:jobs", label: "Majdoori (Work)", emoji: { name: "🔨" } },
+              { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
+              { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
+              { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
+            ],
+          },
+        ],
       });
     }
 
@@ -22,6 +33,8 @@ export default new HybridCommand({
           type: 1,
           components: [
             { type: 2, style: 1, custom_id: "jeet:jobs", label: "Majdoori (Work)", emoji: { name: "🔨" } },
+            { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
+            { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
             { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
           ],
         },

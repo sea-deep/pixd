@@ -1,7 +1,37 @@
 export default {
     paise: "<:paise:1355582818452902119>",
-    aadhaarCard: "<:aadhaar:1355578919650328646>",
+    aadhaarCard: "<:aadhar:1355578919650328646>",
     panCard: "<:pan:1355578969734254712>",
-    mnrega: "<:mnrega:1355579008439419344>"
+    mnrega: "<:mnrega:1355579008439419344>",
 
-}
+    // Items (Searched from Google, downloaded & uploaded to server)
+    chai: "<:jeet_chai:1546238853751382137>",
+    vimal: "<:jeet_vimal:1546238866007261325>",
+    samosa: "<:jeet_samosa:1546238754216345783>",
+    panipuri: "<:jeet_panipuri:1546238878439186472>",
+    chowmein: "<:jeet_chowmein:1546238886827794432>",
+    momos: "<:jeet_momos:1546238898659786813>",
+    gloves: "<:jeet_gloves:1546238920201871360>",
+    cycle: "<:jeet_cycle:1546238932763549757>",
+
+    // Majdoori Jobs (Searched from Google, downloaded & uploaded to server)
+    job_maal: "<:jeet_maal:1546238942687399936>",
+    job_stall: "<:jeet_stall:1546238950568501399>",
+    job_mix: "<:jeet_mix:1546238957119995905>",
+    job_hisaab: "<:jeet_hisaab:1546238972273893557>",
+    job_bhookhmato: "<:jeet_bhookhmato:1546238983275806784>",
+    job_jhatpat: "<:jeet_jhatpat:1546238997984968924>",
+
+    // UI & Gameplay Navigation
+    work: "🔨",
+    shop: "🛒",
+    inventory: "🎒",
+    daily: "📅",
+    card: "💳",
+    success: "✅",
+    failed: "❌",
+    retry: "🔄",
+    trophy: "🏆",
+    gender_male: "♂️",
+    gender_female: "♀️",
+};

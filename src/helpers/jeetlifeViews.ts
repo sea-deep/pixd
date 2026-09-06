@@ -26,6 +26,8 @@ export class JeetlifeViews {
       }
     }
 
+    const isMale = player.gender !== "Female";
+
     const embed = {
       title: `🇮🇳 Jeetlife Dashboard — ${user.username}`,
       description: `**MGNREGA Card:** \`${player.cardId ?? "MGNREGA-0000-0000"}\`\n**Pocket Balance:** \`${player.balance}\` ${emote.paise}\n${activeShiftNotice}`,
@@ -57,7 +59,6 @@ export class JeetlifeViews {
         components: [
           { type: 2, style: 1, custom_id: "jeet:jobs", label: "Majdoori (Work)", emoji: { name: "🔨" } },
           { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
-          { type: 2, style: 2, custom_id: "jeet:shop:food", label: "Street Food", emoji: { name: "🥟" } },
           { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
           { type: 2, style: 3, custom_id: "jeet:daily", label: "Daily Attendance", emoji: { name: "📅" } },
         ],
@@ -66,6 +67,8 @@ export class JeetlifeViews {
         type: 1,
         components: [
           { type: 2, style: 2, custom_id: "jeet:card", label: "View MGNREGA Card", emoji: { name: "🪪" } },
+          { type: 2, style: isMale ? 1 : 2, custom_id: "jeet:gender:Male", label: "Male (Pajeet)", emoji: { name: "♂️" } },
+          { type: 2, style: !isMale ? 1 : 2, custom_id: "jeet:gender:Female", label: "Female (Pajeeta)", emoji: { name: "♀️" } },
         ],
       },
     ];
@@ -109,7 +112,7 @@ export class JeetlifeViews {
   }
 
   /**
-   * Available Jobs list (Traditional Site Work + Modern Gig Work).
+   * Available Jobs list (Traditional Site Work + Modern Gig Work) with SelectMenu and Quick Buttons.
    */
   public static renderJobList(player: any, user: DiscordUser, clientColor: number = 0x1e88e5) {
     const completedShifts = player.stats?.completedShifts ?? 0;
@@ -129,16 +132,33 @@ export class JeetlifeViews {
 
     const embed = {
       title: "👷 Available Majdoori & Modern Gig Shifts",
-      description: `${jobEntries}\n\n*Choose a shift to start working:*`,
+      description: `${jobEntries}\n\n*Select a job below or tap a button to start working:*`,
       color: clientColor,
-      footer: { text: "Select a job to start a 3-round work shift" },
+      footer: { text: "Select a job from the menu or tap a quick button" },
     };
 
-    // Action buttons for unlocked jobs (up to 5 per row)
+    // Frictionless StringSelectMenu
+    const selectMenu = {
+      type: 3,
+      custom_id: "jeet_select:job_select",
+      placeholder: "🔨 Choose a Majdoori or Gig Shift to start...",
+      options: Object.values(JOBS).map((job) => {
+        const unlocked = completedShifts >= job.minShifts && (!job.requiredItem || (job.requiredItem === "cycle" && hasCycle));
+        return {
+          label: `${job.name} (Pay: ${job.basePay}+${job.roundBonus}/rnd)`,
+          value: job.id,
+          description: (unlocked ? job.tagline : `🔒 Needs ${job.minShifts} shifts or Cycle`).slice(0, 100),
+        };
+      }),
+    };
+
+    // Quick action buttons for unlocked jobs (up to 3 per row)
     const row1: any[] = [];
     const row2: any[] = [];
 
-    for (const job of Object.values(JOBS)) {
+    const jobList = Object.values(JOBS);
+    for (let i = 0; i < jobList.length; i++) {
+      const job = jobList[i];
       const unlocked = completedShifts >= job.minShifts && (!job.requiredItem || (job.requiredItem === "cycle" && hasCycle));
       const btn = {
         type: 2,
@@ -147,17 +167,21 @@ export class JeetlifeViews {
         label: job.name,
         disabled: !unlocked,
       };
-      if (row1.length < 3) row1.push(btn);
-      else if (row2.length < 3) row2.push(btn);
+      if (i < 3) row1.push(btn);
+      else row2.push(btn);
     }
 
-    const backBtn = { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } };
-    if (row2.length < 5) row2.push(backBtn);
-    else row1.push(backBtn);
+    const navRow = [
+      { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
+      { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
+      { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
+    ];
 
     const components = [
+      { type: 1, components: [selectMenu] },
       { type: 1, components: row1 },
-      ...(row2.length > 0 ? [{ type: 1, components: row2 }] : []),
+      { type: 1, components: row2 },
+      { type: 1, components: navRow },
     ];
 
     return { embeds: [embed], components };
@@ -172,12 +196,16 @@ export class JeetlifeViews {
 
     const currentPotential = shift.isPractice ? 0 : shift.basePay + (shift.quality * shift.roundBonus);
 
+    const hasChai = (player?.inventory || []).some((i: any) => i.itemId === "chai" && i.amount > 0);
+    const canUseChai = hasChai && !shift.usedChai;
+
     const embed = {
       title: `${job.category === "gig" ? "🛵" : job.category === "stall" ? "☕" : "🏗️"} ${job.name} — Round ${shift.round + 1} of ${shift.maxRounds}`,
       description: `**Shift Instruction:**\n${question.prompt}\n\n` +
         `• Current Score: **${shift.quality}/${shift.round} correct**\n` +
         `• Earned so far: **${currentPotential}** ${emote.paise}${shift.isPractice ? " *(Practice Mode)*" : ""}\n` +
-        `• Round Reward: **+${shift.roundBonus}** ${emote.paise}`,
+        `• Round Reward: **+${shift.roundBonus}** ${emote.paise}` +
+        (canUseChai ? `\n• ☕ *Tapri Chai Lifeline Available in your inventory!*` : ""),
       color: clientColor,
       footer: { text: "Tap the correct answer below within 2 minutes" },
     };
@@ -189,9 +217,18 @@ export class JeetlifeViews {
       label: opt.length > 80 ? opt.slice(0, 77) + "..." : opt,
     }));
 
-    const components = [
+    const components: any[] = [
       { type: 1, components: answerButtons },
     ];
+
+    if (canUseChai) {
+      components.push({
+        type: 1,
+        components: [
+          { type: 2, style: 3, custom_id: `jeet:chai:${shift.sessionId}`, label: "Use Tapri Chai (Retry)", emoji: { name: "☕" } },
+        ],
+      });
+    }
 
     return { embeds: [embed], components };
   }
@@ -219,9 +256,10 @@ export class JeetlifeViews {
       {
         type: 1,
         components: [
-          { type: 2, style: 1, custom_id: `jeet:work:${result.job.id}`, label: "Work Again", emoji: { name: "🔁" } },
+          { type: 2, style: 1, custom_id: `jeet:work:${result.job.id}`, label: "Repeat Shift", emoji: { name: "🔁" } },
           { type: 2, style: 2, custom_id: "jeet:jobs", label: "Change Job", emoji: { name: "🔨" } },
           { type: 2, style: 2, custom_id: "jeet:shop:all", label: "Shop", emoji: { name: "🛒" } },
+          { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
           { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
         ],
       },
@@ -231,7 +269,7 @@ export class JeetlifeViews {
   }
 
   /**
-   * Shop and Street Food catalog view.
+   * Shop and Street Food catalog view with StringSelectMenu and Quick Buy buttons.
    */
   public static renderShop(player: any, category: string = "all", clientColor: number = 0xff9800) {
     const isFoodOnly = category === "food";
@@ -250,11 +288,23 @@ export class JeetlifeViews {
       title: isFoodOnly ? "🥟 Tapri & Street Food Corner" : "🛒 Jeetlife Bazaari (Shop)",
       description: `**Your Balance:** \`${player.balance}\` ${emote.paise}\n\n${list}`,
       color: clientColor,
-      footer: { text: "Click an item below to buy 1 unit or use /buy <item> <quantity>" },
+      footer: { text: "Pick an item from the menu below to buy instantly" },
     };
 
-    // Quick buy buttons for top 4 items in category
-    const buyButtons = items.slice(0, 4).map((item) => ({
+    // Dropdown SelectMenu to buy any item in this catalog
+    const selectMenu = {
+      type: 3,
+      custom_id: "jeet_select:buy_select",
+      placeholder: "🛒 Pick an item to buy (1 unit)...",
+      options: items.map((item) => ({
+        label: `${item.name} (${item.price} paise)`,
+        value: item.id,
+        description: item.description.slice(0, 100),
+      })),
+    };
+
+    // Quick buy buttons for top 3 items in category
+    const buyButtons = items.slice(0, 3).map((item) => ({
       type: 2,
       style: 2,
       custom_id: `jeet:buy:${item.id}:1`,
@@ -267,10 +317,12 @@ export class JeetlifeViews {
       { type: 2, style: isFoodOnly ? 2 : 1, custom_id: "jeet:shop:all", label: "All Items", emoji: { name: "🛒" } },
       { type: 2, style: isFoodOnly ? 1 : 2, custom_id: "jeet:shop:food", label: "Street Food", emoji: { name: "🥟" } },
       { type: 2, style: 2, custom_id: "jeet:inv", label: "Inventory", emoji: { name: "🎒" } },
+      { type: 2, style: 2, custom_id: "jeet:jobs", label: "Majdoori", emoji: { name: "🔨" } },
       { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
     ];
 
     const components = [
+      { type: 1, components: [selectMenu] },
       ...(buyButtons.length > 0 ? [{ type: 1, components: buyButtons }] : []),
       { type: 1, components: navRow },
     ];
@@ -279,7 +331,7 @@ export class JeetlifeViews {
   }
 
   /**
-   * Player Inventory View.
+   * Player Inventory View with SelectMenu to use/eat items and Quick Action buttons.
    */
   public static renderInventory(player: any, user: DiscordUser, clientColor: number = 0x5c6bc0) {
     const inv = player.inventory || [];
@@ -293,22 +345,49 @@ export class JeetlifeViews {
       title: `🎒 ${user.username}'s Jhola (Inventory)`,
       description: `**Balance:** \`${player.balance}\` ${emote.paise}\n\n${itemsList}`,
       color: clientColor,
-      footer: { text: "Use items directly or via /use <item>" },
+      footer: { text: "Select an item below to consume or use it" },
     };
 
-    // Use buttons for usable items currently owned
-    const usableButtons: any[] = [];
-    for (const item of inv) {
+    const usableItems = inv.filter((item: any) => {
       const def = CATALOG_ITEMS[item.itemId];
-      if ((def?.category === "food" || def?.category === "consumable") && item.amount > 0 && usableButtons.length < 3) {
-        usableButtons.push({
-          type: 2,
-          style: 1,
-          custom_id: `jeet:use:${item.itemId}`,
-          label: `Use ${item.itemName}`,
-          emoji: { name: def.icon.startsWith("<") ? undefined : def.icon },
-        });
-      }
+      return (def?.category === "food" || def?.category === "consumable") && item.amount > 0;
+    });
+
+    const components: any[] = [];
+
+    // StringSelectMenu for usable items
+    if (usableItems.length > 0) {
+      components.push({
+        type: 1,
+        components: [
+          {
+            type: 3,
+            custom_id: "jeet_select:use_select",
+            placeholder: "🍽️ Pick an item to consume / use...",
+            options: usableItems.map((item: any) => {
+              const def = CATALOG_ITEMS[item.itemId];
+              return {
+                label: `${item.itemName} (Owned: x${item.amount})`,
+                value: item.itemId,
+                description: (def?.description ?? "Consume item").slice(0, 100),
+              };
+            }),
+          },
+        ],
+      });
+    }
+
+    // Quick use buttons for first 3 usable items
+    const usableButtons: any[] = [];
+    for (const item of usableItems.slice(0, 3)) {
+      const def = CATALOG_ITEMS[item.itemId];
+      usableButtons.push({
+        type: 2,
+        style: 1,
+        custom_id: `jeet:use:${item.itemId}`,
+        label: `Use ${item.itemName}`,
+        emoji: { name: def.icon.startsWith("<") ? undefined : def.icon },
+      });
     }
 
     const navRow = [
@@ -317,11 +396,12 @@ export class JeetlifeViews {
       { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
     ];
 
-    const components = [
-      ...(usableButtons.length > 0 ? [{ type: 1, components: usableButtons }] : []),
-      { type: 1, components: navRow },
-    ];
+    if (usableButtons.length > 0) {
+      components.push({ type: 1, components: usableButtons });
+    }
+    components.push({ type: 1, components: navRow });
 
     return { embeds: [embed], components };
   }
 }
+

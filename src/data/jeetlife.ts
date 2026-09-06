@@ -68,7 +68,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "consumable",
     price: 8,
     limit: 10,
-    icon: "☕",
+    icon: emote.chai,
     description: "Adrak-elaichi wali kadak cutting chai.",
     effectDescription: "Gives 1 retry on an incorrect question during a shift (max 1 used per shift).",
     flavourResponses: [
@@ -83,7 +83,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "consumable",
     price: 4,
     limit: 10,
-    icon: "✌️",
+    icon: emote.vimal,
     description: "Kesar flavour status packet. Purely cosmetic and cultural flavour.",
     effectDescription: "Cosmetic item. Gives no gameplay advantage, only status.",
     flavourResponses: [
@@ -97,7 +97,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "food",
     price: 12,
     limit: 10,
-    icon: "🥟",
+    icon: emote.samosa,
     description: "Fresh crispy aloo samosa served with meethi and teekhi chutney.",
     flavourResponses: [
       "Bhaiya ne doono mein garam samosa aur extra meethi chutney di: 'Khao saheb, fresh ghani ka hai!'",
@@ -110,7 +110,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "food",
     price: 16,
     limit: 10,
-    icon: "🥣",
+    icon: emote.panipuri,
     description: "6 crispy puris with khatta-meetha-teekha pani.",
     flavourResponses: [
       "Chhe ke chhe teekhe golgappe daba ke khaye! Bhaiya bole: 'Ek sookhi papdi to banti hai aakhri mein!'",
@@ -123,7 +123,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "food",
     price: 20,
     limit: 10,
-    icon: "🍜",
+    icon: emote.chowmein,
     description: "Roadside thela spicy veg chowmein with extra cabbage and chilli sauce.",
     flavourResponses: [
       "Bhaiya ne bade tava pe chowmein uchhal ke plate mein di: 'Thoda red chilli sauce aur daal du?'",
@@ -136,7 +136,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "food",
     price: 24,
     limit: 10,
-    icon: "🥟",
+    icon: emote.momos,
     description: "Steamed veg momos with deadly red garlic chutney.",
     flavourResponses: [
       "Bhaiya bole: 'Bhaiya mayo alag se lena, laal chutney mein seedha mirchi ka atom bomb hai!'",
@@ -149,7 +149,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "equipment",
     price: 160,
     limit: 1,
-    icon: "🧤",
+    icon: emote.gloves,
     description: "Heavy-duty construction gloves. Unlocks higher Gloves pay tier across jobs.",
     effectDescription: "Increases base pay on completed shifts by +8 paise permanently.",
   },
@@ -159,7 +159,7 @@ export const CATALOG_ITEMS: Record<string, CatalogItem> = {
     category: "equipment",
     price: 480,
     limit: 1,
-    icon: "🚲",
+    icon: emote.cycle,
     requiresShifts: 12,
     description: "Sturdy black delivery bicycle with a strong carrier for quick deliveries.",
     effectDescription: "Unlocks high-tier modern Quick-Commerce Gig Work ('Jhatpat Delivery') with +16 base pay.",
