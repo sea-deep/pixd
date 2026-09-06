@@ -187,9 +187,12 @@
             <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">content_copy</span> Copy Link
           </button>
         </div>
-        <div style="margin-top: 16px;">
+        <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
           <a href="#" id="view-file-btn" class="btn-upload" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 10px 20px; font-size: 14px;">
             Open File Page <span class="material-symbols-rounded" style="font-size: 16px;">open_in_new</span>
+          </a>
+          <a href="#" id="view-channel-btn" class="btn-upload" style="display: none; background: #2f3136; border: 1px solid #444; align-items: center; gap: 6px; text-decoration: none; padding: 10px 20px; font-size: 14px;">
+            <span class="material-symbols-rounded" style="font-size: 16px;">chat</span> View in Discord
           </a>
         </div>
       </div>
@@ -221,6 +224,7 @@
     const shareLinkInput = document.getElementById('share-link-input');
     const copyShareBtn = document.getElementById('copy-share-btn');
     const viewFileBtn = document.getElementById('view-file-btn');
+    const viewChannelBtn = document.getElementById('view-channel-btn');
 
     let selectedFile = null;
 
@@ -375,9 +379,13 @@
       });
     }
 
-    function showUploadSuccess(fileId, shareUrl) {
+    function showUploadSuccess(fileId, shareUrl, discordUrl) {
       shareLinkInput.value = shareUrl;
       viewFileBtn.href = '/file/' + fileId;
+      if (discordUrl) {
+        viewChannelBtn.href = discordUrl;
+        viewChannelBtn.style.display = 'inline-flex';
+      }
       shareCard.style.display = 'block';
       statusMsg.innerHTML = '<span class="material-symbols-rounded" style="font-size: 20px; vertical-align: -4px; color: #3ba55d; margin-right: 6px;">check_circle</span> <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
       statusMsg.style.color = '#3ba55d';
@@ -471,7 +479,7 @@
           const completeData = await completeRes.json();
           if (completeRes.ok && completeData.success) {
             const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
-            showUploadSuccess(fileId, shareUrl);
+            showUploadSuccess(fileId, shareUrl, completeData.discordUrl);
           } else {
             throw new Error(completeData.error || 'Failed to finalize upload.');
           }
@@ -479,7 +487,7 @@
           // Streaming proxy fallback
           const completeData = await uploadViaProxy(fileId, selectedFile);
           const shareUrl = completeData.shareUrl || (window.location.origin + '/file/' + fileId);
-          showUploadSuccess(fileId, shareUrl);
+          showUploadSuccess(fileId, shareUrl, completeData.discordUrl);
         }
 
       } catch (err) {

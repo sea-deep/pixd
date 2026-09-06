@@ -323,7 +323,13 @@ export class StorageService {
   public static async completeUpload(
     fileId: string,
     client: Client
-  ): Promise<{ success: boolean; upload?: IUpload; shareUrl?: string; error?: string }> {
+  ): Promise<{
+    success: boolean;
+    upload?: IUpload;
+    shareUrl?: string;
+    discordUrl?: string;
+    error?: string;
+  }> {
     const upload = await UploadModel.findOne({ fileId, status: "pending" });
     if (!upload) {
       return { success: false, error: "Upload record not found or already completed." };
@@ -350,7 +356,13 @@ export class StorageService {
       }
 
       const shareUrl = `${env.PUBLIC_BASE_URL}/file/${upload.fileId}`;
-      return { success: true, upload, shareUrl };
+      const discordUrl = upload.guildId && upload.channelId
+        ? (upload.discordMessageId
+            ? `https://discord.com/channels/${upload.guildId}/${upload.channelId}/${upload.discordMessageId}`
+            : `https://discord.com/channels/${upload.guildId}/${upload.channelId}`)
+        : (upload.channelId ? `https://discord.com/channels/@me/${upload.channelId}` : undefined);
+
+      return { success: true, upload, shareUrl, discordUrl };
     } catch (err: any) {
       Logger.error(`Error completing upload ${fileId}:`, err);
       return {
@@ -374,11 +386,18 @@ export class StorageService {
       const shareUrl = `${env.PUBLIC_BASE_URL}/file/${upload.fileId}`;
       const expireTs = Math.floor(upload.expiresAt.getTime() / 1000);
 
+      const channelNotice = upload.channelId
+        ? (upload.guildId
+            ? `💬 **Posted in:** <#${upload.channelId}>\n\n`
+            : `💬 **Posted in:** Direct Messages\n\n`)
+        : "";
+
       const embed = new EmbedBuilder()
         .setTitle("☁️ File Uploaded Successfully")
         .setColor((client as any).color || 0x5865f2)
         .setDescription(
           `Your file **${upload.fileName}** (\`${formatBytes(upload.fileSize)}\`) is ready!\n\n` +
+            channelNotice +
             `🔗 **Shareable Link:**\n${shareUrl}\n\n` +
             `⏳ **Expires:** <t:${expireTs}:R> (<t:${expireTs}:f>)\n\n` +
             `You can copy and share this link anywhere you want.`
@@ -391,6 +410,22 @@ export class StorageService {
           .setStyle(ButtonStyle.Link)
           .setURL(shareUrl)
       );
+
+      const jumpUrl = upload.guildId && upload.channelId
+        ? (upload.discordMessageId
+            ? `https://discord.com/channels/${upload.guildId}/${upload.channelId}/${upload.discordMessageId}`
+            : `https://discord.com/channels/${upload.guildId}/${upload.channelId}`)
+        : (upload.channelId ? `https://discord.com/channels/@me/${upload.channelId}` : null);
+
+      if (jumpUrl) {
+        row.addComponents(
+          new ButtonBuilder()
+            .setLabel("View in Channel")
+            .setEmoji("💬")
+            .setStyle(ButtonStyle.Link)
+            .setURL(jumpUrl)
+        );
+      }
 
       await uploader.send({
         embeds: [embed],

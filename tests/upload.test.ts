@@ -161,6 +161,42 @@ describe("Cloud Upload Service", () => {
 
       process.env.B2_KEY_ID = origKey;
     });
+
+    it("includes channel redirect and 'View in Channel' button in uploader DM", async () => {
+      const dmSend = vi.fn().mockResolvedValue({});
+      const fakeUser = { id: "u123", tag: "tester#0001", send: dmSend };
+      const fakeClient = {
+        users: {
+          fetch: vi.fn().mockResolvedValue(fakeUser),
+        },
+        color: 0x5865f2,
+      };
+
+      const fakeUpload = {
+        fileId: "0123456789ab",
+        userId: "u123",
+        userTag: "tester#0001",
+        channelId: "c456",
+        guildId: "g789",
+        discordMessageId: "m101112",
+        fileName: "example.png",
+        fileSize: 2048,
+        expiresAt: new Date(Date.now() + 6 * 3600 * 1000),
+      };
+
+      await (StorageService as any).sendUploaderDm(fakeUpload, fakeClient);
+
+      expect(dmSend).toHaveBeenCalledOnce();
+      const payload = dmSend.mock.calls[0][0];
+      const embed = payload.embeds[0].data;
+      expect(embed.description).toContain("<#c456>");
+      expect(payload.components).toHaveLength(1);
+      const buttons = payload.components[0].components;
+      expect(buttons).toHaveLength(2);
+      expect(buttons[0].data.label).toBe("Open File Page");
+      expect(buttons[1].data.label).toBe("View in Channel");
+      expect(buttons[1].data.url).toBe("https://discord.com/channels/g789/c456/m101112");
+    });
   });
 
   describe("Web routes and security validation", () => {
