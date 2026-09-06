@@ -396,7 +396,12 @@ export class StorageService {
     discordUrl?: string;
     error?: string;
   }> {
-    const upload = await UploadModel.findOne({ fileId, status: "pending" });
+    // Atomically claim the pending upload so concurrent requests cannot double-finalize
+    const upload = await UploadModel.findOneAndUpdate(
+      { fileId, status: "pending" },
+      { $set: { status: "active" } },
+      { new: true }
+    );
     if (!upload) {
       return { success: false, error: "Upload record not found or already completed." };
     }
