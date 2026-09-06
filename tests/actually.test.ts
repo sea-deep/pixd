@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import actuallyCommand from "../src/Interactions/MessageContextMenus/actually.js";
 import emote from "../Configs/emote.js";
+import ReactionBombService from "../src/services/ReactionBombService.js";
 
 describe("React Nerd Context Menu (actually.ts)", () => {
   it("has exactly 20 valid custom nerd emojis in emote config", () => {
@@ -15,9 +16,15 @@ describe("React Nerd Context Menu (actually.ts)", () => {
     expect(actuallyCommand.commandType).toBe("messageContextMenu");
   });
 
+  beforeEach(() => {
+    (ReactionBombService as any).activeMessageLocks.clear();
+    (ReactionBombService as any).userCooldowns.clear();
+  });
+
   it("safely reacts up to the remaining reaction limit and edits reply", async () => {
     const reactions: string[] = [];
     const mockMessage = {
+      id: "msg_react_18",
       reactions: {
         cache: new Map([
           ["1", {}],
@@ -31,6 +38,7 @@ describe("React Nerd Context Menu (actually.ts)", () => {
     };
 
     const mockInteraction = {
+      user: { id: "test_user_1" },
       deferred: false,
       replied: false,
       deferReply: vi.fn(async () => {
@@ -52,6 +60,7 @@ describe("React Nerd Context Menu (actually.ts)", () => {
 
   it("blocks execution if target message already has 20 reactions", async () => {
     const mockMessage = {
+      id: "msg_react_20",
       reactions: {
         cache: { size: 20 },
       },
@@ -59,6 +68,7 @@ describe("React Nerd Context Menu (actually.ts)", () => {
     };
 
     const mockInteraction = {
+      user: { id: "test_user_2" },
       deferred: false,
       replied: false,
       deferReply: vi.fn(async () => {
@@ -73,7 +83,7 @@ describe("React Nerd Context Menu (actually.ts)", () => {
 
     expect(mockMessage.react).not.toHaveBeenCalled();
     expect(mockInteraction.editReply).toHaveBeenCalledWith({
-      content: "❌ This message already has the maximum of 20 reactions!",
+      content: "❌ Target message already has the maximum of 20 reactions!",
     });
   });
 });
