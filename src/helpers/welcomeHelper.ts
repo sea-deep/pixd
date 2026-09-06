@@ -105,7 +105,8 @@ export async function createOkbbWelcomeGif(member: GuildMember): Promise<Buffer>
     )
   );
 
-  // 50ms delay = 20 FPS (snappy original slapstick speed)
-  return await renderAnimatedGif(rawFrames, 427, 320, 50);
+  // 100ms delay matches uncaption.gif reference timing (3.3s total duration across 33 frames)
+  return await renderAnimatedGif(rawFrames, 427, 320, 100);
 }
+
 
