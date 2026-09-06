@@ -17,7 +17,7 @@ describe("template routing", () => {
     expect(client.prefixCommands.size).toBeGreaterThanOrEqual(47);
     expect(client.slashCommands.size).toBeGreaterThanOrEqual(17);
     expect(client.slashCommandsArray.length).toBeGreaterThanOrEqual(19);
-    expect(client.buttons.size).toBe(30);
+    expect(client.buttons.size).toBe(31);
     expect(client.modals.size).toBe(2);
     expect(client.stringSelectMenus.size).toBe(5);
     expect(client.messageContextMenus.size).toBe(2);

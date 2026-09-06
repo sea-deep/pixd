@@ -1,8 +1,7 @@
 import { ApplicationCommandOptionType } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
-import User from "../../models/jeetModel.js";
+import { JeetlifeService } from "../../services/JeetlifeService.js";
 import emote from "../../../Configs/emote.js";
-
 
 export default new HybridCommand({
   name: "balance",
@@ -14,15 +13,25 @@ export default new HybridCommand({
   execute: async (ctx, client) => {
     const target = ctx.options.getUser("user") ?? ctx.user;
     const displayName = target.id === ctx.user.id ? (ctx.member?.displayName ?? target.username) : (target.globalName ?? target.username);
-    let data = await User.findOne({ userID: target.id });
-    if (!data && target.id !== ctx.user.id) return ctx.reply(`**${displayName} has not joined Jeetlife yet!**`);
-    if (!data) {
-      data = await new User({ userID: target.id }).save();
-      return ctx.reply({
-        content: `**${displayName}'s balance:** \`0\` ${emote.paise}`,
-        embeds: [{ title: "New User!", description: `Welcome to Jeetlife, **${displayName}**.`, color: client.color, thumbnail: { url: target.displayAvatarURL() } }],
-      });
+
+    if (target.id !== ctx.user.id) {
+      const data = await JeetlifeService.getBalance(target.id);
+      if (!data) return ctx.reply(`**${displayName} has not joined Jeetlife yet!**`);
+      return ctx.reply(`**${displayName}'s balance:** \`${data.balance}\` ${emote.paise}`);
     }
-    return ctx.reply(`**${displayName}'s balance:** \`${data.balance}\` ${emote.paise}`);
+
+    const player = await JeetlifeService.ensurePlayer(ctx.user.id, ctx.user);
+    return ctx.reply({
+      content: `**${displayName}'s balance:** \`${player.balance}\` ${emote.paise}`,
+      components: [
+        {
+          type: 1,
+          components: [
+            { type: 2, style: 1, custom_id: "jeet:jobs", label: "Majdoori (Work)", emoji: { name: "🔨" } },
+            { type: 2, style: 2, custom_id: "jeet:dash", label: "Dashboard", emoji: { name: "🏠" } },
+          ],
+        },
+      ],
+    });
   },
 });

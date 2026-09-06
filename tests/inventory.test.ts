@@ -28,7 +28,7 @@ describe("PixD feature inventory", () => {
     expect(standaloneSlashNames).toEqual([]);
 
     const hybrid = await modules("src/HybridCommands/**/*.ts");
-    expect(hybrid).toHaveLength(50);
+    expect(hybrid).toHaveLength(55);
     const hybridNames = new Set(hybrid.map(({ value }) => value.name));
     for (const name of ["contact", "donate", "genesis", "gpt", "help", "img", "ping", "piracy", "screenshot", "ud", "volume", "ytsummarize"]) {
       expect(hybridNames.has(name), `${name} was not consolidated`).toBe(true);
