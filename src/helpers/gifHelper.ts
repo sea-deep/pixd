@@ -279,7 +279,9 @@ export async function extractFrames(buffer: Buffer, maxFrames = 30): Promise<Ext
 }
 
 /**
- * Renders multiple raw RGBA frames into a native animated GIF using Sharp.
+ * Renders multiple raw RGBA frames into a native animated GIF.
+ * Uses high-performance ffmpeg rawvideo pipeline with full-palette quantization
+ * when delays are uniform for ultra-fast encoding, with an automatic Sharp fallback.
  */
 export async function renderAnimatedGif(
   rawFrames: Buffer[],
@@ -291,7 +293,6 @@ export async function renderAnimatedGif(
     throw new Error("Cannot render animated GIF without frames.");
   }
 
-  const combined = Buffer.concat(rawFrames);
   let delays: number[];
   if (Array.isArray(delay)) {
     if (delay.length === rawFrames.length) {
@@ -308,6 +309,53 @@ export async function renderAnimatedGif(
     delays = new Array(rawFrames.length).fill(delay);
   }
 
+  const combined = Buffer.concat(rawFrames);
+
+  // If all delays are uniform, use fast ffmpeg pipeline with exact fractional framerate
+  const isUniform = delays.every((d) => d === delays[0]);
+  if (isUniform && delays.length > 0 && delays[0] >= 10) {
+    try {
+      const frameDelay = delays[0];
+      const gifBuffer = await new Promise<Buffer>((resolve, reject) => {
+        const p = spawn("ffmpeg", [
+          "-f",
+          "rawvideo",
+          "-vcodec",
+          "rawvideo",
+          "-s",
+          `${width}x${height}`,
+          "-pix_fmt",
+          "rgba",
+          "-framerate",
+          `1000/${frameDelay}`,
+          "-i",
+          "-",
+          "-filter_complex",
+          "[0:v] split [a][b];[a] palettegen=stats_mode=full [p];[b][p] paletteuse=dither=bayer:bayer_scale=3",
+          "-f",
+          "gif",
+          "-",
+        ]);
+
+        const chunks: Buffer[] = [];
+        p.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
+        p.on("close", (code) => {
+          if (code === 0 && chunks.length > 0) {
+            resolve(Buffer.concat(chunks));
+          } else {
+            reject(new Error(`ffmpeg exited with code ${code}`));
+          }
+        });
+        p.stdin.on("error", () => {});
+        p.stdin.end(combined);
+      });
+
+      return gifBuffer;
+    } catch {
+      // Graceful fallback to Sharp gif encoding
+    }
+  }
+
   return sharp(combined, {
     raw: {
       width,
@@ -319,6 +367,10 @@ export async function renderAnimatedGif(
     .gif({
       delay: delays,
       loop: 0,
+      effort: 1,
     })
     .toBuffer();
 }
+
+
+
