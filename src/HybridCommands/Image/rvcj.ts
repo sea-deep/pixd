@@ -239,6 +239,7 @@ export default new HybridCommand({
         const rawFrames: Buffer[] = await Promise.all(
           extracted.frames.map(async (frame) => {
             const resizedFrame = await sharp(frame)
+              .flatten({ background: "#ffffff" })
               .resize(resizeOptions)
               .toBuffer();
 
@@ -288,7 +289,11 @@ export default new HybridCommand({
 
       // Static Image composite stack
       // Normalize image to 16:9 rectangle if taller than 16:9 (including square or portrait)
-      let input = await sharp(buffer).resize(1080).png().toBuffer();
+      let input = await sharp(buffer)
+        .flatten({ background: "#ffffff" })
+        .resize(1080)
+        .png()
+        .toBuffer();
       let md = await sharp(input).metadata();
       if ((md.height ?? 0) > Math.round((md.width ?? 1080) * (9 / 16))) {
         input = await sharp(input)

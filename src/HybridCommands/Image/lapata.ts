@@ -61,7 +61,12 @@ export default new HybridCommand({
           const ex = extractedList[p];
           return Promise.all(
             ex.frames.map((f) =>
-              sharp(f).resize(pos.w, pos.h, { fit: "fill" }).raw().toBuffer()
+              sharp(f)
+                .flatten({ background: "#ffffff" })
+                .resize(pos.w, pos.h, { fit: "fill" })
+                .ensureAlpha()
+                .raw()
+                .toBuffer()
             )
           );
         })
@@ -98,6 +103,7 @@ export default new HybridCommand({
     // Static rendering
     for (let i = 0; i < overlays.length; i++) {
       overlays[i] = await sharp(overlays[i])
+        .flatten({ background: "#ffffff" })
         .resize(s[i].w, s[i].h, { fit: "fill" })
         .toBuffer();
     }

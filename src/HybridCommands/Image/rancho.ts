@@ -94,7 +94,11 @@ export default new HybridCommand({
           const ex = extractedList[p];
           return Promise.all(
             ex.frames.map((f) =>
-              sharp(f).resize(pos.width, pos.height, options).png().toBuffer()
+              sharp(f)
+                .flatten({ background: "#ffffff" })
+                .resize(pos.width, pos.height, options)
+                .png()
+                .toBuffer()
             )
           );
         })
@@ -123,9 +127,9 @@ export default new HybridCommand({
       return ctx.reply({ content: line, files: [file] });
     }
 
-    const avatar1 = await sharp(avatars[0]).resize(verdict[0].width, verdict[0].height, options).toBuffer();
-    const avatar2 = await sharp(avatars[1]).resize(verdict[1].width, verdict[1].height, options).toBuffer();
-    const avatar3 = await sharp(avatars[2]).resize(verdict[2].width, verdict[2].height, options).toBuffer();
+    const avatar1 = await sharp(avatars[0]).flatten({ background: "#ffffff" }).resize(verdict[0].width, verdict[0].height, options).toBuffer();
+    const avatar2 = await sharp(avatars[1]).flatten({ background: "#ffffff" }).resize(verdict[1].width, verdict[1].height, options).toBuffer();
+    const avatar3 = await sharp(avatars[2]).flatten({ background: "#ffffff" }).resize(verdict[2].width, verdict[2].height, options).toBuffer();
 
     const idiots = await sharp(templatePath)
       .composite([

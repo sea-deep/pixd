@@ -3,7 +3,22 @@ import { imageOptions } from "../../Interactions/SlashCommands/image.js";
 import { commandInput, contextImage } from "../../helpers/commandInput.js";
 import { AttachmentBuilder } from "discord.js";
 import sharp from "sharp";
+import { readFile } from "fs/promises";
 import { extractFrames, renderAnimatedGif } from "../../helpers/gifHelper.js";
+
+let cachedNearyouFrames: Buffer[] | null = null;
+
+async function getNearyouFrames(): Promise<Buffer[]> {
+  if (!cachedNearyouFrames) {
+    const templateBuf = await readFile("./Assets/nearyou.gif");
+    cachedNearyouFrames = await Promise.all(
+      Array.from({ length: 60 }, (_, i) =>
+        sharp(templateBuf, { page: i }).toBuffer()
+      )
+    );
+  }
+  return cachedNearyouFrames;
+}
 
 export default new HybridCommand({
   name: "nearyou",
@@ -27,21 +42,23 @@ export default new HybridCommand({
     const extracted = await extractFrames(buffer, 30);
     const resizedAvatars = await Promise.all(
       extracted.frames.map((f) =>
-        sharp(f).resize(252, 252, { fit: "fill" }).toBuffer()
+        sharp(f)
+          .flatten({ background: "#ffffff" })
+          .resize(252, 252, { fit: "fill" })
+          .toBuffer()
       )
     );
 
-    // Prepare 60 template frames
-    const rawFrames: Buffer[] = [];
-    for (let i = 0; i < 60; i++) {
-      const frameNum = i < 10 ? `0${i}` : `${i}`;
-      const currentAvatar = resizedAvatars[i % resizedAvatars.length];
-      const frameRaw = await sharp(`./Assets/nearframes/frame_${frameNum}_delay-0.17s.gif`)
-        .composite([{ input: currentAvatar, top: 70, left: -21 }])
-        .raw()
-        .toBuffer();
-      rawFrames.push(frameRaw);
-    }
+    const templateFrames = await getNearyouFrames();
+    const rawFrames = await Promise.all(
+      templateFrames.map((bg, i) => {
+        const currentAvatar = resizedAvatars[i % resizedAvatars.length];
+        return sharp(bg)
+          .composite([{ input: currentAvatar, top: 70, left: -21 }])
+          .raw()
+          .toBuffer();
+      })
+    );
 
     const gifBuffer = await renderAnimatedGif(rawFrames, 360, 360, 170);
     const file = new AttachmentBuilder(gifBuffer, { name: "nearyou.gif" });

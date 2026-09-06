@@ -69,7 +69,11 @@ export default new HybridCommand({
           const ex = extractedList[i];
           return Promise.all(
             ex.frames.map((f) =>
-              sharp(f).resize(d.w, d.h, options).png().toBuffer()
+              sharp(f)
+                .flatten({ background: "#ffffff" })
+                .resize(d.w, d.h, options)
+                .png()
+                .toBuffer()
             )
           );
         })
@@ -107,10 +111,10 @@ export default new HybridCommand({
       return ctx.reply({ content: line, files: [file] });
     }
 
-    const avatar1 = await sharp(avatars[0]).resize(dims[0].w, dims[0].h, options).toBuffer();
-    const avatar2 = await sharp(avatars[1]).resize(dims[1].w, dims[1].h, options).toBuffer();
-    const avatar3 = await sharp(avatars[2]).resize(dims[2].w, dims[2].h, options).toBuffer();
-    const avatar4 = await sharp(avatars[3]).resize(dims[3].w, dims[3].h, options).toBuffer();
+    const avatar1 = await sharp(avatars[0]).flatten({ background: "#ffffff" }).resize(dims[0].w, dims[0].h, options).toBuffer();
+    const avatar2 = await sharp(avatars[1]).flatten({ background: "#ffffff" }).resize(dims[1].w, dims[1].h, options).toBuffer();
+    const avatar3 = await sharp(avatars[2]).flatten({ background: "#ffffff" }).resize(dims[2].w, dims[2].h, options).toBuffer();
+    const avatar4 = await sharp(avatars[3]).flatten({ background: "#ffffff" }).resize(dims[3].w, dims[3].h, options).toBuffer();
 
     const animan = await sharp({
       create: {

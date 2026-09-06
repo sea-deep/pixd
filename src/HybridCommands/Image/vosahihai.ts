@@ -58,6 +58,7 @@ export default new HybridCommand({
       const rawFrames: Buffer[] = await Promise.all(
         extracted.frames.map(async (frame) => {
           const head = await sharp(frame)
+            .flatten({ background: "#ffffff" })
             .resize(Math.round(720 * scale), Math.round(800 * scale), handOptions)
             .rotate(-15, handOptions)
             .toBuffer();
@@ -87,6 +88,7 @@ export default new HybridCommand({
 
     const options = { fit: "fill" as const, background: { r: 0, g: 0, b: 0, alpha: 0 } };
     const head = await sharp(buffer)
+      .flatten({ background: "#ffffff" })
       .resize(720, 800, options)
       .rotate(-15, options)
       .toBuffer();

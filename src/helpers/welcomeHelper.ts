@@ -1,17 +1,16 @@
 import { type GuildMember } from "discord.js";
 import sharp from "sharp";
+import { readFile } from "fs/promises";
 import { renderAnimatedGif } from "./gifHelper.js";
 
 let cachedBgBuffers: Buffer[] | null = null;
 
 async function getCachedBgBuffers(): Promise<Buffer[]> {
   if (!cachedBgBuffers) {
-    const frames = Array.from({ length: 33 }, (_, i) =>
-      i < 10 ? `0${i}` : `${i}`
-    );
+    const templateBuf = await readFile("./Assets/welcome.gif");
     cachedBgBuffers = await Promise.all(
-      frames.map((frame) =>
-        sharp(`./Assets/okbhaibudbak/frame_${frame}_delay-0.1s.gif`).toBuffer()
+      Array.from({ length: 33 }, (_, i) =>
+        sharp(templateBuf, { page: i }).toBuffer()
       )
     );
   }
@@ -35,6 +34,7 @@ export async function createOkbbWelcomeGif(member: GuildMember): Promise<Buffer>
   const buffer = await res.arrayBuffer();
   const avatar = await sharp(Buffer.from(buffer))
     .resize(92, 92)
+    .flatten({ background: "#ffffff" })
     .composite([{ input: circleMask, blend: "dest-in" }])
     .png()
     .toBuffer();

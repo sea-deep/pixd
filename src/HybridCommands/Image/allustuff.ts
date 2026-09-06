@@ -96,6 +96,7 @@ export default new HybridCommand({
       const rawFrames: Buffer[] = await Promise.all(
         extracted.frames.map(async (frame) => {
           const resizedFrame = await sharp(frame)
+            .flatten({ background: "#ffffff" })
             .resize(targetWidth, frameHeight, { fit: "fill" })
             .toBuffer();
 
@@ -133,7 +134,10 @@ export default new HybridCommand({
       });
     }
 
-    const img = await sharp(data).resize(1080).toBuffer();
+    const img = await sharp(data)
+      .flatten({ background: "#ffffff" })
+      .resize(1080)
+      .toBuffer();
     const md = await sharp(img).metadata();
     const height = (md.height ?? 600) + 408;
 
