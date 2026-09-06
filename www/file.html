@@ -119,7 +119,7 @@
     <div id="loading" style="padding: 40px; color: #888;">Loading file metadata...</div>
 
     <div id="file-view" style="display: none;">
-      <div class="file-icon" id="file-icon">📁</div>
+      <div class="file-icon" id="file-icon"><span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">draft</span></div>
       <div class="file-title" id="file-title"></div>
 
       <div class="preview-box" id="preview-box"></div>
@@ -144,12 +144,16 @@
       </div>
 
       <div class="expired-banner" id="expired-banner">
-        ⚠️ This file has expired and was automatically deleted from cloud storage.
+        <span class="material-symbols-rounded" style="font-size: 20px; vertical-align: -4px; margin-right: 6px; color: #ff8888;">warning</span> This file has expired and was automatically deleted from cloud storage.
       </div>
 
       <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-        <a href="#" class="btn-download" id="download-btn">📥 Download File</a>
-        <button type="button" class="btn-share" id="share-btn">📋 Copy Link</button>
+        <a href="#" class="btn-download" id="download-btn">
+          <span class="material-symbols-rounded" style="font-size: 20px; vertical-align: -3px; margin-right: 6px;">download</span> Download File
+        </a>
+        <button type="button" class="btn-share" id="share-btn">
+          <span class="material-symbols-rounded" style="font-size: 18px; vertical-align: -3px; margin-right: 6px;">content_copy</span> Copy Link
+        </button>
       </div>
     </div>
 
@@ -214,21 +218,23 @@
 
       const mime = file.mimeType || '';
       if (/^image\//i.test(mime)) {
-        fileIconEl.textContent = '🖼️';
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">image</span>';
         previewBoxEl.style.display = 'block';
         previewBoxEl.innerHTML = '<img src="/api/file/' + file.fileId + '/view" alt="Preview">';
       } else if (/^video\//i.test(mime)) {
-        fileIconEl.textContent = '🎬';
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">movie</span>';
         previewBoxEl.style.display = 'block';
         previewBoxEl.innerHTML = '<video controls src="/api/file/' + file.fileId + '/view"></video>';
       } else if (/^audio\//i.test(mime)) {
-        fileIconEl.textContent = '🎵';
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">audiotrack</span>';
         previewBoxEl.style.display = 'block';
         previewBoxEl.innerHTML = '<audio controls src="/api/file/' + file.fileId + '/view"></audio>';
       } else if (/zip|rar|tar|7z|gz/i.test(file.fileName)) {
-        fileIconEl.textContent = '📦';
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">folder_zip</span>';
       } else if (/pdf/i.test(mime) || /pdf$/i.test(file.fileName)) {
-        fileIconEl.textContent = '📄';
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">description</span>';
+      } else {
+        fileIconEl.innerHTML = '<span class="material-symbols-rounded" style="font-size: 56px; color: #5865EF;">draft</span>';
       }
 
       // Live countdown
@@ -262,11 +268,11 @@
         return;
       }
       navigator.clipboard.writeText(url).then(() => {
-        shareBtn.textContent = '✅ Copied!';
+        shareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: -3px; margin-right: 6px;">check</span> Copied!';
         shareBtn.style.background = '#3ba55d';
         shareBtn.style.borderColor = '#3ba55d';
         setTimeout(() => {
-          shareBtn.textContent = '📋 Copy Link';
+          shareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: -3px; margin-right: 6px;">content_copy</span> Copy Link';
           shareBtn.style.background = '#36363d';
           shareBtn.style.borderColor = '#4a4a55';
         }, 2500);

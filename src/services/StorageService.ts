@@ -414,8 +414,6 @@ export class StorageService {
       )) as TextBasedChannel | null;
       if (!channel || !("send" in channel)) return;
 
-      const uploadTs = Math.floor(upload.createdAt.getTime() / 1000);
-      const expireTs = Math.floor(upload.expiresAt.getTime() / 1000);
       const downloadPageUrl = `${env.PUBLIC_BASE_URL}/file/${upload.fileId}`;
 
       const isImage = /^image\/(png|jpe?g|gif|webp)$/i.test(upload.mimeType);
@@ -432,13 +430,9 @@ export class StorageService {
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: authorName, iconURL: authorIcon })
-        .setTitle(`☁️ ${upload.fileName}`)
         .setColor((client as any).color || 0x5865f2)
-        .setDescription(
-          `📦 **Size:** \`${formatBytes(upload.fileSize)}\`\n` +
-            `🕒 **Uploaded:** <t:${uploadTs}:R> (<t:${uploadTs}:f>)\n` +
-            `⏳ **Expires:** <t:${expireTs}:R> (<t:${expireTs}:f>)`
-        );
+        .setDescription(`**${upload.fileName}** • \`${formatBytes(upload.fileSize)}\``)
+        .setTimestamp(upload.createdAt);
 
       // Direct embed image preview if supported
       if (isImage) {

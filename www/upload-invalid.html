@@ -17,7 +17,8 @@
       text-align: center;
     }
     .error-icon {
-      font-size: 54px;
+      font-size: 58px;
+      color: #ff6b6b;
       margin-bottom: 16px;
     }
     .error-title {
@@ -41,7 +42,7 @@
       font-size: 13px;
       color: #cfcfe2;
       margin-bottom: 24px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .btn-home {
       display: inline-block;
@@ -61,13 +62,13 @@
 </head>
 <body>
   <div class="error-container">
-    <div class="error-icon">🔒</div>
+    <div class="error-icon"><span class="material-symbols-rounded" style="font-size: 58px;">lock</span></div>
     <div class="error-title">Invalid or Expired Upload Session</div>
     <div class="error-desc">
       This upload link is missing, malformed, or has already expired.
     </div>
     <div class="info-card">
-      <strong>🛡️ Session Security:</strong><br>
+      <strong><span class="material-symbols-rounded" style="font-size: 17px; vertical-align: -3px; color: #7983f5; margin-right: 4px;">security</span> Session Security:</strong><br>
       • Upload links are one-time use and valid for only 15 minutes.<br>
       • To upload a file, run <code>/upload</code> or <code>p!upload</code> in your Discord server to generate a secure private link.<br>
       • Tokens cannot be guessed or reused once consumed.

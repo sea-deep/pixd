@@ -117,17 +117,24 @@
 </head>
 <body>
   <div class="upload-container">
-    <h1 style="font-size: 26px; color: #fff;">📦 PIXD Direct Cloud Transfer</h1>
+    <h1 style="font-size: 26px; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span class="material-symbols-rounded" style="font-size: 30px; color: #5865EF;">cloud_upload</span>
+      PIXD Direct Cloud Transfer
+    </h1>
     <p style="color: #a0a0a8; margin-top: 6px;">Bypass Discord's 20 MB cap — upload files directly up to 1 GiB</p>
-    <div class="badge">⏱️ Auto-expires in 6 hours • Zero server lag</div>
+    <div class="badge">
+      <span class="material-symbols-rounded" style="font-size: 15px; vertical-align: -2px; margin-right: 4px;">schedule</span>
+      Auto-expires in 6 hours • Zero server lag
+    </div>
     <div>
       <div id="dest-badge" class="badge" style="display: none; background: #25252e; border: 1px solid #3e3e48; color: #cfcfe2; margin-top: 8px;">
-        📍 Destination: <span id="dest-info" style="color: #7983f5; font-weight: 600;"></span>
+        <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px; color: #7983f5;">place</span>
+        Destination: <span id="dest-info" style="color: #7983f5; font-weight: 600;"></span>
       </div>
     </div>
 
     <div id="session-loader" style="padding: 40px 20px; color: #888;">
-      <div style="font-size: 38px; margin-bottom: 12px;">🔐</div>
+      <div style="margin-bottom: 12px;"><span class="material-symbols-rounded" style="font-size: 44px; color: #5865EF;">lock</span></div>
       <p style="font-size: 15px; color: #cfcfe2; font-weight: 500;">Validating secure session token...</p>
     </div>
 
@@ -135,7 +142,7 @@
 
     <div id="upload-flow" style="display: none;">
       <div class="drop-zone" id="drop-zone">
-        <div class="drop-icon">📤</div>
+        <div class="drop-icon"><span class="material-symbols-rounded" style="font-size: 48px; color: #5865EF;">upload_file</span></div>
         <p style="font-size: 17px; font-weight: 600; color: #fff;">Drag & drop your file here</p>
         <p style="font-size: 13px; color: #888; margin-top: 4px;">or click to browse from device</p>
         <input type="file" id="file-input" class="file-input">
@@ -149,7 +156,9 @@
             </div>
             <div style="margin-top: 4px;"><strong>Size:</strong> <span id="file-size" style="color: #a0a0a8;"></span></div>
           </div>
-          <button type="button" id="remove-file-btn" class="btn-remove" title="Remove selected file">🗑️ Remove</button>
+          <button type="button" id="remove-file-btn" class="btn-remove" title="Remove selected file">
+            <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 2px;">delete</span> Remove
+          </button>
         </div>
       </div>
 
@@ -167,14 +176,21 @@
       <div class="status-msg" id="status-msg"></div>
 
       <div id="share-card" style="display: none; margin-top: 25px; text-align: left; background: #18181c; border: 1px solid #36363d; border-radius: 10px; padding: 20px;">
-        <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;">🔗 Direct Shareable Link</div>
+        <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+          <span class="material-symbols-rounded" style="font-size: 20px; color: #5865EF;">link</span>
+          Direct Shareable Link
+        </div>
         <p style="font-size: 13px; color: #a0a0a8; margin-bottom: 12px;">Send this link anywhere you want. Anyone with this link can view or download your file directly.</p>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="share-link-input" readonly style="flex: 1; background: #111114; border: 1px solid #444; border-radius: 6px; padding: 10px 14px; color: #fff; font-size: 14px; font-family: monospace;">
-          <button type="button" id="copy-share-btn" style="background: #5865EF; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;">📋 Copy Link</button>
+          <button type="button" id="copy-share-btn" style="background: #5865EF; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;">
+            <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">content_copy</span> Copy Link
+          </button>
         </div>
         <div style="margin-top: 16px;">
-          <a href="#" id="view-file-btn" class="btn-upload" style="display: inline-block; text-decoration: none; padding: 10px 20px; font-size: 14px;">Open File Page ↗</a>
+          <a href="#" id="view-file-btn" class="btn-upload" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 10px 20px; font-size: 14px;">
+            Open File Page <span class="material-symbols-rounded" style="font-size: 16px;">open_in_new</span>
+          </a>
         </div>
       </div>
     </div>
@@ -221,15 +237,17 @@
       if (!navigator.clipboard) {
         shareLinkInput.select();
         document.execCommand('copy');
-        copyShareBtn.textContent = '✅ Copied!';
-        setTimeout(() => { copyShareBtn.textContent = '📋 Copy Link'; }, 2000);
+        copyShareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">check</span> Copied!';
+        setTimeout(() => {
+          copyShareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">content_copy</span> Copy Link';
+        }, 2000);
         return;
       }
       navigator.clipboard.writeText(copyText).then(() => {
-        copyShareBtn.textContent = '✅ Copied!';
+        copyShareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">check</span> Copied!';
         copyShareBtn.style.background = '#3ba55d';
         setTimeout(() => {
-          copyShareBtn.textContent = '📋 Copy Link';
+          copyShareBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">content_copy</span> Copy Link';
           copyShareBtn.style.background = '#5865EF';
         }, 2500);
       });
@@ -242,7 +260,7 @@
       if (uploadFlow) uploadFlow.style.display = 'none';
       if (sessionError) {
         sessionError.style.display = 'block';
-        sessionError.innerHTML = `🔒 <strong>${msg}</strong><br><br>` +
+        sessionError.innerHTML = `<span class="material-symbols-rounded" style="font-size: 20px; vertical-align: -4px; color: #ff6b6b; margin-right: 6px;">lock</span> <strong>${msg}</strong><br><br>` +
           `Upload links require a valid, active token generated via <code>/upload</code> or <code>p!upload</code> in Discord.<br><br>` +
           `<a href="/home" class="btn-upload" style="display: inline-block; text-decoration: none; padding: 8px 18px; font-size: 13px;">Return to Home</a>`;
       }
@@ -361,7 +379,7 @@
       shareLinkInput.value = shareUrl;
       viewFileBtn.href = '/file/' + fileId;
       shareCard.style.display = 'block';
-      statusMsg.innerHTML = '🎉 <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
+      statusMsg.innerHTML = '<span class="material-symbols-rounded" style="font-size: 20px; vertical-align: -4px; color: #3ba55d; margin-right: 6px;">check_circle</span> <strong>Upload Complete!</strong> Announced in your Discord channel & direct link ready below:';
       statusMsg.style.color = '#3ba55d';
       dropZone.style.display = 'none';
       fileDetails.style.display = 'none';
@@ -465,7 +483,7 @@
         }
 
       } catch (err) {
-        statusMsg.textContent = '❌ ' + err.message;
+        statusMsg.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: -3px; color: #ff5555; margin-right: 4px;">error</span> ' + err.message;
         statusMsg.style.color = '#ff5555';
         uploadBtn.disabled = false;
         removeFileBtn.style.display = 'inline-block';
