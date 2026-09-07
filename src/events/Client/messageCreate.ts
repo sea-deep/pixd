@@ -3,6 +3,9 @@ import config from "../../../Configs/config.js";
 import Logger from "../../helpers/Logger.js";
 import Event from "../../structures/Event.js";
 import { handleMessageCommandOptions } from "../../utilities/CommandOptions.js";
+import { generateAiChatResponse, isAiChatConfigured } from "../../services/AiChatService.js";
+
+const mentionCooldowns = new Map<string, number>();
 
 export default new Event({
   event: "messageCreate",
@@ -12,6 +15,48 @@ export default new Event({
 
     // 2. Restricted User Check
     if (config.restricted.includes(message.author.id)) return;
+
+    // 2.5. Bot Mention Event Trigger
+    if (
+      client.user &&
+      (message.mentions.users.has(client.user.id) ||
+        (message.reference?.messageId &&
+          message.channel.messages.cache.get(message.reference.messageId)?.author.id === client.user.id))
+    ) {
+      const prefix = config.commands.prefix;
+      const isPrefixCommand =
+        Boolean(prefix) && message.content.slice(0, prefix.length).toLowerCase() === prefix.toLowerCase();
+
+      if (!isPrefixCommand && isAiChatConfigured()) {
+        const now = Date.now();
+        const lastMention = mentionCooldowns.get(message.author.id) ?? 0;
+        if (now - lastMention < 3000) return;
+        mentionCooldowns.set(message.author.id, now);
+
+        if (mentionCooldowns.size > 1000) {
+          const oldest = mentionCooldowns.keys().next().value;
+          if (oldest) mentionCooldowns.delete(oldest);
+        }
+
+        const mentionRegex = new RegExp(`^<@!?${client.user.id}>\\s*|<@!?${client.user.id}>`, "g");
+        const rawPrompt = message.content.replace(mentionRegex, "").trim();
+        const prompt = rawPrompt.length > 0 ? rawPrompt : "kya bolu";
+
+        if ("sendTyping" in message.channel && typeof message.channel.sendTyping === "function") {
+          await message.channel.sendTyping().catch(() => {});
+        }
+        try {
+          const answer = await generateAiChatResponse(message.author.id, prompt);
+          await message.reply({
+            content: answer,
+            allowedMentions: { repliedUser: false },
+          }).catch((err) => Logger.warn("Could not send mention reply:", err));
+        } catch (err) {
+          Logger.error("Error generating AI mention response:", err);
+        }
+        return;
+      }
+    }
 
     // 3. Check if prefix commands are enabled
     if (!config.commands.message_commands) return;
