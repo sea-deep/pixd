@@ -12,7 +12,6 @@ const categories: Record<string, HelpStyle> = {
   music: { label: "Music", description: "Supar high quality music. Your queue, your rules.", emoji: "🎵", emojiId: "1084743885063991346" },
   image: { label: "Image Generation", description: "Create funny images and highly important memes.", emoji: "🎨", emojiId: "1084741002339831839" },
   games: { label: "Mini-games", description: "Some chotte motte games. Pick your next distraction.", emoji: "🎮", emojiId: "1116349246732521472" },
-  jeetlife: { label: "Jeetlife", description: "Daily rojgaar, your balance, and life admin.", emoji: "🪪" },
   owner: { label: "Owner Tools", description: "Behind-the-scenes bot controls.", emoji: "🔧" },
   general: { label: "More Commands", description: "A little bit of everything else.", emoji: "✨" },
 };

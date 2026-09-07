@@ -36,7 +36,7 @@ and application command registration succeeds; otherwise it returns 503.
 
 ## Feature layout
 
-- `src/HybridCommands`: 49 commands shared by prefix and slash routing, including all migrated games, music, AI, image memes, utilities, owner commands, and Jeetlife
+- `src/HybridCommands`: commands shared by prefix and slash routing, including all migrated games, music, AI, image memes, utilities, and owner commands
 - No prefix-only command entries remain. The newly converted commands execute through the template's `CommandContext`; game collectors keep their actual reply messages and session state.
 - `src/Interactions`: slash parent containers, context menus, buttons, modals, and select menus
 - `src/events`: Discord lifecycle and member events

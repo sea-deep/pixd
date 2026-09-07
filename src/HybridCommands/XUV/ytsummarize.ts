@@ -9,6 +9,7 @@ export default new HybridCommand({
   aliases: ["ytsum", "ytsystum"],
   usage: "<youtube-url> [language-code]",
   guildOnly: true,
+  cooldown: 10_000,
   options: [
     { type: ApplicationCommandOptionType.String, name: "yt-url", description: "A YouTube video URL", required: true },
     { type: ApplicationCommandOptionType.String, name: "lang-code", description: "Subtitle language code (defaults to en)" },

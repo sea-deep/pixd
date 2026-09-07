@@ -22,9 +22,28 @@ export async function summarizeYouTubeVideo(url: string, language = "en"): Promi
     subtitles.slice(0, 500_000),
   ].join("\n");
   const ai = new GoogleGenAI({ apiKey: env.GOOGLEAI_KEY });
-  const response = await ai.models.generateContent({ model: env.GOOGLEAI_MODEL, contents: prompt });
-  const summary = response.text?.trim();
-  if (!summary) throw new Error("The summary model returned an empty response.");
+  const candidateModels = [
+    env.GOOGLEAI_MODEL || "gemini-2.5-flash",
+    "gemini-flash-latest",
+    "gemini-3.5-flash",
+    "gemini-flash-lite-latest",
+  ];
+
+  let summary: string | undefined = undefined;
+  for (const model of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({ model, contents: prompt });
+      const text = response.text?.trim();
+      if (text) {
+        summary = text;
+        break;
+      }
+    } catch {
+      // Try next model fallback
+    }
+  }
+
+  if (!summary) throw new Error("The summary model returned an empty response or all fallback models failed.");
   return { summary, title: metadata.title, thumbnail: metadata.thumbnail };
 }
 
@@ -34,8 +53,10 @@ async function getMetadata(url: string, id: string): Promise<VideoMetadata> {
     dumpSingleJson: true,
     skipDownload: true,
     noWarnings: true,
-    extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
-    ...(cookiesPath ? { cookies: cookiesPath } : {}),
+    jsRuntimes: "node",
+    ...(cookiesPath
+      ? { cookies: cookiesPath }
+      : { extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage" }),
   };
   const data = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
     url,

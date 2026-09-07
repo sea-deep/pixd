@@ -42,7 +42,6 @@ export default new HybridCommand({
     { type: 3, name: "caption", description: "Top caption text" },
     { type: 3, name: "subtitle", description: "Bottom subtitle text below image" },
     { type: 3, name: "question", description: "Question/highlight banner text (yellow on black)" },
-    { type: 3, name: "arguments", description: "All captions separated by | (e.g. Top | Subtitle | Question)" },
     { type: 11, name: "image", description: "Input image or attachment" },
     { type: 6, name: "user", description: "Target user" },
   ],

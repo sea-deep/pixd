@@ -13,6 +13,10 @@ let cachedCookiePath: string | null | undefined = undefined;
  * 3. raw/base64 Netscape cookie text in env.YT_DLP_COOKIES or process.env.YOUTUBE_COOKIES
  */
 export function getCookiesPath(): string | undefined {
+  if (env.ENVIRONMENT === "test" && !process.env.TEST_COOKIES) {
+    return undefined;
+  }
+
   if (cachedCookiePath !== undefined) {
     return cachedCookiePath ?? undefined;
   }
@@ -48,6 +52,26 @@ export function getCookiesPath(): string | undefined {
             content = decoded;
           }
         } catch { }
+      }
+
+      // Check if raw cookies string is in Cookie header format (key=val; key2=val2)
+      if (!content.includes("\t") && content.includes("=") && content.includes(";")) {
+        const netscapeLines: string[] = ["# Netscape HTTP Cookie File"];
+        const pairs = content.split(";").map((p) => p.trim()).filter(Boolean);
+        for (const pair of pairs) {
+          const eqIdx = pair.indexOf("=");
+          if (eqIdx > 0) {
+            const name = pair.slice(0, eqIdx).trim();
+            const value = pair.slice(eqIdx + 1).trim();
+            if (name && value) {
+              netscapeLines.push(`.youtube.com\tTRUE\t/\tTRUE\t2147483647\t${name}\t${value}`);
+            }
+          }
+        }
+        content = netscapeLines.join("\n") + "\n";
+      } else if (!content.startsWith("# Netscape HTTP Cookie File")) {
+        // Automatically ensure Python MozillaCookieJar recognizes Netscape format
+        content = "# Netscape HTTP Cookie File\n" + content;
       }
 
       const tmpFile = path.join(os.tmpdir(), "yt-dlp-cookies.txt");

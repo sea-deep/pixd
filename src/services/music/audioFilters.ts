@@ -53,14 +53,6 @@ export const AUDIO_FILTERS: Record<AudioFilter, FilterDefinition> = {
       "asetrate=48000*1.18,aresample=48000,bass=g=4:f=100,treble=g=2:f=6000,dynaudnorm=f=150",
     ],
   },
-  phonk: {
-    name: "phonk",
-    label: "Phonk",
-    emoji: "",
-    description: "Brazilian funk / montagem remix: beat-aware tamborzão rhythm, ducked bass, and aggressive mastering.",
-    kind: "remix",
-    ffmpegArgs: null,
-  },
 };
 
 export function parseAudioFilter(raw: string | null | undefined): AudioFilter | null {
@@ -78,9 +70,6 @@ export function parseAudioFilter(raw: string | null | undefined): AudioFilter | 
   }
   if (["sped", "spedup", "speed", "speedup", "nightcore", "fast"].includes(norm)) {
     return "sped";
-  }
-  if (["phonk", "brazilian", "automotivo", "montagem", "brazilianphonk", "drift", "driftphonk", "memphis", "cowbell"].includes(norm)) {
-    return "phonk";
   }
 
   return null;

@@ -322,21 +322,35 @@ export async function reverseImageSearch(imageUrl: string, options: { limit?: nu
       if (imgRes.ok) {
         const buf = Buffer.from(await imgRes.arrayBuffer());
         const mimeType = imgRes.headers.get("content-type")?.split(";")[0] || "image/jpeg";
-        const res = await ai.models.generateContent({
-          model: env.GOOGLEAI_MODEL || "gemini-2.5-flash",
-          contents: [
-            {
-              role: "user",
-              parts: [
-                { inlineData: { mimeType, data: buf.toString("base64") } },
-                { text: "Identify the main subject in this image in 1 to 4 keywords suitable for a Google search query. Reply with ONLY the search keywords." },
+        const candidateModels = [
+          env.GOOGLEAI_MODEL || "gemini-2.5-flash",
+          "gemini-flash-latest",
+          "gemini-3.5-flash",
+          "gemini-flash-lite-latest",
+        ];
+
+        for (const model of candidateModels) {
+          try {
+            const res = await ai.models.generateContent({
+              model,
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    { inlineData: { mimeType, data: buf.toString("base64") } },
+                    { text: "Identify the main subject in this image in 1 to 4 keywords suitable for a Google search query. Reply with ONLY the search keywords." },
+                  ],
+                },
               ],
-            },
-          ],
-        });
-        const detected = res.text?.trim();
-        if (detected && detected.length < 100) {
-          query = detected;
+            });
+            const detected = res.text?.trim();
+            if (detected && detected.length < 100) {
+              query = detected;
+              break;
+            }
+          } catch {
+            // Attempt next fallback model
+          }
         }
       }
     } catch {

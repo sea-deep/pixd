@@ -21,9 +21,9 @@ export function commandInput(ctx: CommandContext) {
   const text = source
     ? ctx.args.join(" ")
     : [
-        ctx.options.getString("arguments") ??
+        ctx.options.getString("text") ??
+          ctx.options.getString("arguments") ??
           ctx.options.getString("caption") ??
-          ctx.options.getString("text") ??
           "",
         ...users.map((user) => `<@${user.id}>`),
       ]

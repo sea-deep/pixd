@@ -1,5 +1,6 @@
 import { youtubeDl } from "youtube-dl-exec";
 import config from "../../../Configs/config.js";
+import { env } from "../../utilities/env.js";
 import { getCookiesPath } from "../../helpers/cookieHelper.js";
 import Logger from "../../helpers/Logger.js";
 import type { MusicSource, MusicTrack, ResolveResult } from "./types.js";
@@ -83,10 +84,12 @@ export default class YtDlpResolver {
       dumpSingleJson: true,
       skipDownload: true,
       noWarnings: true,
-      extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
+      jsRuntimes: "node",
       playlistEnd: config.music.maxPlaylistSize,
       socketTimeout: 20,
-      ...(cookiesPath ? { cookies: cookiesPath } : {}),
+      ...(cookiesPath
+        ? { cookies: cookiesPath }
+        : { extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage" }),
     };
 
     let payload: YtDlpEntry;
@@ -97,9 +100,26 @@ export default class YtDlpResolver {
       ) as YtDlpEntry;
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      // If YouTube URL fails with bot verification and we can extract the title from oEmbed or URL
-      if (/Sign in to confirm you're not a bot|bot.*authentication/i.test(errMsg) && /youtube\.com|youtu\.be/i.test(url)) {
-        Logger.warn(`YouTube bot check triggered for URL ${url}. Attempting title fallback.`);
+      // If YouTube URL fails with bot verification and we can extract the title from oEmbed
+      if (/Sign in to confirm you're not a bot|bot.*authentication|HTTP Error 403/i.test(errMsg) && /youtube\.com|youtu\.be/i.test(url)) {
+        Logger.warn(`YouTube bot check triggered for URL ${url}. Attempting oEmbed title fallback.`);
+        try {
+          const oEmbedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+          const resp = await fetch(oEmbedUrl, { signal: AbortSignal.timeout(5000) });
+          if (resp.ok) {
+            const data = await resp.json() as { title?: string; author_name?: string };
+            if (data.title) {
+              const query = `${data.title} ${data.author_name || ""}`.trim();
+              Logger.info(`Successfully recovered YouTube URL title "${data.title}". Falling back to multi-source search.`);
+              const fallbackRes = await this.resolveTrackSearch(query, requesterId, "auto");
+              if (fallbackRes.tracks.length > 0) {
+                return fallbackRes;
+              }
+            }
+          }
+        } catch (fallbackErr) {
+          Logger.warn("Failed to recover title via YouTube oEmbed", fallbackErr);
+        }
       }
       throw err;
     }
@@ -118,7 +138,11 @@ export default class YtDlpResolver {
       dumpSingleJson: true,
       skipDownload: true,
       noWarnings: true,
+      jsRuntimes: "node",
       socketTimeout: 20,
+      ...(cookiesPath
+        ? { cookies: cookiesPath }
+        : { extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage" }),
     };
 
     // 1. Explicit SoundCloud search
@@ -139,28 +163,29 @@ export default class YtDlpResolver {
       return this.resolveUrl(bandcampUrl, requesterId);
     }
 
-    // 3. YouTube search (explicit or auto)
+    // 3. YouTube search (explicit)
     if (source === "youtube") {
+      const fastApiResult = await this.resolveYouTubeDataApi(query, requesterId);
+      if (fastApiResult && fastApiResult.tracks.length > 0) {
+        return fastApiResult;
+      }
       const payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
         `ytsearch1:${query}`,
-        {
-          ...defaultOptions,
-          extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
-          ...(cookiesPath ? { cookies: cookiesPath } : {}),
-        },
+        defaultOptions,
       ) as YtDlpEntry;
       return this.processEntries(payload, requesterId, false, "youtube");
     }
 
-    // 4. "auto" Mode: Try YouTube first -> fallback to SoundCloud -> fallback to Bandcamp
+    // 4. "auto" Mode: Fast YouTube API -> yt-dlp YouTube -> SoundCloud -> Bandcamp
+    const fastApiResult = await this.resolveYouTubeDataApi(query, requesterId);
+    if (fastApiResult && fastApiResult.tracks.length > 0) {
+      return fastApiResult;
+    }
+
     try {
       const payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
         `ytsearch1:${query}`,
-        {
-          ...defaultOptions,
-          extractorArgs: "youtube:player_client=ios,android,mweb;player_skip=webpage",
-          ...(cookiesPath ? { cookies: cookiesPath } : {}),
-        },
+        defaultOptions,
       ) as YtDlpEntry;
 
       const result = this.processEntries(payload, requesterId, false, "youtube");
@@ -199,6 +224,78 @@ export default class YtDlpResolver {
     }
 
     throw new Error(`No playable tracks were found across YouTube, SoundCloud, or Bandcamp for "${query}".`);
+  }
+
+  private async resolveYouTubeDataApi(query: string, requesterId: string): Promise<ResolveResult | null> {
+    if (env.ENVIRONMENT === "test") return null;
+    const apiKey = env.YT_API_KEY || env.YOUTUBE_API_KEY;
+    if (!apiKey) return null;
+
+    try {
+      const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=${encodeURIComponent(query)}&key=${apiKey}`;
+      const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+      if (!searchRes.ok) {
+        Logger.warn(`YouTube Data API search returned HTTP ${searchRes.status}`);
+        return null;
+      }
+      const searchData = await searchRes.json() as {
+        items?: Array<{
+          id?: { videoId?: string };
+          snippet?: {
+            title?: string;
+            channelTitle?: string;
+            thumbnails?: { high?: { url?: string }; default?: { url?: string } };
+          };
+        }>;
+      };
+
+      const item = searchData.items?.[0];
+      const videoId = item?.id?.videoId;
+      if (!videoId) return null;
+
+      let durationMs = 0;
+      try {
+        const videoUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${apiKey}`;
+        const videoRes = await fetch(videoUrl, { signal: AbortSignal.timeout(4000) });
+        if (videoRes.ok) {
+          const videoData = await videoRes.json() as {
+            items?: Array<{ contentDetails?: { duration?: string } }>;
+          };
+          const isoDuration = videoData.items?.[0]?.contentDetails?.duration;
+          if (isoDuration) {
+            durationMs = this.parseIsoDuration(isoDuration);
+          }
+        }
+      } catch { }
+
+      const track: MusicTrack = {
+        id: videoId,
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+        title: item.snippet?.title || "Unknown Title",
+        author: item.snippet?.channelTitle || "YouTube",
+        durationMs,
+        thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url,
+        requesterId,
+        source: "youtube",
+      };
+
+      return {
+        tracks: [track],
+        source: "youtube",
+      };
+    } catch (err) {
+      Logger.warn("YouTube Data API lookup failed; falling back to yt-dlp", err);
+      return null;
+    }
+  }
+
+  private parseIsoDuration(iso: string): number {
+    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
+    const hours = parseInt(match[1] || "0", 10);
+    const minutes = parseInt(match[2] || "0", 10);
+    const seconds = parseInt(match[3] || "0", 10);
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
   }
 
   /**

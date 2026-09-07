@@ -8,7 +8,7 @@ export default new HybridCommand({
   name: "filter",
   description: "Set or view audio filters.",
   aliases: ["filters", "fx", "fitler"],
-  usage: "[bassboost | slowed | sped | phonk | off]",
+  usage: "[bassboost | slowed | sped | off]",
   guildOnly: true,
   options: [{
     type: ApplicationCommandOptionType.String,
@@ -20,7 +20,6 @@ export default new HybridCommand({
       { name: "Bass Boost", value: "bassboost" },
       { name: "Slowed + Reverb", value: "slowed" },
       { name: "Sped Up", value: "sped" },
-      { name: "Phonk", value: "phonk" },
     ],
   }],
   execute: (context) => replyWithError(context, async () => {
@@ -36,7 +35,7 @@ export default new HybridCommand({
         "**Audio Filters**",
         `Active: **${currentDef.label}**`,
         "",
-        "Available: `bassboost`, `slowed`, `sped`, `phonk`, `off`",
+        "Available: `bassboost`, `slowed`, `sped`, `off`",
         "Usage: `p!filter <name>`",
       ];
       return context.reply({ content: lines.join("\n") });
@@ -45,7 +44,7 @@ export default new HybridCommand({
     const targetFilter = parseAudioFilter(rawInput);
     if (!targetFilter) {
       throw new Error(
-        `Unknown filter \`${rawInput}\`. Available: \`bassboost\`, \`slowed\`, \`sped\`, \`phonk\`, \`off\`.`
+        `Unknown filter \`${rawInput}\`. Available: \`bassboost\`, \`slowed\`, \`sped\`, \`off\`.`
       );
     }
 

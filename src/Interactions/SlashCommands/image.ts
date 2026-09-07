@@ -85,11 +85,6 @@ const imageCommand = new SlashCommand({
             name: "image4",
             description: "Fourth image or attachment.",
           },
-          {
-            type: 3,
-            name: "arguments",
-            description: "Text, links, or emojis.",
-          },
         ],
       },
       {

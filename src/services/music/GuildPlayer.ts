@@ -22,7 +22,6 @@ import Logger from "../../helpers/Logger.js";
 import type { AudioFilter, LoopMode, MusicTrack } from "./types.js";
 import { AUDIO_FILTERS } from "./audioFilters.js";
 import LastFmService from "../lastfm/LastFmService.js";
-import remixService from "./remix/RemixService.js";
 import YtDlpResolver from "./YtDlpResolver.js";
 
 const resolver = new YtDlpResolver();
@@ -163,58 +162,6 @@ export default class GuildPlayer {
     this.filter = newFilter;
     if (!this.current || this.destroyed) return true;
 
-    if (newFilter === "phonk") {
-      const track = this.current;
-      const cached = remixService.getRemixPath(track.id);
-      if (cached) {
-        const currentPos = this.getCurrentPositionMs();
-        this.isRestartingStream = true;
-        this.clearInactivityTimer();
-        try {
-          this.killProcess();
-          this.startAtMs = currentPos;
-          await this.startCurrent(true);
-        } catch (err) {
-          Logger.error("Failed to apply remixed audio", err);
-          this.isRestartingStream = false;
-          await this.advanceTrack();
-        } finally {
-          this.isRestartingStream = false;
-        }
-        return true;
-      }
-
-      void this.announce(`⏳ Preparing Brazilian funk remix for **${track.title}** in the background...`);
-      void (async () => {
-        try {
-          await remixService.requestRemix(track);
-          if (this.destroyed || this.current?.id !== track.id || this.filter !== "phonk") {
-            return;
-          }
-          const currentPos = this.getCurrentPositionMs();
-          this.isRestartingStream = true;
-          this.clearInactivityTimer();
-          try {
-            this.killProcess();
-            this.startAtMs = currentPos;
-            await this.startCurrent(true);
-            const hash = remixService.getCanonicalHash(track.id);
-            const link = `\n-# 🔗 [Download / Listen to Remix WAV](${env.PUBLIC_BASE_URL}/remix/${hash})`;
-            await this.announce(`🔥 Applied Brazilian funk remix to **${track.title}**!${link}`);
-          } finally {
-            this.isRestartingStream = false;
-          }
-        } catch (err) {
-          Logger.error(`Failed to generate remix for ${track.title}`, err);
-          if (!this.destroyed && this.current?.id === track.id) {
-            await this.announce(`⚠️ Could not prepare Brazilian funk remix for **${track.title}**.`);
-            this.filter = "off";
-          }
-        }
-      })();
-      return true;
-    }
-
     const currentPos = this.getCurrentPositionMs();
     this.isRestartingStream = true;
     this.clearInactivityTimer();
@@ -329,131 +276,102 @@ export default class GuildPlayer {
     this.killProcess();
 
     const generation = ++this.streamGeneration;
-    const remixPath = this.filter === "phonk" ? remixService.getRemixPath(track.id) : null;
-    let audioStream: Readable;
-    let inputType: StreamType;
+    const cookiesPath = getCookiesPath();
+    const args = [
+      track.url,
+      "--format", "bestaudio[protocol^=http]/bestaudio/best",
+      "--hls-prefer-native",
+      "--downloader", "m3u8:native",
+      "--output", "-",
+      "--no-playlist",
+      "--no-progress",
+      "--no-warnings",
+      "--no-part",
+      "--paths", "temp:/tmp",
+      "--quiet",
+      "--js-runtimes", "node",
+    ];
+    if (cookiesPath) {
+      args.push("--cookies", cookiesPath);
+    } else {
+      args.push("--extractor-args", "youtube:player_client=ios,android,mweb;player_skip=webpage");
+    }
+    if (this.startAtMs > 0) {
+      args.push("--download-sections", `*${this.startAtMs / 1000}-inf`, "--force-keyframes-at-cuts");
+    }
 
-    if (remixPath) {
-      const ffmpegArgs: string[] = [];
-      if (this.startAtMs > 0) {
-        ffmpegArgs.push("-ss", `${this.startAtMs / 1000}`);
+    const executable = (youtubeDl as typeof youtubeDl & {
+      constants: { YOUTUBE_DL_PATH: string };
+    }).constants.YOUTUBE_DL_PATH;
+    const child = spawn(executable, args, { cwd: "/tmp", stdio: ["ignore", "pipe", "pipe"] });
+    this.process = child;
+    let stderr = "";
+    child.stderr.on("data", (chunk) => {
+      if (stderr.length < 8_000) stderr += String(chunk);
+    });
+    child.once("error", (error) => {
+      if (this.streamGeneration === generation && !this.destroyed) {
+        Logger.error(`yt-dlp failed to start for ${track.url}`, error);
       }
-      ffmpegArgs.push(
-        "-i", remixPath,
+    });
+    child.once("close", async (code) => {
+      if (code && code !== 0 && this.streamGeneration === generation && !this.destroyed) {
+        Logger.error(`yt-dlp exited with code ${code}: ${stderr.trim()}`);
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Idle && !this.isRestartingStream && !this.isTransitioning) {
+          // Live playback fallback: If YouTube stream failed and we haven't attempted a fallback yet
+          const isYouTube = /youtube\.com|youtu\.be/i.test(track.url) || track.source === "youtube";
+          if (isYouTube && !track.fallbackUrl) {
+            try {
+              Logger.info(`Attempting live SoundCloud fallback for blocked YouTube track: ${track.title}`);
+              const fallback = await resolver.findSoundCloudFallback(track.title, track.author, track.requesterId);
+              if (fallback && this.streamGeneration === generation && !this.destroyed) {
+                track.fallbackUrl = track.url;
+                track.url = fallback.url;
+                track.source = "soundcloud";
+                void this.announce(`🔄 YouTube stream was blocked; seamlessly switched to SoundCloud for **${track.title}**.`);
+                await this.startCurrent();
+                return;
+              }
+            } catch (fallbackError) {
+              Logger.error("SoundCloud live fallback failed", fallbackError);
+            }
+          }
+          void this.announce(`⚠️ Stream error: ${stderr.trim() || `Exit code ${code}`}`);
+          void this.advanceTrack();
+        }
+      }
+    });
+
+    let audioStream: Readable = child.stdout as Readable;
+    let inputType: StreamType = StreamType.Arbitrary;
+
+    const filterDef = AUDIO_FILTERS[this.filter];
+    if (filterDef?.ffmpegArgs) {
+      const ffmpegArgs = [
+        "-i", "pipe:0",
+        ...filterDef.ffmpegArgs,
         "-f", "s16le",
         "-ar", "48000",
         "-ac", "2",
         "pipe:1",
-      );
-      const child = spawn("ffmpeg", ffmpegArgs, { stdio: ["ignore", "pipe", "pipe"] });
-      this.process = child;
-      child.once("error", (error) => {
-        if (this.streamGeneration === generation && !this.destroyed) {
-          Logger.error(`FFmpeg failed for remixed audio ${remixPath}`, error);
-        }
-      });
-      child.once("close", (code) => {
-        if (code && code !== 0 && this.streamGeneration === generation && !this.destroyed) {
-          Logger.error(`FFmpeg remix process exited with code ${code}`);
-          if (this.audioPlayer.state.status === AudioPlayerStatus.Idle && !this.isRestartingStream && !this.isTransitioning) {
-            void this.advanceTrack();
-          }
-        }
-      });
-      audioStream = child.stdout as Readable;
-      inputType = StreamType.Raw;
-    } else {
-      const cookiesPath = getCookiesPath();
-      const args = [
-        track.url,
-        "--format", "bestaudio/best",
-        "--output", "-",
-        "--no-playlist",
-        "--no-progress",
-        "--no-warnings",
-        "--no-part",
-        "--paths", "temp:/tmp",
-        "--quiet",
-        "--extractor-args", "youtube:player_client=ios,android,mweb;player_skip=webpage",
       ];
-      if (cookiesPath) args.push("--cookies", cookiesPath);
-      if (this.startAtMs > 0) {
-        args.push("--download-sections", `*${this.startAtMs / 1000}-inf`, "--force-keyframes-at-cuts");
-      }
+      const ffmpegChild = spawn("ffmpeg", ffmpegArgs, { stdio: ["pipe", "pipe", "pipe"] });
+      this.filterProcess = ffmpegChild;
 
-      const executable = (youtubeDl as typeof youtubeDl & {
-        constants: { YOUTUBE_DL_PATH: string };
-      }).constants.YOUTUBE_DL_PATH;
-      const child = spawn(executable, args, { cwd: "/tmp", stdio: ["ignore", "pipe", "pipe"] });
-      this.process = child;
-      let stderr = "";
-      child.stderr.on("data", (chunk) => {
-        if (stderr.length < 8_000) stderr += String(chunk);
-      });
-      child.once("error", (error) => {
+      child.stdout?.pipe(ffmpegChild.stdin);
+      child.stdout?.on("error", () => {});
+      ffmpegChild.stdin?.on("error", () => {});
+      ffmpegChild.stdout?.on("error", () => {});
+
+      ffmpegChild.once("error", (err) => {
         if (this.streamGeneration === generation && !this.destroyed) {
-          Logger.error(`yt-dlp failed to start for ${track.url}`, error);
+          Logger.error("FFmpeg filter process error", err);
         }
       });
-      child.once("close", async (code) => {
-        if (code && code !== 0 && this.streamGeneration === generation && !this.destroyed) {
-          Logger.error(`yt-dlp exited with code ${code}: ${stderr.trim()}`);
-          if (this.audioPlayer.state.status === AudioPlayerStatus.Idle && !this.isRestartingStream && !this.isTransitioning) {
-            // Live playback fallback: If YouTube stream failed and we haven't attempted a fallback yet
-            const isYouTube = /youtube\.com|youtu\.be/i.test(track.url) || track.source === "youtube";
-            if (isYouTube && !track.fallbackUrl) {
-              try {
-                Logger.info(`Attempting live SoundCloud fallback for blocked YouTube track: ${track.title}`);
-                const fallback = await resolver.findSoundCloudFallback(track.title, track.author, track.requesterId);
-                if (fallback && this.streamGeneration === generation && !this.destroyed) {
-                  track.fallbackUrl = track.url;
-                  track.url = fallback.url;
-                  track.source = "soundcloud";
-                  void this.announce(`🔄 YouTube stream was blocked; seamlessly switched to SoundCloud for **${track.title}**.`);
-                  await this.startCurrent();
-                  return;
-                }
-              } catch (fallbackError) {
-                Logger.error("SoundCloud live fallback failed", fallbackError);
-              }
-            }
-            void this.announce(`⚠️ Stream error: ${stderr.trim() || `Exit code ${code}`}`);
-            void this.advanceTrack();
-          }
-        }
-      });
+      ffmpegChild.stderr?.on("data", () => {});
 
-      audioStream = child.stdout as Readable;
-      inputType = StreamType.Arbitrary;
-
-      const filterDef = AUDIO_FILTERS[this.filter];
-      if (filterDef?.ffmpegArgs) {
-        const ffmpegArgs = [
-          "-i", "pipe:0",
-          ...filterDef.ffmpegArgs,
-          "-f", "s16le",
-          "-ar", "48000",
-          "-ac", "2",
-          "pipe:1",
-        ];
-        const ffmpegChild = spawn("ffmpeg", ffmpegArgs, { stdio: ["pipe", "pipe", "pipe"] });
-        this.filterProcess = ffmpegChild;
-
-        child.stdout?.pipe(ffmpegChild.stdin);
-        child.stdout?.on("error", () => {});
-        ffmpegChild.stdin?.on("error", () => {});
-        ffmpegChild.stdout?.on("error", () => {});
-
-        ffmpegChild.once("error", (err) => {
-          if (this.streamGeneration === generation && !this.destroyed) {
-            Logger.error("FFmpeg filter process error", err);
-          }
-        });
-        ffmpegChild.stderr?.on("data", () => {});
-
-        audioStream = ffmpegChild.stdout as Readable;
-        inputType = StreamType.Raw;
-      }
+      audioStream = ffmpegChild.stdout as Readable;
+      inputType = StreamType.Raw;
     }
 
     const resource = createAudioResource(audioStream, {

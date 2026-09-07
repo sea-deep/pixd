@@ -35,33 +35,25 @@ describe("Audio Filters Service", () => {
         expect(parseAudioFilter(val)).toBe("sped");
       }
     });
-
-    it("parses phonk synonyms", () => {
-      for (const val of ["phonk", "brazilian", "automotivo", "montagem", "drift", "PHONK"]) {
-        expect(parseAudioFilter(val)).toBe("phonk");
-      }
-    });
   });
 
   describe("AUDIO_FILTERS presets", () => {
-    it("has all 5 presets defined with valid kind and configuration", () => {
-      const keys = ["off", "bassboost", "slowed", "sped", "phonk"] as const;
+    it("has all 4 presets defined with valid kind and configuration", () => {
+      const keys = ["off", "bassboost", "slowed", "sped"] as const;
       for (const key of keys) {
         const def = AUDIO_FILTERS[key];
         expect(def).toBeDefined();
         expect(def.name).toBe(key);
         expect(def.label).toBeTruthy();
-        expect(["live-filter", "remix"]).toContain(def.kind);
-        if (key === "off" || key === "phonk") {
+        expect(def.kind).toBe("live-filter");
+        if (key === "off") {
           expect(def.ffmpegArgs).toBeNull();
         } else {
-          expect(def.kind).toBe("live-filter");
           expect(def.ffmpegArgs).toBeInstanceOf(Array);
           expect(def.ffmpegArgs![0]).toBe("-af");
           expect(def.ffmpegArgs![1]).toBeTruthy();
         }
       }
-      expect(AUDIO_FILTERS.phonk.kind).toBe("remix");
     });
   });
 
@@ -77,7 +69,7 @@ describe("Audio Filters Service", () => {
         raw: {
           client: {
             music: new Map([
-              ["guild123", { filter: "phonk" }],
+              ["guild123", { filter: "bassboost" }],
             ]),
           },
         },
@@ -91,12 +83,12 @@ describe("Audio Filters Service", () => {
 
       expect(mockContext.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringContaining("Active: **Phonk**"),
+          content: expect.stringContaining("Active: **Bass Boost**"),
         })
       );
       expect(mockContext.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringContaining("`bassboost`, `slowed`, `sped`, `phonk`, `off`"),
+          content: expect.stringContaining("`bassboost`, `slowed`, `sped`, `off`"),
         })
       );
     });

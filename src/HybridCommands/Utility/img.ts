@@ -11,6 +11,7 @@ export default new HybridCommand({
   aliases: ["image", "mg"],
   usage: "<query>",
   guildOnly: true,
+  cooldown: 3_000,
   options: [{
     type: ApplicationCommandOptionType.String,
     name: "query",
