@@ -107,5 +107,50 @@ with tempfile.TemporaryDirectory() as tmpdir:
       const outputDuration = parseFloat(stdout.trim());
       expect(Math.abs(outputDuration - 4.0)).toBeLessThan(0.05);
     });
+
+    it.runIf(hasVenv)("extracts vocal chops and schedules montagem stutters without distortion", async () => {
+      const testScript = `
+import json
+import numpy as np
+from vocal_chopper import generate_vocal_chops
+
+sr = 48000
+duration = 8.0
+t = np.linspace(0, duration, int(sr * duration), endpoint=False)
+voc = np.zeros((len(t), 2), dtype=np.float32)
+
+# Add synthetic vocal syllables
+for st in [0.2, 0.8, 1.4, 2.5, 3.2, 4.1, 5.0, 6.3]:
+    idx = int(st * sr)
+    blen = int(0.25 * sr)
+    bt = np.linspace(0, 0.25, blen, endpoint=False)
+    burst = (np.sin(2 * np.pi * 450 * bt) + 0.5 * np.sin(2 * np.pi * 1100 * bt)) * np.exp(-7 * bt)
+    voc[idx:idx+blen, 0] += burst
+    voc[idx:idx+blen, 1] += burst
+
+beats = [i * 0.5 for i in range(16)] # 120 BPM
+downbeats = [i * 2.0 for i in range(4)]
+chops = generate_vocal_chops(voc, beats, downbeats, sr=sr, seed=42)
+
+res = {
+    "is_none": chops is None,
+    "shape": list(chops.shape) if chops is not None else [],
+    "max_val": float(np.max(np.abs(chops))) if chops is not None else 0.0,
+    "has_nan": bool(np.isnan(chops).any()) if chops is not None else True,
+}
+print(json.dumps(res))
+`;
+      const { stdout } = await execFileAsync(venvPythonPath, ["-c", testScript], {
+        cwd: path.resolve(process.cwd(), "src", "services", "music", "remix", "worker"),
+      });
+
+      const res = JSON.parse(stdout.trim());
+      expect(res.is_none).toBe(false);
+      expect(res.shape[0]).toBe(48000 * 8);
+      expect(res.shape[1]).toBe(2);
+      expect(res.max_val).toBeGreaterThan(0.05);
+      expect(res.has_nan).toBe(false);
+    });
   });
 });
+

@@ -67,6 +67,9 @@ def run_pipeline(
         output_path=output_path,
         target_sr=48000,
         expected_duration=duration,
+        beats=beats,
+        downbeats=downbeats,
+        seed=seed,
     )
     timings["render_sec"] = round(time.time() - t0, 2)
     timings["total_sec"] = round(time.time() - start_time, 2)

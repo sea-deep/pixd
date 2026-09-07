@@ -108,6 +108,9 @@ def render_brazilian_remix(
     output_path: str,
     target_sr: int = 48000,
     expected_duration: float = None,
+    beats: List[float] = None,
+    downbeats: List[float] = None,
+    seed: int = 42,
 ) -> str:
     """
     Renders the complete Brazilian funk / montagem remix:
@@ -115,8 +118,9 @@ def render_brazilian_remix(
     2. Renders new Brazilian funk drum events.
     3. Sidechains bass against replacement kick.
     4. Attenuates original drum kicks.
-    5. Masters with soft-clipping and peak limiting.
-    6. Verifies exact duration match.
+    5. Generates syncopated vocal chops and turnaround stutters.
+    6. Masters with soft-clipping and peak limiting.
+    7. Verifies exact duration match.
     """
     # Load all stems
     stems = {}
@@ -166,13 +170,25 @@ def render_brazilian_remix(
     vocals = stems["vocals"]
     other = stems["other"]
 
+    # Generate vocal chops if beat grid is provided
+    vocal_chops = None
+    if beats is not None and downbeats is not None:
+        try:
+            from vocal_chopper import generate_vocal_chops
+            vocal_chops = generate_vocal_chops(vocals, beats, downbeats, sr=target_sr, seed=seed)
+        except Exception:
+            vocal_chops = None
+
+    chop_layer = (vocal_chops * 0.90) if vocal_chops is not None else 0.0
+
     # Sum stems
-    # automotivo balance: loud punchy kick & clap, heavy sub bass, forward vocals
+    # automotivo balance: loud punchy kick & clap, heavy sub bass, forward vocals & chops
     mix = (
         (processed_orig_drums * 0.35) +
         (brazilian_drums * 1.10) +
         (ducked_bass * 1.20) +
         (vocals * 1.00) +
+        chop_layer +
         (other * 0.85)
     )
 
