@@ -1,27 +1,19 @@
-import { ApplicationCommandOptionType } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
 import { replyWithError, requirePlayer } from "../../services/music/commandHelpers.js";
-import type { LoopMode } from "../../services/music/types.js";
 
 export default new HybridCommand({
   name: "loop",
-  description: "Set the music loop mode.",
+  description: "Toggle looping the current track on or off.",
+  aliases: ["repeat", "l"],
   guildOnly: true,
-  options: [{
-    type: ApplicationCommandOptionType.String,
-    name: "mode",
-    description: "Loop mode",
-    required: true,
-    choices: [
-      { name: "Off", value: "off" },
-      { name: "Current track", value: "track" },
-      { name: "Entire queue", value: "queue" },
-    ],
-  }],
   execute: (context) => replyWithError(context, () => {
-    const mode = context.options.getString("mode", true) as LoopMode;
-    if (!["off", "track", "queue"].includes(mode)) throw new Error("Mode must be off, track, or queue.");
-    requirePlayer(context).setLoopMode(mode);
-    return context.reply(`🔁 Loop mode set to **${mode}**.`);
+    const player = requirePlayer(context);
+    const enabled = player.loopMode === "off";
+    player.setLoopMode(enabled ? "track" : "off");
+    return context.reply(
+      enabled
+        ? "🔂 Looping is now **enabled** for the current track."
+        : "➡️ Looping is now **disabled**."
+    );
   }),
 });
