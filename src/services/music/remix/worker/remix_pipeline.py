@@ -46,6 +46,7 @@ def run_pipeline(
     beats = analysis["beats"]
     downbeats = analysis["downbeats"]
     duration = analysis["duration"]
+    root_key = analysis.get("root_key", 5)
 
     # 2. Stem Separation (Demucs)
     t0 = time.time()
@@ -69,6 +70,7 @@ def run_pipeline(
         expected_duration=duration,
         beats=beats,
         downbeats=downbeats,
+        root_key=root_key,
         seed=seed,
     )
     timings["render_sec"] = round(time.time() - t0, 2)
@@ -81,6 +83,7 @@ def run_pipeline(
         "track_id": track_id,
         "bpm": bpm,
         "duration": duration,
+        "root_key": root_key,
         "event_count": len(events),
         "output_path": output_path,
         "output_size_mb": output_size_mb,

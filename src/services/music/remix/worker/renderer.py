@@ -129,6 +129,7 @@ def render_brazilian_remix(
     expected_duration: float = None,
     beats: List[float] = None,
     downbeats: List[float] = None,
+    root_key: int = 5,
     seed: int = 42,
 ) -> str:
     """
@@ -137,9 +138,10 @@ def render_brazilian_remix(
     2. Renders new Brazilian funk drum events.
     3. Sidechains bass against replacement kick.
     4. Attenuates original drum kicks.
-    5. Generates syncopated vocal chops and turnaround stutters.
-    6. Masters with soft-clipping and peak limiting.
-    7. Verifies exact duration match.
+    5. Synthesizes gritty minor/phrygian Brazilian phonk lead synth track.
+    6. Generates syncopated vocal chops and turnaround stutters.
+    7. Masters with soft-clipping and peak limiting.
+    8. Verifies exact duration match.
     """
     # Load all stems
     stems = {}
@@ -198,15 +200,41 @@ def render_brazilian_remix(
 
     chop_layer = (vocal_chops * 0.90) if vocal_chops is not None else 0.0
 
+    # Render Brazilian Phonk lead synth track synchronized to bars
+    bars: List[Tuple[float, float]] = []
+    if downbeats and len(downbeats) >= 2:
+        for i in range(len(downbeats) - 1):
+            bars.append((downbeats[i], downbeats[i + 1]))
+    elif beats and len(beats) >= 4:
+        for i in range(0, len(beats) - 4, 4):
+            bars.append((beats[i], beats[i + 4]))
+
+    lead_layer = 0.0
+    if bars:
+        try:
+            from lead_synth import render_phonk_lead_track
+            raw_lead = render_phonk_lead_track(
+                bars=bars,
+                root_idx=root_key,
+                total_samples=total_samples,
+                sr=target_sr,
+            )
+            # Sidechain lead against kick for pumping automotivo groove
+            ducked_lead = apply_kick_sidechain_to_bass(raw_lead, kick_times, target_sr)
+            lead_layer = ducked_lead * 0.70
+        except Exception:
+            lead_layer = 0.0
+
     # Sum stems
-    # automotivo balance: loud punchy kick & clap, heavy sub bass, forward vocals & chops
+    # automotivo balance: loud punchy kick & clap, heavy sub bass, forward vocals & chops, gritty lead synth
     mix = (
-        (processed_orig_drums * 0.35) +
-        (brazilian_drums * 1.10) +
-        (ducked_bass * 1.20) +
-        (vocals * 1.00) +
+        (processed_orig_drums * 0.30) +
+        (brazilian_drums * 1.15) +
+        (ducked_bass * 1.15) +
+        (vocals * 1.05) +
         chop_layer +
-        (other * 0.85)
+        lead_layer +
+        (other * 0.75)
     )
 
     # Mastering:
