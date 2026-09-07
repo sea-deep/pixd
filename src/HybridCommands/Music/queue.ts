@@ -18,7 +18,7 @@ export default new HybridCommand({
         upcoming.length ? `**Up next:**\n${upcoming.join("\n")}` : "*No queued tracks.*",
         remaining ? `\n…and ${remaining} more.` : "",
       ].join("\n"),
-      footer: { text: `Loop: ${player.loopMode} • ${player.queue.length} queued` },
+      footer: { text: `Loop: ${player.loopMode} • Filter: ${player.filter} • ${player.queue.length} queued` },
       color: client.color,
     }] });
   }),

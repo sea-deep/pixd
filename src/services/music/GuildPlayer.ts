@@ -19,7 +19,8 @@ import config from "../../../Configs/config.js";
 import { env } from "../../utilities/env.js";
 import { getCookiesPath } from "../../helpers/cookieHelper.js";
 import Logger from "../../helpers/Logger.js";
-import type { LoopMode, MusicTrack } from "./types.js";
+import type { AudioFilter, LoopMode, MusicTrack } from "./types.js";
+import { AUDIO_FILTERS } from "./audioFilters.js";
 import LastFmService from "../lastfm/LastFmService.js";
 
 export default class GuildPlayer {
@@ -31,9 +32,11 @@ export default class GuildPlayer {
   readonly connection: VoiceConnection;
   current: MusicTrack | null = null;
   loopMode: LoopMode = "off";
+  filter: AudioFilter = "off";
   volume: number = config.music.defaultVolume;
   private currentResource: AudioResource<MusicTrack> | null = null;
   private process: ChildProcess | null = null;
+  private filterProcess: ChildProcess | null = null;
   private inactivityTimer: NodeJS.Timeout | null = null;
   private destroyed = false;
   private advancing = false;
@@ -132,6 +135,23 @@ export default class GuildPlayer {
     this.loopMode = mode;
   }
 
+  getCurrentPositionMs(): number {
+    if (!this.current) return 0;
+    const base = this.startAtMs || 0;
+    const elapsed = this.activeStartedAt ? Date.now() - this.activeStartedAt : 0;
+    return base + this.playedMs + elapsed;
+  }
+
+  async setFilter(newFilter: AudioFilter): Promise<void> {
+    this.filter = newFilter;
+    if (this.current && this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
+      const currentPos = this.getCurrentPositionMs();
+      if (!this.current.durationMs || currentPos < this.current.durationMs - 2000) {
+        await this.seek(Math.max(0, currentPos));
+      }
+    }
+  }
+
   setVolume(volume: number): number {
     if (!Number.isFinite(volume) || volume < 0 || volume > config.music.maxVolume) {
       throw new Error(`Volume must be between 0 and ${config.music.maxVolume}%.`);
@@ -208,8 +228,33 @@ export default class GuildPlayer {
       }
     });
 
-    const resource = createAudioResource(child.stdout as Readable, {
-      inputType: StreamType.Arbitrary,
+    let audioStream: Readable = child.stdout as Readable;
+    let inputType: StreamType = StreamType.Arbitrary;
+
+    const filterDef = AUDIO_FILTERS[this.filter];
+    if (filterDef?.ffmpegArgs) {
+      const ffmpegArgs = [
+        "-i", "pipe:0",
+        ...filterDef.ffmpegArgs,
+        "-f", "s16le",
+        "-ar", "48000",
+        "-ac", "2",
+        "pipe:1",
+      ];
+      const ffmpegChild = spawn("ffmpeg", ffmpegArgs, { stdio: ["pipe", "pipe", "pipe"] });
+      this.filterProcess = ffmpegChild;
+
+      child.stdout?.pipe(ffmpegChild.stdin);
+
+      ffmpegChild.once("error", (err) => Logger.error("FFmpeg filter process error", err));
+      ffmpegChild.stderr?.on("data", () => {});
+
+      audioStream = ffmpegChild.stdout as Readable;
+      inputType = StreamType.Raw;
+    }
+
+    const resource = createAudioResource(audioStream, {
+      inputType,
       metadata: track,
       inlineVolume: true,
     });
@@ -282,6 +327,10 @@ export default class GuildPlayer {
     const child = this.process;
     this.process = null;
     if (child && child.exitCode === null && !child.killed) child.kill("SIGKILL");
+
+    const filterChild = this.filterProcess;
+    this.filterProcess = null;
+    if (filterChild && filterChild.exitCode === null && !filterChild.killed) filterChild.kill("SIGKILL");
   }
 
   private recordActivePlayback(): void {
