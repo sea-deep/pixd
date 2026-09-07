@@ -3,6 +3,9 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import { spawn } from "child_process";
 
+// Cap Sharp/libvips concurrency to 1 thread to reserve CPU for music streaming and voice UDP packets
+sharp.concurrency(1);
+
 export interface ImageMetadataInfo {
   isAnimated: boolean;
   format?: string;
@@ -179,8 +182,10 @@ export async function ensureSupportedImageBuffer(buffer: Buffer): Promise<Buffer
       try {
         return await new Promise<Buffer>((resolve, reject) => {
           const p = spawn("ffmpeg", [
+            "-threads", "1",
             "-i", "pipe:0",
             "-vf", "fps=20,scale=min(540\\,iw):-1:flags=fast_bilinear",
+            "-threads", "1",
             "-f", "gif",
             "pipe:1",
           ]);
@@ -318,6 +323,8 @@ export async function renderAnimatedGif(
       const frameDelay = delays[0];
       const gifBuffer = await new Promise<Buffer>((resolve, reject) => {
         const p = spawn("ffmpeg", [
+          "-threads",
+          "1",
           "-f",
           "rawvideo",
           "-vcodec",
@@ -332,6 +339,8 @@ export async function renderAnimatedGif(
           "-",
           "-filter_complex",
           "[0:v] split [a][b];[a] palettegen=stats_mode=full [p];[b][p] paletteuse=dither=bayer:bayer_scale=3",
+          "-threads",
+          "1",
           "-f",
           "gif",
           "-",

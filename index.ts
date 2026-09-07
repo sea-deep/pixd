@@ -3,11 +3,15 @@ import mongoose from "mongoose";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Server } from "node:http";
+import sharp from "sharp";
 import { env } from "./src/utilities/env.js";
 import Logger from "./src/helpers/Logger.js";
 import config from "./Configs/config.js";
 import { KeyValueStore, MongodbKeyValue, sleep } from "./src/helpers/helperUtil.js";
 import MusicManager from "./src/services/music/MusicManager.js";
+
+// Ensure image processing threads never starve voice UDP streaming
+sharp.concurrency(1);
 
 declare module "discord.js" {
   interface Client {
