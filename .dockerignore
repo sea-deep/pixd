@@ -9,3 +9,6 @@ tests
 coverage
 docker-compose.yml
 Dockerfile
+.venv
+.cache
+
