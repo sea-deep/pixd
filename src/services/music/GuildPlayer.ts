@@ -40,6 +40,7 @@ export default class GuildPlayer {
   private inactivityTimer: NodeJS.Timeout | null = null;
   private destroyed = false;
   private advancing = false;
+  private isFiltering = false;
   private startAtMs = 0;
   private playStartedAt = 0;
   private activeStartedAt = 0;
@@ -142,14 +143,23 @@ export default class GuildPlayer {
     return base + this.playedMs + elapsed;
   }
 
-  async setFilter(newFilter: AudioFilter): Promise<void> {
+  async setFilter(newFilter: AudioFilter): Promise<boolean> {
+    if (this.filter === newFilter) return false;
     this.filter = newFilter;
-    if (this.current && this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
-      const currentPos = this.getCurrentPositionMs();
-      if (!this.current.durationMs || currentPos < this.current.durationMs - 2000) {
-        await this.seek(Math.max(0, currentPos));
-      }
+    if (!this.current || this.destroyed) return true;
+
+    this.isFiltering = true;
+    this.clearInactivityTimer();
+    try {
+      this.killProcess();
+      this.startAtMs = 0;
+      await this.startCurrent(true);
+    } finally {
+      setTimeout(() => {
+        this.isFiltering = false;
+      }, 2500).unref();
     }
+    return true;
   }
 
   setVolume(volume: number): number {
@@ -245,6 +255,9 @@ export default class GuildPlayer {
       this.filterProcess = ffmpegChild;
 
       child.stdout?.pipe(ffmpegChild.stdin);
+      child.stdout?.on("error", () => {});
+      ffmpegChild.stdin?.on("error", () => {});
+      ffmpegChild.stdout?.on("error", () => {});
 
       ffmpegChild.once("error", (err) => Logger.error("FFmpeg filter process error", err));
       ffmpegChild.stderr?.on("data", () => {});
@@ -276,7 +289,7 @@ export default class GuildPlayer {
   }
 
   private async onIdle(): Promise<void> {
-    if (this.destroyed || this.advancing) return;
+    if (this.destroyed || this.advancing || this.isFiltering) return;
     const finished = this.current;
     const startedAt = this.playStartedAt;
     this.recordActivePlayback();

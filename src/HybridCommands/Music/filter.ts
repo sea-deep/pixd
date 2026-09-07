@@ -6,21 +6,21 @@ import type { AudioFilter } from "../../services/music/types.js";
 
 export default new HybridCommand({
   name: "filter",
-  description: "Set or view audio filters (bassboost, slowed, sped, phonk, off).",
+  description: "Set or view audio filters.",
   aliases: ["filters", "fx"],
   usage: "[bassboost | slowed | sped | phonk | off]",
   guildOnly: true,
   options: [{
     type: ApplicationCommandOptionType.String,
     name: "preset",
-    description: "Audio filter to apply (or leave empty to view active filter)",
+    description: "Filter to apply",
     required: false,
     choices: [
-      { name: "Off (Direct audio)", value: "off" },
-      { name: "Bass Boost (Heavy sub-bass)", value: "bassboost" },
-      { name: "Slowed + Reverb (Atmospheric)", value: "slowed" },
-      { name: "Sped Up (Nightcore lift)", value: "sped" },
-      { name: "Phonk (Drift 808 & cowbells)", value: "phonk" },
+      { name: "Off", value: "off" },
+      { name: "Bass Boost", value: "bassboost" },
+      { name: "Slowed + Reverb", value: "slowed" },
+      { name: "Sped Up", value: "sped" },
+      { name: "Phonk", value: "phonk" },
     ],
   }],
   execute: (context) => replyWithError(context, async () => {
@@ -33,16 +33,11 @@ export default new HybridCommand({
       const currentDef = AUDIO_FILTERS[currentFilter];
 
       const lines = [
-        "🎧 **Audio Filters**",
-        `Current filter: **${currentDef.label}** ${currentDef.emoji}`,
+        "**Audio Filters**",
+        `Active: **${currentDef.label}**`,
         "",
-        "• `off` ➡️ Original direct audio (no filter)",
-        "• `bassboost` 🔊 Deep 60-100Hz punchy sub-bass boost",
-        "• `slowed` 🌌 0.85x pitch drop with atmospheric multi-tap reverb",
-        "• `sped` ⚡ 1.20x nightcore tempo & pitch lift",
-        "• `phonk` 🚗💨 Distorted 808s, Memphis cowbells & dynamic pumping",
-        "",
-        "*Usage:* `p!filter <name>` or `/filter preset:<name>`",
+        "Available: `bassboost`, `slowed`, `sped`, `phonk`, `off`",
+        "Usage: `p!filter <name>`",
       ];
       return context.reply({ content: lines.join("\n") });
     }
@@ -50,20 +45,23 @@ export default new HybridCommand({
     const targetFilter = parseAudioFilter(rawInput);
     if (!targetFilter) {
       throw new Error(
-        `Unknown filter \`${rawInput}\`. Available filters: \`bassboost\`, \`slowed\`, \`sped\`, \`phonk\`, or \`off\`.`
+        `Unknown filter \`${rawInput}\`. Available: \`bassboost\`, \`slowed\`, \`sped\`, \`phonk\`, \`off\`.`
       );
     }
 
     const player = requirePlayer(context);
-    await player.setFilter(targetFilter);
     const def = AUDIO_FILTERS[targetFilter];
 
-    if (targetFilter === "off") {
-      return context.reply(`➡️ Audio filters **disabled** (reverting to normal audio).`);
+    if (player.filter === targetFilter) {
+      return context.reply(`Filter is already set to **${def.label}**.`);
     }
 
-    return context.reply(
-      `${def.emoji} Audio filter set to **${def.label}**${player.current ? " (applying live)" : ""}.`
-    );
+    await player.setFilter(targetFilter);
+
+    if (targetFilter === "off") {
+      return context.reply("Filter disabled.");
+    }
+
+    return context.reply(`Filter set to **${def.label}**.`);
   }),
 });

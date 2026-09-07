@@ -51,7 +51,6 @@ describe("Audio Filters Service", () => {
         expect(def).toBeDefined();
         expect(def.name).toBe(key);
         expect(def.label).toBeTruthy();
-        expect(def.emoji).toBeTruthy();
         if (key === "off") {
           expect(def.ffmpegArgs).toBeNull();
         } else {
@@ -89,17 +88,17 @@ describe("Audio Filters Service", () => {
 
       expect(mockContext.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringContaining("Current filter: **Phonk Remix** 🚗💨"),
+          content: expect.stringContaining("Active: **Phonk**"),
         })
       );
       expect(mockContext.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringContaining("• `bassboost`"),
+          content: expect.stringContaining("`bassboost`, `slowed`, `sped`, `phonk`, `off`"),
         })
       );
     });
 
-    it("sets filter and invokes player.setFilter when valid filter name is provided", async () => {
+    it("sets filter and invokes player.setFilter when new filter is provided", async () => {
       const mockPlayer = {
         voiceChannelId: "vc123",
         filter: "off",
@@ -124,12 +123,38 @@ describe("Audio Filters Service", () => {
       await (filterCommand as any).run(mockContext, {} as any);
 
       expect(mockPlayer.setFilter).toHaveBeenCalledWith("slowed");
-      expect(mockContext.reply).toHaveBeenCalledWith(
-        expect.stringContaining("🌌 Audio filter set to **Slowed + Reverb** (applying live)")
-      );
+      expect(mockContext.reply).toHaveBeenCalledWith("Filter set to **Slowed + Reverb**.");
     });
 
-    it("disables filters when 'off' is provided", async () => {
+    it("notifies cleanly when trying to set the same filter twice without reloading", async () => {
+      const mockPlayer = {
+        voiceChannelId: "vc123",
+        filter: "sped",
+        current: { title: "Track", author: "Artist" },
+        setFilter: vi.fn(),
+      };
+
+      const mockContext = {
+        guild: { id: "guild123" },
+        member: { voice: { channelId: "vc123" } },
+        raw: {
+          client: {
+            music: new Map([["guild123", mockPlayer]]),
+          },
+        },
+        options: {
+          getString: vi.fn().mockReturnValue("sped"),
+        },
+        reply: vi.fn(),
+      } as any;
+
+      await (filterCommand as any).run(mockContext, {} as any);
+
+      expect(mockPlayer.setFilter).not.toHaveBeenCalled();
+      expect(mockContext.reply).toHaveBeenCalledWith("Filter is already set to **Sped Up**.");
+    });
+
+    it("disables filters cleanly when 'off' is provided", async () => {
       const mockPlayer = {
         voiceChannelId: "vc123",
         filter: "bassboost",
@@ -154,9 +179,7 @@ describe("Audio Filters Service", () => {
       await (filterCommand as any).run(mockContext, {} as any);
 
       expect(mockPlayer.setFilter).toHaveBeenCalledWith("off");
-      expect(mockContext.reply).toHaveBeenCalledWith(
-        expect.stringContaining("➡️ Audio filters **disabled**")
-      );
+      expect(mockContext.reply).toHaveBeenCalledWith("Filter disabled.");
     });
 
     it("rejects unknown filter with helpful error message", async () => {
