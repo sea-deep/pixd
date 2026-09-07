@@ -20,4 +20,13 @@ export interface ResolveResult {
 
 export type LoopMode = "off" | "track" | "queue";
 
-export type AudioFilter = "off" | "bassboost" | "slowed" | "sped";
+export type AudioFilter =
+  | "off"
+  | "bassboost"
+  | "slowed"
+  | "sped"
+  | "nightcore"
+  | "vaporwave"
+  | "8d"
+  | "karaoke"
+  | "distorted";

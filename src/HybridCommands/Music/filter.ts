@@ -8,7 +8,7 @@ export default new HybridCommand({
   name: "filter",
   description: "Set or view audio filters.",
   aliases: ["filters", "fx", "fitler"],
-  usage: "[bassboost | slowed | sped | off]",
+  usage: "[bassboost | slowed | sped | nightcore | vaporwave | 8d | karaoke | distorted | off]",
   guildOnly: true,
   options: [{
     type: ApplicationCommandOptionType.String,
@@ -20,6 +20,11 @@ export default new HybridCommand({
       { name: "Bass Boost", value: "bassboost" },
       { name: "Slowed + Reverb", value: "slowed" },
       { name: "Sped Up", value: "sped" },
+      { name: "Nightcore", value: "nightcore" },
+      { name: "Vaporwave", value: "vaporwave" },
+      { name: "8D Audio", value: "8d" },
+      { name: "Karaoke", value: "karaoke" },
+      { name: "Distorted", value: "distorted" },
     ],
   }],
   execute: (context) => replyWithError(context, async () => {
@@ -35,7 +40,7 @@ export default new HybridCommand({
         "**Audio Filters**",
         `Active: **${currentDef.label}**`,
         "",
-        "Available: `bassboost`, `slowed`, `sped`, `off`",
+        "Available: `bassboost`, `slowed`, `sped`, `nightcore`, `vaporwave`, `8d`, `karaoke`, `distorted`, `off`",
         "Usage: `p!filter <name>`",
       ];
       return context.reply({ content: lines.join("\n") });
@@ -44,7 +49,7 @@ export default new HybridCommand({
     const targetFilter = parseAudioFilter(rawInput);
     if (!targetFilter) {
       throw new Error(
-        `Unknown filter \`${rawInput}\`. Available: \`bassboost\`, \`slowed\`, \`sped\`, \`off\`.`
+        `Unknown filter \`${rawInput}\`. Available: \`bassboost\`, \`slowed\`, \`sped\`, \`nightcore\`, \`vaporwave\`, \`8d\`, \`karaoke\`, \`distorted\`, \`off\`.`
       );
     }
 

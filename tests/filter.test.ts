@@ -31,15 +31,56 @@ describe("Audio Filters Service", () => {
     });
 
     it("parses sped synonyms", () => {
-      for (const val of ["sped", "spedup", "speed", "speedup", "nightcore", "fast", "SPED"]) {
+      for (const val of ["sped", "spedup", "speed", "speedup", "fast", "SPED"]) {
         expect(parseAudioFilter(val)).toBe("sped");
+      }
+    });
+
+    it("parses nightcore synonyms", () => {
+      for (const val of ["nightcore", "nc", "NIGHTCORE", " Nc "]) {
+        expect(parseAudioFilter(val)).toBe("nightcore");
+      }
+    });
+
+    it("parses vaporwave synonyms", () => {
+      for (const val of ["vaporwave", "vw", "vapor", "VAPORWAVE", " Vw "]) {
+        expect(parseAudioFilter(val)).toBe("vaporwave");
+      }
+    });
+
+    it("parses 8d synonyms", () => {
+      for (const val of ["8d", "8daudio", "pan", "autopan", "8D", " 8daudio "]) {
+        expect(parseAudioFilter(val)).toBe("8d");
+      }
+    });
+
+    it("parses karaoke synonyms", () => {
+      for (const val of ["karaoke", "vocal", "vocals", "instrumental", "removevocals", "KARAOKE"]) {
+        expect(parseAudioFilter(val)).toBe("karaoke");
+      }
+    });
+
+    it("parses distorted synonyms", () => {
+      for (const val of ["distorted", "distort", "distortion", "crush", "earrape", "DISTORTED"]) {
+        expect(parseAudioFilter(val)).toBe("distorted");
       }
     });
   });
 
   describe("AUDIO_FILTERS presets", () => {
-    it("has all 4 presets defined with valid kind and configuration", () => {
-      const keys = ["off", "bassboost", "slowed", "sped"] as const;
+    it("has all 9 presets defined with valid kind and configuration", () => {
+      const keys = [
+        "off",
+        "bassboost",
+        "slowed",
+        "sped",
+        "nightcore",
+        "vaporwave",
+        "8d",
+        "karaoke",
+        "distorted",
+      ] as const;
+
       for (const key of keys) {
         const def = AUDIO_FILTERS[key];
         expect(def).toBeDefined();
@@ -48,6 +89,11 @@ describe("Audio Filters Service", () => {
         expect(def.kind).toBe("live-filter");
         if (key === "off") {
           expect(def.ffmpegArgs).toBeNull();
+        } else if (key === "karaoke") {
+          expect(def.ffmpegArgs).toBeInstanceOf(Array);
+          expect(def.ffmpegArgs![0]).toBe("-filter_complex");
+          expect(def.ffmpegArgs![2]).toBe("-map");
+          expect(def.ffmpegArgs![3]).toBe("[out]");
         } else {
           expect(def.ffmpegArgs).toBeInstanceOf(Array);
           expect(def.ffmpegArgs![0]).toBe("-af");
@@ -88,7 +134,7 @@ describe("Audio Filters Service", () => {
       );
       expect(mockContext.reply).toHaveBeenCalledWith(
         expect.objectContaining({
-          content: expect.stringContaining("`bassboost`, `slowed`, `sped`, `off`"),
+          content: expect.stringContaining("`bassboost`, `slowed`, `sped`, `nightcore`, `vaporwave`, `8d`, `karaoke`, `distorted`, `off`"),
         })
       );
     });
@@ -110,21 +156,21 @@ describe("Audio Filters Service", () => {
           },
         },
         options: {
-          getString: vi.fn().mockReturnValue("slowed"),
+          getString: vi.fn().mockReturnValue("nightcore"),
         },
         reply: vi.fn(),
       } as any;
 
       await (filterCommand as any).run(mockContext, {} as any);
 
-      expect(mockPlayer.setFilter).toHaveBeenCalledWith("slowed");
-      expect(mockContext.reply).toHaveBeenCalledWith("Filter set to **Slowed + Reverb**.");
+      expect(mockPlayer.setFilter).toHaveBeenCalledWith("nightcore");
+      expect(mockContext.reply).toHaveBeenCalledWith("Filter set to **Nightcore**.");
     });
 
     it("notifies cleanly when trying to set the same filter twice without reloading", async () => {
       const mockPlayer = {
         voiceChannelId: "vc123",
-        filter: "sped",
+        filter: "8d",
         current: { title: "Track", author: "Artist" },
         setFilter: vi.fn(),
       };
@@ -138,7 +184,7 @@ describe("Audio Filters Service", () => {
           },
         },
         options: {
-          getString: vi.fn().mockReturnValue("sped"),
+          getString: vi.fn().mockReturnValue("8d"),
         },
         reply: vi.fn(),
       } as any;
@@ -146,13 +192,13 @@ describe("Audio Filters Service", () => {
       await (filterCommand as any).run(mockContext, {} as any);
 
       expect(mockPlayer.setFilter).not.toHaveBeenCalled();
-      expect(mockContext.reply).toHaveBeenCalledWith("Filter is already set to **Sped Up**.");
+      expect(mockContext.reply).toHaveBeenCalledWith("Filter is already set to **8D Audio**.");
     });
 
     it("disables filters cleanly when 'off' is provided", async () => {
       const mockPlayer = {
         voiceChannelId: "vc123",
-        filter: "bassboost",
+        filter: "distorted",
         current: null,
         setFilter: vi.fn(),
       };
