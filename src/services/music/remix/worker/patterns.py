@@ -66,6 +66,8 @@ TAMBORZAO_B: List[DrumHit] = [
     DrumHit(4.0, "hat", 0.6),
     DrumHit(8.0, "hat", 0.5),
     DrumHit(12.0, "hat", 0.6),
+    # Vocal accent
+    DrumHit(4.0, "vox_hey", 0.85),
 ]
 
 AUTOMOTIVO_HARD: List[DrumHit] = [
@@ -95,6 +97,9 @@ AUTOMOTIVO_HARD: List[DrumHit] = [
     DrumHit(11.0, "hat", 0.55),
     DrumHit(13.0, "hat", 0.55),
     DrumHit(15.0, "hat", 0.55),
+    # Vocal stabs
+    DrumHit(4.0, "vox_hey", 0.8),
+    DrumHit(12.0, "vox_hey", 0.85),
 ]
 
 DROP_HEAVY: List[DrumHit] = [
@@ -134,6 +139,7 @@ FILL_A: List[DrumHit] = [
     DrumHit(12.0, "clap", 1.0),
     DrumHit(13.0, "tom_high", 1.0),
     DrumHit(14.0, "tom_low", 1.0),
+    DrumHit(10.0, "vox_hey", 0.9),
     # Step 15 left silent as a dynamic pre-drop gap!
 ]
 
@@ -151,6 +157,7 @@ FILL_B: List[DrumHit] = [
     DrumHit(13.5, "clap", 1.0),
     DrumHit(14.0, "tom_high", 1.0),
     DrumHit(14.5, "tom_low", 1.0),
+    DrumHit(8.0, "vox_chant", 0.95),
     # Half-beat drop gap at end of bar
 ]
 

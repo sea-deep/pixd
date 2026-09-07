@@ -26,11 +26,44 @@ export function parseTimestamp(input: string): number {
   return parts.reduce((total, part) => total * 60 + part, 0) * 1000;
 }
 
+export function formatMusicError(error: unknown): string {
+  if (!(error instanceof Error)) return "The music command failed.";
+  const raw = error.message;
+
+  if (/Sign in to confirm you're not a bot/i.test(raw) || /bot.*authentication/i.test(raw)) {
+    return "YouTube is requiring bot verification on this server IP. Try searching by title or using a SoundCloud link.";
+  }
+  if (/Sign in to confirm your age/i.test(raw)) {
+    return "This track is age-restricted on YouTube and cannot be played.";
+  }
+  if (/Video unavailable/i.test(raw) || /Private video/i.test(raw)) {
+    return "This track is unavailable or private.";
+  }
+  if (/not available in your country/i.test(raw) || /Geo-restricted/i.test(raw)) {
+    return "This track is region-restricted.";
+  }
+  if (/Spotify audio is DRM-protected/i.test(raw)) {
+    return raw;
+  }
+  if (/No playable tracks/i.test(raw)) {
+    return "No playable tracks were found.";
+  }
+
+  // Strip CLI prefixes, stderr stack traces, and URLs to prevent Discord embed cards
+  const cleaned = raw
+    .replace(/^ERROR:\s*(?:\[[^\]]+\]\s*)?/i, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned || "The music command failed.";
+}
+
 export async function replyWithError(context: CommandContext, action: () => unknown | Promise<unknown>): Promise<unknown> {
   try {
     return await action();
   } catch (error) {
-    const message = error instanceof Error ? error.message : "The music command failed.";
+    const message = formatMusicError(error);
     return context.reply({ content: `❌ ${message}` });
   }
 }

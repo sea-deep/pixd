@@ -45,11 +45,39 @@ export default class YtDlpResolver {
       socketTimeout: 20,
       ...(cookiesPath ? { cookies: cookiesPath } : {}),
     };
-    const payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
-      target,
-      options,
-    ) as YtDlpEntry;
 
+    let payload: YtDlpEntry;
+    try {
+      payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
+        target,
+        options,
+      ) as YtDlpEntry;
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      // If YouTube blocks with bot detection on search queries, attempt SoundCloud search fallback
+      if (!isUrl && (/Sign in to confirm you're not a bot/i.test(errMsg) || /bot.*authentication/i.test(errMsg))) {
+        try {
+          payload = await (youtubeDl as (target: string, flags?: Record<string, unknown>) => Promise<unknown>)(
+            `scsearch1:${query}`,
+            {
+              dumpSingleJson: true,
+              skipDownload: true,
+              noWarnings: true,
+              socketTimeout: 20,
+            },
+          ) as YtDlpEntry;
+          return this.processEntries(payload, requesterId, false);
+        } catch {
+          // Fall through to throw original error
+        }
+      }
+      throw err;
+    }
+
+    return this.processEntries(payload, requesterId, isUrl);
+  }
+
+  private processEntries(payload: YtDlpEntry, requesterId: string, isUrl: boolean): ResolveResult {
     const entries = payload.entries?.length ? payload.entries : [payload];
     const tracks = entries
       .slice(0, config.music.maxPlaylistSize)

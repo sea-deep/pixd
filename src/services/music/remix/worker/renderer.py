@@ -11,25 +11,37 @@ from typing import Dict, List, Tuple
 
 def load_drum_kit(assets_dir: str, target_sr: int = 48000) -> Dict[str, np.ndarray]:
     kit: Dict[str, np.ndarray] = {}
-    samples = ["kick", "clap", "tom_low", "tom_high", "perc", "hat"]
+    required = ["kick", "clap", "tom_low", "tom_high", "perc", "hat"]
+    optional = ["vox_hey", "vox_phrase", "vox_chant", "vox_adlib1", "vox_adlib2"]
 
-    for name in samples:
+    for name in required:
         path = os.path.join(assets_dir, f"{name}.wav")
         if not os.path.exists(path):
             raise FileNotFoundError(f"Missing drum asset: {path}")
 
         data, sr = sf.read(path, dtype="float32")
-        # Ensure stereo
         if data.ndim == 1:
             data = np.stack([data, data], axis=1)
 
-        # Resample if sample rate doesn't match target_sr
         if sr != target_sr:
             from scipy.signal import resample
             new_len = int(len(data) * target_sr / sr)
             data = resample(data, new_len, axis=0)
 
         kit[name] = data
+
+    for name in optional:
+        path = os.path.join(assets_dir, f"{name}.wav")
+        if os.path.exists(path):
+            data, sr = sf.read(path, dtype="float32")
+            if data.ndim == 1:
+                data = np.stack([data, data], axis=1)
+            if sr != target_sr:
+                from scipy.signal import resample
+                new_len = int(len(data) * target_sr / sr)
+                data = resample(data, new_len, axis=0)
+            kit[name] = data
+
     return kit
 
 def render_drum_track(
