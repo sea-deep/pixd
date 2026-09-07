@@ -1,0 +1,7 @@
+numpy>=2.0.0
+scipy>=1.14.0
+soundfile>=0.14.0
+librosa>=1.0.0
+torch>=2.0.0
+torchaudio>=2.0.0
+demucs-infer>=4.2.2

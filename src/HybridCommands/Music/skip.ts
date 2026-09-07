@@ -8,8 +8,8 @@ export default new HybridCommand({
   guildOnly: true,
   execute: (context) => replyWithError(context, async () => {
     const player = requirePlayer(context);
-    const skipped = player.current;
-    if (!player.skip()) throw new Error("Nothing is currently playing.");
-    return context.reply(`⏭️ Skipped **${skipped?.title ?? "the current track"}**.`);
+    const skipped = await player.skip();
+    if (!skipped) throw new Error("Nothing is currently playing.");
+    return context.reply(`⏭️ Skipped **${skipped.title}**.`);
   }),
 });

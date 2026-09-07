@@ -44,28 +44,31 @@ describe("Audio Filters Service", () => {
   });
 
   describe("AUDIO_FILTERS presets", () => {
-    it("has all 5 presets defined with valid ffmpeg arguments", () => {
+    it("has all 5 presets defined with valid kind and configuration", () => {
       const keys = ["off", "bassboost", "slowed", "sped", "phonk"] as const;
       for (const key of keys) {
         const def = AUDIO_FILTERS[key];
         expect(def).toBeDefined();
         expect(def.name).toBe(key);
         expect(def.label).toBeTruthy();
-        if (key === "off") {
+        expect(["live-filter", "remix"]).toContain(def.kind);
+        if (key === "off" || key === "phonk") {
           expect(def.ffmpegArgs).toBeNull();
         } else {
+          expect(def.kind).toBe("live-filter");
           expect(def.ffmpegArgs).toBeInstanceOf(Array);
           expect(def.ffmpegArgs![0]).toBe("-af");
           expect(def.ffmpegArgs![1]).toBeTruthy();
         }
       }
+      expect(AUDIO_FILTERS.phonk.kind).toBe("remix");
     });
   });
 
   describe("HybridCommand filter", () => {
-    it("has name filter and aliases filters and fx", () => {
+    it("has name filter and aliases filters, fx, and fitler", () => {
       expect(filterCommand.name).toBe("filter");
-      expect(filterCommand.aliases).toEqual(["filters", "fx"]);
+      expect(filterCommand.aliases).toEqual(["filters", "fx", "fitler"]);
     });
 
     it("displays filter list and active filter when no argument is given", async () => {

@@ -1,4 +1,5 @@
 import { ApplicationCommandOptionType, type RepliableInteraction } from "discord.js";
+import { AudioPlayerStatus } from "@discordjs/voice";
 import HybridCommand from "../../structures/HybridCommand.js";
 import YtDlpResolver from "../../services/music/YtDlpResolver.js";
 import { replyWithError, requireVoiceChannel } from "../../services/music/commandHelpers.js";
@@ -22,7 +23,7 @@ export default new HybridCommand({
     const voiceChannelId = requireVoiceChannel(context);
     const result = await resolver.resolve(query, context.user.id);
     const player = await client.music.connect(context.guild!, voiceChannelId, context.channel!.id);
-    const wasPlaying = Boolean(player.current);
+    const wasPlaying = Boolean(player.current) && player.audioPlayer.state.status !== AudioPlayerStatus.Idle;
     player.enqueue(result.tracks);
     await player.ensurePlaying();
 

@@ -7,7 +7,7 @@ import type { AudioFilter } from "../../services/music/types.js";
 export default new HybridCommand({
   name: "filter",
   description: "Set or view audio filters.",
-  aliases: ["filters", "fx"],
+  aliases: ["filters", "fx", "fitler"],
   usage: "[bassboost | slowed | sped | phonk | off]",
   guildOnly: true,
   options: [{
