@@ -20,7 +20,6 @@ RUN python3 -m venv /usr/src/app/.venv && \
     /usr/src/app/.venv/bin/pip install --no-cache-dir --upgrade pip && \
     /usr/src/app/.venv/bin/pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
     /usr/src/app/.venv/bin/pip install --no-cache-dir -r ./src/services/music/remix/worker/requirements.txt && \
-    /usr/src/app/.venv/bin/pip install --no-cache-dir diffq && \
     mkdir -p .cache && chown -R node:node /usr/src/app/.venv .cache
 USER node
 CMD ["node", "dist/index.js"]

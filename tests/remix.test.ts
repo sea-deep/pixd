@@ -1,10 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import remixService, { REMIX_VERSION } from "../src/services/music/remix/RemixService.js";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
+import { existsSync } from "node:fs";
 
 const execFileAsync = promisify(execFile);
+const venvPythonPath = path.resolve(process.cwd(), ".venv", "bin", "python");
+const hasVenv = existsSync(venvPythonPath);
+const pythonExec = hasVenv ? venvPythonPath : (process.env.PYTHON_PATH || "python3");
 
 describe("Brazilian Funk Remix Subsystem", () => {
   describe("RemixService Caching & Hashes", () => {
@@ -26,7 +30,6 @@ describe("Brazilian Funk Remix Subsystem", () => {
 
   describe("Python Rhythm Scheduler & Timeline Verification", () => {
     it("generates authentic, beat-locked Brazilian funk patterns at multiple tempos", async () => {
-      const venvPython = path.resolve(process.cwd(), ".venv", "bin", "python");
       const testScript = `
 import json
 from patterns import schedule_drum_timeline
@@ -46,7 +49,7 @@ for bpm in [100.0, 120.0, 130.0, 140.0, 150.0]:
 
 print(json.dumps(results))
 `;
-      const { stdout } = await execFileAsync(venvPython, ["-c", testScript], {
+      const { stdout } = await execFileAsync(pythonExec, ["-c", testScript], {
         cwd: path.resolve(process.cwd(), "src", "services", "music", "remix", "worker"),
       });
 
@@ -61,8 +64,7 @@ print(json.dumps(results))
       }
     });
 
-    it("verifies duration preservation within 50ms tolerance", async () => {
-      const venvPython = path.resolve(process.cwd(), ".venv", "bin", "python");
+    it.runIf(hasVenv)("verifies duration preservation within 50ms tolerance", async () => {
       const testScript = `
 import soundfile as sf
 import numpy as np
@@ -98,7 +100,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     out_info = sf.info(out_wav)
     print(out_info.duration)
 `;
-      const { stdout } = await execFileAsync(venvPython, ["-c", testScript], {
+      const { stdout } = await execFileAsync(venvPythonPath, ["-c", testScript], {
         cwd: path.resolve(process.cwd(), "src", "services", "music", "remix", "worker"),
       });
 
