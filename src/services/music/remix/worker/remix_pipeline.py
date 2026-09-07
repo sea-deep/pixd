@@ -95,7 +95,7 @@ def main():
     parser.add_argument("--output", required=True, help="Output destination WAV path")
     parser.add_argument("--cache-dir", default=".cache/remixes", help="Cache directory")
     parser.add_argument("--track-id", default="default", help="Unique track ID")
-    parser.add_argument("--model", default="mdx_q", help="Demucs model name")
+    parser.add_argument("--model", default="dsp", help="Separation model (dsp or demucs)")
 
     args = parser.parse_args()
 

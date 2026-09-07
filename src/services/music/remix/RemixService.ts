@@ -113,7 +113,7 @@ export class RemixService {
       "--output", finalWavPath,
       "--cache-dir", this.cacheDir,
       "--track-id", track.id,
-      "--model", process.env.PHONK_SEPARATOR_MODEL || "mdx_q",
+      "--model", process.env.PHONK_SEPARATOR_MODEL || "dsp",
     ];
 
     await new Promise<void>((resolve, reject) => {
