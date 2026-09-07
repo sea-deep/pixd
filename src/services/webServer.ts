@@ -225,6 +225,16 @@ app.get("/api/file/:fileId/view", async (req, res) => {
   return res.redirect(result.url);
 });
 
+app.get(["/api/remix/:hash", "/remix/:hash"], (req, res) => {
+  const hash = String(req.params.hash);
+  if (!/^[a-f0-9]{16,64}$/i.test(hash)) return res.status(400).send("Invalid remix hash.");
+  const remixPath = join(process.cwd(), ".cache", "remixes", hash, "remix.wav");
+  if (!existsSync(remixPath)) return res.status(404).send("Remix audio not found or has expired.");
+  res.setHeader("Content-Type", "audio/wav");
+  res.setHeader("Content-Disposition", `inline; filename="phonk_remix_${hash.slice(0, 8)}.wav"`);
+  return res.sendFile(remixPath);
+});
+
 app.get("/", (_req, res) => res.redirect("/home"));
 app.get("/healthz", (_req, res) => {
   const ok = ready();

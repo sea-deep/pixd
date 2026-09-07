@@ -129,7 +129,7 @@ export class RemixService {
         reject(new Error(`Remix worker process error: ${err.message}`));
       });
 
-      child.once("close", (code) => {
+      child.once("close", (code, signal) => {
         if (code === 0) {
           try {
             const parsed = JSON.parse(stdout.trim());
@@ -139,8 +139,9 @@ export class RemixService {
           }
           resolve();
         } else {
-          Logger.error(`Remix worker exited with code ${code}: ${stderr.trim()}`);
-          reject(new Error(`Remix failed (code ${code}): ${stderr.trim() || stdout.trim()}`));
+          const detail = signal ? `signal ${signal}` : `code ${code}`;
+          Logger.error(`Remix worker exited with ${detail}: ${stderr.trim()}`);
+          reject(new Error(`Remix failed (${detail}): ${stderr.trim() || stdout.trim()}`));
         }
       });
     });
@@ -169,7 +170,7 @@ export class RemixService {
       "--output", destPath,
       "--extract-audio",
       "--audio-format", "wav",
-      "--postprocessor-args", "ffmpeg:-ar 44100 -ac 2",
+      "--postprocessor-args", "ffmpeg:-ar 48000 -ac 2",
       "--no-playlist",
       "--no-progress",
       "--no-warnings",

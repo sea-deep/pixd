@@ -8,12 +8,18 @@ export default new HybridCommand({
   guildOnly: true,
   execute: (context, client) => replyWithError(context, () => {
     const player = requirePlayer(context);
-    const upcoming = player.queue.slice(0, 15).map((track, index) => `${index + 1}. ${track.author} — ${track.title}`);
+    const formatTrack = (track: typeof player.queue[0]) => {
+      const src = track.source && track.source !== "youtube" && track.source !== "custom"
+        ? ` [${track.source === "soundcloud" ? "SoundCloud" : track.source === "bandcamp" ? "Bandcamp" : "Spotify"}]`
+        : "";
+      return `${track.author} — ${track.title}${src}`;
+    };
+    const upcoming = player.queue.slice(0, 15).map((track, index) => `${index + 1}. ${formatTrack(track)}`);
     const remaining = Math.max(0, player.queue.length - upcoming.length);
     return context.reply({ embeds: [{
       title: "Music queue",
       description: [
-        `**Now playing:** ${player.current ? `${player.current.author} — ${player.current.title}` : "Nothing"}`,
+        `**Now playing:** ${player.current ? formatTrack(player.current) : "Nothing"}`,
         "",
         upcoming.length ? `**Up next:**\n${upcoming.join("\n")}` : "*No queued tracks.*",
         remaining ? `\n…and ${remaining} more.` : "",

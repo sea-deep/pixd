@@ -49,11 +49,13 @@ def detect_vocal_slices(
         return []
 
     num_frames = (len(mono) - frame_len) // hop_len
-    rms = np.zeros(num_frames, dtype=np.float32)
-    for i in range(num_frames):
-        start = i * hop_len
-        window = mono[start : start + frame_len]
-        rms[i] = np.sqrt(np.mean(window ** 2))
+    if num_frames <= 0:
+        return []
+
+    shape = (num_frames, frame_len)
+    strides = (mono.strides[0] * hop_len, mono.strides[0])
+    frames = np.lib.stride_tricks.as_strided(mono, shape=shape, strides=strides)
+    rms = np.sqrt(np.mean(frames ** 2, axis=1)).astype(np.float32)
 
     max_rms = np.max(rms) if len(rms) > 0 else 0.0
     if max_rms < min_energy_threshold:

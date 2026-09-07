@@ -13,6 +13,19 @@ import numpy as np
 from scipy.signal import butter, sosfilt
 from typing import Dict
 
+def safe_resample(data: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
+    if orig_sr == target_sr:
+        return data
+    new_len = int(len(data) * target_sr / orig_sr)
+    x_orig = np.linspace(0, 1, len(data), endpoint=False)
+    x_new = np.linspace(0, 1, new_len, endpoint=False)
+    if data.ndim == 1:
+        return np.interp(x_new, x_orig, data).astype(np.float32)
+    return np.stack([
+        np.interp(x_new, x_orig, data[:, ch]).astype(np.float32)
+        for ch in range(data.shape[1])
+    ], axis=1)
+
 def separate_stems_dsp(
     audio_path: str,
     stems_dir: str,
@@ -36,9 +49,7 @@ def separate_stems_dsp(
         data = np.stack([data, data], axis=1)
 
     if sr != target_sr:
-        from scipy.signal import resample
-        new_len = int(len(data) * target_sr / sr)
-        data = resample(data, new_len, axis=0)
+        data = safe_resample(data, sr, target_sr)
         sr = target_sr
 
     left = data[:, 0]

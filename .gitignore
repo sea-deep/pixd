@@ -12,3 +12,9 @@ cookies.txt
 
 __pycache__/
 *.pyc
+
+# Local audio test renders
+*.mp3
+www/*.mp3
+www/*.wav
+chahunga_remix.*

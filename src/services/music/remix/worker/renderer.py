@@ -9,6 +9,19 @@ import soundfile as sf
 import numpy as np
 from typing import Dict, List, Tuple
 
+def safe_resample(data: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
+    if orig_sr == target_sr:
+        return data
+    new_len = int(len(data) * target_sr / orig_sr)
+    x_orig = np.linspace(0, 1, len(data), endpoint=False)
+    x_new = np.linspace(0, 1, new_len, endpoint=False)
+    if data.ndim == 1:
+        return np.interp(x_new, x_orig, data).astype(np.float32)
+    return np.stack([
+        np.interp(x_new, x_orig, data[:, ch]).astype(np.float32)
+        for ch in range(data.shape[1])
+    ], axis=1)
+
 def load_drum_kit(assets_dir: str, target_sr: int = 48000) -> Dict[str, np.ndarray]:
     kit: Dict[str, np.ndarray] = {}
     required = ["kick", "clap", "tom_low", "tom_high", "perc", "hat"]
@@ -22,12 +35,8 @@ def load_drum_kit(assets_dir: str, target_sr: int = 48000) -> Dict[str, np.ndarr
         data, sr = sf.read(path, dtype="float32")
         if data.ndim == 1:
             data = np.stack([data, data], axis=1)
-
         if sr != target_sr:
-            from scipy.signal import resample
-            new_len = int(len(data) * target_sr / sr)
-            data = resample(data, new_len, axis=0)
-
+            data = safe_resample(data, sr, target_sr)
         kit[name] = data
 
     for name in optional:
@@ -37,9 +46,7 @@ def load_drum_kit(assets_dir: str, target_sr: int = 48000) -> Dict[str, np.ndarr
             if data.ndim == 1:
                 data = np.stack([data, data], axis=1)
             if sr != target_sr:
-                from scipy.signal import resample
-                new_len = int(len(data) * target_sr / sr)
-                data = resample(data, new_len, axis=0)
+                data = safe_resample(data, sr, target_sr)
             kit[name] = data
 
     return kit
@@ -142,9 +149,7 @@ def render_brazilian_remix(
         if data.ndim == 1:
             data = np.stack([data, data], axis=1)
         if sr != target_sr:
-            from scipy.signal import resample
-            new_len = int(len(data) * target_sr / sr)
-            data = resample(data, new_len, axis=0)
+            data = safe_resample(data, sr, target_sr)
         stems[name] = data
         max_len = max(max_len, len(data))
 
