@@ -371,6 +371,8 @@ export default class GuildPlayer {
         "--no-playlist",
         "--no-progress",
         "--no-warnings",
+        "--no-part",
+        "--paths", "temp:/tmp",
         "--quiet",
         "--extractor-args", "youtube:player_client=ios,android,mweb;player_skip=webpage",
       ];
@@ -382,7 +384,7 @@ export default class GuildPlayer {
       const executable = (youtubeDl as typeof youtubeDl & {
         constants: { YOUTUBE_DL_PATH: string };
       }).constants.YOUTUBE_DL_PATH;
-      const child = spawn(executable, args, { stdio: ["ignore", "pipe", "pipe"] });
+      const child = spawn(executable, args, { cwd: "/tmp", stdio: ["ignore", "pipe", "pipe"] });
       this.process = child;
       let stderr = "";
       child.stderr.on("data", (chunk) => {

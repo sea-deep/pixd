@@ -9,7 +9,7 @@ import Logger from "../../../helpers/Logger.js";
 import { getCookiesPath } from "../../../helpers/cookieHelper.js";
 import type { MusicTrack } from "../types.js";
 
-export const REMIX_VERSION = "brazilian-phonk-v2";
+export const REMIX_VERSION = "brazilian-phonk-v3";
 
 export interface RemixResult {
   trackId: string;
