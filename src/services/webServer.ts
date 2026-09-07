@@ -9,6 +9,7 @@ import { env } from "../utilities/env.js";
 import Logger from "../helpers/Logger.js";
 import StorageService, { formatBytes } from "./StorageService.js";
 import UploadModel from "../models/uploadModel.js";
+import { generateInviteUrl } from "../helpers/inviteHelper.js";
 
 export const app = express();
 let ready = () => false;
@@ -241,9 +242,7 @@ app.get("/lastfm/login", async (req, res) => {
 });
 app.get("/download", (_req, res) => res.redirect("https://rpqsk.github.io/"));
 app.get("/repo", (_req, res) => res.redirect("https://github.com/susudeepa/pixd"));
-app.get("/invite", (_req, res) => res.redirect(
-  "https://discord.com/oauth2/authorize?client_id=1397525517569097729&scope=bot&permissions=1003113402177",
-));
+app.get("/invite", (_req, res) => res.redirect(generateInviteUrl()));
 app.get("/ig-image", async (req, res) => {
   const mediaId = String(req.query.id ?? "");
   if (!/^\d{1,30}$/.test(mediaId)) return res.status(400).send("invalid media id");
