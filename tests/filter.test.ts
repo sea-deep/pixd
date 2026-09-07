@@ -37,7 +37,7 @@ describe("Audio Filters Service", () => {
     });
 
     it("parses phonk synonyms", () => {
-      for (const val of ["phonk", "drift", "driftphonk", "memphis", "cowbell", "PHONK"]) {
+      for (const val of ["phonk", "brazilian", "automotivo", "montagem", "drift", "PHONK"]) {
         expect(parseAudioFilter(val)).toBe("phonk");
       }
     });

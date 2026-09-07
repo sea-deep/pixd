@@ -50,10 +50,10 @@ export const AUDIO_FILTERS: Record<AudioFilter, FilterDefinition> = {
     name: "phonk",
     label: "Phonk",
     emoji: "",
-    description: "Memphis/Drift EQ: boosted 808 sub-bass, cowbell presence, tape cut, and pumping compression.",
+    description: "Brazilian automotivo mix: fast tempo, aggressive clipped low-end, forward metallic mids, and dense compression.",
     ffmpegArgs: [
       "-af",
-      "asetrate=48000*0.94,aresample=48000,highpass=f=30,lowpass=f=12000,bass=g=11:f=75:w=0.6,equalizer=f=2000:width_type=h:width=1000:g=5,acompressor=threshold=0.125:ratio=7:attack=15:release=120:makeup=2,dynaudnorm=f=120:g=15",
+      "asetrate=48000*1.05,aresample=48000,highpass=f=45,equalizer=f=95:width_type=h:width=40:g=8,equalizer=f=250:width_type=h:width=120:g=-4,equalizer=f=1800:width_type=h:width=800:g=4.5,equalizer=f=3800:width_type=h:width=1200:g=5,equalizer=f=8000:width_type=h:width=2500:g=2.5,acompressor=threshold=0.09:ratio=8:attack=4:release=50:makeup=2:knee=1,asoftclip=type=cubic:threshold=0.8:output=1.1,alimiter=limit=0.96",
     ],
   },
 };
@@ -74,7 +74,7 @@ export function parseAudioFilter(raw: string | null | undefined): AudioFilter | 
   if (["sped", "spedup", "speed", "speedup", "nightcore", "fast"].includes(norm)) {
     return "sped";
   }
-  if (["phonk", "drift", "driftphonk", "memphis", "cowbell"].includes(norm)) {
+  if (["phonk", "brazilian", "automotivo", "montagem", "brazilianphonk", "drift", "driftphonk", "memphis", "cowbell"].includes(norm)) {
     return "phonk";
   }
 
