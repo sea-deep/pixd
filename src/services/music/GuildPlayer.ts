@@ -28,7 +28,7 @@ const resolver = new YtDlpResolver();
 
 export default class GuildPlayer {
   readonly guildId: string;
-  readonly voiceChannelId: string;
+  voiceChannelId: string;
   readonly textChannelId: string;
   readonly queue: MusicTrack[] = [];
   readonly audioPlayer: AudioPlayer;
@@ -41,6 +41,7 @@ export default class GuildPlayer {
   private process: ChildProcess | null = null;
   private filterProcess: ChildProcess | null = null;
   private inactivityTimer: NodeJS.Timeout | null = null;
+  private emptyChannelTimer: NodeJS.Timeout | null = null;
   private destroyed = false;
   private isTransitioning = false;
   private pendingAdvance = false;
@@ -193,6 +194,7 @@ export default class GuildPlayer {
     this.destroyed = true;
     this.streamGeneration++;
     this.clearInactivityTimer();
+    this.clearEmptyChannelTimer();
     this.queue.length = 0;
     this.current = null;
     this.currentResource = null;
@@ -429,6 +431,43 @@ export default class GuildPlayer {
   private clearInactivityTimer(): void {
     if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
     this.inactivityTimer = null;
+  }
+
+  checkChannelEmpty(): void {
+    if (this.destroyed) return;
+    const guild = this.client.guilds.cache.get(this.guildId);
+    const channel = guild?.channels.cache.get(this.voiceChannelId);
+    if (!channel || !channel.isVoiceBased()) return;
+
+    const humanCount = channel.members.filter((member) => !member.user.bot).size;
+    if (humanCount === 0) {
+      if (!this.emptyChannelTimer) {
+        this.emptyChannelTimer = setTimeout(async () => {
+          if (this.destroyed) return;
+          const freshGuild = this.client.guilds.cache.get(this.guildId);
+          const freshChannel = freshGuild?.channels.cache.get(this.voiceChannelId);
+          const stillEmpty =
+            !freshChannel ||
+            !freshChannel.isVoiceBased() ||
+            freshChannel.members.filter((member) => !member.user.bot).size === 0;
+
+          if (stillEmpty) {
+            await this.announce("Left the voice channel because no listeners remained.");
+            await this.destroy();
+          } else {
+            this.clearEmptyChannelTimer();
+          }
+        }, config.music.inactivityMs);
+        this.emptyChannelTimer.unref();
+      }
+    } else {
+      this.clearEmptyChannelTimer();
+    }
+  }
+
+  private clearEmptyChannelTimer(): void {
+    if (this.emptyChannelTimer) clearTimeout(this.emptyChannelTimer);
+    this.emptyChannelTimer = null;
   }
 
   private killProcess(): void {

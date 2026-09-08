@@ -33,6 +33,8 @@ export interface MessageCommandData {
   ownerOnly?: boolean;
   /** Limit command to developers only. */
   developerOnly?: boolean;
+  /** Prefix command argument delimiter (defaults to whitespace " "). */
+  argsSeparator?: string | RegExp;
   /** Command execution callback block. */
   execute: (message: Message, args: string[], client: Client) => any;
 }
@@ -57,6 +59,7 @@ export default class MessageCommand {
   public nsfw: boolean;
   public ownerOnly: boolean;
   public developerOnly: boolean;
+  public argsSeparator: string | RegExp;
   public execute: (message: Message, args: string[], client: Client) => any;
   public commandType: "prefix" = "prefix";
 
@@ -87,6 +90,7 @@ export default class MessageCommand {
     this.nsfw = data.nsfw ?? false;
     this.ownerOnly = data.ownerOnly ?? false;
     this.developerOnly = data.developerOnly ?? false;
+    this.argsSeparator = data.argsSeparator ?? " ";
     this.execute = data.execute;
   }
 }

@@ -36,6 +36,7 @@ export default new HybridCommand({
   execute: (context, client) => replyWithError(context, async () => {
     const query = context.options.getString("query", true)!;
     const sourceChoice = context.options.getString("source") as MusicSource | null;
+
     const voiceChannelId = requireVoiceChannel(context);
     const result = await resolver.resolve(query, context.user.id, sourceChoice ?? "auto");
     const player = await client.music.connect(context.guild!, voiceChannelId, context.channel!.id);

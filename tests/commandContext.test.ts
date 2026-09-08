@@ -27,3 +27,44 @@ it("recognizes modern interaction metadata for component ownership", () => {
   const raw = { user: { id: "clicker" }, message: { interactionMetadata: { user: owner } } };
   expect(new CommandContext(raw as any).originalAuthor).toBe(owner);
 });
+
+it("resolves multi-word string query without consuming it into optional choices", () => {
+  const raw = { author: { id: "user" } };
+  const options = [
+    { type: 3, name: "query", description: "Query", required: true },
+    {
+      type: 3,
+      name: "source",
+      description: "Source",
+      required: false,
+      choices: [
+        { name: "SoundCloud", value: "soundcloud" },
+        { name: "YouTube", value: "youtube" },
+      ],
+    },
+  ];
+  const ctx = new CommandContext(raw as any, ["everytime", "we", "touch"], options as any);
+  expect(ctx.options.getString("query")).toBe("everytime we touch");
+  expect(ctx.options.getString("source")).toBeNull();
+});
+
+it("resolves multi-word string query and trailing matching choice", () => {
+  const raw = { author: { id: "user" } };
+  const options = [
+    { type: 3, name: "query", description: "Query", required: true },
+    {
+      type: 3,
+      name: "source",
+      description: "Source",
+      required: false,
+      choices: [
+        { name: "SoundCloud", value: "soundcloud" },
+        { name: "YouTube", value: "youtube" },
+      ],
+    },
+  ];
+  const ctx = new CommandContext(raw as any, ["everytime", "we", "touch", "soundcloud"], options as any);
+  expect(ctx.options.getString("query")).toBe("everytime we touch");
+  expect(ctx.options.getString("source")).toBe("soundcloud");
+});
+

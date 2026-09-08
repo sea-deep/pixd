@@ -42,6 +42,8 @@ export interface HybridCommandData {
     bot?: PermissionResolvable[];
     user?: PermissionResolvable[];
   };
+  /** Prefix command argument delimiter (defaults to whitespace " "). */
+  argsSeparator?: string | RegExp;
   /** Consolidated execution callback block. */
   execute: (ctx: CommandContext, client: Client) => Promise<unknown> | unknown;
 }
@@ -69,6 +71,7 @@ export default class HybridCommand {
     bot: PermissionResolvable[];
     user: PermissionResolvable[];
   };
+  public argsSeparator: string | RegExp;
   public run: (ctx: CommandContext, client: Client) => Promise<unknown> | unknown;
   public data: ChatInputApplicationCommandData;
   public execute: (interactionOrMessage: Message | RepliableInteraction, ...argsOrClient: any[]) => Promise<any>;
@@ -107,6 +110,7 @@ export default class HybridCommand {
       bot: data.permissions?.bot || [],
       user: data.permissions?.user || [],
     };
+    this.argsSeparator = data.argsSeparator ?? " ";
 
     // Store execution logic internally
     this.run = data.execute;

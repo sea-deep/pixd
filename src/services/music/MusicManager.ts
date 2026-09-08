@@ -40,6 +40,7 @@ export default class MusicManager {
     this.players.set(guild.id, player);
     try {
       await player.ready();
+      player.checkChannelEmpty();
       return player;
     } catch (error) {
       this.players.delete(guild.id);

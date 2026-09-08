@@ -55,22 +55,56 @@ export default class MessageOptionResolver {
         opt.type !== ApplicationCommandOptionType.SubcommandGroup
     );
 
-    for (let i = 0; i < parameterOptions.length; i++) {
-      const opt = parameterOptions[i];
-      const argPosition = paramIndex + i;
-      const val = this.args[argPosition];
+    const workingArgs = [...this.args.slice(paramIndex)];
+    const lastOpt = parameterOptions[parameterOptions.length - 1];
+    const lastOptChoices = (lastOpt as any)?.choices as Array<{ name: string; value: string | number }> | undefined;
 
-      if (val === undefined) continue;
+    let trailingChoiceHandled = false;
+    let trailingChoiceValue: string | undefined;
+
+    if (
+      lastOpt &&
+      lastOptChoices &&
+      lastOptChoices.length > 0 &&
+      !(lastOpt as any).required &&
+      parameterOptions.length > 1
+    ) {
+      trailingChoiceHandled = true;
+      if (workingArgs.length > 1) {
+        const candidate = workingArgs[workingArgs.length - 1].toLowerCase();
+        const matched = lastOptChoices.find(
+          (c) => c.value.toString().toLowerCase() === candidate || c.name.toLowerCase() === candidate
+        );
+        if (matched) {
+          trailingChoiceValue = String(matched.value);
+          workingArgs.pop();
+        }
+      }
+    }
+
+    if (trailingChoiceValue !== undefined && lastOpt) {
+      this.resolved[lastOpt.name] = trailingChoiceValue;
+    }
+
+    const optsToProcess = trailingChoiceHandled ? parameterOptions.slice(0, -1) : parameterOptions;
+    let argIdx = 0;
+
+    for (let i = 0; i < optsToProcess.length; i++) {
+      const opt = optsToProcess[i];
+      if (argIdx >= workingArgs.length) break;
 
       if (opt.type === ApplicationCommandOptionType.String) {
-        // If it's the last option in the list, automatically grab all remaining arguments
-        if (i === parameterOptions.length - 1) {
-          this.resolved[opt.name] = this.args.slice(argPosition).join(" ");
+        // If it's the last option in this list, automatically grab all remaining arguments
+        if (i === optsToProcess.length - 1) {
+          this.resolved[opt.name] = workingArgs.slice(argIdx).join(" ");
+          argIdx = workingArgs.length;
         } else {
-          this.resolved[opt.name] = val;
+          this.resolved[opt.name] = workingArgs[argIdx];
+          argIdx++;
         }
       } else {
-        this.resolved[opt.name] = val;
+        this.resolved[opt.name] = workingArgs[argIdx];
+        argIdx++;
       }
     }
   }

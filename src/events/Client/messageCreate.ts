@@ -64,9 +64,11 @@ export default new Event({
     const prefix = config.commands.prefix;
     if (message.content.slice(0, prefix.length).toLowerCase() !== prefix.toLowerCase()) return;
 
-    // 4. Parse args and command input
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const commandInput = args.shift()?.toLowerCase();
+    // 4. Parse command input and remainder
+    const rawContent = message.content.slice(prefix.length).trim();
+    const firstSpaceIndex = rawContent.search(/\s/);
+    const commandInput = (firstSpaceIndex === -1 ? rawContent : rawContent.slice(0, firstSpaceIndex)).toLowerCase();
+    const rawArgsString = firstSpaceIndex === -1 ? "" : rawContent.slice(firstSpaceIndex).trim();
 
     if (!commandInput) return;
 
@@ -76,6 +78,19 @@ export default new Event({
       client.prefixCommands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandInput));
 
     if (!command) return;
+
+    // 5.5. Parse args according to command.argsSeparator (defaults to whitespace)
+    let args: string[] = [];
+    if (rawArgsString.length > 0) {
+      const separator = command.argsSeparator ?? " ";
+      if (separator === " " || separator === "") {
+        args = rawArgsString.split(/ +/);
+      } else if (typeof separator === "string") {
+        args = rawArgsString.split(separator).map((s) => s.trim()).filter(Boolean);
+      } else if (separator instanceof RegExp) {
+        args = rawArgsString.split(separator).map((s) => s.trim()).filter(Boolean);
+      }
+    }
 
     // 6. Run option checks (ownerOnly, developerOnly, permissions, cooldown, nsfw, guildOnly)
     const proceed = await handleMessageCommandOptions(message, command);
