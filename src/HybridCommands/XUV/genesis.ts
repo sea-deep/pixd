@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
+import { isNsfwQuery } from "../../helpers/nsfwFilter.js";
 
 export default new HybridCommand({
   name: "genesis",
@@ -22,11 +23,28 @@ export default new HybridCommand({
 
       const image = Buffer.from(await response.arrayBuffer());
       if (image.length === 0) throw new Error("Image provider returned an empty file.");
+
+      const isNsfw = isNsfwQuery(prompt);
       const filename = `${prompt.replace(/[^a-z0-9]+/gi, "_").slice(0, 80) || "genesis"}.jpg`;
+      const attachment = new AttachmentBuilder(image, { name: filename });
+      if (isNsfw) {
+        attachment.setSpoiler(true);
+      }
+
+      const embed: { description: string; image?: { url: string } } = {
+        description: isNsfw
+          ? `>>> Genesisation done!\nHere is your **||${prompt.slice(0, 300)}||**`
+          : `>>> Genesisation done!\nHere is your **${prompt.slice(0, 300)}**`,
+      };
+
+      if (!isNsfw) {
+        embed.image = { url: `attachment://${filename}` };
+      }
+
       return ctx.reply({
-        embeds: [{ description: `>>> Genesisation done!\nHere is your **${prompt.slice(0, 300)}**`, image: { url: `attachment://${filename}` } }],
+        embeds: [embed],
         components: [{ type: 1, components: [{ type: 2, style: 4, label: "DELETE", custom_id: `delete-btn:${ctx.user.id}`, emoji: { name: "🗑️" } }] }],
-        files: [new AttachmentBuilder(image, { name: filename })],
+        files: [attachment],
       });
     } catch (error) {
       return ctx.reply({ embeds: [{
