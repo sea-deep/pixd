@@ -198,6 +198,9 @@ const BOUNDED_PATTERNS: RegExp[] = [
   /\bshirtless\b/i,
   /\bunclothed\b/i,
   /\bundress(ed)?\b/i,
+  /\bmaking\s+out\b/i,
+  /\bmake\s+out\b/i,
+  /\bguessing\b/i,
 ];
 
 /**

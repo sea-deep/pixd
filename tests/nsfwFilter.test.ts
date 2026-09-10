@@ -46,6 +46,9 @@ describe("isNsfwQuery filter", () => {
       "camgirl live on onlyfans",
       "explicit sex between couples",
       "stripper dancing at a strip club",
+      "couple making out passionately in the rain",
+      "two characters make out on the couch",
+      "anime guessing character",
     ];
 
     for (const prompt of nsfwPrompts) {
