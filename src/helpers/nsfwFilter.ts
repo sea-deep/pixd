@@ -200,7 +200,9 @@ const BOUNDED_PATTERNS: RegExp[] = [
   /\bundress(ed)?\b/i,
   /\bmaking\s+out\b/i,
   /\bmake\s+out\b/i,
-  /\bguessing\b/i,
+  /\bkissing\b/i,
+  /\bkiss\b/i,
+  /\bgrop(e|ing|ed)\b/i,
 ];
 
 /**

@@ -17,6 +17,7 @@ describe("isNsfwQuery filter", () => {
       "A majestic eagle flying over snow covered mountains",
       "Astronaut floating peacefully in orbit around Mars",
       "Photorealistic portrait of an old wise wizard with a beard",
+      "Playing a guessing game with friends",
     ];
 
     for (const prompt of safePrompts) {
@@ -48,7 +49,9 @@ describe("isNsfwQuery filter", () => {
       "stripper dancing at a strip club",
       "couple making out passionately in the rain",
       "two characters make out on the couch",
-      "anime guessing character",
+      "couple kissing under the stars",
+      "passionate kiss between two anime characters",
+      "unwanted groping scene",
     ];
 
     for (const prompt of nsfwPrompts) {
