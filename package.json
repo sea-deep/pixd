@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.5.1",
     "@types/xml2js": "^0.4.14",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2",
