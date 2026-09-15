@@ -34,7 +34,10 @@ async function loadPrefixCommands(): Promise<void> {
         }
       }
     }
-    Logger.success(`Loaded ${client.prefixCommands.size} Prefix Commands!`);
+
+    if (files.length > 0) {
+      Logger.success(`Loaded ${files.length} Prefix Commands!`);
+    }
   } catch (err) {
     Logger.error("Error loading Message Commands:", err);
     throw err;

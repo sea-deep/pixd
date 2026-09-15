@@ -1,6 +1,10 @@
 import { env } from "../src/utilities/env.js";
 
-const prefix = env.ENVIRONMENT === "prod" ? "p!" : "d!";
+const isProduction =
+  env.ENVIRONMENT === "prod" ||
+  process.env.RAILWAY_ENVIRONMENT === "production" ||
+  process.env.NODE_ENV === "production";
+const prefix = process.env.PREFIX || (isProduction ? "p!" : "d!");
 const config = {
   prefix,
   color: 0x0e08e6,

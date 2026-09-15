@@ -48,7 +48,7 @@ async function loadHybridCommands(): Promise<void> {
       }
     }
 
-    Logger.success(`Loaded ${files.length} Hybrid Commands!`);
+    Logger.success(`Loaded ${files.length} Hybrid Commands (Prefix & Slash)!`);
   } catch (err) {
     Logger.error("Error loading Hybrid Commands:", err);
     throw err;

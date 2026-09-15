@@ -39,14 +39,14 @@ Personality & Vibe:
 - Never write angry essays, tryhard roasts, or defensive paragraphs.
 
 How to Respond:
-- Unironic / Genuine messages: When someone asks a real, sincere question or needs actual info/help (technical, gaming, music, advice, facts), give a genuinely knowledgeable, helpful, and concise answer with casual wit. Do not troll or dismiss users who are asking something genuine.
+- Unironic / Genuine requests & questions: When someone asks a real, sincere question or needs actual info/code/help (coding, technical questions, gaming, music, advice, facts), BE ACTUALLY HELPFUL AND COMPREHENSIVE. Write the code, give the solution, explain the answer cleanly with casual wit. NEVER mock, refuse, or troll someone asking for code or genuine help.
 - Sarcastic / Absurd messages: When someone is being sarcastic, trolling, memeing, or saying absurd things, match their energy with dry sarcasm, witty irony, absurdist logic, or effortless dismissal.
 
 Formatting & Rules:
-- Strictly lowercase text only. No formal capitalization.
-- Strictly no punctuation: never end with a period or full stop, avoid commas and semicolons.
+- Conversational text should be in lowercase without trailing periods or formal punctuation (avoid commas, semicolons).
+- Code & technical syntax: When writing code or commands, use proper markdown code blocks with standard correct formatting, syntax, and semicolons (code is exempt from the lowercase/no-punctuation rule).
 - Blend casual internet slang and Hinglish naturally when appropriate.
-- Keep it concise: 1 to 3 short sentences max.
+- Keep regular chat responses concise (1 to 3 sentences max), but give full complete code/solutions when asked.
 - NEVER use standard Unicode emojis (no 😂, 💀, 😭, etc.).
 - You may use at most ONE fitting server custom emoji from this list if it naturally fits the tone:
 <:theekhai:833742354892324894>
@@ -110,9 +110,17 @@ function cleanAnswer(text: string): string {
   let cleaned = text.trim();
   // Strip common generic unicode emojis that ruin the vibe
   cleaned = cleaned.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "");
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
-  // Strip trailing full stops/periods while keeping closing emoji brackets intact
-  while (cleaned.endsWith(".") && !cleaned.endsWith(">")) {
+
+  if (cleaned.includes("```")) {
+    // Preserve code block formatting, only normalize excessive newlines
+    cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
+  } else {
+    // For regular chat responses, normalize whitespace and collapse redundant spacing
+    cleaned = cleaned.replace(/[^\S\r\n]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  // Strip trailing full stops/periods while keeping closing emoji brackets or code blocks intact
+  while (cleaned.endsWith(".") && !cleaned.endsWith(">") && !cleaned.endsWith("```")) {
     cleaned = cleaned.slice(0, -1).trim();
   }
   return cleaned.length > 2000 ? `${cleaned.slice(0, 1997)}...` : cleaned;
@@ -155,9 +163,9 @@ async function tryGroq(history: MemoryMessage[], prompt: string, apiKey: string)
           ...history,
           { role: "user", content: prompt },
         ],
-        temperature: 0.8,
+        temperature: 0.7,
         top_p: 0.95,
-        max_tokens: 200,
+        max_tokens: 800,
       });
 
       const content = completion.choices[0]?.message?.content?.trim();
@@ -199,8 +207,8 @@ async function tryGemini(history: MemoryMessage[], prompt: string, apiKey: strin
         config: {
           systemInstruction: SYSTEM_PROMPT,
           thinkingConfig: { thinkingBudget: 0 },
-          temperature: 0.8,
-          maxOutputTokens: 200,
+          temperature: 0.7,
+          maxOutputTokens: 800,
         },
       });
 
