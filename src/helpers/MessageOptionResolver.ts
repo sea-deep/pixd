@@ -49,44 +49,99 @@ export default class MessageOptionResolver {
     }
 
     // 2. Parse positional arguments mapping to the command options
+    // Note: Attachment options never consume textual args (they reside on message.attachments).
     const parameterOptions = this.optionsList.filter(
       (opt) =>
         opt.type !== ApplicationCommandOptionType.Subcommand &&
-        opt.type !== ApplicationCommandOptionType.SubcommandGroup
+        opt.type !== ApplicationCommandOptionType.SubcommandGroup &&
+        opt.type !== ApplicationCommandOptionType.Attachment
     );
 
     const workingArgs = [...this.args.slice(paramIndex)];
-    const lastOpt = parameterOptions[parameterOptions.length - 1];
-    const lastOptChoices = (lastOpt as any)?.choices as Array<{ name: string; value: string | number }> | undefined;
 
-    let trailingChoiceHandled = false;
-    let trailingChoiceValue: string | undefined;
+    // Process trailing optional parameters (choices, Channel, User, Role) from right to left
+    while (parameterOptions.length > 1) {
+      const lastOpt = parameterOptions[parameterOptions.length - 1];
+      if ((lastOpt as any).required) break;
 
-    if (
-      lastOpt &&
-      lastOptChoices &&
-      lastOptChoices.length > 0 &&
-      !(lastOpt as any).required &&
-      parameterOptions.length > 1
-    ) {
-      trailingChoiceHandled = true;
-      if (workingArgs.length > 1) {
-        const candidate = workingArgs[workingArgs.length - 1].toLowerCase();
-        const matched = lastOptChoices.find(
-          (c) => c.value.toString().toLowerCase() === candidate || c.name.toLowerCase() === candidate
-        );
-        if (matched) {
-          trailingChoiceValue = String(matched.value);
-          workingArgs.pop();
+      const lastOptChoices = (lastOpt as any)?.choices as Array<{ name: string; value: string | number }> | undefined;
+      const candidate = workingArgs.length > 0 ? workingArgs[workingArgs.length - 1] : undefined;
+
+      if (lastOptChoices && lastOptChoices.length > 0) {
+        if (candidate) {
+          const lower = candidate.toLowerCase();
+          const matched = lastOptChoices.find(
+            (c) => c.value.toString().toLowerCase() === lower || c.name.toLowerCase() === lower
+          );
+          if (matched) {
+            this.resolved[lastOpt.name] = String(matched.value);
+            workingArgs.pop();
+            parameterOptions.pop();
+            continue;
+          }
         }
+        parameterOptions.pop();
+        continue;
       }
+
+      if (lastOpt.type === ApplicationCommandOptionType.Channel) {
+        if (
+          candidate &&
+          (/^<#\d+>$/.test(candidate) ||
+            /^\d{17,20}$/.test(candidate) ||
+            Boolean(this.message.guild?.channels.cache.some((c) => c.name.toLowerCase() === candidate.toLowerCase())))
+        ) {
+          this.resolved[lastOpt.name] = candidate;
+          workingArgs.pop();
+          parameterOptions.pop();
+          continue;
+        }
+        parameterOptions.pop();
+        continue;
+      }
+
+      if (lastOpt.type === ApplicationCommandOptionType.User) {
+        if (
+          candidate &&
+          (/^<@!?\d+>$/.test(candidate) ||
+            /^\d{17,20}$/.test(candidate) ||
+            Boolean(
+              this.message.guild?.members.cache.some(
+                (m) =>
+                  m.user.username.toLowerCase() === candidate.toLowerCase() ||
+                  m.displayName.toLowerCase() === candidate.toLowerCase()
+              )
+            ))
+        ) {
+          this.resolved[lastOpt.name] = candidate;
+          workingArgs.pop();
+          parameterOptions.pop();
+          continue;
+        }
+        parameterOptions.pop();
+        continue;
+      }
+
+      if (lastOpt.type === ApplicationCommandOptionType.Role) {
+        if (
+          candidate &&
+          (/^<@&\d+>$/.test(candidate) ||
+            /^\d{17,20}$/.test(candidate) ||
+            Boolean(this.message.guild?.roles.cache.some((r) => r.name.toLowerCase() === candidate.toLowerCase())))
+        ) {
+          this.resolved[lastOpt.name] = candidate;
+          workingArgs.pop();
+          parameterOptions.pop();
+          continue;
+        }
+        parameterOptions.pop();
+        continue;
+      }
+
+      break;
     }
 
-    if (trailingChoiceValue !== undefined && lastOpt) {
-      this.resolved[lastOpt.name] = trailingChoiceValue;
-    }
-
-    const optsToProcess = trailingChoiceHandled ? parameterOptions.slice(0, -1) : parameterOptions;
+    const optsToProcess = parameterOptions;
     let argIdx = 0;
 
     for (let i = 0; i < optsToProcess.length; i++) {

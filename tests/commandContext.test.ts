@@ -68,3 +68,32 @@ it("resolves multi-word string query and trailing matching choice", () => {
   expect(ctx.options.getString("source")).toBe("soundcloud");
 });
 
+it("resolves multi-word string prompt when trailing optional channel is omitted", () => {
+  const raw = { author: { id: "user" } };
+  const options = [
+    { type: 3, name: "prompt", description: "Prompt", required: true },
+    { type: 7, name: "channel", description: "Channel", required: false },
+  ];
+  const ctx = new CommandContext(raw as any, ["making", "out"], options as any);
+  expect(ctx.options.getString("prompt")).toBe("making out");
+  expect((ctx.options as any).getChannel("channel")).toBeNull();
+});
+
+it("resolves multi-word string prompt and captures trailing channel mention when provided", () => {
+  const mockChannel = { id: "804902112700923954", name: "general" };
+  const raw = {
+    author: { id: "user" },
+    guild: {
+      channels: {
+        cache: new Map([["804902112700923954", mockChannel]]),
+      },
+    },
+  };
+  const options = [
+    { type: 3, name: "prompt", description: "Prompt", required: true },
+    { type: 7, name: "channel", description: "Channel", required: false },
+  ];
+  const ctx = new CommandContext(raw as any, ["making", "out", "<#804902112700923954>"], options as any);
+  expect(ctx.options.getString("prompt")).toBe("making out");
+  expect((ctx.options as any).getChannel("channel")).toEqual(mockChannel);
+});
