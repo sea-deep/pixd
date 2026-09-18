@@ -33,6 +33,8 @@ export interface MessageCommandData {
   ownerOnly?: boolean;
   /** Limit command to developers only. */
   developerOnly?: boolean;
+  /** Guild IDs where this command is restricted / disabled completely silently. */
+  restrictedGuilds?: string[];
   /** Prefix command argument delimiter (defaults to whitespace " "). */
   argsSeparator?: string | RegExp;
   /** Command execution callback block. */
@@ -59,6 +61,7 @@ export default class MessageCommand {
   public nsfw: boolean;
   public ownerOnly: boolean;
   public developerOnly: boolean;
+  public restrictedGuilds: string[];
   public argsSeparator: string | RegExp;
   public execute: (message: Message, args: string[], client: Client) => any;
   public commandType: "prefix" = "prefix";
@@ -90,6 +93,7 @@ export default class MessageCommand {
     this.nsfw = data.nsfw ?? false;
     this.ownerOnly = data.ownerOnly ?? false;
     this.developerOnly = data.developerOnly ?? false;
+    this.restrictedGuilds = data.restrictedGuilds || [];
     this.argsSeparator = data.argsSeparator ?? " ";
     this.execute = data.execute;
   }

@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import genesisCommand from "../src/HybridCommands/XUV/genesis.js";
 import { AttachmentBuilder, PermissionsBitField } from "discord.js";
 import { setChannelNsfwWhitelist } from "../src/helpers/genesisWhitelist.js";
+import { handleMessageCommandOptions, handleApplicationCommandOptions } from "../src/utilities/CommandOptions.js";
 
 describe("genesis command and channel-aware NSFW filtering", () => {
   const originalFetch = global.fetch;
@@ -204,5 +205,98 @@ describe("genesis command and channel-aware NSFW filtering", () => {
 
     expect(replyMock).toHaveBeenCalledOnce();
     expect(replyMock.mock.calls[0][0].embeds[0].title).toContain("NSFW Whitelist Removed");
+  });
+
+  describe("restricted guild silence enforcement (804902112700923954)", () => {
+    it("silently blocks message command in restricted server via handleMessageCommandOptions", async () => {
+      const replyMock = vi.fn();
+      const message = {
+        author: { id: "user-123" },
+        guildId: "804902112700923954",
+        guild: { id: "804902112700923954" },
+        reply: replyMock,
+      } as any;
+
+      const proceed = await handleMessageCommandOptions(message, genesisCommand);
+      expect(proceed).toBe(false);
+      expect(replyMock).not.toHaveBeenCalled();
+    });
+
+    it("silently blocks slash interaction in restricted server via handleApplicationCommandOptions", async () => {
+      const replyMock = vi.fn();
+      const interaction = {
+        user: { id: "user-123" },
+        guildId: "804902112700923954",
+        guild: { id: "804902112700923954" },
+        reply: replyMock,
+      } as any;
+
+      const proceed = await handleApplicationCommandOptions(interaction, genesisCommand);
+      expect(proceed).toBe(false);
+      expect(replyMock).not.toHaveBeenCalled();
+    });
+
+    it("silently aborts HybridCommand.execute on message even without arguments in restricted server", async () => {
+      const replyMock = vi.fn();
+      const message = {
+        author: { id: "user-123" },
+        guildId: "804902112700923954",
+        guild: { id: "804902112700923954" },
+        channel: { id: "chan-1", sendTyping: vi.fn() },
+        reply: replyMock,
+      } as any;
+
+      // Notice args is empty: in a normal guild this would reply with missing required argument error
+      await genesisCommand.execute(message, [], {} as any);
+      expect(replyMock).not.toHaveBeenCalled();
+    });
+
+    it("silently aborts HybridCommand.execute on interaction without deferring or replying", async () => {
+      const replyMock = vi.fn();
+      const deferReplyMock = vi.fn();
+      const interaction = {
+        isCommand: () => true,
+        user: { id: "user-123" },
+        guildId: "804902112700923954",
+        guild: { id: "804902112700923954" },
+        reply: replyMock,
+        deferReply: deferReplyMock,
+      } as any;
+
+      await genesisCommand.execute(interaction, {} as any);
+      expect(deferReplyMock).not.toHaveBeenCalled();
+      expect(replyMock).not.toHaveBeenCalled();
+    });
+
+    it("silently aborts genesisCommand.run directly if guild is restricted server", async () => {
+      const replyMock = vi.fn();
+      const ctx = {
+        options: {
+          getString: vi.fn().mockReturnValue("cool prompt"),
+        },
+        user: { id: "user-123" },
+        guild: { id: "804902112700923954" },
+        raw: { guildId: "804902112700923954" },
+        reply: replyMock,
+      } as any;
+
+      await genesisCommand.run(ctx, {} as any);
+      expect(replyMock).not.toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it("allows execution in other servers", async () => {
+      const replyMock = vi.fn();
+      const message = {
+        author: { id: "user-123" },
+        guildId: "111222333444555666",
+        guild: { id: "111222333444555666" },
+        reply: replyMock,
+      } as any;
+
+      const proceed = await handleMessageCommandOptions(message, genesisCommand);
+      expect(proceed).toBe(true);
+      expect(replyMock).not.toHaveBeenCalled();
+    });
   });
 });

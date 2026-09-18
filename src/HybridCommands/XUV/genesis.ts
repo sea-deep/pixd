@@ -13,6 +13,7 @@ export default new HybridCommand({
   slashRoute: "xuv genesis",
   description: "Generate an AI image or manage NSFW channel whitelisting.",
   aliases: ["gen"],
+  restrictedGuilds: ["804902112700923954"],
   usage: "<prompt> | whitelist [channel] | unwhitelist [channel]",
   options: [
     {
@@ -29,6 +30,11 @@ export default new HybridCommand({
     },
   ],
   execute: async (ctx) => {
+    const guildId = ctx.guild?.id || (ctx.raw as any)?.guildId;
+    if (guildId === "804902112700923954") {
+      return;
+    }
+
     const rawPrompt = ctx.options.getString("prompt", true)!.trim();
     const lowerPrompt = rawPrompt.toLowerCase();
 

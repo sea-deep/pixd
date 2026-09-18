@@ -42,6 +42,8 @@ export interface HybridCommandData {
     bot?: PermissionResolvable[];
     user?: PermissionResolvable[];
   };
+  /** Guild IDs where this command is restricted / disabled completely silently. */
+  restrictedGuilds?: string[];
   /** Prefix command argument delimiter (defaults to whitespace " "). */
   argsSeparator?: string | RegExp;
   /** Consolidated execution callback block. */
@@ -65,6 +67,7 @@ export default class HybridCommand {
   public nsfw: boolean;
   public ownerOnly: boolean;
   public developerOnly: boolean;
+  public restrictedGuilds: string[];
   public defer: boolean;
   public ephemeral: boolean;
   public permissions: {
@@ -104,6 +107,7 @@ export default class HybridCommand {
     this.nsfw = data.nsfw ?? false;
     this.ownerOnly = data.ownerOnly ?? false;
     this.developerOnly = data.developerOnly ?? false;
+    this.restrictedGuilds = data.restrictedGuilds || [];
     this.defer = data.defer ?? true; // Defaults to true
     this.ephemeral = data.ephemeral ?? false; // Defaults to false
     this.permissions = {
@@ -124,6 +128,11 @@ export default class HybridCommand {
 
     // Under-the-hood standard dispatcher matching legacy handlers expectations
     this.execute = async (interactionOrMessage: Message | RepliableInteraction, ...argsOrClient: any[]): Promise<any> => {
+      const guildId = (interactionOrMessage as any).guildId ?? (interactionOrMessage as any).guild?.id;
+      if (guildId && this.restrictedGuilds.includes(guildId)) {
+        return;
+      }
+
       const isInteraction = (interactionOrMessage as any).isCommand?.() ?? false;
 
       if (isInteraction) {

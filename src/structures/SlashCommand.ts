@@ -23,6 +23,8 @@ export interface SlashCommandOptions {
     bot?: PermissionResolvable[];
     user?: PermissionResolvable[];
   };
+  /** Guild IDs where this command is restricted / disabled completely silently. */
+  restrictedGuilds?: string[];
 }
 
 /**
@@ -46,6 +48,7 @@ export default class SlashCommand {
   public options: SlashCommandOptions;
   public category: string | null;
   public examples: string[];
+  public restrictedGuilds: string[];
   public execute: ((interaction: ChatInputCommandInteraction, client: Client) => any) | null;
   public permissions?: {
     bot?: PermissionResolvable[];
@@ -70,6 +73,7 @@ export default class SlashCommand {
     this.category = this.options.category || null;
     this.examples = this.options.examples || [];
     this.permissions = this.options.permissions || { bot: [], user: [] };
+    this.restrictedGuilds = this.options.restrictedGuilds || [];
 
     if (!this.execute && (!this.data.options || !this.data.options.some((opt: any) => opt.type === 1))) {
       throw new Error(`SlashCommand Schema Validation (${commandName}): 'execute' function is required if there are no subcommands.`);

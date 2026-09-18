@@ -15,6 +15,7 @@ interface CommandSettings {
   guildOnly?: boolean;
   nsfw?: boolean;
   cooldown?: number;
+  restrictedGuilds?: string[];
   permissions?: {
     bot?: PermissionResolvable[];
     user?: PermissionResolvable[];
@@ -32,6 +33,12 @@ export async function handleApplicationCommandOptions(
   command: SlashCommand | HybridCommand | UserContextMenu | MessageContextMenu | any
 ): Promise<boolean> {
   const settings = (command.commandType === "hybrid" ? command : (command.options || {})) as CommandSettings;
+  const restrictedGuilds = command.restrictedGuilds || settings.restrictedGuilds;
+
+  // 0. Restricted Guild Check (silent abort)
+  if (interaction.guildId && restrictedGuilds?.includes(interaction.guildId)) {
+    return false;
+  }
 
   // 1. Owner Check
   if (settings.ownerOnly) {
@@ -144,6 +151,12 @@ export async function handleMessageCommandOptions(
   message: Message,
   command: MessageCommand | HybridCommand
 ): Promise<boolean> {
+  // 0. Restricted Guild Check (silent abort)
+  const restrictedGuilds = (command as any).restrictedGuilds;
+  if (message.guildId && restrictedGuilds?.includes(message.guildId)) {
+    return false;
+  }
+
   // 1. Owner Check
   if (command.ownerOnly) {
     if (message.author.id !== config.users.ownerId) {

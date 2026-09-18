@@ -3,7 +3,7 @@ import HybridCommand from "../structures/HybridCommand.js";
 import config from "../../Configs/config.js";
 import type { ContextReplyOptions } from "../helpers/CommandContext.js";
 
-export interface HelpViewer { userId: string; inGuild: boolean; nsfw?: boolean; mode?: "prefix" | "slash" }
+export interface HelpViewer { userId: string; inGuild: boolean; nsfw?: boolean; mode?: "prefix" | "slash"; guildId?: string }
 interface HelpStyle { label: string; description: string; emoji: string; emojiId?: string }
 // Presentation only: command membership, names, routes and descriptions come from the registry.
 const categories: Record<string, HelpStyle> = {
@@ -30,7 +30,8 @@ export function helpCommands(client: Client, viewer: HelpViewer): HybridCommand[
     .filter(command => command instanceof HybridCommand)
     .filter(command => (!command.ownerOnly || viewer.userId === config.users.ownerId)
       && (!command.developerOnly || config.users.developers.includes(viewer.userId))
-      && (!command.guildOnly || viewer.inGuild) && (!command.nsfw || viewer.nsfw))
+      && (!command.guildOnly || viewer.inGuild) && (!command.nsfw || viewer.nsfw)
+      && (!viewer.guildId || !command.restrictedGuilds?.includes(viewer.guildId)))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -119,6 +120,7 @@ export async function updateHelp(interaction: StringSelectMenuInteraction | Butt
   // Category selection always starts at page one. Page buttons keep the same category.
   const nextPage = interaction.isStringSelectMenu() ? 0 : Number(page ?? 0);
   const payload = buildHelp(client, { userId: interaction.user.id, inGuild: Boolean(interaction.guild), mode,
+    guildId: interaction.guildId ?? interaction.guild?.id ?? undefined,
     nsfw: Boolean(interaction.channel && "nsfw" in interaction.channel && interaction.channel.nsfw),
   }, "", selectedCategory, nextPage);
   await interaction.deferUpdate();
