@@ -133,16 +133,31 @@ describe("LyricsService, lyrics command, and ephemeral button", () => {
   describe("lyrics HybridCommand", () => {
     it("renders a compact preview card with a View Lyrics button instead of a text wall", async () => {
       global.fetch = vi.fn().mockImplementation(async (url: string) => {
-        if (url.includes("lrclib.net/api/search")) {
+        if (url.includes("api.genius.com")) {
           return {
             ok: true,
-            json: async () => [
-              {
-                trackName: "Instant Crush",
-                artistName: "Daft Punk",
-                plainLyrics: "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7",
+            json: async () => ({
+              response: {
+                hits: [
+                  {
+                    result: {
+                      title: "Instant Crush",
+                      primary_artist: { name: "Daft Punk" },
+                      url: "https://genius.com/daft-punk-instant-crush-lyrics",
+                      song_art_image_thumbnail_url: "https://images.genius.com/thumb.png",
+                    },
+                  },
+                ],
               },
-            ],
+            }),
+          };
+        }
+        if (url.includes("lrclib.net/api/get") || url.includes("lrclib.net/api/search")) {
+          return {
+            ok: true,
+            json: async () => ({
+              plainLyrics: "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7",
+            }),
           };
         }
         return { ok: false };
@@ -169,10 +184,13 @@ describe("LyricsService, lyrics command, and ephemeral button", () => {
       expect(replyMock).toHaveBeenCalledOnce();
       const replyArg = replyMock.mock.calls[0][0];
       expect(replyArg.embeds).toBeDefined();
-      expect(replyArg.embeds[0].title).toContain("Instant Crush");
+      expect(replyArg.embeds[0].title).toBe("🎶 Instant Crush");
+      expect(replyArg.embeds[0].url).toBe("https://genius.com/daft-punk-instant-crush-lyrics");
+      expect(replyArg.embeds[0].title).not.toContain("[");
 
-      // Verify it does NOT contain the full lyrics wall (only preview)
-      expect(replyArg.embeds[0].description).toContain("Click the button below to view the full lyrics");
+      // Verify it does NOT contain the full lyrics wall (only preview) and no tooltip
+      expect(replyArg.embeds[0].description).not.toContain("Click the button below");
+      expect(replyArg.embeds[0].description).toContain("> *Line 1*");
       expect(replyArg.embeds[0].description).not.toContain("Line 7");
 
       // Verify button components are attached

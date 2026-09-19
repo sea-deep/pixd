@@ -74,9 +74,10 @@ export default new HybridCommand({
 
     await context.reply({
       embeds: [{
-        title: result.geniusUrl ? `🎶 [${result.title}](${result.geniusUrl})` : `🎶 ${result.title}`,
+        title: `🎶 ${result.title}`,
+        url: result.geniusUrl,
         author: result.artist ? { name: result.artist } : undefined,
-        description: `${previewBlock}\n\n*Click the button below to view the full lyrics.*`,
+        description: previewBlock,
         thumbnail: result.thumbnail ? { url: result.thumbnail } : undefined,
         color: context.raw.client.color,
       }],

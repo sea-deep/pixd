@@ -39,7 +39,8 @@ export default new Component({
       const firstChunk = chunks.shift() || "";
 
       const primaryEmbed = {
-        title: result.geniusUrl ? `🎶 [${result.title}](${result.geniusUrl})` : `🎶 ${result.title}`,
+        title: `🎶 ${result.title}`,
+        url: result.geniusUrl,
         author: result.artist ? { name: result.artist } : undefined,
         description: firstChunk,
         thumbnail: result.thumbnail ? { url: result.thumbnail } : undefined,
