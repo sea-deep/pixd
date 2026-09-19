@@ -1,7 +1,12 @@
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ApplicationCommandOptionType,
+} from "discord.js";
 import HybridCommand from "../../structures/HybridCommand.js";
 import { replyWithError } from "../../services/music/commandHelpers.js";
-import { fetchLyrics } from "../../services/music/LyricsService.js";
+import { cacheLyrics, fetchLyrics } from "../../services/music/LyricsService.js";
 
 export default new HybridCommand({
   name: "lyrics",
@@ -42,21 +47,40 @@ export default new HybridCommand({
       throw new Error(`Lyrics could not be found for "${targetQuery}".`);
     }
 
-    const chunks = result.lyrics.match(/[\s\S]{1,3900}/g) ?? [];
-    const firstChunk = chunks.shift();
+    const cacheId = cacheLyrics(result);
+
+    // Provide a neat 3-4 line preview in blockquotes so chat isn't flooded with a text wall
+    const rawLines = result.lyrics.split("\n").map((l) => l.trim()).filter(Boolean);
+    const previewLines = rawLines.slice(0, 4);
+    const previewBlock = previewLines.map((l) => `> *${l}*`).join("\n");
+
+    const row = new ActionRowBuilder<ButtonBuilder>();
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(`lyrics-view:${cacheId}`)
+        .setLabel("View Lyrics")
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji("📜")
+    );
+
+    if (result.geniusUrl) {
+      row.addComponents(
+        new ButtonBuilder()
+          .setLabel("Genius")
+          .setStyle(ButtonStyle.Link)
+          .setURL(result.geniusUrl)
+      );
+    }
+
     await context.reply({
       embeds: [{
         title: result.geniusUrl ? `🎶 [${result.title}](${result.geniusUrl})` : `🎶 ${result.title}`,
         author: result.artist ? { name: result.artist } : undefined,
-        description: firstChunk,
+        description: `${previewBlock}\n\n*Click the button below to view the full lyrics.*`,
         thumbnail: result.thumbnail ? { url: result.thumbnail } : undefined,
         color: context.raw.client.color,
       }],
+      components: [row],
     });
-    for (const chunk of chunks) {
-      await context.followUp({
-        embeds: [{ description: chunk, color: context.raw.client.color }],
-      });
-    }
   }),
 });
